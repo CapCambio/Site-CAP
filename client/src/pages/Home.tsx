@@ -138,7 +138,7 @@ export default function Home() {
                             )}
                             {(currency.change === null || currency.change === 0) && (
                               <span className="text-sm font-medium text-gray-500">
-                                -
+                                — 0,00%
                               </span>
                             )}
                           </TableCell>
