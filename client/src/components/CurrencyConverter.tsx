@@ -103,13 +103,13 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
   return (
     <div className="bg-black rounded-lg shadow-md p-5 my-6 max-w-3xl mx-auto border-2 border-[#f3b234]">
-      <h2 className="text-xl font-bold text-center mb-5 text-white">Calculadora de Câmbio</h2>
+      <h2 className="text-xl font-bold text-center mb-5 text-[#f3b234]">Calculadora de Câmbio</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
         {/* Campo "Tenho" */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <label htmlFor="amount" className="text-sm font-medium text-gray-700">Tenho</label>
+            <label htmlFor="amount" className="text-sm font-medium text-[#f3b234]">Tenho</label>
             <Select value={fromCurrency} onValueChange={handleFromCurrencyChange}>
               <SelectTrigger className="w-[140px] border-[#f3b234]">
                 <SelectValue placeholder="Selecione" />
@@ -133,7 +133,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               type="text"
               value={amount}
               onChange={handleAmountChange}
-              className="pr-12 text-lg font-medium focus:ring-[#f3b234] focus:border-[#f3b234] text-[#f3b234] bg-black"
+              className="pr-12 text-lg font-medium focus:ring-[#f3b234] focus:border-[#f3b234] text-black bg-white"
               placeholder="0.00"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
@@ -146,7 +146,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         {/* Campo "Troco por" */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <label htmlFor="converted" className="text-sm font-medium text-gray-700">Troco por</label>
+            <label htmlFor="converted" className="text-sm font-medium text-[#f3b234]">Troco por</label>
             <Select 
               value={toCurrency} 
               onValueChange={handleToCurrencyChange}
@@ -185,7 +185,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               type="text"
               value={convertedAmount}
               readOnly
-              className="pr-12 text-lg font-medium bg-black text-[#f3b234]"
+              className="pr-12 text-lg font-medium bg-white text-black"
               placeholder="0.00"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
