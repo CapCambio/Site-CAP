@@ -17,37 +17,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CurrencyLogo } from "../components/CurrencyLogo";
 import { CurrencyCard } from "../components/CurrencyCard";
 
-const CurrencyConverter = ({ currencies }) => {
-  const [haveCurrency, setHaveCurrency] = useState("BRL");
-  const [wantCurrency, setWantCurrency] = useState("BRL");
-
-  const handleHaveCurrencyChange = (event) => {
-    setHaveCurrency(event.target.value);
-    if (event.target.value !== "BRL") {
-      setWantCurrency("BRL");
-    }
-  };
-
-  const availableCurrencies = currencies.map(c => c.code);
-
-  return (
-    <div className="mt-4">
-      <div className="flex gap-4">
-        <select value={haveCurrency} onChange={handleHaveCurrencyChange}>
-          {availableCurrencies.map(currency => (
-            <option key={currency} value={currency}>{currency}</option>
-          ))}
-        </select>
-        <select value={wantCurrency} onChange={e => setWantCurrency(e.target.value)} disabled={haveCurrency !== "BRL"}>
-          {haveCurrency === "BRL" ? availableCurrencies.map(currency => (
-            <option key={currency} value={currency}>{currency}</option>
-          )) : <option value="BRL">BRL</option>}
-        </select>
-      </div>
-    </div>
-  );
-};
-
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("current");
@@ -82,7 +51,6 @@ export default function Home() {
       <Header />
 
       <main className="container mx-auto px-4 pb-12 flex-grow">
-        <CurrencyConverter currencies={currencies} /> {/* Added Currency Converter */}
         {activeTab === "current" && (
           <>
             {isMobile ? (
