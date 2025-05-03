@@ -71,15 +71,15 @@ export default function Home() {
                 )}
               </div>
             ) : (
-              <div className="bg-black rounded-lg shadow-md overflow-hidden text-white">
-                <Table>
+              <div className="bg-black rounded-lg shadow-md overflow-hidden">
+                <Table className="bg-white">
                   <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[250px]">Moeda</TableHead>
-                      <TableHead className="w-[100px]">Código</TableHead>
-                      <TableHead className="text-right">Compra</TableHead>
-                      <TableHead className="text-right">Venda</TableHead>
-                      <TableHead className="text-right">Variação</TableHead>
+                    <TableRow className="border-b-[#000000]">
+                      <TableHead className="w-[250px] text-[#000000]">Moeda</TableHead>
+                      <TableHead className="w-[100px] text-[#000000]">Código</TableHead>
+                      <TableHead className="text-right text-[#000000]">Compra</TableHead>
+                      <TableHead className="text-right text-[#000000]">Venda</TableHead>
+                      <TableHead className="text-right text-[#000000]">Variação</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -106,7 +106,7 @@ export default function Home() {
                     ) : (
                       currencies.map(currency => (
                         <TableRow key={currency.code}>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-[#000000]">
                             <div className="flex items-center gap-3">
                               <CurrencyLogo code={currency.code} />
                               <span>{currency.name}</span>
