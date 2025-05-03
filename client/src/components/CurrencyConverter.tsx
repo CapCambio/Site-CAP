@@ -213,10 +213,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           
           <div className="text-center text-sm mt-3">
             {exchangeRate && (
-              <p className="text-gray-600 font-medium">{exchangeRate}</p>
+              <p className="text-[#f3b234] font-medium">{exchangeRate}</p>
             )}
-            <p className="text-xs mt-1 text-gray-500">
-              <span className="font-medium">Cotação de referência:</span> As taxas aplicadas são baseadas nas cotações da tabela abaixo
+            <p className="text-xs mt-1">
+              <span className="font-medium text-[#f3b234]">Cotação de referência:</span> <span className="text-gray-500">As taxas aplicadas são baseadas nas cotações da tabela abaixo</span>
             </p>
           </div>
         </div>
