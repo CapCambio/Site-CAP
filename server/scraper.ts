@@ -303,6 +303,7 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       { name: "Libra Esterlina", code: "GBP", buyPrice: 7.40, sellPrice: 8.06 },
       { name: "Dólar Australiano", code: "AUD", buyPrice: 3.52, sellPrice: 3.90 },
       { name: "Peso Argentino", code: "ARS", buyPrice: 0.004, sellPrice: 0.006 },
+      { name: "Dólar Neozelandês", code: "NZD", buyPrice: 3.20, sellPrice: 3.56 },
       { name: "Dólar Canadense", code: "CAD", buyPrice: 4.00, sellPrice: 4.38 },
       { name: "Franco Suíço", code: "CHF", buyPrice: 6.50, sellPrice: 7.44 },
       { name: "Peso Uruguaio", code: "UYU", buyPrice: 0.135, sellPrice: 0.17 },
@@ -311,7 +312,8 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       { name: "Peso Colombiano", code: "COP", buyPrice: 0.0014, sellPrice: 0.00185 },
       { name: "Yuan Chinês", code: "CNY", buyPrice: 0.75, sellPrice: 0.90 },
       { name: "Iene Japonês", code: "JPY", buyPrice: 0.032, sellPrice: 0.044 },
-      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.73 }
+      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.73 },
+      { name: "Rand Africano", code: "ZAR", buyPrice: 0.28, sellPrice: 0.349 }
     ];
 
     console.log(`Fallback concluído. Fornecidas ${currencies.length} moedas.`);
@@ -330,6 +332,7 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       { name: "Libra Esterlina", code: "GBP", buyPrice: 7.40, sellPrice: 8.06 },
       { name: "Dólar Australiano", code: "AUD", buyPrice: 3.52, sellPrice: 3.90 },
       { name: "Peso Argentino", code: "ARS", buyPrice: 0.004, sellPrice: 0.006 },
+      { name: "Dólar Neozelandês", code: "NZD", buyPrice: 3.20, sellPrice: 3.56 },
       { name: "Dólar Canadense", code: "CAD", buyPrice: 4.00, sellPrice: 4.38 },
       { name: "Franco Suíço", code: "CHF", buyPrice: 6.50, sellPrice: 7.44 },
       { name: "Peso Uruguaio", code: "UYU", buyPrice: 0.135, sellPrice: 0.17 },
@@ -338,7 +341,8 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       { name: "Peso Colombiano", code: "COP", buyPrice: 0.0014, sellPrice: 0.00185 },
       { name: "Yuan Chinês", code: "CNY", buyPrice: 0.75, sellPrice: 0.90 },
       { name: "Iene Japonês", code: "JPY", buyPrice: 0.032, sellPrice: 0.044 },
-      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.73 }
+      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.73 },
+      { name: "Rand Africano", code: "ZAR", buyPrice: 0.28, sellPrice: 0.349 }
     ];
 
     return currencies;

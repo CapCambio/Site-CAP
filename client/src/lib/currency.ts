@@ -18,6 +18,8 @@ export const currencyFlags: Record<string, string> = {
   PYG: "py",
   BOB: "bo",
   COP: "co",
+  NZD: "nz", // Nova Zelândia
+  ZAR: "za", // África do Sul
 };
 
 // Currency details like full names
@@ -38,6 +40,8 @@ export const currencyDetails: Record<string, { name: string }> = {
   PYG: { name: "Guarani Paraguaio" },
   BOB: { name: "Boliviano" },
   COP: { name: "Peso Colombiano" },
+  NZD: { name: "Dólar Neozelandês" },
+  ZAR: { name: "Rand Africano" },
 };
 
 // Format currency values according to their rules
