@@ -8,7 +8,7 @@ import { formatCurrencyValue, formatPercentage } from "../lib/currency";
 
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { TabNavigation } from "../components/TabNavigation";
+// import { TabNavigation } from "../components/TabNavigation"; //Removed
 import { HistorySelection } from "../components/HistorySelection";
 import { HistoryChart } from "../components/HistoryChart";
 import { HistoryTable } from "../components/HistoryTable";
@@ -52,14 +52,11 @@ export default function Home() {
       <Header />
 
       <main className="container mx-auto px-4 pb-12 flex-grow">
-        <div className="mb-4 flex justify-center">
-          <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
-        </div>
-        
+        {/* Removed TabNavigation */}
         {!isLoadingCurrencies && activeTab === "current" && (
           <CurrencyConverter currencies={currencies} />
         )}
-        
+
         {activeTab === "current" && (
           <>
             {isMobile ? (
