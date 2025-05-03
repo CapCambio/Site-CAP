@@ -41,35 +41,21 @@ export const currencyDetails: Record<string, { name: string }> = {
 };
 
 // Format currency values according to their rules
+// Shows up to 5 decimal places, and remove trailing zeros that don't change the value
 export function formatCurrencyValue(code: string, value: number): string {
-  const locale = 'pt-BR';
+  // Primeiro converte para string com 5 casas decimais
+  let stringValue = value.toFixed(5);
   
-  switch (code) {
-    case 'JPY':
-      // Japanese Yen has no decimal places
-      return value.toLocaleString(locale, { 
-        style: 'decimal',
-        minimumFractionDigits: 3,
-        maximumFractionDigits: 3
-      });
-    
-    case 'CLP':
-    case 'PYG':
-      // Chilean and Paraguayan currencies have no decimal places
-      return value.toLocaleString(locale, { 
-        style: 'decimal',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 
-      });
-      
-    default:
-      // Standard 2 decimal places for most currencies
-      return value.toLocaleString(locale, { 
-        style: 'decimal',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 
-      });
+  // Remove zeros à direita que não alteram o valor
+  stringValue = stringValue.replace(/\.?0+$/, "");
+  
+  // Se terminar com ponto, remove-o
+  if (stringValue.endsWith('.')) {
+    stringValue = stringValue.slice(0, -1);
   }
+  
+  // Converte para formato brasileiro (vírgula como separador decimal)
+  return stringValue.replace('.', ',');
 }
 
 // Format percentage changes

@@ -82,23 +82,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCurrencyHistory(code: string, startDate?: Date, endDate?: Date): Promise<CurrencyHistory[]> {
-    // Constrói a consulta base
-    let query = db
-      .select()
-      .from(currencyHistory)
-      .where(eq(currencyHistory.code, code));
+    // Construa a consulta inicial
+    let query = db.select().from(currencyHistory);
+    
+    // Aplica os filtros um por um
+    const filters = [];
+    filters.push(eq(currencyHistory.code, code));
     
     // Adiciona filtros de data se fornecidos
     if (startDate) {
-      query = query.where(gte(currencyHistory.timestamp, startDate));
+      filters.push(gte(currencyHistory.timestamp, startDate));
     }
     
     if (endDate) {
-      query = query.where(lte(currencyHistory.timestamp, endDate));
+      filters.push(lte(currencyHistory.timestamp, endDate));
     }
     
-    // Ordena por timestamp em ordem decrescente (mais recente primeiro)
-    return await query.orderBy(desc(currencyHistory.timestamp));
+    // Aplica todos os filtros
+    const result = await query.where(and(...filters)).orderBy(desc(currencyHistory.timestamp));
+    
+    return result;
   }
 
   async addCurrencyHistory(insertHistory: InsertCurrencyHistory): Promise<CurrencyHistory> {
@@ -111,23 +114,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async cleanupOldHistory(olderThan: Date): Promise<number> {
-    // Obtém o número de registros antes da limpeza
-    const [{ count: beforeCount }] = await db
-      .select({ count: db.fn.count() })
-      .from(currencyHistory);
-    
-    // Exclui registros mais antigos que a data especificada
-    await db
+    // Implementação mais simples: executar o delete e verificar quantas linhas foram afetadas
+    const result = await db
       .delete(currencyHistory)
-      .where(lte(currencyHistory.timestamp, olderThan));
+      .where(lte(currencyHistory.timestamp, olderThan))
+      .returning();
     
-    // Obtém o número de registros após a limpeza
-    const [{ count: afterCount }] = await db
-      .select({ count: db.fn.count() })
-      .from(currencyHistory);
-    
-    // Retorna a diferença (número de registros excluídos)
-    return Number(beforeCount) - Number(afterCount);
+    // Retorna o número de registros excluídos
+    return result.length;
   }
 }
 
