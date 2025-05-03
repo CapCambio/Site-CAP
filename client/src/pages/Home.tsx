@@ -54,14 +54,15 @@ export default function Home() {
       <main className="container mx-auto px-4 pb-12 flex-grow">
         {/* Removed TabNavigation */}
         {!isLoadingCurrencies && activeTab === "current" && (
-          <div className={isMobile ? "" : "hidden"}>
-            <CurrencyConverter currencies={currencies} />
-          </div>
-        )}
-        {!isLoadingCurrencies && activeTab === "current" && !isMobile && (
-          <div className="my-6 max-w-3xl mx-auto bg-white rounded-lg shadow-md p-5">
-            <h2 className="text-xl font-bold text-[#1a1a1a] text-center mb-5">Calculadora de Câmbio</h2>
-            <CurrencyConverter currencies={currencies} />
+          <div className="my-6 max-w-3xl mx-auto">
+            {isMobile ? (
+              <CurrencyConverter currencies={currencies} />
+            ) : (
+              <div className="bg-white rounded-lg shadow-md p-5">
+                <h2 className="text-xl font-bold text-[#1a1a1a] text-center mb-5">Calculadora de Câmbio</h2>
+                <CurrencyConverter currencies={currencies} />
+              </div>
+            )}
           </div>
         )}
 
