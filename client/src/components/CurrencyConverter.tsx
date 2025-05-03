@@ -108,7 +108,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
         {/* Campo "Tenho" */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
             <label htmlFor="amount" className="text-sm font-medium text-gray-700">Tenho</label>
             <Select value={fromCurrency} onValueChange={handleFromCurrencyChange}>
               <SelectTrigger className="w-[140px] border-[#f3b234]">
@@ -145,7 +145,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         
         {/* Campo "Troco por" */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
             <label htmlFor="converted" className="text-sm font-medium text-gray-700">Troco por</label>
             <Select 
               value={toCurrency} 
