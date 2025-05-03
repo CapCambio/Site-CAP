@@ -43,7 +43,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllCurrencies(): Promise<Currency[]> {
-    return await db.select().from(currencies);
+    // Retorna todas as moedas ordenadas pelo campo displayOrder (ordem exata da página fonte)
+    return await db.select().from(currencies).orderBy(currencies.displayOrder);
   }
 
   async getCurrencyByCode(code: string): Promise<Currency | undefined> {
@@ -64,7 +65,8 @@ export class DatabaseStorage implements IStorage {
           buyPrice: insertCurrency.buyPrice,
           sellPrice: insertCurrency.sellPrice,
           change: insertCurrency.change,
-          lastUpdate: insertCurrency.lastUpdate
+          lastUpdate: insertCurrency.lastUpdate,
+          displayOrder: insertCurrency.displayOrder
         })
         .where(eq(currencies.code, insertCurrency.code))
         .returning();

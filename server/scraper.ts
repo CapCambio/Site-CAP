@@ -353,8 +353,10 @@ export function updateCurrenciesWithScrapedData(
   });
 
   // Atualiza ou cria cada moeda com base nos dados extraídos
-  return scrapedData.map(scraped => {
+  return scrapedData.map((scraped, index) => {
     const existing = currencyMap.get(scraped.code);
+    // Atribui a ordem de exibição baseada na ordem da lista que vem da página fonte
+    const displayOrder = index + 1;
 
     // Se a moeda existir, calcula a variação em relação à cotação anterior
     if (existing) {
@@ -367,7 +369,8 @@ export function updateCurrenciesWithScrapedData(
         buyPrice: scraped.buyPrice,
         sellPrice: scraped.sellPrice,
         change,
-        lastUpdate: now
+        lastUpdate: now,
+        displayOrder // Mantém a ordem da página fonte
       };
     }
 
@@ -379,7 +382,8 @@ export function updateCurrenciesWithScrapedData(
       buyPrice: scraped.buyPrice,
       sellPrice: scraped.sellPrice,
       change: null, // Não há valor anterior para calcular
-      lastUpdate: now
+      lastUpdate: now,
+      displayOrder // Mantém a ordem da página fonte
     };
   });
 }

@@ -25,6 +25,7 @@ export const currencies = pgTable("currencies", {
   sellPrice: doublePrecision("sell_price").notNull(),
   change: doublePrecision("change"),
   lastUpdate: timestamp("last_update").notNull(),
+  displayOrder: integer("display_order").notNull().default(999), // Para manter a ordem exata da página fonte
 });
 
 export const insertCurrencySchema = createInsertSchema(currencies).pick({
@@ -34,6 +35,7 @@ export const insertCurrencySchema = createInsertSchema(currencies).pick({
   sellPrice: true,
   change: true,
   lastUpdate: true,
+  displayOrder: true,
 });
 
 export type InsertCurrency = z.infer<typeof insertCurrencySchema>;
