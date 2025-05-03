@@ -22,6 +22,7 @@ import { CurrencyConverter } from "../components/CurrencyConverter";
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("current");
   const isMobile = useIsMobile();
+  const [showCalculator, setShowCalculator] = useState(false); // Added state for calculator visibility
 
   const { 
     currencies, 
@@ -54,7 +55,24 @@ export default function Home() {
       <main className="container mx-auto px-4 pb-12 flex-grow">
         {/* Removed TabNavigation */}
         {!isLoadingCurrencies && activeTab === "current" && (
-          <CurrencyConverter currencies={currencies} />
+          <div className="my-6 max-w-3xl mx-auto">
+            {isMobile ? (
+              <div>
+                <button 
+                  onClick={() => setShowCalculator(!showCalculator)}
+                  className="w-full bg-white text-[#1a1a1a] py-3 rounded-lg shadow-md font-bold text-xl"
+                >
+                  Calculadora de Câmbio
+                </button>
+                {showCalculator && <CurrencyConverter currencies={currencies} />}
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-md p-5">
+                <h2 className="text-xl font-bold text-[#1a1a1a] text-center mb-5">Calculadora de Câmbio</h2>
+                <CurrencyConverter currencies={currencies} />
+              </div>
+            )}
+          </div>
         )}
 
         {activeTab === "current" && (
