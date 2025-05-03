@@ -57,3 +57,11 @@ export const insertCurrencyHistorySchema = createInsertSchema(currencyHistory).p
 
 export type InsertCurrencyHistory = z.infer<typeof insertCurrencyHistorySchema>;
 export type CurrencyHistory = typeof currencyHistory.$inferSelect;
+
+// Tipo para dados raspados da página fonte
+export interface ScrapedCurrency {
+  name: string;
+  code: string;
+  buyPrice: number;
+  sellPrice: number;
+}
