@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Currency } from '../lib/types';
 import { 
@@ -22,7 +22,7 @@ export function useCurrencyData() {
   } = useQuery({
     queryKey: ['/api/currencies'],
     refetchOnWindowFocus: false,
-    staleTime: 15 * 60 * 1000, // 15 minutes
+    staleTime: 60 * 1000, // 1 minuto (atualização automática a cada minuto)
   });
 
   // Get the formatted last update time
@@ -37,9 +37,12 @@ export function useCurrencyData() {
   };
 
   // Refresh currency data
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     setIsRefreshing(true);
     try {
+      // Uso do endpoint de atualização
+      await fetch('/api/refresh-currencies');
+      // Busca os dados atualizados
       await refetch();
       setLastUpdated(new Date());
     } catch (err) {
@@ -47,7 +50,7 @@ export function useCurrencyData() {
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [refetch]);
 
   // Initialize last updated time
   useEffect(() => {
@@ -61,6 +64,21 @@ export function useCurrencyData() {
       setLastUpdated(mostRecentDate);
     }
   }, [currencies]);
+
+  // Configura a atualização automática a cada minuto
+  useEffect(() => {
+    // Atualiza imediatamente na primeira carga
+    refreshData();
+    
+    // Configura o timer para atualizar a cada minuto
+    const timer = setInterval(() => {
+      console.log('Executando atualização automática...');
+      refreshData();
+    }, 60000); // 1 minuto
+    
+    // Limpa o timer quando o componente é desmontado
+    return () => clearInterval(timer);
+  }, [refreshData]);
 
   return {
     currencies: currencies as Currency[] || [],

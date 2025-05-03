@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
+import { InsertCurrencyHistory } from "../shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes
@@ -59,6 +61,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to add history record" });
     }
   });
+  
+  // Endpoint para forçar um scraping manual dos dados da fonte
+  app.get("/api/refresh-currencies", async (req, res) => {
+    try {
+      const scrapedData = await scrapeCurrencyData();
+      const currentCurrencies = await storage.getAllCurrencies();
+      const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
+      
+      // Atualiza as moedas no storage
+      const savedCurrencies = await Promise.all(
+        updatedCurrencies.map(currency => storage.upsertCurrency(currency))
+      );
+      
+      // Adiciona entradas ao histórico para cada moeda atualizada
+      const now = new Date();
+      await Promise.all(
+        savedCurrencies.map(currency => {
+          const historyEntry: InsertCurrencyHistory = {
+            code: currency.code,
+            buyPrice: currency.buyPrice,
+            sellPrice: currency.sellPrice,
+            timestamp: now
+          };
+          return storage.addCurrencyHistory(historyEntry);
+        })
+      );
+      
+      res.json({
+        message: "Currencies refreshed successfully",
+        count: savedCurrencies.length,
+        currencies: savedCurrencies
+      });
+    } catch (error) {
+      console.error("Error refreshing currencies:", error);
+      res.status(500).json({ 
+        message: "Failed to refresh currencies",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Configura o timer para atualização automática a cada minuto
+  const setupAutoRefresh = async () => {
+    try {
+      console.log("Iniciando primeira atualização de moedas...");
+      const scrapedData = await scrapeCurrencyData();
+      const currentCurrencies = await storage.getAllCurrencies();
+      const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
+      
+      // Atualiza as moedas no storage
+      const savedCurrencies = await Promise.all(
+        updatedCurrencies.map(currency => storage.upsertCurrency(currency))
+      );
+      
+      // Adiciona entradas ao histórico para cada moeda atualizada
+      const now = new Date();
+      await Promise.all(
+        savedCurrencies.map(currency => {
+          const historyEntry: InsertCurrencyHistory = {
+            code: currency.code,
+            buyPrice: currency.buyPrice,
+            sellPrice: currency.sellPrice,
+            timestamp: now
+          };
+          return storage.addCurrencyHistory(historyEntry);
+        })
+      );
+      
+      console.log(`Atualização automática inicial concluída. ${savedCurrencies.length} moedas atualizadas.`);
+    } catch (error) {
+      console.error("Erro na atualização automática inicial:", error);
+    }
+    
+    // Define o intervalo para atualização automática (1 minuto = 60000 ms)
+    setInterval(async () => {
+      try {
+        console.log("Executando atualização automática de moedas...");
+        const scrapedData = await scrapeCurrencyData();
+        const currentCurrencies = await storage.getAllCurrencies();
+        const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
+        
+        // Atualiza as moedas no storage
+        const savedCurrencies = await Promise.all(
+          updatedCurrencies.map(currency => storage.upsertCurrency(currency))
+        );
+        
+        // Adiciona entradas ao histórico para cada moeda atualizada
+        const now = new Date();
+        await Promise.all(
+          savedCurrencies.map(currency => {
+            const historyEntry: InsertCurrencyHistory = {
+              code: currency.code,
+              buyPrice: currency.buyPrice,
+              sellPrice: currency.sellPrice,
+              timestamp: now
+            };
+            return storage.addCurrencyHistory(historyEntry);
+          })
+        );
+        
+        console.log(`Atualização automática concluída. ${savedCurrencies.length} moedas atualizadas.`);
+      } catch (error) {
+        console.error("Erro na atualização automática:", error);
+      }
+    }, 60000); // Atualiza a cada 1 minuto
+  };
+  
+  // Inicia o processo de atualização automática
+  setupAutoRefresh();
 
   const httpServer = createServer(app);
   return httpServer;

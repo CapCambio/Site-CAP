@@ -15,6 +15,9 @@ export const currencyFlags: Record<string, string> = {
   PEN: "pe",
   CLP: "cl",
   MXN: "mx",
+  PYG: "py",
+  BOB: "bo",
+  COP: "co",
 };
 
 // Currency details like full names
@@ -32,6 +35,9 @@ export const currencyDetails: Record<string, { name: string }> = {
   PEN: { name: "Nuevo Sol" },
   CLP: { name: "Peso Chileno" },
   MXN: { name: "Peso Mexicano" },
+  PYG: { name: "Guarani Paraguaio" },
+  BOB: { name: "Boliviano" },
+  COP: { name: "Peso Colombiano" },
 };
 
 // Format currency values according to their rules
