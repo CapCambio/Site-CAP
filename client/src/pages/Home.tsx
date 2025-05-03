@@ -71,7 +71,7 @@ export default function Home() {
                 )}
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="bg-black rounded-lg shadow-md overflow-hidden text-white">
                 <Table>
                   <TableHeader>
                     <TableRow>
