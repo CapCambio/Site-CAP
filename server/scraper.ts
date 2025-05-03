@@ -1,15 +1,15 @@
 import { Currency, ScrapedCurrency } from '../shared/schema';
 import fetch from 'node-fetch';
-import { JSDOM } from 'jsdom';
+import * as cheerio from 'cheerio';
 
 // URL da fonte de dados
 const SOURCE_URL = 'https://ctrcambio.com.br/tvcaxias/';
 
 /**
- * Função para extrair os dados de câmbio da página fonte usando fetch e jsdom
+ * Função para extrair dados de câmbio usando Cheerio
  */
 export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
-  console.log('Iniciando extração de dados de moedas da página fonte...');
+  console.log('Iniciando extração de dados com Cheerio...');
   
   try {
     // Tenta buscar a página fonte
@@ -24,156 +24,261 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
     }
     
     const html = await response.text();
-    const dom = new JSDOM(html);
-    const document = dom.window.document;
+    const $ = cheerio.load(html);
     
-    // Tenta encontrar os elementos de cotação na página
-    const cotacaoElements = document.querySelectorAll('.cotacao-inner');
+    console.log('Página carregada, analisando conteúdo...');
     
-    // Depuração - procura por outros elementos que possam conter os dados
-    // Mostra informações sobre a estrutura da página para ajudar a identificar os seletores corretos
-    console.log('Depuração da estrutura HTML:');
+    // Depuração básica da estrutura da página
+    console.log(`Título da página: ${$('title').text()}`);
+    console.log(`Número de tabelas: ${$('table').length}`);
     
-    // Procura por tabelas
-    const tables = document.querySelectorAll('table');
-    console.log(`- Encontradas ${tables.length} tabelas`);
-    
-    // Procura por divs que possam conter informações de cotações
-    const divs = document.querySelectorAll('div[class*="cotacao"], div[class*="moeda"], div[class*="cambio"], div[class*="currency"]');
-    console.log(`- Encontradas ${divs.length} divs potenciais com cotações`);
-    
-    // Procura por elementos que mencionam códigos de moedas conhecidos
-    const currencyTexts = Array.from(document.querySelectorAll('*')).filter((el: Element) => {
-      const text = el.textContent || '';
-      return text.includes('USD') || text.includes('EUR') || text.includes('Dólar');
-    });
-    console.log(`- Encontrados ${currencyTexts.length} elementos com menções a moedas`);
-    
-    // Tenta analisar a tabela (já que detectamos uma tabela na página)
-    if (tables.length > 0) {
-      console.log('Analisando a tabela encontrada:');
-      const table = tables[0];
+    // Analisando as tabelas
+    if ($('table').length > 0) {
+      console.log('Analisando tabelas...');
       
-      // Verifica as linhas da tabela
-      const rows = table.querySelectorAll('tr');
-      console.log(`- A tabela tem ${rows.length} linhas`);
-      
-      if (rows.length > 0) {
-        // Amostra do conteúdo da primeira linha
-        const firstRow = rows[0];
-        console.log(`- Primeira linha: ${firstRow.textContent?.trim().substring(0, 100)}...`);
-        
-        // Verifica células
-        const cells = firstRow.querySelectorAll('td, th');
-        console.log(`- A primeira linha tem ${cells.length} células`);
-        
-        if (cells.length > 0) {
-          // Amostra do conteúdo da primeira célula
-          console.log(`- Primeira célula: ${cells[0].textContent?.trim()}`);
-        }
-        
-        // Tenta um método alternativo de extração baseado na tabela
-        try {
-          const extractedCurrencies = extractCurrenciesFromTable(table);
-          if (extractedCurrencies.length > 0) {
-            console.log(`Extração via tabela bem-sucedida. Encontradas ${extractedCurrencies.length} moedas.`);
-            return extractedCurrencies;
-          }
-        } catch (err) {
-          console.error('Erro ao tentar extrair da tabela:', err);
-        }
-      }
-    }
-    
-    // Tenta encontrar a estrutura exata do site
-    if (currencyTexts.length > 0) {
-      console.log('Exemplo de elemento com menção a moeda:');
-      const sampleElement = currencyTexts[0];
-      console.log(`- Tag: ${sampleElement.tagName}`);
-      console.log(`- Classes: ${sampleElement.className}`);
-      console.log(`- ID: ${sampleElement.id}`);
-      console.log(`- Texto: ${sampleElement.textContent?.substring(0, 100)}...`);
-      
-      // Tenta encontrar o elemento pai que contém a estrutura completa
-      let parent = sampleElement.parentElement;
-      for (let i = 0; i < 5 && parent; i++) {  // Verifica até 5 níveis acima
-        console.log(`- Pai ${i+1}: ${parent.tagName}, Classes: ${parent.className}`);
-        parent = parent.parentElement;
-      }
-    }
-    
-    // Se encontrou os elementos de cotação, extrai os dados
-    if (cotacaoElements && cotacaoElements.length > 0) {
-      console.log(`Encontrados ${cotacaoElements.length} elementos de cotação na página.`);
-      
+      // Tentando extrair cotações de tabelas
       const results: ScrapedCurrency[] = [];
+      let tableFound = false;
       
-      cotacaoElements.forEach((element: Element, index: number) => {
-        try {
-          // Extrai nome e código da moeda
-          const titleElement = element.querySelector('.cotacao-title');
-          if (!titleElement) {
-            console.log(`Elemento ${index}: Não encontrou .cotacao-title`);
-            return;
-          }
+      $('table').each((tableIndex, tableElement) => {
+        console.log(`Analisando tabela ${tableIndex + 1}:`);
+        
+        // Verifica o número de linhas da tabela
+        const rows = $(tableElement).find('tr');
+        console.log(`- Tabela ${tableIndex + 1} tem ${rows.length} linhas`);
+        
+        // Verifica estrutura da primeira linha (cabeçalho potencial)
+        if (rows.length > 0) {
+          const headerTexts: string[] = [];
+          $(rows[0]).find('th, td').each((i, cell) => {
+            headerTexts.push($(cell).text().trim());
+          });
+          console.log(`- Cabeçalhos potenciais: ${headerTexts.join(' | ')}`);
           
-          const titleText = titleElement.textContent?.trim() || '';
-          console.log(`Elemento ${index}: Título encontrado: "${titleText}"`);
-          
-          // O formato esperado é algo como "Dólar Americano (USD)"
-          const match = titleText.match(/(.+)\s+\(([A-Z]{3})\)/);
-          if (!match) {
-            console.log(`Elemento ${index}: Não conseguiu extrair código da moeda de "${titleText}"`);
-            return;
-          }
-          
-          const name = match[1].trim();
-          const code = match[2].trim();
-          
-          // Extrai valores de compra e venda
-          const compraElement = element.querySelector('.cotacao-compra .cotacao-valor');
-          const vendaElement = element.querySelector('.cotacao-venda .cotacao-valor');
-          
-          if (!compraElement || !vendaElement) {
-            console.log(`Elemento ${index}: Não encontrou elementos de compra/venda`);
-            return;
-          }
-          
-          // Converte os valores para números
-          const compraText = compraElement.textContent?.trim().replace(',', '.') || '0';
-          const vendaText = vendaElement.textContent?.trim().replace(',', '.') || '0';
-          
-          console.log(`Elemento ${index}: Valores extraídos - Compra: ${compraText}, Venda: ${vendaText}`);
-          
-          const buyPrice = parseFloat(compraText);
-          const sellPrice = parseFloat(vendaText);
-          
-          // Adiciona à lista apenas se os valores foram extraídos com sucesso
-          if (!isNaN(buyPrice) && !isNaN(sellPrice)) {
-            results.push({
-              name,
-              code,
-              buyPrice,
-              sellPrice
+          // Se a primeira linha tem conteúdo que indicam ser uma tabela de cotações
+          const headerText = headerTexts.join(' ').toLowerCase();
+          if (
+            headerText.includes('moeda') || 
+            headerText.includes('valor') || 
+            headerText.includes('compra') || 
+            headerText.includes('venda') ||
+            headerText.includes('câmbio') ||
+            headerText.includes('cotação')
+          ) {
+            console.log('Tabela de cotações encontrada!');
+            tableFound = true;
+            
+            // Definindo índices das colunas relevantes (nome/código, compra, venda)
+            let nameIndex = -1;
+            let buyIndex = -1;
+            let sellIndex = -1;
+            
+            // Identifica índices das colunas relevantes pelo cabeçalho
+            headerTexts.forEach((text, index) => {
+              const lowerText = text.toLowerCase();
+              if (lowerText.includes('moeda') || lowerText.includes('descrição') || lowerText.includes('nome')) {
+                nameIndex = index;
+              } else if (lowerText.includes('compra')) {
+                buyIndex = index;
+              } else if (lowerText.includes('venda')) {
+                sellIndex = index;
+              }
             });
-          } else {
-            console.log(`Elemento ${index}: Valores inválidos após conversão`);
+            
+            // Se não conseguiu determinar pelos cabeçalhos, assume os índices padrão (0, 1, 2)
+            if (nameIndex === -1 || buyIndex === -1 || sellIndex === -1) {
+              console.log('Usando índices padrão para as colunas (moeda: 0, compra: 1, venda: 2)');
+              nameIndex = 0;
+              buyIndex = 1;
+              sellIndex = 2;
+            }
+            
+            // Para cada linha após o cabeçalho
+            $(rows).each((rowIndex, row) => {
+              // Pula o cabeçalho
+              if (rowIndex === 0 && headerTexts.some(h => h.toLowerCase().includes('moeda') || h.toLowerCase().includes('compra'))) {
+                return; // Equivalente a continue no loop each do jQuery
+              }
+              
+              const cells = $(row).find('td');
+              
+              // Verifica se tem células suficientes
+              if (cells.length < Math.max(nameIndex, buyIndex, sellIndex) + 1) {
+                return;
+              }
+              
+              try {
+                // Extrai o conteúdo de cada célula relevante
+                const nameText = $(cells[nameIndex]).text().trim();
+                const buyText = $(cells[buyIndex]).text().trim().replace('R$', '').replace(',', '.').trim();
+                const sellText = $(cells[sellIndex]).text().trim().replace('R$', '').replace(',', '.').trim();
+                
+                console.log(`Linha ${rowIndex}: "${nameText}" | "${buyText}" | "${sellText}"`);
+                
+                // Tentar extrair o código da moeda e nome
+                let code = '';
+                let name = nameText;
+                
+                // Formato: "Nome Moeda (XXX)" - extrai o código entre parênteses
+                const codeMatch = nameText.match(/\(([A-Z]{3})\)/);
+                if (codeMatch) {
+                  code = codeMatch[1];
+                  name = nameText.replace(/\s*\([A-Z]{3}\)/, '').trim();
+                } 
+                // Formato: "XXX - Nome da Moeda" - extrai o código no início
+                else if (nameText.match(/^[A-Z]{3}\s*[-–—]\s*.+/)) {
+                  const parts = nameText.split(/[-–—]/);
+                  code = parts[0].trim();
+                  name = parts.slice(1).join('-').trim();
+                }
+                // Formato: "Nome da Moeda - XXX" - extrai o código no final
+                else if (nameText.match(/.+\s*[-–—]\s*[A-Z]{3}$/)) {
+                  const parts = nameText.split(/[-–—]/);
+                  code = parts[parts.length - 1].trim();
+                  name = parts.slice(0, -1).join('-').trim();
+                }
+                // Verifica se o texto é apenas o código
+                else if (/^[A-Z]{3}$/.test(nameText)) {
+                  code = nameText;
+                  
+                  // Mapeamento de códigos para nomes
+                  const codeToName: Record<string, string> = {
+                    'USD': 'Dólar Americano',
+                    'EUR': 'Euro',
+                    'GBP': 'Libra Esterlina',
+                    'CAD': 'Dólar Canadense',
+                    'AUD': 'Dólar Australiano',
+                    'ARS': 'Peso Argentino',
+                    'CLP': 'Peso Chileno',
+                    'UYU': 'Peso Uruguaio',
+                    'CHF': 'Franco Suíço',
+                    'JPY': 'Iene Japonês',
+                    'CNY': 'Yuan Chinês',
+                    'MXN': 'Peso Mexicano',
+                    'PYG': 'Guarani Paraguaio',
+                    'PEN': 'Novo Sol Peruano',
+                    'BOB': 'Boliviano',
+                    'COP': 'Peso Colombiano'
+                  };
+                  
+                  name = codeToName[code] || code;
+                }
+                // Tentativa de extrair por palavras-chave conhecidas
+                else {
+                  const lowerName = nameText.toLowerCase();
+                  
+                  if (lowerName.includes('dólar') || lowerName.includes('dolar')) {
+                    if (lowerName.includes('australiano') || lowerName.includes('aud')) {
+                      code = 'AUD';
+                      name = 'Dólar Australiano';
+                    } else if (lowerName.includes('canadense') || lowerName.includes('cad')) {
+                      code = 'CAD';
+                      name = 'Dólar Canadense';
+                    } else {
+                      code = 'USD';
+                      name = 'Dólar Americano';
+                    }
+                  } else if (lowerName.includes('euro')) {
+                    code = 'EUR';
+                    name = 'Euro';
+                  } else if (lowerName.includes('libra')) {
+                    code = 'GBP';
+                    name = 'Libra Esterlina';
+                  } else if (lowerName.includes('iene') || lowerName.includes('japones') || lowerName.includes('japonês')) {
+                    code = 'JPY';
+                    name = 'Iene Japonês';
+                  } else if (lowerName.includes('yuan') || lowerName.includes('chines') || lowerName.includes('chinês')) {
+                    code = 'CNY';
+                    name = 'Yuan Chinês';
+                  } else if (lowerName.includes('peso')) {
+                    if (lowerName.includes('argentino') || lowerName.includes('arg')) {
+                      code = 'ARS';
+                      name = 'Peso Argentino';
+                    } else if (lowerName.includes('chileno') || lowerName.includes('chile')) {
+                      code = 'CLP';
+                      name = 'Peso Chileno';
+                    } else if (lowerName.includes('uruguaio') || lowerName.includes('uruguai')) {
+                      code = 'UYU';
+                      name = 'Peso Uruguaio';
+                    } else if (lowerName.includes('mexicano') || lowerName.includes('mexico')) {
+                      code = 'MXN';
+                      name = 'Peso Mexicano';
+                    } else if (lowerName.includes('colombiano') || lowerName.includes('colombia')) {
+                      code = 'COP';
+                      name = 'Peso Colombiano';
+                    }
+                  } else if (lowerName.includes('franco') || lowerName.includes('suiço') || lowerName.includes('suíço')) {
+                    code = 'CHF';
+                    name = 'Franco Suíço';
+                  } else if (lowerName.includes('guarani') || lowerName.includes('paraguaio')) {
+                    code = 'PYG';
+                    name = 'Guarani Paraguaio';
+                  } else if (lowerName.includes('sol') || lowerName.includes('peruano')) {
+                    code = 'PEN';
+                    name = 'Novo Sol Peruano';
+                  } else if (lowerName.includes('boliviano') || lowerName.includes('bolivia')) {
+                    code = 'BOB';
+                    name = 'Boliviano';
+                  }
+                }
+                
+                // Se conseguiu extrair um código
+                if (code) {
+                  // Converte os textos para valores numéricos
+                  const buyPrice = parseFloat(buyText);
+                  const sellPrice = parseFloat(sellText);
+                  
+                  // Adiciona à lista somente se os valores são válidos
+                  if (!isNaN(buyPrice) && !isNaN(sellPrice) && buyPrice > 0 && sellPrice > 0) {
+                    console.log(`Extraído: ${name} (${code}), Compra: ${buyPrice}, Venda: ${sellPrice}`);
+                    
+                    results.push({
+                      name,
+                      code,
+                      buyPrice,
+                      sellPrice
+                    });
+                  } else {
+                    console.log(`Valores inválidos: Compra: ${buyText}/${buyPrice}, Venda: ${sellText}/${sellPrice}`);
+                  }
+                } else {
+                  console.log(`Não foi possível extrair o código da moeda: ${nameText}`);
+                }
+              } catch (err) {
+                console.error(`Erro ao processar linha ${rowIndex}:`, err);
+              }
+            });
           }
-        } catch (err) {
-          console.log(`Erro ao processar elemento ${index}:`, err);
         }
       });
       
-      if (results.length > 0) {
+      // Se encontrou moedas na tabela
+      if (tableFound && results.length > 0) {
         console.log(`Extração concluída. Encontradas ${results.length} moedas.`);
         return results;
       }
-    } else {
-      console.log('Não foram encontrados elementos de cotação na página.');
     }
     
-    // Em caso de falha na extração, usa valores de fallback com pequenas variações
-    console.log('Usando dados de fallback para simulação temporária.');
+    // Tenta outros métodos se a análise de tabela falhou
+    console.log('Tentando extrair moedas de outros elementos...');
+    
+    // Se não encontrou dados na tabela, procura por elementos específicos com palavras-chave
+    const currencyElements = $('div:contains("USD"), div:contains("EUR"), span:contains("USD"), span:contains("EUR")');
+    console.log(`Encontrados ${currencyElements.length} elementos com menções a moedas.`);
+    
+    if (currencyElements.length > 0) {
+      console.log('Analisando elementos com menções a moedas...');
+      
+      // Tenta extrair mais informações para depuração
+      currencyElements.each((i, element) => {
+        if (i < 5) { // Limita a análise para não sobrecarregar os logs
+          console.log(`Elemento ${i}: ${$(element).text().trim().substring(0, 100)}...`);
+        }
+      });
+    }
+    
+    // Se nenhum método funcionou, usa os dados de fallback
+    console.log('Não foi possível extrair os dados da página. Usando dados de fallback para simulação temporária.');
     
     // Gera pequenas variações nos valores para simular mudanças de mercado
     const variation = () => (Math.random() * 0.02) - 0.01; // -1% a +1%
@@ -231,105 +336,6 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
     
     return currencies;
   }
-}
-
-/**
- * Função para extrair cotações da tabela da página
- */
-function extractCurrenciesFromTable(table: Element): ScrapedCurrency[] {
-  const results: ScrapedCurrency[] = [];
-  const rows = table.querySelectorAll('tr');
-  
-  // Pula a primeira linha se for cabeçalho
-  const startIdx = rows[0].querySelector('th') ? 1 : 0;
-  
-  for (let i = startIdx; i < rows.length; i++) {
-    const row = rows[i];
-    const cells = row.querySelectorAll('td');
-    
-    // Verifica se temos células suficientes
-    if (cells.length < 3) continue;
-    
-    try {
-      // Tenta extrair informações das células
-      // Assume formato: [Nome da Moeda (Código)] [Compra] [Venda]
-      const nameCell = cells[0];
-      const buyCell = cells[1];
-      const sellCell = cells[2];
-      
-      if (!nameCell || !buyCell || !sellCell) continue;
-      
-      const nameText = nameCell.textContent?.trim() || '';
-      console.log(`Analisando linha ${i}, texto: ${nameText}`);
-      
-      // Extrai o código da moeda - assume formato "Nome Moeda (XXX)" ou apenas "XXX"
-      let name = nameText;
-      let code = '';
-      
-      // Tenta encontrar o código no formato "Nome (XXX)"
-      const codeMatch = nameText.match(/\(([A-Z]{3})\)/);
-      if (codeMatch) {
-        code = codeMatch[1];
-        name = nameText.replace(/\s*\([A-Z]{3}\)/, '').trim();
-      } else {
-        // Tenta encontrar o código no formato "XXX" (apenas o código)
-        if (/^[A-Z]{3}$/.test(nameText)) {
-          code = nameText;
-          
-          // Associa códigos comuns aos seus nomes
-          const codeToName: {[key: string]: string} = {
-            'USD': 'Dólar Americano',
-            'EUR': 'Euro',
-            'GBP': 'Libra Esterlina',
-            'CAD': 'Dólar Canadense',
-            'AUD': 'Dólar Australiano',
-            'ARS': 'Peso Argentino',
-            'CLP': 'Peso Chileno',
-            'UYU': 'Peso Uruguaio',
-            'CHF': 'Franco Suíço',
-            'JPY': 'Iene Japonês',
-            'CNY': 'Yuan Chinês',
-            'MXN': 'Peso Mexicano',
-            'PYG': 'Guarani Paraguaio',
-            'PEN': 'Novo Sol Peruano',
-            'BOB': 'Boliviano',
-            'COP': 'Peso Colombiano'
-          };
-          
-          name = codeToName[code] || code;
-        } else {
-          console.log(`Linha ${i}: Não foi possível extrair o código da moeda`);
-          continue;
-        }
-      }
-      
-      // Extrai e converte os valores para números
-      const buyText = buyCell.textContent?.trim().replace(',', '.').replace('R$', '').trim() || '0';
-      const sellText = sellCell.textContent?.trim().replace(',', '.').replace('R$', '').trim() || '0';
-      
-      const buyPrice = parseFloat(buyText);
-      const sellPrice = parseFloat(sellText);
-      
-      if (isNaN(buyPrice) || isNaN(sellPrice)) {
-        console.log(`Linha ${i}: Valores inválidos - Compra: ${buyText}, Venda: ${sellText}`);
-        continue;
-      }
-      
-      console.log(`Linha ${i} - Extraído: ${name} (${code}), Compra: ${buyPrice}, Venda: ${sellPrice}`);
-      
-      // Adiciona à lista de resultados
-      results.push({
-        name,
-        code,
-        buyPrice,
-        sellPrice
-      });
-    } catch (err) {
-      console.error(`Erro ao processar linha ${i}:`, err);
-    }
-  }
-  
-  return results;
 }
 
 /**
