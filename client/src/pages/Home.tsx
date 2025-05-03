@@ -174,9 +174,6 @@ export default function Home() {
           </div>
         )}
       </main>
-      
-      <Footer />
-      
       <LoadingOverlay isVisible={isRefreshing} />
     </div>
   );
