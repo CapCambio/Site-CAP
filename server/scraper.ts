@@ -112,7 +112,8 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
                 const nameText = $(cells[nameIndex]).text().trim();
                 const buyText = $(cells[buyIndex]).text().trim().replace('R$', '').replace(',', '.').trim();
                 const sellText = $(cells[sellIndex]).text().trim().replace('R$', '').replace(',', '.').trim();
-
+                
+                // Log para debug - mostrar linha e conteúdo exato extraído
                 console.log(`Linha ${rowIndex}: "${nameText}" | "${buyText}" | "${sellText}"`);
 
                 // Tentar extrair o código da moeda e nome
@@ -174,6 +175,9 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
                     } else if (lowerName.includes('canadense') || lowerName.includes('cad')) {
                       code = 'CAD';
                       name = 'Dólar Canadense';
+                    } else if (lowerName.includes('neozelandês') || lowerName.includes('neozelandes') || lowerName.includes('nzd')) {
+                      code = 'NZD';
+                      name = 'Dólar Neozelandês';
                     } else {
                       code = 'USD';
                       name = 'Dólar Americano';
@@ -219,9 +223,21 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
                   } else if (lowerName.includes('boliviano') || lowerName.includes('bolivia')) {
                     code = 'BOB';
                     name = 'Boliviano';
+                  } else if (lowerName.includes('rand') || lowerName.includes('africano') || lowerName.includes('áfrica') || lowerName.includes('africa')) {
+                    code = 'ZAR';
+                    name = 'Rand Africano';
                   }
                 }
 
+                // Tratamento específico para moedas que precisam de corrções manuais
+                if (rowIndex === 6 && nameText.includes("Neozelandês")) {
+                  code = "NZD";
+                  name = "Dólar Neozelandês";
+                } else if (rowIndex === 16 && nameText.includes("Rand")) {
+                  code = "ZAR";
+                  name = "Rand Africano";
+                }
+                
                 // Se conseguiu extrair um código
                 if (code) {
                   // Converte os textos para valores numéricos
