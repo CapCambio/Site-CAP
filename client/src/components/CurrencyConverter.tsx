@@ -5,6 +5,7 @@ import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { formatCurrencyValue } from '../lib/currency';
 import { Currency } from '../lib/types';
+import { CurrencyLogo } from './CurrencyLogo';
 
 interface CurrencyConverterProps {
   currencies: Currency[];
@@ -16,7 +17,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const [amount, setAmount] = useState('');
   const [convertedAmount, setConvertedAmount] = useState('');
 
-  // Add BRL to the list of currencies
   const allCurrencies = [
     { name: 'Real Brasileiro', code: 'BRL', buyPrice: 1, sellPrice: 1 },
     ...currencies
@@ -28,13 +28,11 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       const value = parseFloat(amount);
 
       if (fromCurrency === 'BRL') {
-        // Converting from BRL to foreign currency
         const targetCurrency = currencies.find(c => c.code === toCurrency);
         if (targetCurrency) {
           result = value / targetCurrency.sellPrice;
         }
       } else {
-        // Converting from foreign currency to BRL
         const sourceCurrency = currencies.find(c => c.code === fromCurrency);
         if (sourceCurrency) {
           result = value * sourceCurrency.buyPrice;
@@ -47,7 +45,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     }
   }, [amount, fromCurrency, toCurrency, currencies]);
 
-  // Handle currency selection changes
   const handleFromCurrencyChange = (value: string) => {
     setFromCurrency(value);
     if (value !== 'BRL') {
@@ -55,57 +52,71 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     }
   };
 
-  const handleToCurrencyChange = (value: string) => {
-    setToCurrency(value);
-  };
-
   return (
-    <Card className="p-4 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Tenho</label>
-          <div className="flex gap-2">
+    <Card className="p-6 mb-8 bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a]">
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-4">
+          <label className="block text-lg font-semibold text-white mb-2">Tenho</label>
+          <div className="flex gap-3">
             <Select value={fromCurrency} onValueChange={handleFromCurrencyChange}>
-              <SelectTrigger>
-                <SelectValue />
+              <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white">
+                <div className="flex items-center gap-2">
+                  <CurrencyLogo code={fromCurrency} />
+                  <SelectValue />
+                </div>
               </SelectTrigger>
               <SelectContent>
                 {allCurrencies.map(currency => (
                   <SelectItem key={currency.code} value={currency.code}>
-                    {currency.code} - {currency.name}
+                    <div className="flex items-center gap-2">
+                      <CurrencyLogo code={currency.code} />
+                      {currency.code} - {currency.name}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Input
               type="number"
-              placeholder="Valor"
+              placeholder="0,00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
+              className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50"
             />
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Troco por</label>
-          <div className="flex gap-2">
+        <div className="space-y-4">
+          <label className="block text-lg font-semibold text-white mb-2">Troco por</label>
+          <div className="flex gap-3">
             <Select 
               value={toCurrency} 
-              onValueChange={handleToCurrencyChange}
+              onValueChange={setToCurrency}
               disabled={fromCurrency !== 'BRL'}
             >
-              <SelectTrigger>
-                <SelectValue />
+              <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white">
+                <div className="flex items-center gap-2">
+                  <CurrencyLogo code={toCurrency} />
+                  <SelectValue />
+                </div>
               </SelectTrigger>
               <SelectContent>
                 {fromCurrency === 'BRL' ? (
                   currencies.map(currency => (
                     <SelectItem key={currency.code} value={currency.code}>
-                      {currency.code} - {currency.name}
+                      <div className="flex items-center gap-2">
+                        <CurrencyLogo code={currency.code} />
+                        {currency.code} - {currency.name}
+                      </div>
                     </SelectItem>
                   ))
                 ) : (
-                  <SelectItem value="BRL">BRL - Real Brasileiro</SelectItem>
+                  <SelectItem value="BRL">
+                    <div className="flex items-center gap-2">
+                      <CurrencyLogo code="BRL" />
+                      BRL - Real Brasileiro
+                    </div>
+                  </SelectItem>
                 )}
               </SelectContent>
             </Select>
@@ -113,7 +124,8 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               type="text"
               readOnly
               value={convertedAmount}
-              placeholder="Valor convertido"
+              placeholder="0,00"
+              className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50"
             />
           </div>
         </div>
