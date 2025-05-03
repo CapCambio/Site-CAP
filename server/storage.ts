@@ -4,6 +4,8 @@ import {
   type Currency, type InsertCurrency,
   type CurrencyHistory, type InsertCurrencyHistory
 } from "@shared/schema";
+import { db } from './db';
+import { eq, and, gte, lte, desc } from 'drizzle-orm';
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -21,170 +23,112 @@ export interface IStorage {
   cleanupOldHistory(olderThan: Date): Promise<number>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private currenciesMap: Map<string, Currency>;
-  private currencyHistoryList: CurrencyHistory[];
-  private userId: number;
-  private currencyId: number;
-  private historyId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.currenciesMap = new Map();
-    this.currencyHistoryList = [];
-    this.userId = 1;
-    this.currencyId = 1;
-    this.historyId = 1;
-
-    // Initialize with some default currencies
-    this.initializeDefaultCurrencies();
-  }
-
-  private initializeDefaultCurrencies() {
-    const defaultCurrencies: InsertCurrency[] = [
-      {
-        name: "Dólar Americano",
-        code: "USD",
-        buyPrice: 5.25,
-        sellPrice: 5.45,
-        change: 0.42,
-        lastUpdate: new Date()
-      },
-      {
-        name: "Euro",
-        code: "EUR",
-        buyPrice: 5.75,
-        sellPrice: 5.95,
-        change: -0.18,
-        lastUpdate: new Date()
-      },
-      {
-        name: "Libra Esterlina",
-        code: "GBP",
-        buyPrice: 6.65,
-        sellPrice: 6.85,
-        change: 0.35,
-        lastUpdate: new Date()
-      },
-      {
-        name: "Dólar Canadense",
-        code: "CAD",
-        buyPrice: 3.85,
-        sellPrice: 4.05,
-        change: 0.22,
-        lastUpdate: new Date()
-      },
-      {
-        name: "Dólar Australiano",
-        code: "AUD",
-        buyPrice: 3.45,
-        sellPrice: 3.65,
-        change: -0.15,
-        lastUpdate: new Date()
-      },
-      {
-        name: "Iene",
-        code: "JPY",
-        buyPrice: 0.035,
-        sellPrice: 0.037,
-        change: 0.17,
-        lastUpdate: new Date()
-      }
-    ];
-
-    defaultCurrencies.forEach(currency => {
-      this.upsertCurrency(currency);
-    });
-
-    // Add some historical data
-    const today = new Date();
-    for (let i = 0; i < 30; i++) {
-      const date = new Date();
-      date.setDate(today.getDate() - i);
-      
-      defaultCurrencies.forEach(currency => {
-        // Add small random variations for historical data
-        const randomChange = (Math.random() * 0.4 - 0.2) / 100;
-        const historicalEntry: InsertCurrencyHistory = {
-          code: currency.code,
-          buyPrice: currency.buyPrice * (1 + (i === 0 ? 0 : randomChange)),
-          sellPrice: currency.sellPrice * (1 + (i === 0 ? 0 : randomChange)),
-          timestamp: date
-        };
-        this.addCurrencyHistory(historicalEntry);
-      });
-    }
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async getAllCurrencies(): Promise<Currency[]> {
-    return Array.from(this.currenciesMap.values());
+    return await db.select().from(currencies);
   }
 
   async getCurrencyByCode(code: string): Promise<Currency | undefined> {
-    return this.currenciesMap.get(code);
+    const [currency] = await db.select().from(currencies).where(eq(currencies.code, code));
+    return currency || undefined;
   }
 
   async upsertCurrency(insertCurrency: InsertCurrency): Promise<Currency> {
+    // Tenta encontrar a moeda existente
     const existingCurrency = await this.getCurrencyByCode(insertCurrency.code);
-    let currency: Currency;
-
+    
     if (existingCurrency) {
-      currency = {
-        ...existingCurrency,
-        ...insertCurrency,
-      };
+      // Atualiza a moeda existente
+      const [updatedCurrency] = await db
+        .update(currencies)
+        .set({
+          name: insertCurrency.name,
+          buyPrice: insertCurrency.buyPrice,
+          sellPrice: insertCurrency.sellPrice,
+          change: insertCurrency.change,
+          lastUpdate: insertCurrency.lastUpdate
+        })
+        .where(eq(currencies.code, insertCurrency.code))
+        .returning();
+      
+      return updatedCurrency;
     } else {
-      const id = this.currencyId++;
-      currency = { ...insertCurrency, id };
+      // Insere uma nova moeda
+      const [newCurrency] = await db
+        .insert(currencies)
+        .values(insertCurrency)
+        .returning();
+      
+      return newCurrency;
     }
-
-    this.currenciesMap.set(currency.code, currency);
-    return currency;
   }
 
   async getCurrencyHistory(code: string, startDate?: Date, endDate?: Date): Promise<CurrencyHistory[]> {
-    return this.currencyHistoryList.filter(history => {
-      if (history.code !== code) return false;
-      
-      if (startDate && history.timestamp < startDate) return false;
-      if (endDate && history.timestamp > endDate) return false;
-      
-      return true;
-    }).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()); // Sort by timestamp descending
+    // Constrói a consulta base
+    let query = db
+      .select()
+      .from(currencyHistory)
+      .where(eq(currencyHistory.code, code));
+    
+    // Adiciona filtros de data se fornecidos
+    if (startDate) {
+      query = query.where(gte(currencyHistory.timestamp, startDate));
+    }
+    
+    if (endDate) {
+      query = query.where(lte(currencyHistory.timestamp, endDate));
+    }
+    
+    // Ordena por timestamp em ordem decrescente (mais recente primeiro)
+    return await query.orderBy(desc(currencyHistory.timestamp));
   }
 
   async addCurrencyHistory(insertHistory: InsertCurrencyHistory): Promise<CurrencyHistory> {
-    const id = this.historyId++;
-    const history: CurrencyHistory = { ...insertHistory, id };
-    this.currencyHistoryList.push(history);
+    const [history] = await db
+      .insert(currencyHistory)
+      .values(insertHistory)
+      .returning();
+    
     return history;
   }
 
   async cleanupOldHistory(olderThan: Date): Promise<number> {
-    const initialLength = this.currencyHistoryList.length;
-    this.currencyHistoryList = this.currencyHistoryList.filter(
-      history => history.timestamp >= olderThan
-    );
-    return initialLength - this.currencyHistoryList.length;
+    // Obtém o número de registros antes da limpeza
+    const [{ count: beforeCount }] = await db
+      .select({ count: db.fn.count() })
+      .from(currencyHistory);
+    
+    // Exclui registros mais antigos que a data especificada
+    await db
+      .delete(currencyHistory)
+      .where(lte(currencyHistory.timestamp, olderThan));
+    
+    // Obtém o número de registros após a limpeza
+    const [{ count: afterCount }] = await db
+      .select({ count: db.fn.count() })
+      .from(currencyHistory);
+    
+    // Retorna a diferença (número de registros excluídos)
+    return Number(beforeCount) - Number(afterCount);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
