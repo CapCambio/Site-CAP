@@ -7,7 +7,7 @@ interface TabNavigationProps {
 
 export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   return (
-    <div className="bg-white shadow-sm mb-6">
+    <div className="mb-6">
       <div className="container mx-auto">
         <div className="flex overflow-x-auto">
           <button 
