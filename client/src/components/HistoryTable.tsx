@@ -91,14 +91,14 @@ export function HistoryTable({ data, code, isLoading }: HistoryTableProps) {
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
             <thead>
-              <tr className="bg-gray-100 text-gray-600 uppercase text-sm">
-                <th className="py-3 px-4 text-left">Data</th>
-                <th className="py-3 px-4 text-right">Compra</th>
-                <th className="py-3 px-4 text-right">Venda</th>
-                <th className="py-3 px-4 text-right">Variação</th>
+              <tr className="bg-gray-100 text-gray-600 uppercase text-base">
+                <th className="py-4 px-4 text-left">Data</th>
+                <th className="py-4 px-4 text-right">Compra</th>
+                <th className="py-4 px-4 text-right">Venda</th>
+                <th className="py-4 px-4 text-right">Variação</th>
               </tr>
             </thead>
-            <tbody className="text-gray-600">
+            <tbody className="text-gray-600 text-base">
               {getCurrentPageData().map((item, index) => {
                 const change = getChange(index);
                 const isPositive = change !== null && change > 0;
