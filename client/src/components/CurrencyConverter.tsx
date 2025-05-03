@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Currency } from "@/lib/types";
 import { formatCurrencyValue } from "@/lib/currency";
@@ -11,21 +10,19 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { CurrencyLogo } from "./CurrencyLogo";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface CurrencyConverterProps {
   currencies: Currency[];
 }
 
 export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [fromCurrency, setFromCurrency] = useState<string>("BRL");
   const [toCurrency, setToCurrency] = useState<string>("USD");
   const [amount, setAmount] = useState<string>("1");
   const [convertedAmount, setConvertedAmount] = useState<string>("");
   const [exchangeRate, setExchangeRate] = useState<string>("");
 
+  // Adicionar Real à lista de moedas disponíveis
   const allCurrencies = [
     { 
       code: "BRL", 
@@ -50,6 +47,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     let result: number;
     let rate: number;
 
+    // Se o valor convertido for de BRL para moeda estrangeira
     if (fromCurrency === "BRL") {
       const targetCurrency = currencies.find(c => c.code === toCurrency);
       if (!targetCurrency) return;
@@ -58,7 +56,9 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       result = Number(amount) / rate;
       
       setExchangeRate(`1 BRL = ${formatCurrencyValue(toCurrency, 1 / rate)} ${toCurrency}`);
-    } else {
+    } 
+    // Se o valor convertido for de moeda estrangeira para BRL
+    else {
       const sourceCurrency = currencies.find(c => c.code === fromCurrency);
       if (!sourceCurrency) return;
       
@@ -68,6 +68,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       setExchangeRate(`1 ${fromCurrency} = ${formatCurrencyValue("BRL", rate)} BRL`);
     }
 
+    // Formatar o resultado com até 5 casas decimais, removendo zeros à direita
     let stringValue = result.toFixed(5);
     stringValue = stringValue.replace(/\.?0+$/, "");
     if (stringValue.endsWith('.')) {
@@ -79,9 +80,13 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
   const handleFromCurrencyChange = (value: string) => {
     setFromCurrency(value);
+    
+    // Se a moeda de origem não for BRL, a moeda de destino deve ser BRL
     if (value !== "BRL") {
       setToCurrency("BRL");
-    } else if (toCurrency === "BRL") {
+    } 
+    // Se a moeda de origem for BRL, podemos definir USD como padrão para destino
+    else if (toCurrency === "BRL") {
       setToCurrency("USD");
     }
   };
@@ -91,136 +96,115 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Permitir apenas números e ponto decimal no campo de entrada
     const value = e.target.value.replace(/[^\d.]/g, '');
     setAmount(value);
   };
 
   return (
-    <div className="my-6 max-w-3xl mx-auto">
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        variant="outline"
-        className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50"
-      >
-        <div className="flex items-center gap-2">
-          <img 
-            src="/calculator-icon.png" 
-            alt="Calculadora" 
-            className="w-6 h-6"
-          />
-          <span className="font-bold">Calculadora de Câmbio</span>
-        </div>
-        {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-      </Button>
-
-      {isOpen && (
-        <div className="bg-white rounded-lg shadow-md p-5 mt-2">
-          <div className="flex items-center justify-center gap-2 mb-5">
-            <img 
-              src="/calculator-icon.png" 
-              alt="Calculadora" 
-              className="w-6 h-6"
+    <div className="bg-white rounded-lg shadow-md p-5 my-6 max-w-3xl mx-auto">
+      <h2 className="text-xl font-bold text-center mb-5 text-[#1a1a1a]">Calculadora de Câmbio</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        {/* Campo "Tenho" */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <label htmlFor="amount" className="text-sm font-medium text-gray-700">Tenho</label>
+            <Select value={fromCurrency} onValueChange={handleFromCurrencyChange}>
+              <SelectTrigger className="w-[140px] border-[#f3b234]">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                {allCurrencies.map((currency) => (
+                  <SelectItem key={`from-${currency.code}`} value={currency.code}>
+                    <div className="flex items-center">
+                      <CurrencyLogo code={currency.code} className="w-4 h-4 mr-2" />
+                      {currency.code}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="relative">
+            <Input
+              id="amount"
+              type="text"
+              value={amount}
+              onChange={handleAmountChange}
+              className="pr-12 text-lg font-medium focus:ring-[#f3b234] focus:border-[#f3b234]"
+              placeholder="0.00"
             />
-            <h2 className="text-xl font-bold text-[#1a1a1a]">Calculadora de Câmbio</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <label htmlFor="amount" className="text-sm font-medium text-gray-700">Tenho</label>
-                <Select value={fromCurrency} onValueChange={handleFromCurrencyChange}>
-                  <SelectTrigger className="w-[140px] border-[#f3b234]">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allCurrencies.map((currency) => (
-                      <SelectItem key={`from-${currency.code}`} value={currency.code}>
-                        <div className="flex items-center">
-                          <CurrencyLogo code={currency.code} className="w-4 h-4 mr-2" />
-                          {currency.code}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="relative">
-                <Input
-                  id="amount"
-                  type="text"
-                  value={amount}
-                  onChange={handleAmountChange}
-                  className="pr-12 text-lg font-medium focus:ring-[#f3b234] focus:border-[#f3b234]"
-                  placeholder="0.00"
-                />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
-                  <CurrencyLogo code={fromCurrency} className="w-5 h-5 mr-1" />
-                  <span className="text-sm font-medium text-gray-600">{fromCurrency}</span>
-                </div>
-              </div>
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
+              <CurrencyLogo code={fromCurrency} className="w-5 h-5 mr-1" />
+              <span className="text-sm font-medium text-gray-600">{fromCurrency}</span>
             </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <label htmlFor="converted" className="text-sm font-medium text-gray-700">Troco por</label>
-                <Select 
-                  value={toCurrency} 
-                  onValueChange={handleToCurrencyChange}
-                  disabled={fromCurrency !== "BRL"}
-                >
-                  <SelectTrigger className="w-[140px] border-[#f3b234]">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {fromCurrency === "BRL" ? (
-                      currencies.map((currency) => (
-                        <SelectItem key={`to-${currency.code}`} value={currency.code}>
-                          <div className="flex items-center">
-                            <CurrencyLogo code={currency.code} className="w-4 h-4 mr-2" />
-                            {currency.code}
-                          </div>
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="BRL">
-                        <div className="flex items-center">
-                          <CurrencyLogo code="BRL" className="w-4 h-4 mr-2" />
-                          BRL
-                        </div>
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="relative">
-                <Input
-                  id="converted"
-                  type="text"
-                  value={convertedAmount}
-                  readOnly
-                  className="pr-12 text-lg font-medium"
-                  placeholder="0.00"
-                />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
-                  <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-1" />
-                  <span className="text-sm font-medium text-gray-600">{toCurrency}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="text-center text-sm mt-3">
-            {exchangeRate && (
-              <p className="text-[#f3b234] font-medium">{exchangeRate}</p>
-            )}
-            <p className="text-xs mt-1">
-              <span className="font-medium text-[#f3b234]">Cotação de referência:</span> <span className="text-gray-500">As taxas aplicadas são baseadas nas cotações da tabela abaixo</span>
-            </p>
           </div>
         </div>
-      )}
+        
+        {/* Campo "Troco por" */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <label htmlFor="converted" className="text-sm font-medium text-gray-700">Troco por</label>
+            <Select 
+              value={toCurrency} 
+              onValueChange={handleToCurrencyChange}
+              disabled={fromCurrency !== "BRL"}
+            >
+              <SelectTrigger className="w-[140px] border-[#f3b234]">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                {fromCurrency === "BRL" ? (
+                  // Se "Tenho" for BRL, mostrar todas as moedas estrangeiras
+                  currencies.map((currency) => (
+                    <SelectItem key={`to-${currency.code}`} value={currency.code}>
+                      <div className="flex items-center">
+                        <CurrencyLogo code={currency.code} className="w-4 h-4 mr-2" />
+                        {currency.code}
+                      </div>
+                    </SelectItem>
+                  ))
+                ) : (
+                  // Se "Tenho" for moeda estrangeira, mostrar apenas BRL
+                  <SelectItem value="BRL">
+                    <div className="flex items-center">
+                      <CurrencyLogo code="BRL" className="w-4 h-4 mr-2" />
+                      BRL
+                    </div>
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="relative">
+            <Input
+              id="converted"
+              type="text"
+              value={convertedAmount}
+              readOnly
+              className="pr-12 text-lg font-medium"
+              placeholder="0.00"
+            />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
+              <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-1" />
+              <span className="text-sm font-medium text-gray-600">{toCurrency}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Taxa de câmbio */}
+      <div className="text-center text-sm mt-3">
+        {exchangeRate && (
+          <p className="text-gray-600 font-medium">{exchangeRate}</p>
+        )}
+        <p className="text-xs mt-1 text-gray-500">
+          <span className="font-medium">Cotação de referência:</span> As taxas aplicadas são baseadas nas cotações da tabela abaixo
+        </p>
+      </div>
     </div>
   );
 }
