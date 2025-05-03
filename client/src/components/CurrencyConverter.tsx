@@ -102,14 +102,14 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   return (
-    <div className="bg-black rounded-lg shadow-md p-5 my-6 max-w-3xl mx-auto border-2 border-[#f3b234]">
-      <h2 className="text-xl font-bold text-center mb-5 text-[#f3b234]">Calculadora de Câmbio</h2>
+    <div className="bg-white rounded-lg shadow-md p-5 my-6 max-w-3xl mx-auto">
+      <h2 className="text-xl font-bold text-center mb-5 text-[#1a1a1a]">Calculadora de Câmbio</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
         {/* Campo "Tenho" */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <label htmlFor="amount" className="text-sm font-medium text-[#f3b234]">Tenho</label>
+            <label htmlFor="amount" className="text-sm font-medium text-gray-700">Tenho</label>
             <Select value={fromCurrency} onValueChange={handleFromCurrencyChange}>
               <SelectTrigger className="w-[140px] border-[#f3b234]">
                 <SelectValue placeholder="Selecione" />
@@ -133,12 +133,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               type="text"
               value={amount}
               onChange={handleAmountChange}
-              className="pr-12 text-lg font-medium focus:ring-[#f3b234] focus:border-[#f3b234] text-black bg-white"
+              className="pr-12 text-lg font-medium focus:ring-[#f3b234] focus:border-[#f3b234]"
               placeholder="0.00"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
               <CurrencyLogo code={fromCurrency} className="w-5 h-5 mr-1" />
-              <span className="text-sm font-medium text-[#f3b234]">{fromCurrency}</span>
+              <span className="text-sm font-medium text-gray-600">{fromCurrency}</span>
             </div>
           </div>
         </div>
@@ -146,7 +146,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         {/* Campo "Troco por" */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <label htmlFor="converted" className="text-sm font-medium text-[#f3b234]">Troco por</label>
+            <label htmlFor="converted" className="text-sm font-medium text-gray-700">Troco por</label>
             <Select 
               value={toCurrency} 
               onValueChange={handleToCurrencyChange}
@@ -185,12 +185,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               type="text"
               value={convertedAmount}
               readOnly
-              className="pr-12 text-lg font-medium bg-white text-black"
+              className="pr-12 text-lg font-medium"
               placeholder="0.00"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
               <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-1" />
-              <span className="text-sm font-medium text-[#f3b234]">{toCurrency}</span>
+              <span className="text-sm font-medium text-gray-600">{toCurrency}</span>
             </div>
           </div>
         </div>
@@ -199,10 +199,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       {/* Taxa de câmbio */}
       <div className="text-center text-sm mt-3">
         {exchangeRate && (
-          <p className="text-[#f3b234] font-medium">{exchangeRate}</p>
+          <p className="text-gray-600 font-medium">{exchangeRate}</p>
         )}
-        <p className="text-xs mt-1">
-          <span className="text-[#f3b234] font-medium">Cotação de referência:</span> <span className="text-white">As taxas aplicadas são baseadas nas cotações da tabela abaixo</span>
+        <p className="text-xs mt-1 text-gray-500">
+          <span className="font-medium">Cotação de referência:</span> As taxas aplicadas são baseadas nas cotações da tabela abaixo
         </p>
       </div>
     </div>
