@@ -75,7 +75,8 @@ export default function Home() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[300px]">Moeda</TableHead>
+                      <TableHead className="w-[250px]">Moeda</TableHead>
+                      <TableHead className="w-[100px]">Código</TableHead>
                       <TableHead className="text-right">Compra</TableHead>
                       <TableHead className="text-right">Venda</TableHead>
                       <TableHead className="text-right">Variação</TableHead>
@@ -87,6 +88,9 @@ export default function Home() {
                         <TableRow key={index}>
                           <TableCell className="animate-pulse">
                             <div className="h-6 bg-gray-200 rounded w-48"></div>
+                          </TableCell>
+                          <TableCell className="animate-pulse">
+                            <div className="h-6 bg-gray-200 rounded w-16"></div>
                           </TableCell>
                           <TableCell className="animate-pulse">
                             <div className="h-6 bg-gray-200 rounded w-24 ml-auto"></div>
@@ -106,10 +110,12 @@ export default function Home() {
                             <div className="flex items-center gap-3">
                               <CurrencyLogo code={currency.code} />
                               <span>{currency.name}</span>
-                              <span className="text-sm font-medium bg-[#f3b234] text-[#000000] px-2 py-1 rounded">
-                                {currency.code}
-                              </span>
                             </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm font-medium bg-[#f3b234] text-[#000000] px-2 py-1 rounded">
+                              {currency.code}
+                            </span>
                           </TableCell>
                           <TableCell className="text-right font-medium">
                             R$ {formatCurrencyValue(currency.code, currency.buyPrice)}
