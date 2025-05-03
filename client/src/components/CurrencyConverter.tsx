@@ -102,8 +102,8 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-5 my-6 max-w-3xl mx-auto">
-      <h2 className="text-xl font-bold text-center mb-5 text-[#1a1a1a]">Calculadora de Câmbio</h2>
+    <div className="bg-black rounded-lg shadow-md p-5 my-6 max-w-3xl mx-auto border-2 border-[#f3b234]">
+      <h2 className="text-xl font-bold text-center mb-5 text-white">Calculadora de Câmbio</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
         {/* Campo "Tenho" */}
@@ -133,12 +133,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               type="text"
               value={amount}
               onChange={handleAmountChange}
-              className="pr-12 text-lg font-medium focus:ring-[#f3b234] focus:border-[#f3b234]"
+              className="pr-12 text-lg font-medium focus:ring-[#f3b234] focus:border-[#f3b234] text-[#f3b234] bg-black"
               placeholder="0.00"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
               <CurrencyLogo code={fromCurrency} className="w-5 h-5 mr-1" />
-              <span className="text-sm font-medium text-gray-500">{fromCurrency}</span>
+              <span className="text-sm font-medium text-[#f3b234]">{fromCurrency}</span>
             </div>
           </div>
         </div>
@@ -185,24 +185,24 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               type="text"
               value={convertedAmount}
               readOnly
-              className="pr-12 text-lg font-medium bg-gray-50"
+              className="pr-12 text-lg font-medium bg-black text-[#f3b234]"
               placeholder="0.00"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
               <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-1" />
-              <span className="text-sm font-medium text-gray-500">{toCurrency}</span>
+              <span className="text-sm font-medium text-[#f3b234]">{toCurrency}</span>
             </div>
           </div>
         </div>
       </div>
       
       {/* Taxa de câmbio */}
-      <div className="text-center text-sm text-gray-500 mt-3">
+      <div className="text-center text-sm mt-3">
         {exchangeRate && (
-          <p className="text-[#1a1a1a] font-medium">{exchangeRate}</p>
+          <p className="text-[#f3b234] font-medium">{exchangeRate}</p>
         )}
         <p className="text-xs mt-1">
-          <span className="text-[#f3b234] font-medium">Cotação de referência:</span> As taxas aplicadas são baseadas nas cotações do quadro acima
+          <span className="text-[#f3b234] font-medium">Cotação de referência:</span> <span className="text-white">As taxas aplicadas são baseadas nas cotações da tabela abaixo</span>
         </p>
       </div>
     </div>
