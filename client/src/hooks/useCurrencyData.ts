@@ -54,7 +54,7 @@ export function useCurrencyData() {
 
   // Initialize last updated time
   useEffect(() => {
-    if (currencies && currencies.length > 0) {
+    if (currencies && Array.isArray(currencies) && currencies.length > 0) {
       // Use the most recent timestamp from the currencies
       const mostRecentDate = currencies.reduce((latest: Date, currency: Currency) => {
         const currDate = new Date(currency.lastUpdate);
