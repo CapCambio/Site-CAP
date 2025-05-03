@@ -1,9 +1,11 @@
+
 interface LoadingOverlayProps {
   isVisible: boolean;
+  type?: 'full' | 'silent';
 }
 
-export function LoadingOverlay({ isVisible }: LoadingOverlayProps) {
-  if (!isVisible) return null;
+export function LoadingOverlay({ isVisible, type = 'full' }: LoadingOverlayProps) {
+  if (!isVisible || type === 'silent') return null;
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

@@ -175,7 +175,7 @@ export default function Home() {
           </div>
         )}
       </main>
-      <LoadingOverlay isVisible={isRefreshing} />
+      <LoadingOverlay isVisible={isLoadingCurrencies} type={isRefreshing ? 'silent' : 'full'} />
     </div>
   );
 }
