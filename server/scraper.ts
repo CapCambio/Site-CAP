@@ -43,19 +43,55 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
     console.log(`- Encontradas ${divs.length} divs potenciais com cotações`);
     
     // Procura por elementos que mencionam códigos de moedas conhecidos
-    const currencyTexts = Array.from(document.querySelectorAll('*')).filter(el => {
+    const currencyTexts = Array.from(document.querySelectorAll('*')).filter((el: Element) => {
       const text = el.textContent || '';
       return text.includes('USD') || text.includes('EUR') || text.includes('Dólar');
     });
     console.log(`- Encontrados ${currencyTexts.length} elementos com menções a moedas`);
+    
+    // Tenta analisar a tabela (já que detectamos uma tabela na página)
+    if (tables.length > 0) {
+      console.log('Analisando a tabela encontrada:');
+      const table = tables[0];
+      
+      // Verifica as linhas da tabela
+      const rows = table.querySelectorAll('tr');
+      console.log(`- A tabela tem ${rows.length} linhas`);
+      
+      if (rows.length > 0) {
+        // Amostra do conteúdo da primeira linha
+        const firstRow = rows[0];
+        console.log(`- Primeira linha: ${firstRow.textContent?.trim().substring(0, 100)}...`);
+        
+        // Verifica células
+        const cells = firstRow.querySelectorAll('td, th');
+        console.log(`- A primeira linha tem ${cells.length} células`);
+        
+        if (cells.length > 0) {
+          // Amostra do conteúdo da primeira célula
+          console.log(`- Primeira célula: ${cells[0].textContent?.trim()}`);
+        }
+        
+        // Tenta um método alternativo de extração baseado na tabela
+        try {
+          const extractedCurrencies = extractCurrenciesFromTable(table);
+          if (extractedCurrencies.length > 0) {
+            console.log(`Extração via tabela bem-sucedida. Encontradas ${extractedCurrencies.length} moedas.`);
+            return extractedCurrencies;
+          }
+        } catch (err) {
+          console.error('Erro ao tentar extrair da tabela:', err);
+        }
+      }
+    }
     
     // Tenta encontrar a estrutura exata do site
     if (currencyTexts.length > 0) {
       console.log('Exemplo de elemento com menção a moeda:');
       const sampleElement = currencyTexts[0];
       console.log(`- Tag: ${sampleElement.tagName}`);
-      console.log(`- Classes: ${(sampleElement as Element).className}`);
-      console.log(`- ID: ${(sampleElement as Element).id}`);
+      console.log(`- Classes: ${sampleElement.className}`);
+      console.log(`- ID: ${sampleElement.id}`);
       console.log(`- Texto: ${sampleElement.textContent?.substring(0, 100)}...`);
       
       // Tenta encontrar o elemento pai que contém a estrutura completa
@@ -195,6 +231,105 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
     
     return currencies;
   }
+}
+
+/**
+ * Função para extrair cotações da tabela da página
+ */
+function extractCurrenciesFromTable(table: Element): ScrapedCurrency[] {
+  const results: ScrapedCurrency[] = [];
+  const rows = table.querySelectorAll('tr');
+  
+  // Pula a primeira linha se for cabeçalho
+  const startIdx = rows[0].querySelector('th') ? 1 : 0;
+  
+  for (let i = startIdx; i < rows.length; i++) {
+    const row = rows[i];
+    const cells = row.querySelectorAll('td');
+    
+    // Verifica se temos células suficientes
+    if (cells.length < 3) continue;
+    
+    try {
+      // Tenta extrair informações das células
+      // Assume formato: [Nome da Moeda (Código)] [Compra] [Venda]
+      const nameCell = cells[0];
+      const buyCell = cells[1];
+      const sellCell = cells[2];
+      
+      if (!nameCell || !buyCell || !sellCell) continue;
+      
+      const nameText = nameCell.textContent?.trim() || '';
+      console.log(`Analisando linha ${i}, texto: ${nameText}`);
+      
+      // Extrai o código da moeda - assume formato "Nome Moeda (XXX)" ou apenas "XXX"
+      let name = nameText;
+      let code = '';
+      
+      // Tenta encontrar o código no formato "Nome (XXX)"
+      const codeMatch = nameText.match(/\(([A-Z]{3})\)/);
+      if (codeMatch) {
+        code = codeMatch[1];
+        name = nameText.replace(/\s*\([A-Z]{3}\)/, '').trim();
+      } else {
+        // Tenta encontrar o código no formato "XXX" (apenas o código)
+        if (/^[A-Z]{3}$/.test(nameText)) {
+          code = nameText;
+          
+          // Associa códigos comuns aos seus nomes
+          const codeToName: {[key: string]: string} = {
+            'USD': 'Dólar Americano',
+            'EUR': 'Euro',
+            'GBP': 'Libra Esterlina',
+            'CAD': 'Dólar Canadense',
+            'AUD': 'Dólar Australiano',
+            'ARS': 'Peso Argentino',
+            'CLP': 'Peso Chileno',
+            'UYU': 'Peso Uruguaio',
+            'CHF': 'Franco Suíço',
+            'JPY': 'Iene Japonês',
+            'CNY': 'Yuan Chinês',
+            'MXN': 'Peso Mexicano',
+            'PYG': 'Guarani Paraguaio',
+            'PEN': 'Novo Sol Peruano',
+            'BOB': 'Boliviano',
+            'COP': 'Peso Colombiano'
+          };
+          
+          name = codeToName[code] || code;
+        } else {
+          console.log(`Linha ${i}: Não foi possível extrair o código da moeda`);
+          continue;
+        }
+      }
+      
+      // Extrai e converte os valores para números
+      const buyText = buyCell.textContent?.trim().replace(',', '.').replace('R$', '').trim() || '0';
+      const sellText = sellCell.textContent?.trim().replace(',', '.').replace('R$', '').trim() || '0';
+      
+      const buyPrice = parseFloat(buyText);
+      const sellPrice = parseFloat(sellText);
+      
+      if (isNaN(buyPrice) || isNaN(sellPrice)) {
+        console.log(`Linha ${i}: Valores inválidos - Compra: ${buyText}, Venda: ${sellText}`);
+        continue;
+      }
+      
+      console.log(`Linha ${i} - Extraído: ${name} (${code}), Compra: ${buyPrice}, Venda: ${sellPrice}`);
+      
+      // Adiciona à lista de resultados
+      results.push({
+        name,
+        code,
+        buyPrice,
+        sellPrice
+      });
+    } catch (err) {
+      console.error(`Erro ao processar linha ${i}:`, err);
+    }
+  }
+  
+  return results;
 }
 
 /**
