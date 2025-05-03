@@ -8,7 +8,7 @@ export function Header() {
           <img 
             src={capLogo} 
             alt="CAP Câmbio Logo" 
-            className="h-14 md:h-16"
+            className="h-28 md:h-32"
           />
         </div>
       </div>
