@@ -16,6 +16,7 @@ import { LoadingOverlay } from "../components/LoadingOverlay";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CurrencyLogo } from "../components/CurrencyLogo";
 import { CurrencyCard } from "../components/CurrencyCard";
+import { CurrencyConverter } from "../components/CurrencyConverter";
 
 
 export default function Home() {
@@ -51,6 +52,14 @@ export default function Home() {
       <Header />
 
       <main className="container mx-auto px-4 pb-12 flex-grow">
+        <div className="mb-4 flex justify-center">
+          <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+        </div>
+        
+        {!isLoadingCurrencies && activeTab === "current" && (
+          <CurrencyConverter currencies={currencies} />
+        )}
+        
         {activeTab === "current" && (
           <>
             {isMobile ? (
