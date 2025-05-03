@@ -10,7 +10,7 @@ const SOURCE_URL = 'https://ctrcambio.com.br/tvcaxias/';
  */
 export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
   console.log('Iniciando extração de dados com Cheerio...');
-  
+
   try {
     // Tenta buscar a página fonte
     const response = await fetch(SOURCE_URL, { 
@@ -18,35 +18,35 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       }
     });
-    
+
     if (!response.ok) {
       throw new Error(`Falha ao acessar a página fonte: ${response.status} ${response.statusText}`);
     }
-    
+
     const html = await response.text();
     const $ = cheerio.load(html);
-    
+
     console.log('Página carregada, analisando conteúdo...');
-    
+
     // Depuração básica da estrutura da página
     console.log(`Título da página: ${$('title').text()}`);
     console.log(`Número de tabelas: ${$('table').length}`);
-    
+
     // Analisando as tabelas
     if ($('table').length > 0) {
       console.log('Analisando tabelas...');
-      
+
       // Tentando extrair cotações de tabelas
       const results: ScrapedCurrency[] = [];
       let tableFound = false;
-      
+
       $('table').each((tableIndex, tableElement) => {
         console.log(`Analisando tabela ${tableIndex + 1}:`);
-        
+
         // Verifica o número de linhas da tabela
         const rows = $(tableElement).find('tr');
         console.log(`- Tabela ${tableIndex + 1} tem ${rows.length} linhas`);
-        
+
         // Verifica estrutura da primeira linha (cabeçalho potencial)
         if (rows.length > 0) {
           const headerTexts: string[] = [];
@@ -54,7 +54,7 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
             headerTexts.push($(cell).text().trim());
           });
           console.log(`- Cabeçalhos potenciais: ${headerTexts.join(' | ')}`);
-          
+
           // Se a primeira linha tem conteúdo que indicam ser uma tabela de cotações
           const headerText = headerTexts.join(' ').toLowerCase();
           if (
@@ -67,12 +67,12 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
           ) {
             console.log('Tabela de cotações encontrada!');
             tableFound = true;
-            
+
             // Definindo índices das colunas relevantes (nome/código, compra, venda)
             let nameIndex = -1;
             let buyIndex = -1;
             let sellIndex = -1;
-            
+
             // Identifica índices das colunas relevantes pelo cabeçalho
             headerTexts.forEach((text, index) => {
               const lowerText = text.toLowerCase();
@@ -84,7 +84,7 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
                 sellIndex = index;
               }
             });
-            
+
             // Se não conseguiu determinar pelos cabeçalhos, assume os índices padrão (0, 1, 2)
             if (nameIndex === -1 || buyIndex === -1 || sellIndex === -1) {
               console.log('Usando índices padrão para as colunas (moeda: 0, compra: 1, venda: 2)');
@@ -92,33 +92,33 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
               buyIndex = 1;
               sellIndex = 2;
             }
-            
+
             // Para cada linha após o cabeçalho
             $(rows).each((rowIndex, row) => {
               // Pula o cabeçalho
               if (rowIndex === 0 && headerTexts.some(h => h.toLowerCase().includes('moeda') || h.toLowerCase().includes('compra'))) {
                 return; // Equivalente a continue no loop each do jQuery
               }
-              
+
               const cells = $(row).find('td');
-              
+
               // Verifica se tem células suficientes
               if (cells.length < Math.max(nameIndex, buyIndex, sellIndex) + 1) {
                 return;
               }
-              
+
               try {
                 // Extrai o conteúdo de cada célula relevante
                 const nameText = $(cells[nameIndex]).text().trim();
                 const buyText = $(cells[buyIndex]).text().trim().replace('R$', '').replace(',', '.').trim();
                 const sellText = $(cells[sellIndex]).text().trim().replace('R$', '').replace(',', '.').trim();
-                
+
                 console.log(`Linha ${rowIndex}: "${nameText}" | "${buyText}" | "${sellText}"`);
-                
+
                 // Tentar extrair o código da moeda e nome
                 let code = '';
                 let name = nameText;
-                
+
                 // Formato: "Nome Moeda (XXX)" - extrai o código entre parênteses
                 const codeMatch = nameText.match(/\(([A-Z]{3})\)/);
                 if (codeMatch) {
@@ -140,7 +140,7 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
                 // Verifica se o texto é apenas o código
                 else if (/^[A-Z]{3}$/.test(nameText)) {
                   code = nameText;
-                  
+
                   // Mapeamento de códigos para nomes
                   const codeToName: Record<string, string> = {
                     'USD': 'Dólar Americano',
@@ -160,13 +160,13 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
                     'BOB': 'Boliviano',
                     'COP': 'Peso Colombiano'
                   };
-                  
+
                   name = codeToName[code] || code;
                 }
                 // Tentativa de extrair por palavras-chave conhecidas
                 else {
                   const lowerName = nameText.toLowerCase();
-                  
+
                   if (lowerName.includes('dólar') || lowerName.includes('dolar')) {
                     if (lowerName.includes('australiano') || lowerName.includes('aud')) {
                       code = 'AUD';
@@ -221,17 +221,17 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
                     name = 'Boliviano';
                   }
                 }
-                
+
                 // Se conseguiu extrair um código
                 if (code) {
                   // Converte os textos para valores numéricos
                   const buyPrice = parseFloat(buyText);
                   const sellPrice = parseFloat(sellText);
-                  
+
                   // Adiciona à lista somente se os valores são válidos
                   if (!isNaN(buyPrice) && !isNaN(sellPrice) && buyPrice > 0 && sellPrice > 0) {
                     console.log(`Extraído: ${name} (${code}), Compra: ${buyPrice}, Venda: ${sellPrice}`);
-                    
+
                     results.push({
                       name,
                       code,
@@ -251,24 +251,24 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
           }
         }
       });
-      
+
       // Se encontrou moedas na tabela
       if (tableFound && results.length > 0) {
         console.log(`Extração concluída. Encontradas ${results.length} moedas.`);
         return results;
       }
     }
-    
+
     // Tenta outros métodos se a análise de tabela falhou
     console.log('Tentando extrair moedas de outros elementos...');
-    
+
     // Se não encontrou dados na tabela, procura por elementos específicos com palavras-chave
     const currencyElements = $('div:contains("USD"), div:contains("EUR"), span:contains("USD"), span:contains("EUR")');
     console.log(`Encontrados ${currencyElements.length} elementos com menções a moedas.`);
-    
+
     if (currencyElements.length > 0) {
       console.log('Analisando elementos com menções a moedas...');
-      
+
       // Tenta extrair mais informações para depuração
       currencyElements.each((i, element) => {
         if (i < 5) { // Limita a análise para não sobrecarregar os logs
@@ -276,64 +276,55 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
         }
       });
     }
-    
+
     // Se nenhum método funcionou, usa os dados de fallback
     console.log('Não foi possível extrair os dados da página. Usando dados de fallback para simulação temporária.');
-    
-    // Gera pequenas variações nos valores para simular mudanças de mercado
-    const variation = () => (Math.random() * 0.02) - 0.01; // -1% a +1%
-    
-    // Lista de moedas na ordem que aparecem na página fonte
+
+    // Lista de moedas na ordem exata da página fonte
     const currencies: ScrapedCurrency[] = [
-      { name: "Dólar Americano", code: "USD", buyPrice: 5.25 * (1 + variation()), sellPrice: 5.30 * (1 + variation()) },
-      { name: "Euro", code: "EUR", buyPrice: 5.75 * (1 + variation()), sellPrice: 5.82 * (1 + variation()) },
-      { name: "Libra Esterlina", code: "GBP", buyPrice: 6.70 * (1 + variation()), sellPrice: 6.78 * (1 + variation()) },
-      { name: "Dólar Canadense", code: "CAD", buyPrice: 3.85 * (1 + variation()), sellPrice: 3.90 * (1 + variation()) },
-      { name: "Dólar Australiano", code: "AUD", buyPrice: 3.45 * (1 + variation()), sellPrice: 3.52 * (1 + variation()) },
-      { name: "Peso Argentino", code: "ARS", buyPrice: 0.062 * (1 + variation()), sellPrice: 0.065 * (1 + variation()) },
-      { name: "Peso Chileno", code: "CLP", buyPrice: 0.0057 * (1 + variation()), sellPrice: 0.0060 * (1 + variation()) },
-      { name: "Peso Uruguaio", code: "UYU", buyPrice: 0.13 * (1 + variation()), sellPrice: 0.14 * (1 + variation()) },
-      { name: "Franco Suíço", code: "CHF", buyPrice: 5.92 * (1 + variation()), sellPrice: 5.98 * (1 + variation()) },
-      { name: "Iene Japonês", code: "JPY", buyPrice: 0.034 * (1 + variation()), sellPrice: 0.037 * (1 + variation()) },
-      { name: "Yuan Chinês", code: "CNY", buyPrice: 0.72 * (1 + variation()), sellPrice: 0.75 * (1 + variation()) },
-      { name: "Peso Mexicano", code: "MXN", buyPrice: 0.31 * (1 + variation()), sellPrice: 0.33 * (1 + variation()) },
-      { name: "Guarani Paraguaio", code: "PYG", buyPrice: 0.00072 * (1 + variation()), sellPrice: 0.00075 * (1 + variation()) },
-      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.41 * (1 + variation()), sellPrice: 1.45 * (1 + variation()) },
-      { name: "Boliviano", code: "BOB", buyPrice: 0.76 * (1 + variation()), sellPrice: 0.79 * (1 + variation()) },
-      { name: "Peso Colombiano", code: "COP", buyPrice: 0.0013 * (1 + variation()), sellPrice: 0.0014 * (1 + variation()) }
+      { name: "Dólar Americano", code: "USD", buyPrice: 5.55, sellPrice: 5.87 },
+      { name: "Euro", code: "EUR", buyPrice: 6.40, sellPrice: 6.71 },
+      { name: "Libra Esterlina", code: "GBP", buyPrice: 7.40, sellPrice: 8.06 },
+      { name: "Dólar Australiano", code: "AUD", buyPrice: 3.52, sellPrice: 3.90 },
+      { name: "Peso Argentino", code: "ARS", buyPrice: 0.004, sellPrice: 0.006 },
+      { name: "Dólar Canadense", code: "CAD", buyPrice: 4.00, sellPrice: 4.38 },
+      { name: "Franco Suíço", code: "CHF", buyPrice: 6.50, sellPrice: 7.44 },
+      { name: "Peso Uruguaio", code: "UYU", buyPrice: 0.135, sellPrice: 0.17 },
+      { name: "Peso Chileno", code: "CLP", buyPrice: 0.0059, sellPrice: 0.0071 },
+      { name: "Peso Mexicano", code: "MXN", buyPrice: 0.28, sellPrice: 0.35 },
+      { name: "Peso Colombiano", code: "COP", buyPrice: 0.0014, sellPrice: 0.00185 },
+      { name: "Yuan Chinês", code: "CNY", buyPrice: 0.75, sellPrice: 0.90 },
+      { name: "Iene Japonês", code: "JPY", buyPrice: 0.032, sellPrice: 0.044 },
+      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.73 }
     ];
-    
+
     console.log(`Fallback concluído. Fornecidas ${currencies.length} moedas.`);
     return currencies;
   } catch (error) {
     console.error('Erro ao fazer scraping dos dados de moedas:', error);
-    
+
     // Em caso de erro, retorna dados de fallback
     console.log('Erro na extração. Usando dados de fallback para simulação temporária.');
-    
-    // Gera pequenas variações nos valores para simular mudanças de mercado
-    const variation = () => (Math.random() * 0.02) - 0.01; // -1% a +1%
-    
-    // Lista de moedas na ordem que aparecem na página fonte
+
+
+    // Lista de moedas na ordem exata da página fonte
     const currencies: ScrapedCurrency[] = [
-      { name: "Dólar Americano", code: "USD", buyPrice: 5.25 * (1 + variation()), sellPrice: 5.30 * (1 + variation()) },
-      { name: "Euro", code: "EUR", buyPrice: 5.75 * (1 + variation()), sellPrice: 5.82 * (1 + variation()) },
-      { name: "Libra Esterlina", code: "GBP", buyPrice: 6.70 * (1 + variation()), sellPrice: 6.78 * (1 + variation()) },
-      { name: "Dólar Canadense", code: "CAD", buyPrice: 3.85 * (1 + variation()), sellPrice: 3.90 * (1 + variation()) },
-      { name: "Dólar Australiano", code: "AUD", buyPrice: 3.45 * (1 + variation()), sellPrice: 3.52 * (1 + variation()) },
-      { name: "Peso Argentino", code: "ARS", buyPrice: 0.062 * (1 + variation()), sellPrice: 0.065 * (1 + variation()) },
-      { name: "Peso Chileno", code: "CLP", buyPrice: 0.0057 * (1 + variation()), sellPrice: 0.0060 * (1 + variation()) },
-      { name: "Peso Uruguaio", code: "UYU", buyPrice: 0.13 * (1 + variation()), sellPrice: 0.14 * (1 + variation()) },
-      { name: "Franco Suíço", code: "CHF", buyPrice: 5.92 * (1 + variation()), sellPrice: 5.98 * (1 + variation()) },
-      { name: "Iene Japonês", code: "JPY", buyPrice: 0.034 * (1 + variation()), sellPrice: 0.037 * (1 + variation()) },
-      { name: "Yuan Chinês", code: "CNY", buyPrice: 0.72 * (1 + variation()), sellPrice: 0.75 * (1 + variation()) },
-      { name: "Peso Mexicano", code: "MXN", buyPrice: 0.31 * (1 + variation()), sellPrice: 0.33 * (1 + variation()) },
-      { name: "Guarani Paraguaio", code: "PYG", buyPrice: 0.00072 * (1 + variation()), sellPrice: 0.00075 * (1 + variation()) },
-      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.41 * (1 + variation()), sellPrice: 1.45 * (1 + variation()) },
-      { name: "Boliviano", code: "BOB", buyPrice: 0.76 * (1 + variation()), sellPrice: 0.79 * (1 + variation()) },
-      { name: "Peso Colombiano", code: "COP", buyPrice: 0.0013 * (1 + variation()), sellPrice: 0.0014 * (1 + variation()) }
+      { name: "Dólar Americano", code: "USD", buyPrice: 5.55, sellPrice: 5.87 },
+      { name: "Euro", code: "EUR", buyPrice: 6.40, sellPrice: 6.71 },
+      { name: "Libra Esterlina", code: "GBP", buyPrice: 7.40, sellPrice: 8.06 },
+      { name: "Dólar Australiano", code: "AUD", buyPrice: 3.52, sellPrice: 3.90 },
+      { name: "Peso Argentino", code: "ARS", buyPrice: 0.004, sellPrice: 0.006 },
+      { name: "Dólar Canadense", code: "CAD", buyPrice: 4.00, sellPrice: 4.38 },
+      { name: "Franco Suíço", code: "CHF", buyPrice: 6.50, sellPrice: 7.44 },
+      { name: "Peso Uruguaio", code: "UYU", buyPrice: 0.135, sellPrice: 0.17 },
+      { name: "Peso Chileno", code: "CLP", buyPrice: 0.0059, sellPrice: 0.0071 },
+      { name: "Peso Mexicano", code: "MXN", buyPrice: 0.28, sellPrice: 0.35 },
+      { name: "Peso Colombiano", code: "COP", buyPrice: 0.0014, sellPrice: 0.00185 },
+      { name: "Yuan Chinês", code: "CNY", buyPrice: 0.75, sellPrice: 0.90 },
+      { name: "Iene Japonês", code: "JPY", buyPrice: 0.032, sellPrice: 0.044 },
+      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.73 }
     ];
-    
+
     return currencies;
   }
 }
@@ -354,21 +345,21 @@ export function updateCurrenciesWithScrapedData(
   scrapedData: ScrapedCurrency[]
 ): Omit<Currency, 'id'>[] {
   const now = new Date();
-  
+
   // Mapeia as moedas existentes pelo código para acesso rápido
   const currencyMap = new Map<string, Currency>();
   currentCurrencies.forEach(currency => {
     currencyMap.set(currency.code, currency);
   });
-  
+
   // Atualiza ou cria cada moeda com base nos dados extraídos
   return scrapedData.map(scraped => {
     const existing = currencyMap.get(scraped.code);
-    
+
     // Se a moeda existir, calcula a variação em relação à cotação anterior
     if (existing) {
       const change = calculateChange(scraped.buyPrice, existing.buyPrice);
-      
+
       return {
         // id será gerenciado pelo storage
         name: scraped.name,
@@ -379,7 +370,7 @@ export function updateCurrenciesWithScrapedData(
         lastUpdate: now
       };
     }
-    
+
     // Se for uma nova moeda, cria com variação nula
     return {
       // id será gerenciado pelo storage
