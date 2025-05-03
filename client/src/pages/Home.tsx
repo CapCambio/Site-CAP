@@ -136,9 +136,9 @@ export default function Home() {
                                 {formatPercentage(Math.abs(currency.change))}
                               </span>
                             )}
-                            {currency.change === null && (
+                            {(currency.change === null || currency.change === 0) && (
                               <span className="text-sm font-medium text-gray-500">
-                                Sem variação
+                                -
                               </span>
                             )}
                           </TableCell>

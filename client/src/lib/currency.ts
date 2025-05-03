@@ -50,13 +50,10 @@ export function formatCurrencyValue(code: string, value: number): string {
   // Primeiro converte para string com 5 casas decimais
   let stringValue = value.toFixed(5);
   
-  // Remove zeros à direita que não alteram o valor
-  stringValue = stringValue.replace(/\.?0+$/, "");
-  
-  // Se terminar com ponto, remove-o
-  if (stringValue.endsWith('.')) {
-    stringValue = stringValue.slice(0, -1);
-  }
+  // Remove zeros à direita que não alteram o valor, mas mantém pelo menos 2 casas
+  const [intPart, decPart] = stringValue.split('.');
+  const minTwoDecimals = decPart.replace(/0+$/, '').padEnd(2, '0');
+  stringValue = `${intPart}.${minTwoDecimals}`;
   
   // Converte para formato brasileiro (vírgula como separador decimal)
   return stringValue.replace('.', ',');
@@ -64,7 +61,7 @@ export function formatCurrencyValue(code: string, value: number): string {
 
 // Format percentage changes
 export function formatPercentage(value: number | null): string {
-  if (value === null) return '0,00%';
+  if (value === null || value === 0) return '0,00%';
   
   return value.toLocaleString('pt-BR', {
     style: 'decimal',

@@ -53,9 +53,9 @@ export function CurrencyCard({ currency }: CurrencyCardProps) {
               {formatPercentage(Math.abs(change || 0))}
             </span>
           )}
-          {change === null && (
+          {(change === null || change === 0) && (
             <span className="text-sm font-medium text-gray-500">
-              Sem variação
+              -
             </span>
           )}
           <span className="text-xs text-gray-500 ml-2">desde ontem</span>
