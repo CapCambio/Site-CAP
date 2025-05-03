@@ -58,7 +58,6 @@ export function CurrencyCard({ currency }: CurrencyCardProps) {
               — 0,00%
             </span>
           )}
-          <span className="text-xs text-gray-500 ml-2">desde ontem</span>
         </div>
       </div>
     </Card>
