@@ -116,14 +116,42 @@ export class DatabaseStorage implements IStorage {
   }
 
   async cleanupOldHistory(olderThan: Date): Promise<number> {
-    // Implementação mais simples: executar o delete e verificar quantas linhas foram afetadas
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    
     const result = await db
       .delete(currencyHistory)
-      .where(lte(currencyHistory.timestamp, olderThan))
+      .where(lte(currencyHistory.timestamp, oneYearAgo))
       .returning();
     
-    // Retorna o número de registros excluídos
     return result.length;
+  }
+
+  async getLastCurrencyHistory(code: string): Promise<CurrencyHistory | undefined> {
+    const [history] = await db
+      .select()
+      .from(currencyHistory)
+      .where(eq(currencyHistory.code, code))
+      .orderBy(desc(currencyHistory.timestamp))
+      .limit(1);
+    
+    return history;
+  }
+
+  async getPreviousDifferentPrice(code: string, currentPrice: number): Promise<CurrencyHistory | undefined> {
+    const [history] = await db
+      .select()
+      .from(currencyHistory)
+      .where(
+        and(
+          eq(currencyHistory.code, code),
+          not(eq(currencyHistory.sellPrice, currentPrice))
+        )
+      )
+      .orderBy(desc(currencyHistory.timestamp))
+      .limit(1);
+    
+    return history;
   }
 }
 
