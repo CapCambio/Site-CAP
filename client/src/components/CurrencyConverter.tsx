@@ -141,7 +141,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                   marginTop: '-1px'
                 }}
               >
-                {allCurrencies.filter(currency => currency.code !== toCurrency).map((currency) => (
+                {allCurrencies
+                  .filter(currency => currency.code !== toCurrency)
+                  .sort((a, b) => (a.code === "BRL" ? -1 : b.code === "BRL" ? 1 : 0))
+                  .map((currency) => (
                   <div 
                     key={`from-${currency.code}`}
                     className="flex items-center p-3 hover:bg-[#f4ba4a] cursor-pointer border-b border-black/10"
@@ -207,7 +210,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                   marginTop: '-1px'
                 }}
               >
-                {allCurrencies.filter(currency => currency.code !== fromCurrency && currency.code !== "BRL").map((currency) => ( //Filter out BRL if fromCurrency is BRL
+                {allCurrencies
+                  .filter(currency => currency.code !== fromCurrency && currency.code !== "BRL")
+                  .sort((a, b) => (a.code === "BRL" ? -1 : b.code === "BRL" ? 1 : 0))
+                  .map((currency) => (
                   <div 
                     key={`to-${currency.code}`}
                     className="flex items-center p-3 hover:bg-[#f4ba4a] cursor-pointer border-b border-black/10"
