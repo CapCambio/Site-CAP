@@ -146,6 +146,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               {showFromDropdown && !showToDropdown && (
                 <div className="absolute mt-1 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{
                   width: '100%',
+                  minWidth: '240px',
                   top: '100%',
                   left: '0'
                 }}>
@@ -210,6 +211,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 {showToDropdown && fromCurrency === "BRL" && (
                   <div className="absolute mt-1 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{
                     width: '100%',
+                    minWidth: '240px',
                     top: '100%',
                     left: '0'
                   }}>
