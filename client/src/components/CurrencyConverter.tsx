@@ -144,33 +144,26 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               </div>
 
               {showFromDropdown && !showToDropdown && (
-                <div className="fixed left-0 right-0 top-0 bottom-0 flex items-start justify-center z-[1000]">
-                  <div className="fixed inset-0 bg-black bg-opacity-30" onClick={() => setShowFromDropdown(false)}></div>
-                  <div 
-                    className="absolute max-h-96 overflow-y-auto bg-white rounded-md shadow-xl border border-gray-200"
-                    style={{
-                      width: '240px',
-                      top: '100%',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      marginTop: '0.5rem',
-                      zIndex: 1001
-                    }}
-                  >
-                    {allCurrencies.map((currency) => (
-                      <div 
-                        key={`from-${currency.code}`}
-                        className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
-                        onClick={() => handleFromCurrencyChange(currency.code)}
-                      >
-                        <CurrencyLogo code={currency.code} className="w-5 h-5 mr-3" />
-                        <div className="flex flex-col">
-                          <span className="font-medium text-sm">{currency.code}</span>
-                          <span className="text-xs text-gray-600">{currency.name}</span>
-                        </div>
+                <div className="absolute inset-x-0 w-full bg-white rounded-b-md shadow-xl border border-gray-200 z-50 max-h-80 overflow-y-auto"
+                  style={{
+                    top: '100%',
+                    borderTopLeftRadius: 0,
+                    borderTopRightRadius: 0
+                  }}
+                >
+                  {allCurrencies.map((currency) => (
+                    <div 
+                      key={`from-${currency.code}`}
+                      className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
+                      onClick={() => handleFromCurrencyChange(currency.code)}
+                    >
+                      <CurrencyLogo code={currency.code} className="w-5 h-5 mr-3" />
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">{currency.code}</span>
+                        <span className="text-xs text-gray-600">{currency.name}</span>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -217,33 +210,26 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 </div>
 
                 {showToDropdown && fromCurrency === "BRL" && (
-                  <div className="fixed left-0 right-0 top-0 bottom-0 flex items-start justify-center z-[1000]">
-                    <div className="fixed inset-0 bg-black bg-opacity-30" onClick={() => setShowToDropdown(false)}></div>
-                    <div 
-                      className="absolute max-h-96 overflow-y-auto bg-white rounded-md shadow-xl border border-gray-200"
-                      style={{
-                        width: '240px',
-                        top: '100%',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        marginTop: '0.5rem',
-                        zIndex: 1001
-                      }}
-                    >
-                      {allCurrencies.filter(currency => currency.code !== fromCurrency).map((currency) => (
-                        <div 
-                          key={`to-${currency.code}`}
-                          className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
-                          onClick={() => handleToCurrencyChange(currency.code)}
-                        >
-                          <CurrencyLogo code={currency.code} className="w-5 h-5 mr-3" />
-                          <div className="flex flex-col">
-                            <span className="font-medium text-sm">{currency.code}</span>
-                            <span className="text-xs text-gray-600">{currency.name}</span>
-                          </div>
+                  <div className="absolute inset-x-0 w-full bg-white rounded-b-md shadow-xl border border-gray-200 z-50 max-h-80 overflow-y-auto"
+                    style={{
+                      top: '100%',
+                      borderTopLeftRadius: 0,
+                      borderTopRightRadius: 0
+                    }}
+                  >
+                    {allCurrencies.filter(currency => currency.code !== fromCurrency).map((currency) => (
+                      <div 
+                        key={`to-${currency.code}`}
+                        className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
+                        onClick={() => handleToCurrencyChange(currency.code)}
+                      >
+                        <CurrencyLogo code={currency.code} className="w-5 h-5 mr-3" />
+                        <div className="flex flex-col">
+                          <span className="font-medium text-sm">{currency.code}</span>
+                          <span className="text-xs text-gray-600">{currency.name}</span>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
