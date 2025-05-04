@@ -17,13 +17,13 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const [showToDropdown, setShowToDropdown] = useState<boolean>(false);
 
   const allCurrencies = [
-    ...currencies,
     { 
       code: "BRL", 
       name: "Real Brasileiro",
       buyPrice: 1,
       sellPrice: 1
-    }
+    },
+    ...currencies
   ];
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               </div>
 
               {showFromDropdown && (
-                <div className="absolute right-0 top-full mt-1 w-60 max-h-80 overflow-y-auto z-20 bg-white rounded-md shadow-lg">
+                <div className="fixed mt-1 w-60 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{top: 'auto', right: 'auto', transform: 'translateY(-100%)'}}>
                   {allCurrencies.map((currency) => (
                     <div 
                       key={`from-${currency.code}`}
@@ -183,18 +183,20 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
               <div className="currency-dropdown relative">
                 <div 
-                  className="flex items-center cursor-pointer" 
-                  onClick={() => setShowToDropdown(!showToDropdown)}
+                  className={`flex items-center ${fromCurrency === "BRL" ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
+                  onClick={() => fromCurrency === "BRL" && setShowToDropdown(!showToDropdown)}
                 >
                   <span className="text-xl sm:text-2xl font-bold mr-1">{toCurrency}</span>
                   <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-2"/>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  {fromCurrency === "BRL" && (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
                 </div>
 
-                {showToDropdown && (
-                  <div className="absolute right-0 top-full mt-1 w-60 max-h-80 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
+                {showToDropdown && fromCurrency === "BRL" && (
+                  <div className="fixed mt-1 w-60 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{top: 'auto', right: 'auto', transform: 'translateY(-100%)'}}>
                     {allCurrencies.map((currency) => (
                       <div 
                         key={`to-${currency.code}`}
