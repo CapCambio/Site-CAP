@@ -104,21 +104,19 @@ export function CurrencyCard({
             )}
           </div>
           
-          {isMobile && (
-            <button 
-              onClick={toggleExpand}
-              className="text-xs text-[#1a1a1a] hover:text-gray-700 flex items-center focus:outline-none"
-            >
-              Mais informações de variação
-              <ChevronDown 
-                className={`ml-1 h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
-              />
-            </button>
-          )}
+          <button 
+            onClick={toggleExpand}
+            className="text-xs text-[#1a1a1a] hover:text-gray-700 flex items-center focus:outline-none"
+          >
+            Mais informações de variação
+            <ChevronDown 
+              className={`ml-1 h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+            />
+          </button>
         </div>
         
         {/* Área expandível com o gráfico */}
-        {isMobile && isExpanded && (
+        {isExpanded && (
           <div className="mt-3 pt-3 border-t border-gray-200">
             <CurrencyMiniChart 
               currencyCode={code} 

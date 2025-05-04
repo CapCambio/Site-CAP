@@ -89,7 +89,7 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
                 width={45}
               />
               <Tooltip 
-                formatter={(value: number) => [`R$ ${value.toFixed(2)}`, '']}
+                formatter={(value: number) => [`R$ ${value.toFixed(5).replace(/\.?0+$/, '')}`, '']}
                 labelFormatter={(label) => `Data: ${label}`}
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
               />
