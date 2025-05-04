@@ -140,7 +140,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             
             {showFromDropdown && !showToDropdown && (
               <div 
-                className="absolute inset-x-0 w-full bg-[#f3b234] rounded-b-xl shadow-xl z-50 max-h-80 overflow-y-auto"
+                className="absolute inset-x-0 w-full bg-[#f3b234] rounded-b-xl shadow-xl z-[1000] max-h-80 overflow-y-auto"
                 style={{
                   top: 'calc(100% - 12px)',
                   borderTopLeftRadius: 0,
@@ -207,7 +207,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
             {showToDropdown && fromCurrency === "BRL" && (
               <div 
-                className="absolute inset-x-0 w-full bg-[#f3b234] rounded-b-xl shadow-xl z-50 max-h-80 overflow-y-auto"
+                className="absolute inset-x-0 w-full bg-[#f3b234] rounded-b-xl shadow-xl z-[1000] max-h-80 overflow-y-auto"
                 style={{
                   top: 'calc(100% - 12px)',
                   borderTopLeftRadius: 0,

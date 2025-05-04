@@ -47,13 +47,16 @@ export const currencyDetails: Record<string, { name: string }> = {
 // Format currency values according to their rules
 // Shows up to 5 decimal places, and remove trailing zeros that don't change the value
 export function formatCurrencyValue(code: string, value: number): string {
-  // Primeiro converte para string com 5 casas decimais
-  let stringValue = value.toFixed(5);
+  // Evita arredondamento truncando o número para 5 casas decimais
+  const valueStr = value.toString();
+  const [intPart, rawDecPart = ''] = valueStr.split('.');
+  
+  // Trunca para 5 decimais sem arredondar
+  const decPart = rawDecPart.length > 5 ? rawDecPart.slice(0, 5) : rawDecPart;
   
   // Remove zeros à direita que não alteram o valor, mas mantém pelo menos 2 casas
-  const [intPart, decPart] = stringValue.split('.');
   const minTwoDecimals = decPart.replace(/0+$/, '').padEnd(2, '0');
-  stringValue = `${intPart}.${minTwoDecimals}`;
+  const stringValue = `${intPart}.${minTwoDecimals}`;
   
   // Converte para formato brasileiro (vírgula como separador decimal)
   return stringValue.replace('.', ',');
@@ -63,11 +66,14 @@ export function formatCurrencyValue(code: string, value: number): string {
 export function formatPercentage(value: number | null): string {
   if (value === null || value === 0) return '0,00%';
   
-  return value.toLocaleString('pt-BR', {
-    style: 'decimal',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }) + '%';
+  // Converte para string e trunca para 2 casas sem arredondar
+  const valueStr = value.toString();
+  const [intPart, rawDecPart = ''] = valueStr.split('.');
+  
+  // Trunca para 2 decimais sem arredondar
+  const decPart = rawDecPart.length > 2 ? rawDecPart.slice(0, 2) : rawDecPart.padEnd(2, '0');
+  
+  return `${intPart},${decPart}%`;
 }
 
 // Format dates to Brazilian format
