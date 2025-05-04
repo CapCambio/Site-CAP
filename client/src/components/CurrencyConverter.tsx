@@ -107,7 +107,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     <div className="relative max-w-4xl mx-auto my-6">
       <div className="bg-[#252525] p-4 sm:p-6 rounded-xl overflow-hidden">
         <h2 className="text-white text-xl font-semibold mb-4 text-center">Conversor de Moedas</h2>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:space-x-4">
           {/* Campo de entrada com moeda "FROM" */}
           <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-4 mb-4 sm:mb-0 relative flex-1">
             <input
@@ -202,10 +202,11 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             </div>
           </div>
         </div>
-
-        {toCurrency !== "BRL" && convertedAmount && Number(convertedAmount) !== Math.round(Number(convertedAmount)) && (
-          <div className="text-xs text-[#f3b234] mt-2 text-center">Valor aproximado</div>
-        )}
+        <div className="flex flex-col items-center mt-2">
+          {toCurrency !== "BRL" && convertedAmount && Number(convertedAmount) !== Math.round(Number(convertedAmount)) && (
+            <div className="text-xs text-[#f3b234]">Valor aproximado</div>
+          )}
+        </div>
       </div>
     </div>
   );
