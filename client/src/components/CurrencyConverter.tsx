@@ -117,9 +117,9 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     <div className="relative max-w-4xl mx-auto my-6">
       <div className="bg-[#252525] p-3 sm:p-5 rounded-xl overflow-hidden">
         <h2 className="text-white text-xl font-semibold mb-3 text-center">Conversor de Moedas</h2>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           {/* Campo de entrada com moeda "FROM" */}
-          <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 mb-2 sm:mb-0 relative flex-1 h-16 sm:h-[4.5rem]">
+          <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 mb-6 sm:mb-0 relative flex-1 h-16 sm:h-[4.5rem]">
             <input
               type="text"
               value={amount}
@@ -161,7 +161,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           {/* Botão para trocar as moedas */}
-          <div className="flex justify-center items-center -my-1 z-10 relative sm:self-center sm:flex-shrink-0">
+          <div className="flex justify-center items-center z-10 relative sm:mx-4 sm:self-center sm:flex-shrink-0">
             <button
               onClick={handleSwapCurrencies}
               className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2"
@@ -175,7 +175,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           {/* Campo de saída com moeda "TO" */}
-          <div className="flex flex-col mt-2 sm:mt-0 relative flex-1">
+          <div className="flex flex-col mt-6 sm:mt-0 relative flex-1">
             <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 h-16 sm:h-[4.5rem]">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
