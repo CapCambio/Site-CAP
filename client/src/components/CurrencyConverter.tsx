@@ -144,11 +144,14 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               </div>
 
               {showFromDropdown && !showToDropdown && (
-                <div className="absolute mt-1 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{
+                <div className="absolute mt-0 max-h-80 overflow-y-auto z-50 bg-white rounded-b-md shadow-lg border border-gray-200" style={{
                   width: '100%',
                   minWidth: '240px',
                   top: '100%',
-                  left: '0'
+                  left: '0',
+                  borderTop: 'none',
+                  borderTopLeftRadius: '0',
+                  borderTopRightRadius: '0'
                 }}>
                   {allCurrencies.map((currency) => (
                     <div 
@@ -209,11 +212,14 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 </div>
 
                 {showToDropdown && fromCurrency === "BRL" && (
-                  <div className="absolute mt-1 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{
+                  <div className="absolute mt-0 max-h-80 overflow-y-auto z-50 bg-white rounded-b-md shadow-lg border border-gray-200" style={{
                     width: '100%',
                     minWidth: '240px',
                     top: '100%',
-                    left: '0'
+                    left: '0',
+                    borderTop: 'none',
+                    borderTopLeftRadius: '0',
+                    borderTopRightRadius: '0'
                   }}>
                     {allCurrencies.filter(currency => currency.code !== fromCurrency).map((currency) => (
                       <div 
@@ -235,7 +241,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
             {isApproximateValue && (
               <div className="text-center mt-1 absolute w-full">
-                <span className="text-[#f3b234] text-xs">Valor aproximado</span>
+                <span className="text-white text-xs">Valor aproximado</span>
               </div>
             )}
           </div>
