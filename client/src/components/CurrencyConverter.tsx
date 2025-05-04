@@ -1,15 +1,8 @@
 import { useState, useEffect } from "react";
 import { Currency } from "@/lib/types";
 import { formatCurrencyValue } from "@/lib/currency";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { CurrencyLogo } from "./CurrencyLogo";
+import { ArrowDown } from "lucide-react";
 
 interface CurrencyConverterProps {
   currencies: Currency[];
@@ -20,6 +13,8 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const [toCurrency, setToCurrency] = useState<string>("USD");
   const [amount, setAmount] = useState<string>("1");
   const [convertedAmount, setConvertedAmount] = useState<string>("");
+  const [showFromDropdown, setShowFromDropdown] = useState<boolean>(false);
+  const [showToDropdown, setShowToDropdown] = useState<boolean>(false);
   const [exchangeRate, setExchangeRate] = useState<string>("");
 
   // Adicionar Real à lista de moedas disponíveis
@@ -32,6 +27,22 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     },
     ...currencies
   ];
+
+  useEffect(() => {
+    // Fechar dropdowns quando clicar fora deles
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.currency-dropdown')) {
+        setShowFromDropdown(false);
+        setShowToDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     convertCurrency();
@@ -78,11 +89,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     setConvertedAmount(stringValue);
   };
 
-  const handleFromCurrencyChange = (value: string) => {
-    setFromCurrency(value);
+  const handleFromCurrencyChange = (code: string) => {
+    setFromCurrency(code);
+    setShowFromDropdown(false);
     
     // Se a moeda de origem não for BRL, a moeda de destino deve ser BRL
-    if (value !== "BRL") {
+    if (code !== "BRL") {
       setToCurrency("BRL");
     } 
     // Se a moeda de origem for BRL, podemos definir USD como padrão para destino
@@ -91,8 +103,9 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     }
   };
 
-  const handleToCurrencyChange = (value: string) => {
-    setToCurrency(value);
+  const handleToCurrencyChange = (code: string) => {
+    setToCurrency(code);
+    setShowToDropdown(false);
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,109 +114,110 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     setAmount(value);
   };
 
+  // Encontrar os objetos de moeda selecionados
+  const selectedFromCurrency = allCurrencies.find(c => c.code === fromCurrency);
+  const selectedToCurrency = allCurrencies.find(c => c.code === toCurrency);
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-5 my-6 max-w-3xl mx-auto">
-      <h2 className="text-xl font-bold text-center mb-5 text-[#1a1a1a]">Calculadora de Câmbio</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-        {/* Campo "Tenho" */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <label htmlFor="amount" className="text-sm font-medium text-gray-700">Tenho</label>
-            <Select value={fromCurrency} onValueChange={handleFromCurrencyChange}>
-              <SelectTrigger className="w-[140px] border-[#f3b234]">
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent>
-                {allCurrencies.map((currency) => (
-                  <SelectItem key={`from-${currency.code}`} value={currency.code}>
-                    <div className="flex items-center">
-                      <CurrencyLogo code={currency.code} className="w-4 h-4 mr-2" />
-                      {currency.code}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <div className="bg-black p-4 rounded-lg my-6 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Primeiro bloco: Entrada de valor e seleção de moeda */}
+        <div className="bg-white p-5 rounded-lg shadow-sm">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold">DE</span>
+            <div className="relative currency-dropdown">
+              <button 
+                className="flex items-center space-x-2 bg-[#f3b234] text-black px-4 py-2 rounded-md"
+                onClick={() => setShowFromDropdown(!showFromDropdown)}
+              >
+                <CurrencyLogo code={fromCurrency} className="w-5 h-5" />
+                <span>{fromCurrency}</span>
+                <ArrowDown className="w-4 h-4" />
+              </button>
+              
+              {showFromDropdown && (
+                <div className="absolute right-0 mt-1 w-56 max-h-60 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
+                  {allCurrencies.map((currency) => (
+                    <button 
+                      key={`from-${currency.code}`}
+                      className="w-full flex items-center p-2 hover:bg-gray-100 text-left"
+                      onClick={() => handleFromCurrencyChange(currency.code)}
+                    >
+                      <CurrencyLogo code={currency.code} className="w-5 h-5 mr-2" />
+                      <span className="font-medium">{currency.code}</span>
+                      <span className="text-xs ml-2 text-gray-500">{currency.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           
-          <div className="relative">
-            <Input
-              id="amount"
-              type="text"
-              value={amount}
-              onChange={handleAmountChange}
-              className="pr-12 text-lg font-medium focus:ring-[#f3b234] focus:border-[#f3b234]"
-              placeholder="0.00"
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
-              <CurrencyLogo code={fromCurrency} className="w-5 h-5 mr-1" />
-              <span className="text-sm font-medium text-gray-600">{fromCurrency}</span>
-            </div>
+          <input
+            type="text"
+            value={amount}
+            onChange={handleAmountChange}
+            className="w-full text-3xl font-medium border-none focus:ring-0 focus:outline-none"
+            placeholder="0.00"
+          />
+          
+          <div className="text-xs text-gray-500 mt-1">
+            {selectedFromCurrency && (
+              <span>{selectedFromCurrency.name}</span>
+            )}
           </div>
         </div>
         
-        {/* Campo "Troco por" */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <label htmlFor="converted" className="text-sm font-medium text-gray-700">Troco por</label>
-            <Select 
-              value={toCurrency} 
-              onValueChange={handleToCurrencyChange}
-              disabled={fromCurrency !== "BRL"}
-            >
-              <SelectTrigger className="w-[140px] border-[#f3b234]">
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent>
-                {fromCurrency === "BRL" ? (
-                  // Se "Tenho" for BRL, mostrar todas as moedas estrangeiras
-                  currencies.map((currency) => (
-                    <SelectItem key={`to-${currency.code}`} value={currency.code}>
-                      <div className="flex items-center">
-                        <CurrencyLogo code={currency.code} className="w-4 h-4 mr-2" />
-                        {currency.code}
-                      </div>
-                    </SelectItem>
-                  ))
-                ) : (
-                  // Se "Tenho" for moeda estrangeira, mostrar apenas BRL
-                  <SelectItem value="BRL">
-                    <div className="flex items-center">
-                      <CurrencyLogo code="BRL" className="w-4 h-4 mr-2" />
-                      BRL
-                    </div>
-                  </SelectItem>
-                )}
-              </SelectContent>
-            </Select>
+        {/* Segundo bloco: Valor convertido e seleção de moeda */}
+        <div className="bg-white p-5 rounded-lg shadow-sm">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold">PARA</span>
+            <div className="relative currency-dropdown">
+              <button 
+                className="flex items-center space-x-2 bg-[#f3b234] text-black px-4 py-2 rounded-md"
+                onClick={() => setShowToDropdown(!showToDropdown)}
+                disabled={fromCurrency !== "BRL"}
+              >
+                <CurrencyLogo code={toCurrency} className="w-5 h-5" />
+                <span>{toCurrency}</span>
+                <ArrowDown className="w-4 h-4" />
+              </button>
+              
+              {showToDropdown && fromCurrency === "BRL" && (
+                <div className="absolute right-0 mt-1 w-56 max-h-60 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
+                  {currencies.map((currency) => (
+                    <button 
+                      key={`to-${currency.code}`}
+                      className="w-full flex items-center p-2 hover:bg-gray-100 text-left"
+                      onClick={() => handleToCurrencyChange(currency.code)}
+                    >
+                      <CurrencyLogo code={currency.code} className="w-5 h-5 mr-2" />
+                      <span className="font-medium">{currency.code}</span>
+                      <span className="text-xs ml-2 text-gray-500">{currency.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           
-          <div className="relative">
-            <Input
-              id="converted"
-              type="text"
-              value={convertedAmount}
-              readOnly
-              className="pr-12 text-lg font-medium"
-              placeholder="0.00"
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
-              <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-1" />
-              <span className="text-sm font-medium text-gray-600">{toCurrency}</span>
-            </div>
+          <div className="text-3xl font-medium text-gray-800">
+            {convertedAmount || "0"}
+          </div>
+          
+          <div className="text-xs text-gray-500 mt-1">
+            {selectedToCurrency && (
+              <span>{selectedToCurrency.name}</span>
+            )}
           </div>
         </div>
       </div>
       
       {/* Taxa de câmbio */}
-      <div className="text-center text-sm mt-3">
+      <div className="text-center text-sm text-white mt-3">
         {exchangeRate && (
-          <p className="text-[#f3b234] font-medium">{exchangeRate}</p>
+          <div className="text-sm">{exchangeRate}</div>
         )}
-        <p className="text-xs mt-1">
-          <span className="font-medium text-[#f3b234]">Cotação de referência:</span> <span className="text-gray-500">As taxas aplicadas são baseadas nas cotações da tabela abaixo</span>
-        </p>
       </div>
     </div>
   );
