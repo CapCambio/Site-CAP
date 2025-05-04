@@ -109,20 +109,20 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   return (
     <div className="currency-converter relative max-w-3xl mx-auto mt-0 mb-6">
       <div className="bg-[#252525] p-3 pb-8 sm:p-6 sm:pb-12 rounded-xl">
-        <h2 className="text-white text-xl font-semibold mb-2 sm:mb-3 text-center">Conversor de Moedas</h2>
-        
+        <h2 className="text-[#f3b234] text-xl font-semibold mb-2 sm:mb-3 text-center">Conversor de Moedas</h2>
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           {/* Campo de entrada com moeda "FROM" */}
           <div className="relative flex-1">
-            <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 mb-3 sm:mb-0 h-14 sm:h-[4.5rem]">
+            <div className="bg-white rounded-xl flex justify-between items-center p-3 mb-3 sm:mb-0 h-14 sm:h-[4.5rem]">
               <input
                 type="text"
                 value={amount}
                 onChange={handleAmountChange}
-                className="text-xl sm:text-2xl font-medium bg-[#f3b234] border-none focus:ring-0 focus:outline-none text-black w-3/5"
+                className="text-xl sm:text-2xl font-medium bg-white border-none focus:ring-0 focus:outline-none text-black w-3/5"
                 placeholder="0"
               />
-  
+
               <div 
                 className="currency-dropdown flex items-center cursor-pointer" 
                 onClick={() => {
@@ -137,10 +137,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 </svg>
               </div>
             </div>
-            
+
             {showFromDropdown && !showToDropdown && (
               <div 
-                className="absolute inset-x-0 w-full bg-[#f3b234] rounded-b-xl shadow-xl z-[1000] max-h-80 overflow-y-auto currency-dropdown-list"
+                className="absolute inset-x-0 w-full bg-white rounded-b-xl shadow-xl z-[1000] max-h-80 overflow-y-auto currency-dropdown-list"
                 style={{
                   top: 'calc(100% - 12px)',
                   borderTopLeftRadius: 0,
@@ -181,7 +181,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
           {/* Campo de saída com moeda "TO" */}
           <div className="relative flex-1">
-            <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem] mt-3 sm:mt-0">
+            <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem] mt-3 sm:mt-0">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
               </div>
@@ -207,7 +207,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
             {showToDropdown && fromCurrency === "BRL" && (
               <div 
-                className="absolute inset-x-0 w-full bg-[#f3b234] rounded-b-xl shadow-xl z-[1000] max-h-80 overflow-y-auto currency-dropdown-list"
+                className="absolute inset-x-0 w-full bg-white rounded-b-xl shadow-xl z-[1000] max-h-80 overflow-y-auto currency-dropdown-list"
                 style={{
                   top: 'calc(100% - 12px)',
                   borderTopLeftRadius: 0,
@@ -233,7 +233,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
             {isApproximateValue && (
               <div className="text-center mt-1 absolute w-full">
-                <span className="text-white text-xs">Valor aproximado</span>
+                <span className="text-[#f3b234] text-xs">Valor aproximado</span>
               </div>
             )}
           </div>
