@@ -1,0 +1,29 @@
+O sistema de cálculo de variações funciona da seguinte forma:
+
+1. Armazenamento de Histórico
+Cada cotação obtida do site CTR Câmbio (https://ctrcambio.com.br/tvcaxias/) é salva na tabela currency_history no banco de dados.
+O sistema só armazena novos valores quando há mudança real nas cotações. Se a cotação for idêntica à última armazenada, ela não é duplicada no banco.
+Os registros são mantidos por 1 ano (12 meses) e depois automaticamente removidos para evitar crescimento excessivo do banco de dados.
+2. Cálculo das Variações
+Quando uma nova cotação é obtida, o sistema busca o registro anterior para comparação dentro de uma janela de 96 horas (4 dias).
+3. Regras Específicas para Cálculo
+O sistema procura primeiro por cotações diferentes da atual dentro das últimas 96 horas para calcular a variação real.
+Se todas as cotações nas últimas 96 horas tiverem o mesmo valor da atual, o sistema usa a mais antiga dessa janela para calcular a variação (que será 0%).
+A variação é calculada apenas sobre o valor de venda (não usa o valor de compra), por ser o valor mais relevante para o consumidor.
+O sistema arredonda a variação para 2 casas decimais.
+4. Casos Especiais
+Quando não há registros anteriores nas últimas 96 horas, o sistema define a variação como 0%.
+Quando uma cotação permanece igual por muito tempo, a variação mostrada será 0%.
+Quando ocorre uma alteração, a variação calculada permanece visível até que:
+Uma nova alteração ocorra (gerando uma nova variação)
+Se passem 96 horas desde a última alteração (a variação volta a zero)
+5. Exibição na Interface
+As variações positivas são mostradas em verde com um ícone de seta para cima.
+As variações negativas são mostradas em vermelho com um ícone de seta para baixo.
+Variações zero são mostradas em cinza com um ícone horizontal.
+Todas as variações são formatadas com uma casa decimal, por exemplo: "+1.2%", "-0.5%", "0.0%".
+Cenário de Exemplo
+Se o Dólar estiver com valor de venda R$ 5,00 hoje
+E ontem tinha valor de venda R$ 4,90
+A variação calculada será: +2.0% (((5.00 - 4.90) / 4.90) * 100)
+Esta variação será exibida até que ocorra uma nova mudança ou se passem 96 horas.
