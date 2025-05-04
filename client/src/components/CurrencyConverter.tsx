@@ -12,6 +12,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const [toCurrency, setToCurrency] = useState<string>("USD");
   const [amount, setAmount] = useState<string>("1000");
   const [convertedAmount, setConvertedAmount] = useState<string>("");
+  const [isApproximateValue, setIsApproximateValue] = useState<boolean>(false);
   const [showFromDropdown, setShowFromDropdown] = useState<boolean>(false);
   const [showToDropdown, setShowToDropdown] = useState<boolean>(false);
 
@@ -67,13 +68,22 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       result = Number(amount) * sourceCurrency.buyPrice;
     }
 
+    // Formatar o valor com até 5 casas decimais, removendo zeros à direita
     let stringValue = result.toFixed(5);
     stringValue = stringValue.replace(/\.?0+$/, "");
     if (stringValue.endsWith('.')) {
       stringValue = stringValue.slice(0, -1);
     }
-
-    setConvertedAmount(stringValue);
+    
+    // Se o destino é BRL, mostrar valor exato
+    // Se não, arredondar para inteiro se não for inteiro
+    if (toCurrency !== "BRL" && Math.floor(result) !== result) {
+      setIsApproximateValue(true);
+      setConvertedAmount(Math.round(result).toString());
+    } else {
+      setIsApproximateValue(false);
+      setConvertedAmount(stringValue);
+    }
   };
 
   const handleFromCurrencyChange = (code: string) => {
@@ -104,7 +114,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto my-6 bg-white p-4 sm:p-6 rounded-xl">
+    <div className="relative max-w-4xl mx-auto my-6">
       <div className="bg-[#252525] p-4 sm:p-6 rounded-xl overflow-hidden">
         <h2 className="text-white text-xl font-semibold mb-4 text-center">Conversor de Moedas</h2>
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:space-x-4">
@@ -203,9 +213,11 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               </div>
             </div>
             
-            <div className="text-center mt-1">
-              <span className="text-white text-xs">Valor aproximado</span>
-            </div>
+            {isApproximateValue && (
+              <div className="text-center mt-1">
+                <span className="text-white text-xs">Valor aproximado</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
