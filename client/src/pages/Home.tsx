@@ -25,6 +25,7 @@ export default function Home() {
   const isMobile = useIsMobile();
   const [showCalculator, setShowCalculator] = useState(false);
   const [isHistoricalView, setIsHistoricalView] = useState(false);
+  const [expandedCards, setExpandedCards] = useState<{[key: string]: boolean}>({}); // Para controlar individualmente cada card
 
   const { 
     currencies, 
@@ -65,6 +66,13 @@ export default function Home() {
   const handleResetToCurrentView = () => {
     setIsHistoricalView(false);
   };
+  
+  const handleToggleCardExpand = (code: string) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [code]: !prev[code]
+    }));
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -99,6 +107,8 @@ export default function Home() {
                     historicalPrice={historicalPrices[currency.code]} 
                     selectedDate={selectedDate}
                     isHistoricalView={isHistoricalView}
+                    isExpanded={expandedCards[currency.code] || false}
+                    onToggleExpand={() => handleToggleCardExpand(currency.code)}
                   />
                 ))
               )}

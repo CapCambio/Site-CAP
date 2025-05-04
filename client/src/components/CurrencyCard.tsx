@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ArrowDown, ArrowUp, ChevronDown } from "lucide-react";
 import { Currency } from "../lib/types";
 import { Card } from "@/components/ui/card";
@@ -6,7 +5,7 @@ import { CurrencyLogo } from "./CurrencyLogo";
 import { formatCurrencyValue, formatPercentage } from "../lib/currency";
 import { CurrencyMiniChart } from "./CurrencyMiniChart";
 import { useIsMobile } from "../hooks/use-mobile";
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 
 interface CurrencyCardProps {
   currency: Currency;
@@ -17,29 +16,31 @@ interface CurrencyCardProps {
   };
   selectedDate?: Date;
   isHistoricalView?: boolean;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
 export function CurrencyCard({ 
   currency, 
   historicalPrice, 
   selectedDate,
-  isHistoricalView = false
+  isHistoricalView = false,
+  isExpanded = false,
+  onToggleExpand
 }: CurrencyCardProps) {
   const { name, code, buyPrice, sellPrice, change } = currency;
-  const [isExpanded, setIsExpanded] = useState(false);
   const isMobile = useIsMobile();
   
   const isPositiveChange = change !== null && change > 0;
   const isNegativeChange = change !== null && change < 0;
   
-  const toggleExpand = () => {
-    setIsExpanded(prev => !prev);
-  };
-
   // Determina se estamos exibindo dados históricos ou atuais
   const displayBuyPrice = isHistoricalView && historicalPrice ? historicalPrice.buyPrice : buyPrice;
   const displaySellPrice = isHistoricalView && historicalPrice ? historicalPrice.sellPrice : sellPrice;
   const hasHistoricalData = isHistoricalView && historicalPrice && historicalPrice.buyPrice !== null;
+  
+  // Verifica se a data selecionada é a data atual
+  const isCurrentDate = selectedDate ? isSameDay(selectedDate, new Date()) : false;
   
   return (
     <Card className={`currency-card overflow-hidden hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
@@ -68,8 +69,8 @@ export function CurrencyCard({
           </div>
         </div>
 
-        {/* Mensagem de cotação histórica */}
-        {isHistoricalView && selectedDate && (
+        {/* Mensagem de cotação histórica - apenas mostrar se não for o dia atual */}
+        {isHistoricalView && selectedDate && !isCurrentDate && (
           <div className="mb-3 text-center">
             {hasHistoricalData ? (
               <p className="text-sm font-bold text-[#f3b234]">
@@ -105,7 +106,7 @@ export function CurrencyCard({
           </div>
           
           <button 
-            onClick={toggleExpand}
+            onClick={onToggleExpand}
             className="text-xs text-[#1a1a1a] hover:text-gray-700 flex items-center focus:outline-none"
           >
             Mais informações de variação
