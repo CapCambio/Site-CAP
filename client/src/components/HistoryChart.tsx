@@ -68,9 +68,9 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
         <CardTitle className="text-lg text-[#1a1a1a]">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-72 w-full">
+        <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+            <LineChart data={data} margin={{ top: 5, right: 5, left: 25, bottom: 25 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="date" 
@@ -80,11 +80,13 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
                   const parts = value.split('/');
                   return `${parts[0]}/${parts[1]}`;
                 }}
+                label={{ value: "Data", position: "insideBottom", offset: -15, fill: "#000000", fontSize: 12 }}
               />
               <YAxis 
                 tick={{ fontSize: 12 }}
                 domain={['auto', 'auto']}
                 tickFormatter={(value) => value.toFixed(2)}
+                label={{ value: "Cotação", angle: -90, position: "insideLeft", offset: 10, fill: "#000000", fontSize: 12 }}
               />
               <Tooltip 
                 formatter={(value: number) => [`R$ ${value.toFixed(2)}`, '']}
