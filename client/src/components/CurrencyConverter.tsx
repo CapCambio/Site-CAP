@@ -144,11 +144,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               </div>
 
               {showFromDropdown && !showToDropdown && (
-                <div className="fixed mt-1 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{
-                  width: 'calc(40% - 1rem)',
-                  top: 'auto',
-                  left: 'auto',
-                  transform: 'translateY(0)'
+                <div className="absolute mt-1 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{
+                  width: '100%',
+                  top: '100%',
+                  left: '0'
                 }}>
                   {allCurrencies.map((currency) => (
                     <div 
@@ -209,11 +208,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 </div>
 
                 {showToDropdown && fromCurrency === "BRL" && (
-                  <div className="fixed mt-1 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{
-                    width: 'calc(40% - 1rem)',
-                    top: 'auto',
-                    left: 'auto',
-                    transform: 'translateY(0)'
+                  <div className="absolute mt-1 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{
+                    width: '100%',
+                    top: '100%',
+                    left: '0'
                   }}>
                     {allCurrencies.filter(currency => currency.code !== fromCurrency).map((currency) => (
                       <div 
