@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Currency } from "@/lib/types";
 import { formatCurrencyValue } from "@/lib/currency";
@@ -106,7 +105,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
   return (
     <div className="relative max-w-4xl mx-auto my-6">
-      <div className="bg-[#252525] p-4 sm:p-6 rounded-xl overflow-hidden">
+      <div className="p-4 sm:p-6 rounded-xl overflow-hidden"> {/* Removed bg-[#252525] */}
         <h2 className="text-white text-xl font-semibold mb-4 text-center">Conversor de Moedas</h2>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4">
           {/* Campo de entrada com moeda "FROM" */}
@@ -167,8 +166,11 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
           {/* Campo de saída com moeda "TO" */}
           <div className="bg-white rounded-xl flex justify-between items-center p-4 mt-3 sm:mt-0 relative flex-1">
-            <div className="text-2xl sm:text-3xl font-medium text-black w-3/5 truncate">
-              {convertedAmount || "0"}
+            <div className="flex flex-col">
+              <div className="text-2xl sm:text-3xl font-medium text-black truncate">
+                {convertedAmount ? Math.round(Number(convertedAmount)).toString() : "0"}
+              </div>
+              <div className="text-xs text-[#f3b234] mt-1">Valor aproximado</div>
             </div>
 
             <div className="currency-dropdown relative">

@@ -56,10 +56,7 @@ export default function Home() {
         {/* Removed TabNavigation */}
         {!isLoadingCurrencies && activeTab === "current" && (
           <div className="my-6 max-w-3xl mx-auto">
-            <div className={`${isMobile ? '' : 'bg-white rounded-lg shadow-md p-5'}`}>
-              {!isMobile && <h2 className="text-xl font-bold text-[#1a1a1a] text-center mb-5">Calculadora de Câmbio</h2>}
-              <CurrencyConverter currencies={currencies} />
-            </div>
+            <CurrencyConverter currencies={currencies} />
           </div>
         )}
 
