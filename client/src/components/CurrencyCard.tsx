@@ -73,7 +73,7 @@ export function CurrencyCard({ currency }: CurrencyCardProps) {
           {isMobile && (
             <button 
               onClick={toggleExpand}
-              className="text-xs text-[#1a1a1a] hover:text-gray-700 flex items-center focus:outline-none"
+              className="text-xs text-[#f3b234] hover:text-[#f3b234]/80 flex items-center focus:outline-none"
             >
               Mais informações de variação
               <ChevronDown 
