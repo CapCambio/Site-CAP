@@ -104,7 +104,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto my-6">
+    <div className="relative max-w-4xl mx-auto my-6 bg-white p-4 sm:p-6 rounded-xl">
       <div className="bg-[#252525] p-4 sm:p-6 rounded-xl overflow-hidden">
         <h2 className="text-white text-xl font-semibold mb-4 text-center">Conversor de Moedas</h2>
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:space-x-4">
@@ -165,47 +165,48 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           {/* Campo de saída com moeda "TO" */}
-          <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-4 mt-3 sm:mt-0 relative flex-1">
-            <div className="text-2xl sm:text-3xl font-medium text-black truncate">
-              {convertedAmount ? (toCurrency === "BRL" ? convertedAmount : Math.round(Number(convertedAmount)).toString()) : "0"}
-            </div>
-
-            <div className="currency-dropdown relative">
-              <div 
-                className="flex items-center cursor-pointer" 
-                onClick={() => setShowToDropdown(!showToDropdown)}
-              >
-                <span className="text-2xl sm:text-3xl font-bold mr-1">{toCurrency}</span>
-                <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-2"/>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+          <div className="flex flex-col mt-3 sm:mt-0 relative flex-1">
+            <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-4">
+              <div className="text-2xl sm:text-3xl font-medium text-black truncate">
+                {convertedAmount ? convertedAmount : "0"}
               </div>
 
-              {showToDropdown && (
-                <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
-                  {allCurrencies.map((currency) => (
-                    <div 
-                      key={`to-${currency.code}`}
-                      className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
-                      onClick={() => handleToCurrencyChange(currency.code)}
-                    >
-                      <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
-                      <div className="flex flex-col">
-                        <span className="font-medium text-base">{currency.code}</span>
-                        <span className="text-sm text-gray-600">{currency.name}</span>
-                      </div>
-                    </div>
-                  ))}
+              <div className="currency-dropdown relative">
+                <div 
+                  className="flex items-center cursor-pointer" 
+                  onClick={() => setShowToDropdown(!showToDropdown)}
+                >
+                  <span className="text-2xl sm:text-3xl font-bold mr-1">{toCurrency}</span>
+                  <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-2"/>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </div>
-              )}
+
+                {showToDropdown && (
+                  <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
+                    {allCurrencies.map((currency) => (
+                      <div 
+                        key={`to-${currency.code}`}
+                        className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
+                        onClick={() => handleToCurrencyChange(currency.code)}
+                      >
+                        <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
+                        <div className="flex flex-col">
+                          <span className="font-medium text-base">{currency.code}</span>
+                          <span className="text-sm text-gray-600">{currency.name}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="text-center mt-1">
+              <span className="text-white text-xs">Valor aproximado</span>
             </div>
           </div>
-        </div>
-        <div className="flex flex-col items-center mt-2">
-          {toCurrency !== "BRL" && convertedAmount && Number(convertedAmount) !== Math.round(Number(convertedAmount)) && (
-            <div className="text-xs text-[#f3b234]">Valor aproximado</div>
-          )}
         </div>
       </div>
     </div>
