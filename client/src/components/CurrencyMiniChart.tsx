@@ -105,7 +105,7 @@ export function CurrencyMiniChart({ currencyCode, initialMonth }: CurrencyMiniCh
     return {
       date: formattedDay,
       day: day.toString(), // Para mostrar apenas o dia no eixo X
-      buyPrice: historyEntry?.buyPrice || null
+      sellPrice: historyEntry?.sellPrice || null
     };
   });
 
@@ -203,8 +203,8 @@ export function CurrencyMiniChart({ currencyCode, initialMonth }: CurrencyMiniCh
           />
           <Line 
             type="monotone" 
-            dataKey="buyPrice" 
-            name="Compra" 
+            dataKey="sellPrice" 
+            name="Venda" 
             stroke="#f3b234" 
             strokeWidth={2}
             dot={{ r: 2 }}

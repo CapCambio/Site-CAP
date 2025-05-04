@@ -96,17 +96,17 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
               <Legend />
               <Line 
                 type="monotone" 
-                dataKey="compra" 
-                name="Compra" 
-                stroke="#1a1a1a" 
+                dataKey="venda" 
+                name="Venda" 
+                stroke="#f3b234" 
                 activeDot={{ r: 8 }} 
                 strokeWidth={2}
               />
               <Line 
                 type="monotone" 
-                dataKey="venda" 
-                name="Venda" 
-                stroke="#f3b234" 
+                dataKey="compra" 
+                name="Compra" 
+                stroke="#1a1a1a" 
                 activeDot={{ r: 8 }} 
                 strokeWidth={2}
               />
