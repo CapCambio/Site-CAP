@@ -70,7 +70,7 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
       <CardContent>
         <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 5, right: 5, left: 25, bottom: 25 }}>
+            <LineChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 25 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="date" 
@@ -85,8 +85,8 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
               <YAxis 
                 tick={{ fontSize: 12 }}
                 domain={['auto', 'auto']}
-                tickFormatter={(value) => value.toFixed(2)}
-                label={{ value: "Cotação", angle: -90, position: "insideLeft", offset: 10, fill: "#000000", fontSize: 12 }}
+                tickFormatter={(value) => value.toFixed(5).replace(/\.?0+$/, '')}
+                width={45}
               />
               <Tooltip 
                 formatter={(value: number) => [`R$ ${value.toFixed(2)}`, '']}
