@@ -90,11 +90,18 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const handleFromCurrencyChange = (code: string) => {
     setFromCurrency(code);
     setShowFromDropdown(false);
+    // Se selecionar uma moeda estrangeira, força BRL como destino
+    if (code !== "BRL") {
+      setToCurrency("BRL");
+    }
   };
 
   const handleToCurrencyChange = (code: string) => {
-    setToCurrency(code);
-    setShowToDropdown(false);
+    // Só permite mudar se a moeda de origem for BRL
+    if (fromCurrency === "BRL") {
+      setToCurrency(code);
+      setShowToDropdown(false);
+    }
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,10 +110,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     setAmount(value);
   };
 
-  // Trocar as moedas de lugar
+  // Trocar as moedas de lugar apenas se uma delas for BRL
   const handleSwapCurrencies = () => {
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
+    if (fromCurrency === "BRL" || toCurrency === "BRL") {
+      setFromCurrency(toCurrency);
+      setToCurrency(fromCurrency);
+    }
   };
 
   return (
@@ -156,9 +165,13 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         <div className="flex justify-center -my-3 z-10 relative">
           <button
             onClick={handleSwapCurrencies}
-            className="bg-black rounded-full p-2 text-white"
+            className="bg-black rounded-full p-1.5 text-white"
           >
-            <ArrowUpDown size={24} />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 6L3 6L3 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M15 18H21V12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 6L21 18" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
           </button>
         </div>
 
