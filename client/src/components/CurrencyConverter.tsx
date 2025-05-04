@@ -114,7 +114,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   return (
-    <div className="relative max-w-3xl mx-auto mt-2 mb-6">
+    <div className="relative max-w-3xl mx-auto mb-6">
       <div className="bg-[#252525] p-3 pb-8 sm:p-6 sm:pb-12 rounded-xl overflow-hidden">
         <h2 className="text-white text-xl font-semibold mb-2 sm:mb-3 text-center">Conversor de Moedas</h2>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
