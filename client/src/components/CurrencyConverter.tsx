@@ -50,7 +50,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       return;
     }
 
-    let result = 0; // Inicializa com zero para evitar erro
+    let result = 0; 
 
     if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
       setConvertedAmount("Invalid conversion");
@@ -104,7 +104,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto my-6 bg-white p-4 sm:p-6 rounded-xl">
+    <div className="relative max-w-4xl mx-auto my-6">
       <div className="bg-[#252525] p-4 sm:p-6 rounded-xl overflow-hidden">
         <h2 className="text-white text-xl font-semibold mb-4 text-center">Conversor de Moedas</h2>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4">
@@ -166,10 +166,8 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
           {/* Campo de saída com moeda "TO" */}
           <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-4 mt-3 sm:mt-0 relative flex-1">
-            <div className="flex flex-col">
-              <div className="text-2xl sm:text-3xl font-medium text-black truncate bg-[#f3b234]">
-                {convertedAmount ? convertedAmount : "0"}
-              </div>
+            <div className="text-2xl sm:text-3xl font-medium text-black truncate">
+              {convertedAmount ? (toCurrency === "BRL" ? convertedAmount : Math.round(Number(convertedAmount)).toString()) : "0"}
             </div>
 
             <div className="currency-dropdown relative">
@@ -204,11 +202,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             </div>
           </div>
         </div>
-        
-        {/* Mensagem de valor aproximado - Fora do campo e embaixo */}
-        <div className="text-center mt-3">
-          <span className="text-white text-xs">Valor aproximado</span>
-        </div>
+
+        {toCurrency !== "BRL" && convertedAmount && Number(convertedAmount) !== Math.round(Number(convertedAmount)) && (
+          <div className="text-xs text-[#f3b234] mt-2 text-center">Valor aproximado</div>
+        )}
       </div>
     </div>
   );
