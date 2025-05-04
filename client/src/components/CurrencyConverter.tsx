@@ -119,11 +119,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   return (
-    <div className="relative max-w-xl mx-auto my-6">
+    <div className="relative max-w-4xl mx-auto my-6">
       <div className="bg-[#252525] p-4 sm:p-6 rounded-xl overflow-hidden">
         <h2 className="text-white text-xl font-semibold mb-4 text-center">Conversor de Moedas</h2>
-        {/* Campo de entrada com moeda "FROM" */}
-        <div className="bg-white rounded-xl flex justify-between items-center p-4 mb-4 relative"> {/* Changed background to white */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4">
+          {/* Campo de entrada com moeda "FROM" */}
+          <div className="bg-white rounded-xl flex justify-between items-center p-4 mb-4 sm:mb-0 relative flex-1"> {/* Changed background to white */}
           <input
             type="text"
             value={amount}
@@ -165,10 +166,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         </div>
 
         {/* Botão para trocar as moedas */}
-        <div className="flex justify-center my-4 z-10 relative">
+        <div className="flex justify-center my-4 sm:my-0 z-10 relative">
           <button
             onClick={handleSwapCurrencies}
-            className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2"
+            className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2 sm:mx-4"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M7 8L3 12L7 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -179,7 +180,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         </div>
 
         {/* Campo de saída com moeda "TO" */}
-        <div className="bg-white rounded-xl flex justify-between items-center p-4 mt-3 relative"> {/* Changed background to white */}
+        <div className="bg-white rounded-xl flex justify-between items-center p-4 mt-3 sm:mt-0 relative flex-1"> {/* Changed background to white */}
           <div className="text-2xl sm:text-3xl font-medium text-black w-3/5 truncate">
             {convertedAmount || "0"}
           </div>
