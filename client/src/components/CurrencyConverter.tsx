@@ -67,11 +67,14 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           result = amountInBRL / toCurrencyData.sellPrice;
         }
 
-        // Verifica se o valor tem mais de 2 casas decimais para mostrar "Valor aproximado"
+        // Se o destino não é BRL, arredonda para inteiro
+        const finalResult = toCurrency === "BRL" ? result : Math.round(result);
+        
+        // Mostra "valor aproximado" apenas quando o destino é BRL e tem mais de 2 casas decimais
         const decimalPart = (result.toString().split('.')[1] || '').length;
-        setIsApproximateValue(decimalPart > 2 && toCurrency !== "BRL");
+        setIsApproximateValue(decimalPart > 2 && toCurrency === "BRL");
 
-        setConvertedAmount(formatCurrencyValue(toCurrency, result));
+        setConvertedAmount(formatCurrencyValue(toCurrency, finalResult));
       } else {
         setConvertedAmount("0");
         setIsApproximateValue(false);
