@@ -29,8 +29,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (showFromDropdown || showToDropdown) {
-        // No método certo verificaríamos se o clique foi fora do dropdown
-        // mas para simplificar vamos fechar quando houver clique fora da área do conversor
         const converterElement = document.querySelector(".currency-converter");
         if (converterElement && !converterElement.contains(event.target as Node)) {
           setShowFromDropdown(false);
@@ -46,7 +44,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   }, [showFromDropdown, showToDropdown]);
 
   useEffect(() => {
-    // Converter a moeda
     const fromCurrencyData = allCurrencies.find(c => c.code === fromCurrency);
     const toCurrencyData = allCurrencies.find(c => c.code === toCurrency);
 
@@ -56,18 +53,14 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         let result;
 
         if (fromCurrency === "BRL") {
-          // De Real para moeda estrangeira (divisão pelo valor de venda)
           result = numericAmount / toCurrencyData.sellPrice;
         } else if (toCurrency === "BRL") {
-          // De moeda estrangeira para Real (multiplicação pelo valor de compra)
           result = numericAmount * fromCurrencyData.buyPrice;
         } else {
-          // Entre moedas estrangeiras (converte para BRL primeiro, depois para a moeda destino)
           const amountInBRL = numericAmount * fromCurrencyData.buyPrice;
           result = amountInBRL / toCurrencyData.sellPrice;
         }
 
-        // Verifica se houve arredondamento
         const rawResult = result;
         const roundedResult = toCurrency === "BRL" ? result : Math.round(result);
         setIsApproximateValue(rawResult !== roundedResult);
@@ -83,16 +76,11 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const handleFromCurrencyChange = (code: string) => {
     setFromCurrency(code);
     setShowFromDropdown(false);
-    if (code !== "BRL") {
-      setToCurrency("BRL");
-    }
   };
 
   const handleToCurrencyChange = (code: string) => {
-    if (fromCurrency === "BRL") {
-      setToCurrency(code);
-      setShowToDropdown(false);
-    }
+    setToCurrency(code);
+    setShowToDropdown(false);
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,10 +89,8 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   const handleSwapCurrencies = () => {
-    if (fromCurrency === "BRL" || toCurrency === "BRL") {
-      setFromCurrency(toCurrency);
-      setToCurrency(fromCurrency);
-    }
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
   };
 
   return (
@@ -113,7 +99,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         <h2 className="text-[#f3b234] text-xl font-semibold mb-2 sm:mb-3 text-center">Conversor de Moedas</h2>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          {/* Campo de entrada com moeda "FROM" */}
           <div className="relative flex-1">
             <div className="bg-white rounded-xl flex justify-between items-center p-3 mb-3 sm:mb-0 h-14 sm:h-[4.5rem]">
               <input
@@ -149,7 +134,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                   marginTop: '-1px'
                 }}
               >
-                {allCurrencies.map((currency) => (
+                {allCurrencies.filter(currency => currency.code !== toCurrency).map((currency) => (
                   <div 
                     key={`from-${currency.code}`}
                     className="flex items-center p-3 hover:bg-[#f4ba4a] cursor-pointer border-b border-black/10"
@@ -166,7 +151,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             )}
           </div>
 
-          {/* Botão para trocar as moedas */}
           <div className="flex justify-center items-center z-10 relative sm:mx-4 sm:self-center sm:flex-shrink-0">
             <button
               onClick={handleSwapCurrencies}
@@ -180,7 +164,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             </button>
           </div>
 
-          {/* Campo de saída com moeda "TO" */}
           <div className="relative flex-1">
             <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem] mt-3 sm:mt-0">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
@@ -188,25 +171,21 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               </div>
 
               <div 
-                className={`currency-dropdown flex items-center ${fromCurrency === "BRL" ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
+                className="currency-dropdown flex items-center cursor-pointer"
                 onClick={() => {
-                  if (fromCurrency === "BRL") {
-                    setShowFromDropdown(false);
-                    setShowToDropdown(!showToDropdown);
-                  }
+                  setShowFromDropdown(false);
+                  setShowToDropdown(!showToDropdown);
                 }}
               >
                 <span className="text-xl sm:text-2xl font-bold mr-1">{toCurrency}</span>
                 <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-2"/>
-                {fromCurrency === "BRL" && (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             </div>
 
-            {showToDropdown && fromCurrency === "BRL" && (
+            {showToDropdown && (
               <div 
                 className="absolute inset-x-0 w-full bg-white rounded-b-xl shadow-xl z-[1000] max-h-80 overflow-y-auto currency-dropdown-list"
                 style={{
