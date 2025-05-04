@@ -121,6 +121,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   return (
     <div className="relative max-w-xl mx-auto my-6">
       <div className="bg-[#252525] p-4 sm:p-6 rounded-xl overflow-hidden">
+        <h2 className="text-white text-xl font-semibold mb-4 text-center">Conversor de Moedas</h2>
         {/* Campo de entrada com moeda "FROM" */}
         <div className="bg-white rounded-xl flex justify-between items-center p-4 mb-4 relative"> {/* Changed background to white */}
           <input
@@ -144,7 +145,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             </div>
 
             {showFromDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
+              <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-20 bg-white rounded-md shadow-lg">
                 {allCurrencies.map((currency) => (
                   <div 
                     key={`from-${currency.code}`}
