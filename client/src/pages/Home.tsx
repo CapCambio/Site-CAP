@@ -83,20 +83,11 @@ export default function Home() {
         {activeTab === "current" && (
           <>
             {/* Seletor de data - exibido tanto na versão móvel quanto desktop */}
-            <div className="flex justify-between items-center mb-4 mt-4">
+            <div className="flex justify-center items-center mb-4 mt-4">
               <DatePicker
                 selectedDate={selectedDate}
                 onDateChange={handleDateChange}
               />
-              
-              {isHistoricalView && (
-                <button
-                  onClick={handleResetToCurrentView}
-                  className="text-sm text-[#f3b234] hover:text-[#f3b234]/80"
-                >
-                  Ver valores atuais
-                </button>
-              )}
             </div>
             
             {isMobile ? (

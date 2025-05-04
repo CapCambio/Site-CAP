@@ -180,13 +180,14 @@ export function CurrencyMiniChart({ currencyCode, initialMonth }: CurrencyMiniCh
         </button>
       </div>
       
-      <ResponsiveContainer width="100%" height={150}>
-        <LineChart data={chartData} margin={{ top: 10, right: 5, left: 0, bottom: 10 }}>
+      <ResponsiveContainer width="100%" height={170}>
+        <LineChart data={chartData} margin={{ top: 10, right: 5, left: 25, bottom: 25 }}>
           <XAxis 
             dataKey="day" 
             tick={{ fontSize: 10 }}
             tickFormatter={(value) => value}
             interval="preserveStartEnd"
+            label={{ value: "Dia", position: "insideBottom", offset: -15, fill: "#000000", fontSize: 12 }}
           />
           <YAxis 
             tick={{ fontSize: 10 }}
@@ -194,6 +195,7 @@ export function CurrencyMiniChart({ currencyCode, initialMonth }: CurrencyMiniCh
             tickCount={4}
             tickFormatter={(value) => value.toFixed(2)}
             width={35}
+            label={{ value: "Cotação", angle: -90, position: "insideLeft", offset: 10, fill: "#000000", fontSize: 12 }}
           />
           <Tooltip 
             formatter={(value: any) => value !== null ? [`R$ ${Number(value).toFixed(5)}`, 'Compra'] : ['Sem dados', 'Compra']}

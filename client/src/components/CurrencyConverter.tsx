@@ -93,8 +93,8 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   const handleSwapCurrencies = () => {
-    if (fromCurrency === "BRL") {
-      //Allow swap only if fromCurrency is BRL
+    // Always allow swap if one of the currencies is BRL
+    if (fromCurrency === "BRL" || toCurrency === "BRL") {
       setFromCurrency(toCurrency);
       setToCurrency(fromCurrency);
     }
@@ -180,7 +180,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             <button
               onClick={handleSwapCurrencies}
               className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2"
-              disabled={fromCurrency !== "BRL"} // Disable swap button if fromCurrency is not BRL
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7 8L3 12L7 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -197,21 +196,17 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               </div>
 
               <div 
-                className={`currency-dropdown flex items-center ${fromCurrency === "BRL" ? "cursor-pointer" : "cursor-not-allowed"}`}
+                className="currency-dropdown flex items-center cursor-pointer"
                 onClick={() => {
-                  if (fromCurrency === "BRL") {
-                    setShowFromDropdown(false);
-                    setShowToDropdown(!showToDropdown);
-                  }
+                  setShowFromDropdown(false);
+                  setShowToDropdown(!showToDropdown);
                 }}
               >
                 <span className="text-xl sm:text-2xl font-bold mr-1">{toCurrency}</span>
                 <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-2"/>
-                {fromCurrency === "BRL" && (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             </div>
 
@@ -226,7 +221,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 }}
               >
                 {allCurrencies
-                  .filter(currency => currency.code !== fromCurrency && currency.code !== "BRL")
+                  .filter(currency => currency.code !== fromCurrency)
                   .sort((a, b) => (a.code === "BRL" ? -1 : b.code === "BRL" ? 1 : 0))
                   .map((currency) => (
                   <div 
@@ -241,19 +236,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                     </div>
                   </div>
                 ))}
-                {fromCurrency !== "BRL" && ( //Add BRL to dropdown if fromCurrency is not BRL
-                  <div 
-                    key={`to-BRL`}
-                    className="flex items-center p-3 hover:bg-[#f4ba4a] cursor-pointer border-b border-black/10"
-                    onClick={() => handleToCurrencyChange("BRL")}
-                  >
-                    <CurrencyLogo code={"BRL"} className="w-5 h-5 mr-3" />
-                    <div className="flex flex-col">
-                      <span className="font-medium text-sm text-black">BRL</span>
-                      <span className="text-xs text-black/70">Real Brasileiro</span>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 

@@ -149,7 +149,9 @@ export function DatePicker({ selectedDate, onDateChange }: DatePickerProps) {
                       ${day.isDisabled ? 'text-gray-300 cursor-not-allowed' : 
                         format(day.date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd') 
                           ? 'bg-[#f3b234] text-[#1a1a1a] font-medium'
-                          : 'hover:bg-gray-100 text-[#1a1a1a]'
+                          : format(day.date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+                            ? 'border-2 border-[#f3b234] text-[#1a1a1a] font-medium'
+                            : 'hover:bg-gray-100 text-[#1a1a1a]'
                       }
                     `}
                     onClick={() => {
