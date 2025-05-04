@@ -115,16 +115,16 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
   return (
     <div className="relative max-w-4xl mx-auto my-6">
-      <div className="bg-[#252525] p-4 sm:p-6 rounded-xl overflow-hidden">
-        <h2 className="text-white text-xl font-semibold mb-4 text-center">Conversor de Moedas</h2>
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:space-x-4">
+      <div className="bg-[#252525] p-3 sm:p-5 rounded-xl overflow-hidden">
+        <h2 className="text-white text-xl font-semibold mb-3 text-center">Conversor de Moedas</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4">
           {/* Campo de entrada com moeda "FROM" */}
-          <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-4 mb-4 sm:mb-0 relative flex-1">
+          <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 mb-2 sm:mb-0 relative flex-1 h-16 sm:h-[4.5rem]">
             <input
               type="text"
               value={amount}
               onChange={handleAmountChange}
-              className="text-2xl sm:text-3xl font-medium bg-[#f3b234] border-none focus:ring-0 focus:outline-none text-black w-3/5"
+              className="text-xl sm:text-2xl font-medium bg-[#f3b234] border-none focus:ring-0 focus:outline-none text-black w-3/5"
               placeholder="0"
             />
 
@@ -133,25 +133,25 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 className="flex items-center cursor-pointer" 
                 onClick={() => setShowFromDropdown(!showFromDropdown)}
               >
-                <span className="text-2xl sm:text-3xl font-bold mr-1">{fromCurrency}</span>
+                <span className="text-xl sm:text-2xl font-bold mr-1">{fromCurrency}</span>
                 <CurrencyLogo code={fromCurrency} className="w-5 h-5 mr-2"/>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
 
               {showFromDropdown && (
-                <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-20 bg-white rounded-md shadow-lg">
+                <div className="absolute right-0 top-full mt-1 w-60 max-h-80 overflow-y-auto z-20 bg-white rounded-md shadow-lg">
                   {allCurrencies.map((currency) => (
                     <div 
                       key={`from-${currency.code}`}
-                      className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
+                      className="flex items-center p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
                       onClick={() => handleFromCurrencyChange(currency.code)}
                     >
-                      <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
+                      <CurrencyLogo code={currency.code} className="w-5 h-5 mr-2" />
                       <div className="flex flex-col">
-                        <span className="font-medium text-base">{currency.code}</span>
-                        <span className="text-sm text-gray-600">{currency.name}</span>
+                        <span className="font-medium text-sm">{currency.code}</span>
+                        <span className="text-xs text-gray-600">{currency.name}</span>
                       </div>
                     </div>
                   ))}
@@ -161,12 +161,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           {/* Botão para trocar as moedas */}
-          <div className="flex justify-center my-4 sm:my-0 z-10 relative">
+          <div className="flex justify-center items-center -my-1 z-10 relative sm:self-center sm:flex-shrink-0">
             <button
               onClick={handleSwapCurrencies}
-              className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2 sm:mx-4"
+              className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7 8L3 12L7 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M17 16L21 12L17 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M3 12H21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -175,9 +175,9 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           {/* Campo de saída com moeda "TO" */}
-          <div className="flex flex-col mt-3 sm:mt-0 relative flex-1">
-            <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-4">
-              <div className="text-2xl sm:text-3xl font-medium text-black truncate">
+          <div className="flex flex-col mt-2 sm:mt-0 relative flex-1">
+            <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 h-16 sm:h-[4.5rem]">
+              <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
               </div>
 
@@ -186,25 +186,25 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                   className="flex items-center cursor-pointer" 
                   onClick={() => setShowToDropdown(!showToDropdown)}
                 >
-                  <span className="text-2xl sm:text-3xl font-bold mr-1">{toCurrency}</span>
+                  <span className="text-xl sm:text-2xl font-bold mr-1">{toCurrency}</span>
                   <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-2"/>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
 
                 {showToDropdown && (
-                  <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
+                  <div className="absolute right-0 top-full mt-1 w-60 max-h-80 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
                     {allCurrencies.map((currency) => (
                       <div 
                         key={`to-${currency.code}`}
-                        className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
+                        className="flex items-center p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
                         onClick={() => handleToCurrencyChange(currency.code)}
                       >
-                        <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
+                        <CurrencyLogo code={currency.code} className="w-5 h-5 mr-2" />
                         <div className="flex flex-col">
-                          <span className="font-medium text-base">{currency.code}</span>
-                          <span className="text-sm text-gray-600">{currency.name}</span>
+                          <span className="font-medium text-sm">{currency.code}</span>
+                          <span className="text-xs text-gray-600">{currency.name}</span>
                         </div>
                       </div>
                     ))}
