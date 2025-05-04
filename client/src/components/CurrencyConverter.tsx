@@ -148,7 +148,22 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                   <div 
                     key={`from-${currency.code}`}
                     className="flex items-center p-3 hover:bg-[#f4ba4a] cursor-pointer border-b border-black/10"
-                    onClick={() => handleFromCurrencyChange(currency.code)}
+                    onClick={() => {
+                      const newFromCurrency = currency.code;
+                      if (newFromCurrency === "BRL") {
+                        // Se BRL for selecionado, define o segundo campo como a segunda moeda da lista
+                        const secondCurrency = allCurrencies.find(c => c.code !== "BRL")?.code || "USD";
+                        setToCurrency(secondCurrency);
+                      } else if (toCurrency === "BRL") {
+                        // Se já estiver BRL no segundo campo, mantém
+                        handleFromCurrencyChange(newFromCurrency);
+                      } else {
+                        // Se não for BRL, força BRL no segundo campo
+                        setFromCurrency(newFromCurrency);
+                        setToCurrency("BRL");
+                      }
+                      setShowFromDropdown(false);
+                    }}
                   >
                     <CurrencyLogo code={currency.code} className="w-5 h-5 mr-3" />
                     <div className="flex flex-col">
