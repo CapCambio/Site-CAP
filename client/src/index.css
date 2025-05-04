@@ -99,3 +99,28 @@
 .currency-card:hover {
   @apply shadow-lg transform -translate-y-1;
 }
+
+/* Customizing scrollbar for dropdown lists */
+.currency-dropdown-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) rgba(243, 178, 52, 0.6);
+}
+
+.currency-dropdown-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.currency-dropdown-list::-webkit-scrollbar-track {
+  background: rgba(243, 178, 52, 0.6);
+  border-radius: 0 0 8px 0;
+}
+
+.currency-dropdown-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  border: 1px solid rgba(243, 178, 52, 0.6);
+}
+
+.currency-dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
