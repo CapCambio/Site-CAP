@@ -2,6 +2,7 @@ import { useState } from "react";
 import { TabType } from "../lib/types";
 import { useCurrencyData } from "../hooks/useCurrencyData";
 import { useHistoricalData } from "../hooks/useHistoricalData";
+import { useDateSelection } from "../hooks/useDateSelection";
 import { useIsMobile } from "../hooks/use-mobile";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { formatCurrencyValue, formatPercentage } from "../lib/currency";
@@ -17,12 +18,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CurrencyLogo } from "../components/CurrencyLogo";
 import { CurrencyCard } from "../components/CurrencyCard";
 import { CurrencyConverter } from "../components/CurrencyConverter";
+import { DatePicker } from "../components/DatePicker";
 
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("current");
   const isMobile = useIsMobile();
   const [showCalculator, setShowCalculator] = useState(false); // Added state for calculator visibility
+  const [isHistoricalView, setIsHistoricalView] = useState(false);
 
   const { 
     currencies, 
@@ -40,12 +43,28 @@ export default function Home() {
     isLoading: isLoadingHistory,
     refetch: fetchHistoricalData
   } = useHistoricalData();
+  
+  const {
+    selectedDate,
+    setSelectedDate,
+    historicalPrices,
+    isLoading: isLoadingDateSelection
+  } = useDateSelection();
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
     if (tab === "history") {
       fetchHistoricalData();
     }
+  };
+  
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+    setIsHistoricalView(true);
+  };
+  
+  const handleResetToCurrentView = () => {
+    setIsHistoricalView(false);
   };
 
   return (
@@ -62,15 +81,38 @@ export default function Home() {
 
         {activeTab === "current" && (
           <>
+            {/* Seletor de data - exibido tanto na versão móvel quanto desktop */}
+            <div className="flex justify-between items-center mb-4 mt-4">
+              <DatePicker
+                selectedDate={selectedDate}
+                onDateChange={handleDateChange}
+              />
+              
+              {isHistoricalView && (
+                <button
+                  onClick={handleResetToCurrentView}
+                  className="text-sm text-[#f3b234] hover:text-[#f3b234]/80"
+                >
+                  Ver valores atuais
+                </button>
+              )}
+            </div>
+            
             {isMobile ? (
               <div className="grid grid-cols-1 gap-4">
-                {isLoadingCurrencies ? (
+                {isLoadingCurrencies || isLoadingDateSelection ? (
                   Array.from({ length: 6 }).map((_, index) => (
                     <div key={index} className="h-36 bg-gray-100 rounded-lg animate-pulse" />
                   ))
                 ) : (
                   currencies.map(currency => (
-                    <CurrencyCard key={currency.code} currency={currency} />
+                    <CurrencyCard 
+                      key={currency.code} 
+                      currency={currency}
+                      historicalPrice={historicalPrices[currency.code]} 
+                      selectedDate={selectedDate}
+                      isHistoricalView={isHistoricalView}
+                    />
                   ))
                 )}
               </div>

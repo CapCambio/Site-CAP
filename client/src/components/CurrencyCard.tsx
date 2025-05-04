@@ -6,12 +6,25 @@ import { CurrencyLogo } from "./CurrencyLogo";
 import { formatCurrencyValue, formatPercentage } from "../lib/currency";
 import { CurrencyMiniChart } from "./CurrencyMiniChart";
 import { useIsMobile } from "../hooks/use-mobile";
+import { format } from 'date-fns';
 
 interface CurrencyCardProps {
   currency: Currency;
+  historicalPrice?: {
+    buyPrice: number | null;
+    sellPrice: number | null;
+    timestamp: Date | null;
+  };
+  selectedDate?: Date;
+  isHistoricalView?: boolean;
 }
 
-export function CurrencyCard({ currency }: CurrencyCardProps) {
+export function CurrencyCard({ 
+  currency, 
+  historicalPrice, 
+  selectedDate,
+  isHistoricalView = false
+}: CurrencyCardProps) {
   const { name, code, buyPrice, sellPrice, change } = currency;
   const [isExpanded, setIsExpanded] = useState(false);
   const isMobile = useIsMobile();
@@ -22,6 +35,11 @@ export function CurrencyCard({ currency }: CurrencyCardProps) {
   const toggleExpand = () => {
     setIsExpanded(prev => !prev);
   };
+
+  // Determina se estamos exibindo dados históricos ou atuais
+  const displayBuyPrice = isHistoricalView && historicalPrice ? historicalPrice.buyPrice : buyPrice;
+  const displaySellPrice = isHistoricalView && historicalPrice ? historicalPrice.sellPrice : sellPrice;
+  const hasHistoricalData = isHistoricalView && historicalPrice && historicalPrice.buyPrice !== null;
   
   return (
     <Card className={`currency-card overflow-hidden hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
@@ -38,32 +56,48 @@ export function CurrencyCard({ currency }: CurrencyCardProps) {
         <div className="flex justify-between mb-3">
           <div>
             <p className="text-sm text-gray-500">Compra</p>
-            <p className="text-xl font-bold text-[#1a1a1a]">
-              R$ {formatCurrencyValue(code, buyPrice)}
+            <p className={`text-xl font-bold text-[#1a1a1a] ${!hasHistoricalData && isHistoricalView ? 'opacity-50' : ''}`}>
+              {hasHistoricalData || !isHistoricalView ? `R$ ${formatCurrencyValue(code, displayBuyPrice || 0)}` : '—'}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Venda</p>
-            <p className="text-xl font-bold text-[#1a1a1a]">
-              R$ {formatCurrencyValue(code, sellPrice)}
+            <p className={`text-xl font-bold text-[#1a1a1a] ${!hasHistoricalData && isHistoricalView ? 'opacity-50' : ''}`}>
+              {hasHistoricalData || !isHistoricalView ? `R$ ${formatCurrencyValue(code, displaySellPrice || 0)}` : '—'}
             </p>
           </div>
         </div>
+
+        {/* Mensagem de cotação histórica */}
+        {isHistoricalView && selectedDate && (
+          <div className="mb-3 text-center">
+            {hasHistoricalData ? (
+              <p className="text-sm font-bold text-[#f3b234]">
+                Cotação do dia {format(selectedDate, 'dd/MM/yyyy')}
+              </p>
+            ) : (
+              <p className="text-sm font-bold text-[#f3b234]">
+                Sem registros da data selecionada
+              </p>
+            )}
+          </div>
+        )}
+        
         <div className="flex items-center justify-between">
           <div>
-            {isPositiveChange && (
+            {isPositiveChange && !isHistoricalView && (
               <span className="text-sm font-medium text-green-600 flex items-center">
                 <ArrowUp className="mr-1 h-4 w-4" />
                 {formatPercentage(Math.abs(change || 0))}
               </span>
             )}
-            {isNegativeChange && (
+            {isNegativeChange && !isHistoricalView && (
               <span className="text-sm font-medium text-red-600 flex items-center">
                 <ArrowDown className="mr-1 h-4 w-4" />
                 {formatPercentage(Math.abs(change || 0))}
               </span>
             )}
-            {(change === null || change === 0) && (
+            {((change === null || change === 0) && !isHistoricalView) && (
               <span className="text-sm font-medium text-gray-500">
                 — 0,00%
               </span>
@@ -86,7 +120,10 @@ export function CurrencyCard({ currency }: CurrencyCardProps) {
         {/* Área expandível com o gráfico */}
         {isMobile && isExpanded && (
           <div className="mt-3 pt-3 border-t border-gray-200">
-            <CurrencyMiniChart currencyCode={code} />
+            <CurrencyMiniChart 
+              currencyCode={code} 
+              initialMonth={selectedDate && isHistoricalView ? selectedDate : undefined}
+            />
           </div>
         )}
       </div>

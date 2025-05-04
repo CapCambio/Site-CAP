@@ -15,11 +15,12 @@ import { ptBR } from 'date-fns/locale';
 
 interface CurrencyMiniChartProps {
   currencyCode: string;
+  initialMonth?: Date;
 }
 
-export function CurrencyMiniChart({ currencyCode }: CurrencyMiniChartProps) {
+export function CurrencyMiniChart({ currencyCode, initialMonth }: CurrencyMiniChartProps) {
   const today = new Date();
-  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [selectedMonth, setSelectedMonth] = useState<Date>(initialMonth || new Date());
   
   // Calcular o limite de 12 meses para trás
   const minDate = new Date();
