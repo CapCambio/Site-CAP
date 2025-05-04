@@ -144,16 +144,18 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             </div>
 
             {showFromDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-56 max-h-60 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
+              <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
                 {allCurrencies.map((currency) => (
                   <div 
                     key={`from-${currency.code}`}
-                    className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+                    className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
                     onClick={() => handleFromCurrencyChange(currency.code)}
                   >
-                    <CurrencyLogo code={currency.code} className="w-5 h-5 mr-2" />
-                    <span className="font-medium">{currency.code}</span>
-                    <span className="text-xs ml-2 text-gray-500 truncate">{currency.name}</span>
+                    <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
+                    <div className="flex flex-col">
+                      <span className="font-medium text-base">{currency.code}</span>
+                      <span className="text-sm text-gray-600">{currency.name}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -194,16 +196,18 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             </div>
 
             {showToDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-56 max-h-60 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
+              <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
                 {allCurrencies.map((currency) => (
                   <div 
                     key={`to-${currency.code}`}
-                    className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+                    className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
                     onClick={() => handleToCurrencyChange(currency.code)}
                   >
-                    <CurrencyLogo code={currency.code} className="w-5 h-5 mr-2" />
-                    <span className="font-medium">{currency.code}</span>
-                    <span className="text-xs ml-2 text-gray-500 truncate">{currency.name}</span>
+                    <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
+                    <div className="flex flex-col">
+                      <span className="font-medium text-base">{currency.code}</span>
+                      <span className="text-sm text-gray-600">{currency.name}</span>
+                    </div>
                   </div>
                 ))}
               </div>
