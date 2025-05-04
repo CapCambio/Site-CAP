@@ -74,7 +74,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     if (stringValue.endsWith('.')) {
       stringValue = stringValue.slice(0, -1);
     }
-    
+
     // Se o destino é BRL, mostrar valor exato
     // Se não, arredondar para inteiro se não for inteiro
     if (toCurrency !== "BRL" && Math.floor(result) !== result) {
@@ -115,7 +115,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
   return (
     <div className="relative max-w-4xl mx-auto my-6">
-      <div className="bg-[#252525] p-3 sm:p-5 rounded-xl overflow-hidden">
+      <div className="bg-[#252525] p-4 pb-8 sm:p-6 sm:pb-10 rounded-xl overflow-hidden">
         <h2 className="text-white text-xl font-semibold mb-3 text-center">Conversor de Moedas</h2>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           {/* Campo de entrada com moeda "FROM" */}
@@ -212,7 +212,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 )}
               </div>
             </div>
-            
+
             {isApproximateValue && (
               <div className="text-center mt-1 absolute w-full">
                 <span className="text-white text-xs">Valor aproximado</span>
