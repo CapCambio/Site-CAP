@@ -175,8 +175,8 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           {/* Campo de saída com moeda "TO" */}
-          <div className="flex flex-col mt-6 sm:mt-0 relative flex-1">
-            <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 h-16 sm:h-[4.5rem]">
+          <div className="relative flex-1">
+            <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 h-16 sm:h-[4.5rem] mt-6 sm:mt-0">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
               </div>
@@ -214,7 +214,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             </div>
             
             {isApproximateValue && (
-              <div className="text-center mt-1">
+              <div className="text-center mt-1 absolute w-full">
                 <span className="text-white text-xs">Valor aproximado</span>
               </div>
             )}
