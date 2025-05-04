@@ -170,7 +170,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               <div className="text-2xl sm:text-3xl font-medium text-black truncate">
                 {convertedAmount ? Math.round(Number(convertedAmount)).toString() : "0"}
               </div>
-              <div className="text-xs text-[#f3b234] mt-1">Valor aproximado</div>
             </div>
 
             <div className="currency-dropdown relative">
@@ -203,6 +202,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 </div>
               )}
             </div>
+            <div className="text-xs text-[#f3b234] mt-2 ml-4">Valor aproximado</div>
           </div>
         </div>
       </div>
