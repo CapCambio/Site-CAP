@@ -142,7 +142,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 }}
               >
                 {allCurrencies
-                  .filter(currency => currency.code !== toCurrency)
                   .sort((a, b) => (a.code === "BRL" ? -1 : b.code === "BRL" ? 1 : 0))
                   .map((currency) => (
                   <div 
