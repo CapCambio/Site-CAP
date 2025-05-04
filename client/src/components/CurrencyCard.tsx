@@ -86,7 +86,6 @@ export function CurrencyCard({ currency }: CurrencyCardProps) {
         {/* Área expandível com o gráfico */}
         {isMobile && isExpanded && (
           <div className="mt-3 pt-3 border-t border-gray-200">
-            <h4 className="text-sm font-medium mb-2">Histórico de preços (últimos 30 dias)</h4>
             <CurrencyMiniChart currencyCode={code} />
           </div>
         )}
