@@ -197,7 +197,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
                 {showToDropdown && fromCurrency === "BRL" && (
                   <div className="absolute mt-1 w-60 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{top: '100%', left: '0'}}>
-                    {allCurrencies.map((currency) => (
+                    {allCurrencies.filter(currency => currency.code !== fromCurrency).map((currency) => (
                       <div 
                         key={`to-${currency.code}`}
                         className="flex items-center p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
