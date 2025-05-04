@@ -6,6 +6,7 @@ import { useDateSelection } from "../hooks/useDateSelection";
 import { useIsMobile } from "../hooks/use-mobile";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { formatCurrencyValue, formatPercentage } from "../lib/currency";
+import { format } from "date-fns";
 
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
@@ -129,7 +130,7 @@ export default function Home() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {isLoadingCurrencies ? (
+                    {isLoadingCurrencies || isLoadingDateSelection ? (
                       Array.from({ length: 6 }).map((_, index) => (
                         <TableRow key={index}>
                           <TableCell className="animate-pulse">
@@ -164,27 +165,58 @@ export default function Home() {
                             </span>
                           </TableCell>
                           <TableCell className="text-right font-medium">
-                            R$ {formatCurrencyValue(currency.code, currency.buyPrice)}
+                            {isHistoricalView ? (
+                              historicalPrices[currency.code]?.buyPrice !== null ? (
+                                <span>
+                                  R$ {formatCurrencyValue(currency.code, historicalPrices[currency.code]?.buyPrice || 0)}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">—</span>
+                              )
+                            ) : (
+                              <span>
+                                R$ {formatCurrencyValue(currency.code, currency.buyPrice)}
+                              </span>
+                            )}
                           </TableCell>
                           <TableCell className="text-right font-medium">
-                            R$ {formatCurrencyValue(currency.code, currency.sellPrice)}
+                            {isHistoricalView ? (
+                              historicalPrices[currency.code]?.sellPrice !== null ? (
+                                <span>
+                                  R$ {formatCurrencyValue(currency.code, historicalPrices[currency.code]?.sellPrice || 0)}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">—</span>
+                              )
+                            ) : (
+                              <span>
+                                R$ {formatCurrencyValue(currency.code, currency.sellPrice)}
+                              </span>
+                            )}
                           </TableCell>
                           <TableCell className="text-right">
-                            {currency.change !== null && currency.change > 0 && (
+                            {!isHistoricalView && currency.change !== null && currency.change > 0 && (
                               <span className="text-sm font-medium text-green-600 flex items-center justify-end">
                                 <ArrowUp className="mr-1 h-4 w-4" />
                                 {formatPercentage(Math.abs(currency.change))}
                               </span>
                             )}
-                            {currency.change !== null && currency.change < 0 && (
+                            {!isHistoricalView && currency.change !== null && currency.change < 0 && (
                               <span className="text-sm font-medium text-red-600 flex items-center justify-end">
                                 <ArrowDown className="mr-1 h-4 w-4" />
                                 {formatPercentage(Math.abs(currency.change))}
                               </span>
                             )}
-                            {(currency.change === null || currency.change === 0) && (
+                            {(!isHistoricalView && (currency.change === null || currency.change === 0)) && (
                               <span className="text-sm font-medium text-gray-500">
                                 — 0,00%
+                              </span>
+                            )}
+                            {isHistoricalView && (
+                              <span className="text-sm font-medium text-[#f3b234]">
+                                {historicalPrices[currency.code]?.timestamp ? 
+                                  `${format(selectedDate, 'dd/MM/yyyy')}` : 
+                                  'Sem registros'}
                               </span>
                             )}
                           </TableCell>
