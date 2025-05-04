@@ -164,15 +164,15 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         </div>
 
         {/* Botão para trocar as moedas */}
-        <div className="flex justify-center -my-3 z-10 relative">
+        <div className="flex justify-center my-4 z-10 relative">
           <button
             onClick={handleSwapCurrencies}
-            className="bg-black rounded-full p-1.5 text-white"
+            className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 6L3 6L3 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M15 18H21V12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 6L21 18" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 8L3 12L7 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M17 16L21 12L17 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 12H21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
             </svg>
           </button>
         </div>
