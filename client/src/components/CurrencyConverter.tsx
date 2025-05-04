@@ -131,7 +131,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             <div className="currency-dropdown relative">
               <div 
                 className="flex items-center cursor-pointer" 
-                onClick={() => setShowFromDropdown(!showFromDropdown)}
+                onClick={() => {
+                    setShowToDropdown(false);
+                    setShowFromDropdown(!showFromDropdown);
+                  }}
               >
                 <span className="text-xl sm:text-2xl font-bold mr-1">{fromCurrency}</span>
                 <CurrencyLogo code={fromCurrency} className="w-5 h-5 mr-2"/>
@@ -140,7 +143,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 </svg>
               </div>
 
-              {showFromDropdown && (
+              {showFromDropdown && !showToDropdown && (
                 <div className="absolute mt-1 w-60 max-h-80 overflow-y-auto z-50 bg-white rounded-md shadow-lg" style={{top: '100%', left: '0'}}>
                   {allCurrencies.map((currency) => (
                     <div 
@@ -184,7 +187,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               <div className="currency-dropdown relative">
                 <div 
                   className={`flex items-center ${fromCurrency === "BRL" ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
-                  onClick={() => fromCurrency === "BRL" && setShowToDropdown(!showToDropdown)}
+                  onClick={() => {
+                    if (fromCurrency === "BRL") {
+                      setShowFromDropdown(false);
+                      setShowToDropdown(!showToDropdown);
+                    }
+                  }}
                 >
                   <span className="text-xl sm:text-2xl font-bold mr-1">{toCurrency}</span>
                   <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-2"/>
