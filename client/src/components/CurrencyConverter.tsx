@@ -1,8 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { Currency } from "@/lib/types";
 import { formatCurrencyValue } from "@/lib/currency";
 import { CurrencyLogo } from "./CurrencyLogo";
-import { ArrowUpDown } from "lucide-react";
 
 interface CurrencyConverterProps {
   currencies: Currency[];
@@ -16,7 +16,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const [showFromDropdown, setShowFromDropdown] = useState<boolean>(false);
   const [showToDropdown, setShowToDropdown] = useState<boolean>(false);
 
-  // Adicionar Real à lista de moedas disponíveis se não estiver na lista
   const allCurrencies = [
     ...currencies,
     { 
@@ -28,7 +27,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   ];
 
   useEffect(() => {
-    // Fechar dropdowns quando clicar fora deles
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (!target.closest('.currency-dropdown')) {
@@ -55,29 +53,21 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
     let result: number;
 
-    // Restrict conversion between two foreign currencies
     if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
       setConvertedAmount("Invalid conversion");
       return;
     }
 
-
-    // Se o valor convertido for de BRL para moeda estrangeira
     if (fromCurrency === "BRL") {
       const targetCurrency = currencies.find(c => c.code === toCurrency);
       if (!targetCurrency) return;
-
       result = Number(amount) / targetCurrency.sellPrice;
-    } 
-    // Se o valor convertido for de moeda estrangeira para BRL
-    else if (toCurrency === "BRL") {
+    } else if (toCurrency === "BRL") {
       const sourceCurrency = currencies.find(c => c.code === fromCurrency);
       if (!sourceCurrency) return;
-
       result = Number(amount) * sourceCurrency.buyPrice;
     }
 
-    // Formatar o resultado com até 5 casas decimais, removendo zeros à direita
     let stringValue = result.toFixed(5);
     stringValue = stringValue.replace(/\.?0+$/, "");
     if (stringValue.endsWith('.')) {
@@ -90,14 +80,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const handleFromCurrencyChange = (code: string) => {
     setFromCurrency(code);
     setShowFromDropdown(false);
-    // Se selecionar uma moeda estrangeira, força BRL como destino
     if (code !== "BRL") {
       setToCurrency("BRL");
     }
   };
 
   const handleToCurrencyChange = (code: string) => {
-    // Só permite mudar se a moeda de origem for BRL
     if (fromCurrency === "BRL") {
       setToCurrency(code);
       setShowToDropdown(false);
@@ -105,12 +93,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Permitir apenas números e ponto decimal no campo de entrada
     const value = e.target.value.replace(/[^\d.]/g, '');
     setAmount(value);
   };
 
-  // Trocar as moedas de lugar apenas se uma delas for BRL
   const handleSwapCurrencies = () => {
     if (fromCurrency === "BRL" || toCurrency === "BRL") {
       setFromCurrency(toCurrency);
@@ -124,96 +110,97 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         <h2 className="text-white text-xl font-semibold mb-4 text-center">Conversor de Moedas</h2>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4">
           {/* Campo de entrada com moeda "FROM" */}
-          <div className="bg-white rounded-xl flex justify-between items-center p-4 mb-4 sm:mb-0 relative flex-1"> {/* Changed background to white */}
-          <input
-            type="text"
-            value={amount}
-            onChange={handleAmountChange}
-            className="text-2xl sm:text-3xl font-medium bg-transparent border-none focus:ring-0 focus:outline-none text-black w-3/5"
-            placeholder="0"
-          />
+          <div className="bg-white rounded-xl flex justify-between items-center p-4 mb-4 sm:mb-0 relative flex-1">
+            <input
+              type="text"
+              value={amount}
+              onChange={handleAmountChange}
+              className="text-2xl sm:text-3xl font-medium bg-transparent border-none focus:ring-0 focus:outline-none text-black w-3/5"
+              placeholder="0"
+            />
 
-          <div className="currency-dropdown relative">
-            <div 
-              className="flex items-center cursor-pointer" 
-              onClick={() => setShowFromDropdown(!showFromDropdown)}
-            >
-              <span className="text-2xl sm:text-3xl font-bold mr-1">{fromCurrency}</span>
-              <CurrencyLogo code={fromCurrency} className="w-5 h-5 mr-2"/> {/* Added flag */}
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-
-            {showFromDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-20 bg-white rounded-md shadow-lg">
-                {allCurrencies.map((currency) => (
-                  <div 
-                    key={`from-${currency.code}`}
-                    className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
-                    onClick={() => handleFromCurrencyChange(currency.code)}
-                  >
-                    <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
-                    <div className="flex flex-col">
-                      <span className="font-medium text-base">{currency.code}</span>
-                      <span className="text-sm text-gray-600">{currency.name}</span>
-                    </div>
-                  </div>
-                ))}
+            <div className="currency-dropdown relative">
+              <div 
+                className="flex items-center cursor-pointer" 
+                onClick={() => setShowFromDropdown(!showFromDropdown)}
+              >
+                <span className="text-2xl sm:text-3xl font-bold mr-1">{fromCurrency}</span>
+                <CurrencyLogo code={fromCurrency} className="w-5 h-5 mr-2"/>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* Botão para trocar as moedas */}
-        <div className="flex justify-center my-4 sm:my-0 z-10 relative">
-          <button
-            onClick={handleSwapCurrencies}
-            className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2 sm:mx-4"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M7 8L3 12L7 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M17 16L21 12L17 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 12H21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-        </div>
-
-        {/* Campo de saída com moeda "TO" */}
-        <div className="bg-white rounded-xl flex justify-between items-center p-4 mt-3 sm:mt-0 relative flex-1"> {/* Changed background to white */}
-          <div className="text-2xl sm:text-3xl font-medium text-black w-3/5 truncate">
-            {convertedAmount || "0"}
+              {showFromDropdown && (
+                <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-20 bg-white rounded-md shadow-lg">
+                  {allCurrencies.map((currency) => (
+                    <div 
+                      key={`from-${currency.code}`}
+                      className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
+                      onClick={() => handleFromCurrencyChange(currency.code)}
+                    >
+                      <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
+                      <div className="flex flex-col">
+                        <span className="font-medium text-base">{currency.code}</span>
+                        <span className="text-sm text-gray-600">{currency.name}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="currency-dropdown relative">
-            <div 
-              className="flex items-center cursor-pointer" 
-              onClick={() => setShowToDropdown(!showToDropdown)}
+          {/* Botão para trocar as moedas */}
+          <div className="flex justify-center my-4 sm:my-0 z-10 relative">
+            <button
+              onClick={handleSwapCurrencies}
+              className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2 sm:mx-4"
             >
-              <span className="text-2xl sm:text-3xl font-bold mr-1">{toCurrency}</span>
-              <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-2"/> {/* Added flag */}
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M7 8L3 12L7 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M17 16L21 12L17 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M3 12H21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
               </svg>
+            </button>
+          </div>
+
+          {/* Campo de saída com moeda "TO" */}
+          <div className="bg-white rounded-xl flex justify-between items-center p-4 mt-3 sm:mt-0 relative flex-1">
+            <div className="text-2xl sm:text-3xl font-medium text-black w-3/5 truncate">
+              {convertedAmount || "0"}
             </div>
 
-            {showToDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
-                {allCurrencies.map((currency) => (
-                  <div 
-                    key={`to-${currency.code}`}
-                    className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
-                    onClick={() => handleToCurrencyChange(currency.code)}
-                  >
-                    <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
-                    <div className="flex flex-col">
-                      <span className="font-medium text-base">{currency.code}</span>
-                      <span className="text-sm text-gray-600">{currency.name}</span>
-                    </div>
-                  </div>
-                ))}
+            <div className="currency-dropdown relative">
+              <div 
+                className="flex items-center cursor-pointer" 
+                onClick={() => setShowToDropdown(!showToDropdown)}
+              >
+                <span className="text-2xl sm:text-3xl font-bold mr-1">{toCurrency}</span>
+                <CurrencyLogo code={toCurrency} className="w-5 h-5 mr-2"/>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9L12 15L18 9" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
-            )}
+
+              {showToDropdown && (
+                <div className="absolute right-0 top-full mt-1 w-72 max-h-96 overflow-y-auto z-10 bg-white rounded-md shadow-lg">
+                  {allCurrencies.map((currency) => (
+                    <div 
+                      key={`to-${currency.code}`}
+                      className="flex items-center p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
+                      onClick={() => handleToCurrencyChange(currency.code)}
+                    >
+                      <CurrencyLogo code={currency.code} className="w-6 h-6 mr-3" />
+                      <div className="flex flex-col">
+                        <span className="font-medium text-base">{currency.code}</span>
+                        <span className="text-sm text-gray-600">{currency.name}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
