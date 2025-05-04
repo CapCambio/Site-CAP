@@ -114,12 +114,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto mt-2 mb-6">
-      <div className="bg-[#252525] p-4 pb-8 sm:p-6 sm:pb-10 rounded-xl overflow-hidden">
-        <h2 className="text-white text-xl font-semibold mb-3 text-center">Conversor de Moedas</h2>
+    <div className="relative max-w-3xl mx-auto mt-2 mb-6">
+      <div className="bg-[#252525] p-3 pb-6 sm:p-6 sm:pb-10 rounded-xl overflow-hidden">
+        <h2 className="text-white text-xl font-semibold mb-2 sm:mb-3 text-center">Conversor de Moedas</h2>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           {/* Campo de entrada com moeda "FROM" */}
-          <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 mb-6 sm:mb-0 relative flex-1 h-16 sm:h-[4.5rem]">
+          <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 mb-3 sm:mb-0 relative flex-1 h-14 sm:h-[4.5rem]">
             <input
               type="text"
               value={amount}
@@ -176,7 +176,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
           {/* Campo de saída com moeda "TO" */}
           <div className="relative flex-1">
-            <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 h-16 sm:h-[4.5rem] mt-6 sm:mt-0">
+            <div className="bg-[#f3b234] rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem] mt-3 sm:mt-0">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
               </div>
