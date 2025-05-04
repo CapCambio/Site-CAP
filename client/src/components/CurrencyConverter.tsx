@@ -152,10 +152,11 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                       if (newFromCurrency === "BRL") {
                         // Se BRL for selecionado, define o segundo campo como a segunda moeda da lista
                         const secondCurrency = allCurrencies.find(c => c.code !== "BRL")?.code || "USD";
+                        setFromCurrency(newFromCurrency);
                         setToCurrency(secondCurrency);
                       } else if (toCurrency === "BRL") {
                         // Se já estiver BRL no segundo campo, mantém
-                        handleFromCurrencyChange(newFromCurrency);
+                        setFromCurrency(newFromCurrency);
                       } else {
                         // Se não for BRL, força BRL no segundo campo
                         setFromCurrency(newFromCurrency);
