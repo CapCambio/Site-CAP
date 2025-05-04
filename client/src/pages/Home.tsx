@@ -94,23 +94,28 @@ export default function Home() {
               />
             </div>
             
-            <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+            <div className={`${isMobile ? '' : 'currency-grid'}`}>
               {isLoadingCurrencies || isLoadingDateSelection ? (
-                Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="h-36 bg-gray-100 rounded-lg animate-pulse" />
-                ))
+                <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div key={index} className="h-36 bg-gray-100 rounded-lg animate-pulse" />
+                  ))}
+                </div>
               ) : (
-                currencies.map(currency => (
-                  <CurrencyCard 
-                    key={currency.code} 
-                    currency={currency}
-                    historicalPrice={historicalPrices[currency.code]} 
-                    selectedDate={selectedDate}
-                    isHistoricalView={isHistoricalView}
-                    isExpanded={expandedCards[currency.code] || false}
-                    onToggleExpand={() => handleToggleCardExpand(currency.code)}
-                  />
-                ))
+                <div className={`${isMobile ? '' : 'currency-desktop-layout'}`}>
+                  {currencies.map(currency => (
+                    <div key={currency.code} className="currency-item">
+                      <CurrencyCard 
+                        currency={currency}
+                        historicalPrice={historicalPrices[currency.code]} 
+                        selectedDate={selectedDate}
+                        isHistoricalView={isHistoricalView}
+                        isExpanded={expandedCards[currency.code] || false}
+                        onToggleExpand={() => handleToggleCardExpand(currency.code)}
+                      />
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </>

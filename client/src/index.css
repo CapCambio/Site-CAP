@@ -124,3 +124,16 @@
 .currency-dropdown-list::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.5);
 }
+
+/* Layout para desktop com cards independentes */
+.currency-desktop-layout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.currency-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
