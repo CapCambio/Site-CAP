@@ -197,7 +197,7 @@ export function CurrencyMiniChart({ currencyCode, initialMonth }: CurrencyMiniCh
             width={40}
           />
           <Tooltip 
-            formatter={(value: any) => value !== null ? [`R$ ${Number(value).toFixed(5).replace(/\.?0+$/, '')}`, 'Compra'] : ['Sem dados', 'Compra']}
+            formatter={(value: any) => value !== null ? [`R$ ${Number(value).toFixed(5).replace(/\.?0+$/, '')}`, 'Venda'] : ['Sem dados', 'Venda']}
             labelFormatter={(label) => `Dia: ${label}`}
             contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', fontSize: '12px' }}
           />
