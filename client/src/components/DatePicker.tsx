@@ -110,7 +110,7 @@ export function DatePicker({ selectedDate, onDateChange }: DatePickerProps) {
       {isOpen && (
         <Card 
           ref={calendarRef}
-          className="absolute mt-2 p-3 z-[1000] shadow-lg bg-white dark:bg-black"
+          className="absolute mt-2 p-3 z-[1000] shadow-lg bg-white dark:bg-black max-w-[calc(100vw-2rem)] right-0 sm:right-auto"
           style={{ width: '300px' }}
         >
           <div className="flex items-center justify-between mb-4">
