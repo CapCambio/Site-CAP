@@ -5,7 +5,7 @@ import {
   type CurrencyHistory, type InsertCurrencyHistory
 } from "@shared/schema";
 import { db } from './db';
-import { eq, and, gte, lte, desc } from 'drizzle-orm';
+import { eq, and, gte, lte, desc, not } from 'drizzle-orm';
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -139,19 +139,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPreviousDifferentPrice(code: string, currentPrice: number): Promise<CurrencyHistory | undefined> {
-    const [history] = await db
+    // Busca histórico ordenado por timestamp decrescente
+    const histories = await db
       .select()
       .from(currencyHistory)
-      .where(
-        and(
-          eq(currencyHistory.code, code),
-          not(eq(currencyHistory.sellPrice, currentPrice))
-        )
-      )
+      .where(eq(currencyHistory.code, code))
       .orderBy(desc(currencyHistory.timestamp))
-      .limit(1);
+      .limit(10);
     
-    return history;
+    // Encontra manualmente o primeiro preço diferente
+    for (const history of histories) {
+      if (history.buyPrice !== currentPrice) {
+        return history;
+      }
+    }
+    
+    return undefined;
   }
 }
 

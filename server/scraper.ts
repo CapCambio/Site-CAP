@@ -112,7 +112,7 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
                 const nameText = $(cells[nameIndex]).text().trim();
                 const buyText = $(cells[buyIndex]).text().trim().replace('R$', '').replace(',', '.').trim();
                 const sellText = $(cells[sellIndex]).text().trim().replace('R$', '').replace(',', '.').trim();
-                
+
                 // Log para debug - mostrar linha e conteúdo exato extraído
                 console.log(`Linha ${rowIndex}: "${nameText}" | "${buyText}" | "${sellText}"`);
 
@@ -237,7 +237,7 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
                   code = "ZAR";
                   name = "Rand Africano";
                 }
-                
+
                 // Se conseguiu extrair um código
                 if (code) {
                   // Converte os textos para valores numéricos
@@ -298,22 +298,22 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
 
     // Lista de moedas na ordem exata da página fonte
     const currencies: ScrapedCurrency[] = [
-      { name: "Dólar Americano", code: "USD", buyPrice: 5.55, sellPrice: 5.87 },
-      { name: "Euro", code: "EUR", buyPrice: 6.40, sellPrice: 6.71 },
-      { name: "Libra Esterlina", code: "GBP", buyPrice: 7.40, sellPrice: 8.06 },
-      { name: "Dólar Australiano", code: "AUD", buyPrice: 3.52, sellPrice: 3.90 },
+      { name: "Dólar Americano", code: "USD", buyPrice: 5.55, sellPrice: 5.92 },
+      { name: "Euro", code: "EUR", buyPrice: 6.40, sellPrice: 6.81 },
+      { name: "Libra Esterlina", code: "GBP", buyPrice: 7.45, sellPrice: 8.19 },
+      { name: "Dólar Australiano", code: "AUD", buyPrice: 3.52, sellPrice: 3.96 },
       { name: "Peso Argentino", code: "ARS", buyPrice: 0.004, sellPrice: 0.006 },
-      { name: "Dólar Neozelandês", code: "NZD", buyPrice: 3.20, sellPrice: 3.56 },
-      { name: "Dólar Canadense", code: "CAD", buyPrice: 4.00, sellPrice: 4.38 },
-      { name: "Franco Suíço", code: "CHF", buyPrice: 6.50, sellPrice: 7.44 },
+      { name: "Dólar Neozelandês", code: "NZD", buyPrice: 3.25, sellPrice: 3.64 },
+      { name: "Dólar Canadense", code: "CAD", buyPrice: 4.00, sellPrice: 4.46 },
+      { name: "Franco Suíço", code: "CHF", buyPrice: 6.60, sellPrice: 7.40 },
       { name: "Peso Uruguaio", code: "UYU", buyPrice: 0.135, sellPrice: 0.17 },
       { name: "Peso Chileno", code: "CLP", buyPrice: 0.0059, sellPrice: 0.0071 },
       { name: "Peso Mexicano", code: "MXN", buyPrice: 0.28, sellPrice: 0.35 },
       { name: "Peso Colombiano", code: "COP", buyPrice: 0.0014, sellPrice: 0.00185 },
       { name: "Yuan Chinês", code: "CNY", buyPrice: 0.75, sellPrice: 0.90 },
-      { name: "Iene Japonês", code: "JPY", buyPrice: 0.032, sellPrice: 0.044 },
-      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.73 },
-      { name: "Rand Africano", code: "ZAR", buyPrice: 0.28, sellPrice: 0.349 }
+      { name: "Iene Japonês", code: "JPY", buyPrice: 0.032, sellPrice: 0.0453 },
+      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.74 },
+      { name: "Rand Africano", code: "ZAR", buyPrice: 0.28, sellPrice: 0.356 }
     ];
 
     console.log(`Fallback concluído. Fornecidas ${currencies.length} moedas.`);
@@ -327,22 +327,22 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
 
     // Lista de moedas na ordem exata da página fonte
     const currencies: ScrapedCurrency[] = [
-      { name: "Dólar Americano", code: "USD", buyPrice: 5.55, sellPrice: 5.87 },
-      { name: "Euro", code: "EUR", buyPrice: 6.40, sellPrice: 6.71 },
-      { name: "Libra Esterlina", code: "GBP", buyPrice: 7.40, sellPrice: 8.06 },
-      { name: "Dólar Australiano", code: "AUD", buyPrice: 3.52, sellPrice: 3.90 },
+      { name: "Dólar Americano", code: "USD", buyPrice: 5.55, sellPrice: 5.92 },
+      { name: "Euro", code: "EUR", buyPrice: 6.40, sellPrice: 6.81 },
+      { name: "Libra Esterlina", code: "GBP", buyPrice: 7.45, sellPrice: 8.19 },
+      { name: "Dólar Australiano", code: "AUD", buyPrice: 3.52, sellPrice: 3.96 },
       { name: "Peso Argentino", code: "ARS", buyPrice: 0.004, sellPrice: 0.006 },
-      { name: "Dólar Neozelandês", code: "NZD", buyPrice: 3.20, sellPrice: 3.56 },
-      { name: "Dólar Canadense", code: "CAD", buyPrice: 4.00, sellPrice: 4.38 },
-      { name: "Franco Suíço", code: "CHF", buyPrice: 6.50, sellPrice: 7.44 },
+      { name: "Dólar Neozelandês", code: "NZD", buyPrice: 3.25, sellPrice: 3.64 },
+      { name: "Dólar Canadense", code: "CAD", buyPrice: 4.00, sellPrice: 4.46 },
+      { name: "Franco Suíço", code: "CHF", buyPrice: 6.60, sellPrice: 7.40 },
       { name: "Peso Uruguaio", code: "UYU", buyPrice: 0.135, sellPrice: 0.17 },
       { name: "Peso Chileno", code: "CLP", buyPrice: 0.0059, sellPrice: 0.0071 },
       { name: "Peso Mexicano", code: "MXN", buyPrice: 0.28, sellPrice: 0.35 },
       { name: "Peso Colombiano", code: "COP", buyPrice: 0.0014, sellPrice: 0.00185 },
       { name: "Yuan Chinês", code: "CNY", buyPrice: 0.75, sellPrice: 0.90 },
-      { name: "Iene Japonês", code: "JPY", buyPrice: 0.032, sellPrice: 0.044 },
-      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.73 },
-      { name: "Rand Africano", code: "ZAR", buyPrice: 0.28, sellPrice: 0.349 }
+      { name: "Iene Japonês", code: "JPY", buyPrice: 0.032, sellPrice: 0.0453 },
+      { name: "Novo Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.74 },
+      { name: "Rand Africano", code: "ZAR", buyPrice: 0.28, sellPrice: 0.356 }
     ];
 
     return currencies;
