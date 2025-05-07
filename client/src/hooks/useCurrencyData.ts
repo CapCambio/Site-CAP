@@ -23,12 +23,42 @@ export function useCurrencyData() {
     queryKey: ['/api/currencies'],
     refetchOnWindowFocus: false,
     staleTime: 60 * 1000, // 1 minuto (atualização automática a cada minuto)
+    queryFn: async () => {
+      const [currenciesResponse, historyResponse] = await Promise.all([
+        fetch('/api/currencies'),
+        fetch('/api/history/USD?startDate=' + new Date(Date.now() - 96 * 60 * 60 * 1000).toISOString().split('T')[0] + '&endDate=' + new Date().toISOString().split('T')[0])
+      ]);
+
+      if (!currenciesResponse.ok) {
+        throw new Error('Failed to fetch currencies');
+      }
+
+      const currencies = await currenciesResponse.json();
+      const history = historyResponse.ok ? await historyResponse.json() : [];
+
+      // Encontra o registro anterior mais recente
+      if (history.length > 1) {
+        const sortedHistory = history.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        const latest = sortedHistory[0];
+        const previous = sortedHistory[1];
+
+        // Calcula a variação
+        currencies.forEach((currency: any) => {
+          if (currency.code === 'USD') {
+            const change = ((currency.sellPrice - previous.sellPrice) / previous.sellPrice) * 100;
+            currency.change = Number(change.toFixed(2));
+          }
+        });
+      }
+
+      return currencies;
+    },
   });
 
   // Get the formatted last update time
   const getFormattedLastUpdate = () => {
     if (!lastUpdated) return 'Não disponível';
-    
+
     return lastUpdated.toLocaleDateString('pt-BR') + ' ' + 
            lastUpdated.toLocaleTimeString('pt-BR', { 
              hour: '2-digit', 
@@ -60,7 +90,7 @@ export function useCurrencyData() {
         const currDate = new Date(currency.lastUpdate);
         return currDate > latest ? currDate : latest;
       }, new Date(0));
-      
+
       setLastUpdated(mostRecentDate);
     }
   }, [currencies]);
@@ -69,13 +99,13 @@ export function useCurrencyData() {
   useEffect(() => {
     // Atualiza imediatamente na primeira carga
     refreshData();
-    
+
     // Configura o timer para atualizar a cada minuto
     const timer = setInterval(() => {
       console.log('Executando atualização automática...');
       refreshData();
     }, 60000); // 1 minuto
-    
+
     // Limpa o timer quando o componente é desmontado
     return () => clearInterval(timer);
   }, [refreshData]);
