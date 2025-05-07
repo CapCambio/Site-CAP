@@ -200,14 +200,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const savedCurrencies = [];
 
         for (const currency of updatedCurrencies) {
-          // Verifica se houve mudança real na cotação
           const lastHistory = await storage.getLastCurrencyHistory(currency.code);
-
+          const isEndOfDay = new Date().getHours() >= 18; // Considera final do dia após 18h
+          
+          // Salva no histórico se:
+          // 1. Preço mudou
+          // 2. É final do dia
+          // 3. Não tem histórico ainda
           if (!lastHistory || 
               lastHistory.sellPrice !== currency.sellPrice || 
-              lastHistory.buyPrice !== currency.buyPrice) {
+              lastHistory.buyPrice !== currency.buyPrice ||
+              isEndOfDay) {
 
-            // Busca cotação anterior para cálculo de variação (96 horas)
+            // Para variação, continua buscando a cotação anterior diferente
             const previousHistory = await storage.getPreviousDifferentPrice(currency.code, currency.sellPrice);
 
             // Calcula variação
