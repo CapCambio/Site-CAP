@@ -87,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let change = 0;
           if (previousHistory && 
               (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-            change = ((currency.sellPrice - previousHistory.sellPrice) / currency.sellPrice) * 100;
+            change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
             change = Number(change.toFixed(2));
           }
 
@@ -155,7 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let change = 0;
           if (previousHistory && 
               (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-            change = ((currency.sellPrice - previousHistory.sellPrice) / currency.sellPrice) * 100;
+            change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
             change = Number(change.toFixed(2));
           }
 
@@ -219,7 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             let change = 0;
             if (previousHistory && 
                 (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-              change = ((currency.sellPrice - previousHistory.sellPrice) / currency.sellPrice) * 100;
+              change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
               change = Number(change.toFixed(2));
             }
 
