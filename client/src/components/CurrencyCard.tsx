@@ -77,7 +77,7 @@ export function CurrencyCard({
           <div className="mb-3 text-center">
             {hasHistoricalData ? (
               <p className="text-sm font-bold text-[#f3b234]">
-                Cotação do dia {format(selectedDate, 'dd/MM/yyyy')}
+                Cotação ao final do dia {format(selectedDate, 'dd/MM/yyyy')}
               </p>
             ) : (
               <p className="text-sm font-bold text-[#f3b234]">
