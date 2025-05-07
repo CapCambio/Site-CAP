@@ -86,7 +86,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Calcula variação
           let change = 0;
           if (previousHistory && 
-              (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
+              (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000 &&
+              previousHistory.sellPrice !== currency.sellPrice) {
             change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
             change = Number(change.toFixed(2));
           }
@@ -154,7 +155,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Calcula variação
           let change = 0;
           if (previousHistory && 
-              (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
+              (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000 &&
+              previousHistory.sellPrice !== currency.sellPrice) {
             change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
             change = Number(change.toFixed(2));
           }
@@ -218,7 +220,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Calcula variação
             let change = 0;
             if (previousHistory && 
-                (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
+                (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000 &&
+                previousHistory.sellPrice !== currency.sellPrice) {
               change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
               change = Number(change.toFixed(2));
             }

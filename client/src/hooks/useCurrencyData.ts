@@ -44,9 +44,11 @@ export function useCurrencyData() {
 
         // Calcula a variação
         currencies.forEach((currency: any) => {
-          if (currency.code === 'USD') {
+          if (currency.code === 'USD' && previous.sellPrice !== currency.sellPrice) {
             const change = ((currency.sellPrice - previous.sellPrice) / previous.sellPrice) * 100;
             currency.change = Number(change.toFixed(2));
+          } else {
+            currency.change = 0;
           }
         });
       }
