@@ -42,6 +42,9 @@ export function CurrencyCard({
   // Verifica se a data selecionada é a data atual
   const isCurrentDate = selectedDate ? isSameDay(selectedDate, new Date()) : false;
   
+  // Só esconde a variação se estiver em modo histórico E não for data atual
+  const shouldShowVariation = !isHistoricalView || isCurrentDate;
+  
   return (
     <Card className={`currency-card overflow-hidden hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
       <div className="bg-[#1a1a1a] text-white p-4 flex items-center justify-between">
@@ -86,19 +89,19 @@ export function CurrencyCard({
         
         <div className="flex items-center justify-between">
           <div>
-            {isPositiveChange && !isHistoricalView && (
+            {isPositiveChange && shouldShowVariation && (
               <span className="text-sm font-medium text-green-600 flex items-center">
                 <ArrowUp className="mr-1 h-4 w-4" />
                 {formatPercentage(Math.abs(change || 0))}
               </span>
             )}
-            {isNegativeChange && !isHistoricalView && (
+            {isNegativeChange && shouldShowVariation && (
               <span className="text-sm font-medium text-red-600 flex items-center">
                 <ArrowDown className="mr-1 h-4 w-4" />
                 {formatPercentage(Math.abs(change || 0))}
               </span>
             )}
-            {((change === null || change === 0) && !isHistoricalView) && (
+            {((change === null || change === 0) && shouldShowVariation) && (
               <span className="text-sm font-medium text-gray-500">
                 — 0,00%
               </span>
