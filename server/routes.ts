@@ -87,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let change = 0;
           if (previousHistory && 
               (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-            change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
+            change = ((currency.sellPrice - previousHistory.sellPrice) / currency.sellPrice) * 100;
             change = Number(change.toFixed(2));
           }
 
@@ -155,7 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let change = 0;
           if (previousHistory && 
               (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-            change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
+            change = ((currency.sellPrice - previousHistory.sellPrice) / currency.sellPrice) * 100;
             change = Number(change.toFixed(2));
           }
 
@@ -202,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const currency of updatedCurrencies) {
           const lastHistory = await storage.getLastCurrencyHistory(currency.code);
           const isEndOfDay = new Date().getHours() >= 18; // Considera final do dia após 18h
-          
+
           // Salva no histórico se:
           // 1. Preço mudou
           // 2. É final do dia
@@ -219,7 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             let change = 0;
             if (previousHistory && 
                 (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-              change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
+              change = ((currency.sellPrice - previousHistory.sellPrice) / currency.sellPrice) * 100;
               change = Number(change.toFixed(2));
             }
 

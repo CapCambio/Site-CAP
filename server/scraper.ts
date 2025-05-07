@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 
 // URL da fonte de dados
-const SOURCE_URL = 'https://ctrcambio.com.br/tvcaxias/';
+const SOURCE_URL = 'https://www.ctrcambio.com.br/tvcaxias/';
 
 /**
  * Função para extrair dados de câmbio usando Cheerio
