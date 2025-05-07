@@ -139,22 +139,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPreviousDifferentPrice(code: string, currentPrice: number): Promise<CurrencyHistory | undefined> {
-    // Busca histórico ordenado por timestamp decrescente
-    const histories = await db
+    const [history] = await db
       .select()
       .from(currencyHistory)
-      .where(eq(currencyHistory.code, code))
+      .where(
+        and(
+          eq(currencyHistory.code, code),
+          not(eq(currencyHistory.sellPrice, currentPrice))
+        )
+      )
       .orderBy(desc(currencyHistory.timestamp))
-      .limit(10);
+      .limit(1);
     
-    // Encontra manualmente o primeiro preço diferente
-    for (const history of histories) {
-      if (history.buyPrice !== currentPrice) {
-        return history;
-      }
-    }
-    
-    return undefined;
+    return history;
   }
 }
 
