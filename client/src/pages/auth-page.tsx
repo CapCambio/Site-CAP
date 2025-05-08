@@ -146,7 +146,12 @@ export default function LoginPage() {
                 )}
               </Button>
               
-              {form.formState.isSubmitted && !isAuthorized && !isLoading && (
+              {form.formState.isSubmitted && !isAuthorized && !isLoading && form.formState.errors.password && (
+                <div className="mt-4 text-red-500 text-sm">
+                  Senha incorreta
+                </div>
+              )}
+              {form.formState.isSubmitted && !isAuthorized && !isLoading && !form.formState.errors.password && !isAdmin && (
                 <div className="mt-4 text-red-500 text-sm">
                   Parece que seu e-mail não está autorizado, solicite seu acesso online{" "}
                   <button 

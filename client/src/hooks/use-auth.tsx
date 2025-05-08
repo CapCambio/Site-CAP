@@ -98,11 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       if (isAdmin && password !== ADMIN_PASSWORD) {
-        toast({
-          title: "Senha incorreta",
-          description: "A senha de administrador está incorreta.",
-          variant: "destructive",
-        });
+        form.setError("password", { message: "Senha incorreta" });
         return;
       }
 
