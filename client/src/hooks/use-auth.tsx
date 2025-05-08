@@ -74,13 +74,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Se for admin, verifica a senha
       if (isAdmin) {
-        if (password !== ADMIN_PASSWORD) {
-          toast({
-            title: "Senha incorreta",
-            description: "A senha de administrador está incorreta.",
-            variant: "destructive",
-          });
-          return;
+        if (!password || password !== ADMIN_PASSWORD) {
+          setIsLoading(false);
+          return {
+            error: "password",
+            message: "Senha incorreta"
+          };
         }
         // Admin com senha correta está autorizado
         const userData: AuthUser = {
