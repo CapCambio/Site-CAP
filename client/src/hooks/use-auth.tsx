@@ -95,11 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Se não for admin, verifica se o email está autorizado
       const isAuthorized = AUTHORIZED_EMAILS.includes(email);
-      if (!isAuthorized) {
-        return;
-      }
-      if (isAdmin && password !== ADMIN_PASSWORD) {
-        form.setError("password", { message: "Senha incorreta" });
+      if (!isAdmin && !isAuthorized) {
         return;
       }
 
