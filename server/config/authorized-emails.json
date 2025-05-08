@@ -1,0 +1,13 @@
+
+{
+  "authorizedEmails": [
+    "cliente@example.com",
+    "cliente2@example.com",
+    "capcambiocx@gmail.com",
+    "capcambio_caxias@hotmail.com"
+  ],
+  "adminEmails": [
+    "capcambiocx@gmail.com",
+    "capcambio_caxias@hotmail.com"
+  ]
+}

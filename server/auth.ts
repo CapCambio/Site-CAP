@@ -1,16 +1,9 @@
 import { Router } from "express";
 
-// Lista de emails autorizados (em um ambiente real, isso viria do banco de dados)
-const AUTHORIZED_EMAILS = [
-  "cliente@example.com",
-  "admin@example.com"
-];
+import authorizedEmailsConfig from './config/authorized-emails.json';
 
-// Lista de emails de admin (em um ambiente real, isso viria do banco de dados)
-const ADMIN_EMAILS = [
-  "capcambiocx@gmail.com",
-  "capcambio_caxias@hotmail.com"
-];
+const AUTHORIZED_EMAILS = authorizedEmailsConfig.authorizedEmails;
+const ADMIN_EMAILS = authorizedEmailsConfig.adminEmails;
 
 const router = Router();
 

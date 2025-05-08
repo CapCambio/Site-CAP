@@ -16,16 +16,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-// Lista de emails autorizados (em um ambiente real, isso viria do banco de dados)
-const AUTHORIZED_EMAILS = [
-  "cliente@example.com",
-  "admin@example.com"
-];
-
-// Lista de emails de admin (em um ambiente real, isso viria do banco de dados)
-const ADMIN_EMAILS = [
-  "admin@example.com"
-];
+// Os emails autorizados agora são verificados no servidor
+const ADMIN_PASSWORD = "passo2012";
 
 // Senha padrão de admin (em um ambiente real, seria armazenada de forma segura)
 const ADMIN_PASSWORD = "passo2012";
