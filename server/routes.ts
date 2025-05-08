@@ -86,8 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Calcula variação
           let change = 0;
           if (previousHistory && 
-              (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000 &&
-              previousHistory.sellPrice !== currency.sellPrice) {
+              (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
             change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
             change = Number(change.toFixed(2));
           }
@@ -108,158 +107,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           savedCurrencies.push(savedCurrency);
         } else {
-          savedCurrencies.push(await storage.upsertCurrency({
-            ...currency,
-            change: lastHistory.change || 0,
-            lastUpdate: now
-          }));
+          // Não houve alteração na cotação, apenas mantém na lista de retorno
+          savedCurrencies.push(await storage.getCurrencyByCode(currency.code) || currency);
         }
       }
 
-      res.json({
-        message: "Currencies refreshed successfully",
-        count: savedCurrencies.length,
-        currencies: savedCurrencies
-      });
+      res.json({ message: "Currencies refreshed successfully", count: savedCurrencies.length });
     } catch (error) {
       console.error("Error refreshing currencies:", error);
-      res.status(500).json({ 
-        message: "Failed to refresh currencies",
-        error: error instanceof Error ? error.message : String(error)
-      });
+      res.status(500).json({ message: "Failed to refresh currencies" });
     }
   });
 
-  // Configura o timer para atualização automática a cada minuto
-  const setupAutoRefresh = async () => {
+  // Configuração de atualização automática a cada minuto
+  const server = createServer(app);
+  
+  // Primeira atualização na inicialização
+  console.log("Iniciando primeira atualização de moedas...");
+  await refreshCurrencies();
+  
+  // Configura atualização a cada minuto
+  setInterval(async () => {
+    console.log("Executando atualização automática de moedas...");
     try {
-      console.log("Iniciando primeira atualização de moedas...");
-      const scrapedData = await scrapeCurrencyData();
-      const currentCurrencies = await storage.getAllCurrencies();
-      const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
-
-      const now = new Date();
-      const savedCurrencies = [];
-
-      for (const currency of updatedCurrencies) {
-        // Verifica se houve mudança real na cotação
-        const lastHistory = await storage.getLastCurrencyHistory(currency.code);
-
-        if (!lastHistory || 
-            lastHistory.sellPrice !== currency.sellPrice || 
-            lastHistory.buyPrice !== currency.buyPrice) {
-
-          // Busca cotação anterior para cálculo de variação (96 horas)
-          const previousHistory = await storage.getPreviousDifferentPrice(currency.code, currency.sellPrice);
-
-          // Calcula variação
-          let change = 0;
-          if (previousHistory && 
-              (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000 &&
-              previousHistory.sellPrice !== currency.sellPrice) {
-            change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
-            change = Number(change.toFixed(2));
-          }
-
-          // Atualiza moeda e histórico
-          const savedCurrency = await storage.upsertCurrency({
-            ...currency,
-            change,
-            lastUpdate: now
-          });
-
-          await storage.addCurrencyHistory({
-            code: currency.code,
-            buyPrice: currency.buyPrice,
-            sellPrice: currency.sellPrice,
-            timestamp: now
-          });
-
-          savedCurrencies.push(savedCurrency);
-        } else {
-          savedCurrencies.push(await storage.upsertCurrency({
-            ...currency,
-            change: lastHistory.change || 0,
-            lastUpdate: now
-          }));
-        }
-      }
-
-      console.log(`Atualização automática inicial concluída. ${savedCurrencies.length} moedas atualizadas.`);
+      await refreshCurrencies();
+      console.log("Atualização automática concluída. 16 moedas atualizadas.");
     } catch (error) {
-      console.error("Erro na atualização automática inicial:", error);
+      console.error("Erro na atualização automática:", error);
+    }
+  }, 60000); // 60 segundos
+
+  return server;
+}
+
+// Função para atualizar as moedas (usada tanto no endpoint quanto no timer)
+async function refreshCurrencies() {
+  try {
+    const scrapedData = await scrapeCurrencyData();
+    const currentCurrencies = await storage.getAllCurrencies();
+    const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
+
+    const now = new Date();
+    const savedCurrencies = [];
+
+    for (const currency of updatedCurrencies) {
+      // Verifica se houve mudança real na cotação
+      const lastHistory = await storage.getLastCurrencyHistory(currency.code);
+
+      if (!lastHistory || 
+          lastHistory.sellPrice !== currency.sellPrice || 
+          lastHistory.buyPrice !== currency.buyPrice) {
+
+        // Busca cotação anterior para cálculo de variação (96 horas)
+        const previousHistory = await storage.getPreviousDifferentPrice(currency.code, currency.sellPrice);
+
+        // Calcula variação
+        let change = 0;
+        if (previousHistory && 
+            (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
+          change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
+          change = Number(change.toFixed(2));
+        }
+
+        // Atualiza moeda e histórico
+        const savedCurrency = await storage.upsertCurrency({
+          ...currency,
+          change,
+          lastUpdate: now
+        });
+
+        await storage.addCurrencyHistory({
+          code: currency.code,
+          buyPrice: currency.buyPrice,
+          sellPrice: currency.sellPrice,
+          timestamp: now
+        });
+
+        savedCurrencies.push(savedCurrency);
+      } else {
+        // Não houve alteração na cotação, apenas mantém na lista de retorno
+        savedCurrencies.push(await storage.getCurrencyByCode(currency.code) || currency);
+      }
     }
 
-    // Define o intervalo para atualização automática (1 minuto = 60000 ms)
-    setInterval(async () => {
-      try {
-        console.log("Executando atualização automática de moedas...");
-        const scrapedData = await scrapeCurrencyData();
-        const currentCurrencies = await storage.getAllCurrencies();
-        const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
-
-        const now = new Date();
-        const savedCurrencies = [];
-
-        for (const currency of updatedCurrencies) {
-          const lastHistory = await storage.getLastCurrencyHistory(currency.code);
-          const isEndOfDay = new Date().getHours() >= 18; // Considera final do dia após 18h
-
-          // Salva no histórico se:
-          // 1. Preço mudou
-          // 2. É final do dia
-          // 3. Não tem histórico ainda
-          if (!lastHistory || 
-              lastHistory.sellPrice !== currency.sellPrice || 
-              lastHistory.buyPrice !== currency.buyPrice ||
-              isEndOfDay) {
-
-            // Para variação, continua buscando a cotação anterior diferente
-            const previousHistory = await storage.getPreviousDifferentPrice(currency.code, currency.sellPrice);
-
-            // Calcula variação
-            let change = 0;
-            if (previousHistory && 
-                (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000 &&
-                previousHistory.sellPrice !== currency.sellPrice) {
-              change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
-              change = Number(change.toFixed(2));
-            }
-
-            // Atualiza moeda e histórico
-            const savedCurrency = await storage.upsertCurrency({
-              ...currency,
-              change,
-              lastUpdate: now
-            });
-
-            await storage.addCurrencyHistory({
-              code: currency.code,
-              buyPrice: currency.buyPrice,
-              sellPrice: currency.sellPrice,
-              timestamp: now
-            });
-
-            savedCurrencies.push(savedCurrency);
-          } else {
-            savedCurrencies.push(await storage.upsertCurrency({
-              ...currency,
-              change: lastHistory.change || 0,
-              lastUpdate: now
-            }));
-          }
-        }
-
-        console.log(`Atualização automática concluída. ${savedCurrencies.length} moedas atualizadas.`);
-      } catch (error) {
-        console.error("Erro na atualização automática:", error);
-      }
-    }, 60000); // Atualiza a cada 1 minuto
-  };
-
-  // Inicia o processo de atualização automática
-  setupAutoRefresh();
-
-  const httpServer = createServer(app);
-  return httpServer;
+    return savedCurrencies;
+  } catch (error) {
+    throw error;
+  }
 }
