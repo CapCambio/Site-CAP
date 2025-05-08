@@ -19,6 +19,33 @@ interface HistoryChartProps {
   isLoading: boolean;
 }
 
+// Função para calcular o domínio do eixo Y com base nas regras definidas
+function calculateYAxisDomain(data: Array<{ date: string; compra: number; venda: number }>): [number, number] {
+  // Se não houver dados, retorna um domínio padrão
+  if (!data || data.length === 0) {
+    return [0, 10];
+  }
+  
+  // O primeiro valor do período (mais antigo)
+  const firstEntry = data[data.length - 1];
+  const baseValue = firstEntry.venda; // Usando o valor de venda como referência
+  
+  // Calculando limites de 10% para cima e para baixo
+  const tenPercentUp = baseValue * 1.1;
+  const tenPercentDown = baseValue * 0.9;
+  
+  // Encontrando valores min e max reais nos dados
+  const allValues = data.flatMap(item => [item.compra, item.venda]);
+  const minValue = Math.min(...allValues);
+  const maxValue = Math.max(...allValues);
+  
+  // Definindo os limites finais considerando a regra de 10% e valores extremos
+  const yMin = Math.min(tenPercentDown, minValue);
+  const yMax = Math.max(tenPercentUp, maxValue);
+  
+  return [yMin, yMax];
+}
+
 export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
   const currencyName = currencyDetails[filter.code]?.name || filter.code;
   
@@ -84,7 +111,7 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
               />
               <YAxis 
                 tick={{ fontSize: 0 }}
-                domain={['auto', 'auto']}
+                domain={calculateYAxisDomain(data)}
                 tickCount={5}
                 width={35}
                 axisLine={true}

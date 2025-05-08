@@ -144,21 +144,41 @@ export function CurrencyMiniChart({ currencyCode, initialMonth }: CurrencyMiniCh
     );
   }
 
-  // Calculando valores mínimos e máximos para definir domínio do eixo Y
+  // Calculando valores para definir domínio do eixo Y
   // Filtrando valores nulos antes de calcular
-  const validPrices = historicalData.map((d: CurrencyHistory) => d.buyPrice).filter((price: number) => price !== null && price !== undefined);
-  
+  const validPrices = historicalData
+    .map((d: CurrencyHistory) => d.sellPrice)
+    .filter((price: number) => price !== null && price !== undefined);
+
+  let basePrice = 0;
   let minPrice = 0;
   let maxPrice = 0;
   
   if (validPrices.length > 0) {
-    minPrice = Math.min(...validPrices);
-    maxPrice = Math.max(...validPrices);
+    // Primeiro valor do mês (o mais antigo cronologicamente nos dados fornecidos)
+    basePrice = validPrices[validPrices.length - 1]; 
+    
+    // Calculando os limites mínimos e máximos dos dados
+    const actualMinPrice = Math.min(...validPrices);
+    const actualMaxPrice = Math.max(...validPrices);
+    
+    // Calculando 10% para cima e para baixo do valor base
+    const tenPercentUp = basePrice * 1.1;
+    const tenPercentDown = basePrice * 0.9;
+    
+    // O domínio deve ir de 10% abaixo do valor base até 10% acima,
+    // mas se algum valor ultrapassar esse limite, expandimos o domínio
+    minPrice = Math.min(tenPercentDown, actualMinPrice);
+    maxPrice = Math.max(tenPercentUp, actualMaxPrice);
+  } else {
+    // Caso não tenha dados, valor padrão
+    basePrice = 1;
+    minPrice = 0.9;
+    maxPrice = 1.1;
   }
   
-  // Adicionando uma margem de 2% acima e abaixo
-  const yDomainMin = minPrice * 0.98;
-  const yDomainMax = maxPrice * 1.02;
+  const yDomainMin = minPrice;
+  const yDomainMax = maxPrice;
 
   return (
     <div className="w-full h-[200px] mt-3">
