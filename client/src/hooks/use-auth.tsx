@@ -69,14 +69,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Simula uma chamada de API
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Verifica se o email está autorizado
+      // Verifica se é um admin
+      const isAdmin = ADMIN_EMAILS.includes(email);
+
+      // Se for admin, verifica a senha
+      if (isAdmin) {
+        if (password !== ADMIN_PASSWORD) {
+          toast({
+            title: "Senha incorreta",
+            description: "A senha de administrador está incorreta.",
+            variant: "destructive",
+          });
+          return;
+        }
+        // Admin com senha correta está autorizado
+        const userData: AuthUser = {
+          email,
+          isAdmin
+        };
+        setUser(userData);
+        localStorage.setItem("auth_user", JSON.stringify(userData));
+        return;
+      }
+
+      // Se não for admin, verifica se o email está autorizado
       const isAuthorized = AUTHORIZED_EMAILS.includes(email);
       if (!isAuthorized) {
         return;
       }
-
-      // Verifica se é um admin e se precisa de senha
-      const isAdmin = ADMIN_EMAILS.includes(email);
       if (isAdmin && password !== ADMIN_PASSWORD) {
         toast({
           title: "Senha incorreta",
