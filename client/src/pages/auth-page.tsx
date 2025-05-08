@@ -145,18 +145,6 @@ export default function LoginPage() {
                   "Acessar"
                 )}
               </Button>
-              
-              {form.formState.isSubmitted && !isAuthorized && !isLoading && (
-                <div className="mt-4 text-red-500 text-sm">
-                  Parece que seu e-mail não está autorizado, solicite seu acesso online{" "}
-                  <button 
-                    onClick={() => setShowBranchDialog(true)}
-                    className="text-white underline hover:text-white/80"
-                  >
-                    aqui
-                  </button>.
-                </div>
-              )}
             </form>
           </Form>
 
