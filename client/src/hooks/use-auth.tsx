@@ -16,9 +16,6 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-// Os emails autorizados agora são verificados no servidor
-const ADMIN_PASSWORD = "passo2012";
-
 // Senha padrão de admin (em um ambiente real, seria armazenada de forma segura)
 const ADMIN_PASSWORD = "passo2012";
 
