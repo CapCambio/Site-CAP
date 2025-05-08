@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { CurrencyHistory } from '../lib/types';
 import { useQuery } from '@tanstack/react-query';
+import { format, getDate, startOfMonth, endOfMonth, isBefore, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface CurrencyMiniChartProps {
