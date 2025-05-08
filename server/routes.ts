@@ -2,7 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
-import { InsertCurrencyHistory } from "../shared/schema";
+import { InsertCurrencyHistory, currencyHistory } from "../shared/schema";
+import { eq, desc } from "drizzle-orm";
+import { db } from "./db";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes
@@ -65,53 +67,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint para forçar um scraping manual dos dados da fonte
   app.get("/api/refresh-currencies", async (req, res) => {
     try {
-      const scrapedData = await scrapeCurrencyData();
-      const currentCurrencies = await storage.getAllCurrencies();
-      const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
-
-      const now = new Date();
-      const savedCurrencies = [];
-
-      for (const currency of updatedCurrencies) {
-        // Verifica se houve mudança real na cotação
-        const lastHistory = await storage.getLastCurrencyHistory(currency.code);
-
-        if (!lastHistory || 
-            lastHistory.sellPrice !== currency.sellPrice || 
-            lastHistory.buyPrice !== currency.buyPrice) {
-
-          // Busca cotação anterior para cálculo de variação (96 horas)
-          const previousHistory = await storage.getPreviousDifferentPrice(currency.code, currency.sellPrice);
-
-          // Calcula variação
-          let change = 0;
-          if (previousHistory && 
-              (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-            change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
-            change = Number(change.toFixed(2));
-          }
-
-          // Atualiza moeda e histórico
-          const savedCurrency = await storage.upsertCurrency({
-            ...currency,
-            change,
-            lastUpdate: now
-          });
-
-          await storage.addCurrencyHistory({
-            code: currency.code,
-            buyPrice: currency.buyPrice,
-            sellPrice: currency.sellPrice,
-            timestamp: now
-          });
-
-          savedCurrencies.push(savedCurrency);
-        } else {
-          // Não houve alteração na cotação, apenas mantém na lista de retorno
-          savedCurrencies.push(await storage.getCurrencyByCode(currency.code) || currency);
-        }
-      }
-
+      const savedCurrencies = await refreshCurrencies();
       res.json({ message: "Currencies refreshed successfully", count: savedCurrencies.length });
     } catch (error) {
       console.error("Error refreshing currencies:", error);
@@ -153,45 +109,61 @@ async function refreshCurrencies() {
     for (const currency of updatedCurrencies) {
       // Verifica se houve mudança real na cotação
       const lastHistory = await storage.getLastCurrencyHistory(currency.code);
+      let isNewPrice = !lastHistory || 
+                      lastHistory.sellPrice !== currency.sellPrice || 
+                      lastHistory.buyPrice !== currency.buyPrice;
 
-      if (!lastHistory || 
-          lastHistory.sellPrice !== currency.sellPrice || 
-          lastHistory.buyPrice !== currency.buyPrice) {
+      // Forçamos o cálculo da variação para todas as moedas, independente se o preço mudou
+      // Busca o último registro com preço diferente para cálculo de variação (96 horas)
+      let previousHistories = await db
+        .select()
+        .from(currencyHistory)
+        .where(eq(currencyHistory.code, currency.code))
+        .orderBy(desc(currencyHistory.timestamp))
+        .limit(100);  // Pegamos vários registros para garantir que encontraremos um diferente
 
-        // Busca cotação anterior para cálculo de variação (96 horas)
-        const previousHistory = await storage.getPreviousDifferentPrice(currency.code, currency.sellPrice);
-
-        // Calcula variação
-        let change = 0;
-        if (previousHistory && 
-            (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-          change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
-          change = Number(change.toFixed(2));
+      // Encontra o registro mais recente com preço diferente
+      let previousHistory = null;
+      if (previousHistories.length > 1) {
+        for (let i = 0; i < previousHistories.length; i++) {
+          if (previousHistories[i].sellPrice !== currency.sellPrice) {
+            previousHistory = previousHistories[i];
+            break;
+          }
         }
+      }
 
-        // Atualiza moeda e histórico
-        const savedCurrency = await storage.upsertCurrency({
-          ...currency,
-          change,
-          lastUpdate: now
-        });
+      // Calcula variação
+      let change = 0;
+      if (previousHistory && 
+          (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
+        change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
+        change = Number(change.toFixed(2));
+      }
 
+      // Atualiza moeda sempre, mesmo que o preço não tenha mudado, para atualizar a variação
+      const savedCurrency = await storage.upsertCurrency({
+        ...currency,
+        change,
+        lastUpdate: now
+      });
+
+      // Adiciona ao histórico apenas se for um novo preço
+      if (isNewPrice) {
         await storage.addCurrencyHistory({
           code: currency.code,
           buyPrice: currency.buyPrice,
           sellPrice: currency.sellPrice,
           timestamp: now
         });
-
-        savedCurrencies.push(savedCurrency);
-      } else {
-        // Não houve alteração na cotação, apenas mantém na lista de retorno
-        savedCurrencies.push(await storage.getCurrencyByCode(currency.code) || currency);
       }
+
+      savedCurrencies.push(savedCurrency);
     }
 
     return savedCurrencies;
   } catch (error) {
+    console.error("Erro ao atualizar moedas:", error);
     throw error;
   }
 }
