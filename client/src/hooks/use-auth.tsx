@@ -72,11 +72,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Verifica se o email está autorizado
       const isAuthorized = AUTHORIZED_EMAILS.includes(email);
       if (!isAuthorized) {
-        toast({
-          title: "Acesso negado",
-          description: "Seu email não está autorizado a acessar este sistema.",
-          variant: "destructive",
-        });
         return;
       }
 
