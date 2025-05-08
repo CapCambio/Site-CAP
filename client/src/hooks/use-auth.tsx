@@ -55,48 +55,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password?: string) => {
     setIsLoading(true);
     try {
-      // Simula uma chamada de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Faz a verificação de autorização no servidor
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
 
-      // Verifica se é um admin
-      const isAdmin = ADMIN_EMAILS.includes(email);
+      const data = await response.json();
 
-      // Se for admin, verifica a senha
-      if (isAdmin) {
-        if (!password || password !== ADMIN_PASSWORD) {
-          setIsLoading(false);
+      if (!response.ok) {
+        if (data.error === "Email não autorizado") {
           toast({
-            title: "Erro de autenticação",
-            description: "Senha incorreta",
+            title: "Acesso não autorizado",
+            description: "Parece que seu e-mail não está autorizado, solicite seu acesso online aqui.",
             variant: "destructive",
           });
-          return;
+        } else {
+          toast({
+            title: "Erro no login",
+            description: data.error,
+            variant: "destructive",
+          });
         }
-        // Admin com senha correta está autorizado
-        const userData: AuthUser = {
-          email,
-          isAdmin
-        };
-        setUser(userData);
-        localStorage.setItem("auth_user", JSON.stringify(userData));
         return;
       }
 
-      // Se não for admin, verifica se o email está autorizado
-      const isAuthorized = AUTHORIZED_EMAILS.includes(email);
-      if (!isAdmin && !isAuthorized) {
-        return;
-      }
 
       // Login bem-sucedido
       const userData: AuthUser = {
         email,
-        isAdmin
+        isAdmin: data.isAdmin // Assuming the server returns isAdmin
       };
 
       setUser(userData);
       localStorage.setItem("auth_user", JSON.stringify(userData));
-      
+
       toast({
         title: "Login realizado com sucesso",
         description: `Bem-vindo, ${email}!`,
@@ -120,10 +114,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // Simula uma chamada de API
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       setUser(null);
       localStorage.removeItem("auth_user");
-      
+
       toast({
         title: "Logout realizado",
         description: "Você saiu do sistema com sucesso.",

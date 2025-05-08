@@ -30,7 +30,9 @@ router.post("/login", (req, res) => {
   
   // Verifica se o email está autorizado
   const isAuthorized = AUTHORIZED_EMAILS.includes(email);
-  if (!isAuthorized) {
+  const isAdmin = ADMIN_EMAILS.includes(email);
+  
+  if (!isAuthorized && !isAdmin) {
     return res.status(403).json({ error: "Email não autorizado" });
   }
   
