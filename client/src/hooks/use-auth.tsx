@@ -28,7 +28,7 @@ const ADMIN_EMAILS = [
 ];
 
 // Senha padrão de admin (em um ambiente real, seria armazenada de forma segura)
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_PASSWORD = "passo2012";
 
 // Criação do contexto
 const AuthContext = createContext<AuthContextType | null>(null);

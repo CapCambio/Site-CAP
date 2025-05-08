@@ -110,7 +110,7 @@ export default function LoginPage() {
               />
 
               {/* Campo de senha aparece apenas para admin */}
-              {isAdmin && emailVerified && (
+              {isAdmin && (
                 <FormField
                   control={form.control}
                   name="password"

@@ -8,7 +8,8 @@ const AUTHORIZED_EMAILS = [
 
 // Lista de emails de admin (em um ambiente real, isso viria do banco de dados)
 const ADMIN_EMAILS = [
-  "admin@example.com"
+  "capcambiocx@gmail.com",
+  "capcambio_caxias@hotmail.com"
 ];
 
 const router = Router();
