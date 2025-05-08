@@ -190,11 +190,11 @@ export function CurrencyMiniChart({ currencyCode, initialMonth }: CurrencyMiniCh
             label={{ value: "Dia", position: "insideBottom", offset: -15, fill: "#000000", fontSize: 12 }}
           />
           <YAxis 
-            tick={{ fontSize: 10 }}
+            tick={false} 
             domain={[yDomainMin, yDomainMax]}
-            tickCount={4}
-            tickFormatter={(value) => value.toFixed(5).replace(/\.?0+$/, '')}
-            width={40}
+            tickCount={0}
+            width={30}
+            label={{ value: "Cotação", angle: -90, position: "insideLeft", style: { textAnchor: 'middle', fill: '#666', fontSize: 12 } }}
           />
           <Tooltip 
             formatter={(value: any) => value !== null ? [`R$ ${Number(value).toFixed(5).replace(/\.?0+$/, '')}`, 'Venda'] : ['Sem dados', 'Venda']}

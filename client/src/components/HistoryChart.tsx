@@ -83,10 +83,10 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
                 label={{ value: "Data", position: "insideBottom", offset: -15, fill: "#000000", fontSize: 12 }}
               />
               <YAxis 
-                tick={{ fontSize: 12 }}
+                tick={false}
                 domain={['auto', 'auto']}
-                tickFormatter={(value) => value.toFixed(5).replace(/\.?0+$/, '')}
-                width={45}
+                width={30}
+                label={{ value: "Cotação", angle: -90, position: "insideLeft", style: { textAnchor: 'middle', fill: '#666', fontSize: 12 } }}
               />
               <Tooltip 
                 formatter={(value: number) => [`R$ ${value.toFixed(5).replace(/\.?0+$/, '')}`, '']}
