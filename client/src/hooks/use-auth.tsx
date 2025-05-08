@@ -76,10 +76,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (isAdmin) {
         if (!password || password !== ADMIN_PASSWORD) {
           setIsLoading(false);
-          return {
-            error: "password",
-            message: "Senha incorreta"
-          };
+          toast({
+            title: "Erro de autenticação",
+            description: "Senha incorreta",
+            variant: "destructive",
+          });
+          return;
         }
         // Admin com senha correta está autorizado
         const userData: AuthUser = {
