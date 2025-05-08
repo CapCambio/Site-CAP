@@ -30,21 +30,21 @@ export function CurrencyCard({
 }: CurrencyCardProps) {
   const { name, code, buyPrice, sellPrice, change } = currency;
   const isMobile = useIsMobile();
-  
+
   const isPositiveChange = change !== null && change > 0;
   const isNegativeChange = change !== null && change < 0;
-  
+
   // Determina se estamos exibindo dados históricos ou atuais
   const displayBuyPrice = isHistoricalView && historicalPrice ? historicalPrice.buyPrice : buyPrice;
   const displaySellPrice = isHistoricalView && historicalPrice ? historicalPrice.sellPrice : sellPrice;
   const hasHistoricalData = isHistoricalView && historicalPrice && historicalPrice.buyPrice !== null;
-  
+
   // Verifica se a data selecionada é a data atual
   const isCurrentDate = selectedDate ? isSameDay(selectedDate, new Date()) : false;
-  
+
   // Só esconde a variação se estiver em modo histórico E não for data atual
   const shouldShowVariation = !isHistoricalView || isCurrentDate;
-  
+
   return (
     <Card className={`currency-card overflow-hidden hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
       <div className="bg-[#1a1a1a] text-white p-4 flex items-center justify-between">
@@ -86,7 +86,7 @@ export function CurrencyCard({
             )}
           </div>
         )}
-        
+
         <div className="flex items-center justify-between">
           <div>
             {isPositiveChange && shouldShowVariation && (
@@ -107,7 +107,7 @@ export function CurrencyCard({
               </span>
             )}
           </div>
-          
+
           <button 
             onClick={onToggleExpand}
             className="text-xs text-[#1a1a1a] hover:text-gray-700 flex items-center focus:outline-none"
@@ -118,13 +118,13 @@ export function CurrencyCard({
             />
           </button>
         </div>
-        
+
         {/* Área expandível com o gráfico */}
         {isExpanded && (
           <div className="mt-3 pt-3 border-t border-gray-200">
             <CurrencyMiniChart 
-              currencyCode={code} 
-              initialMonth={selectedDate && isHistoricalView ? selectedDate : undefined}
+              currencyCode={currency.code}
+              currentPrice={currency.sellPrice}
             />
           </div>
         )}
