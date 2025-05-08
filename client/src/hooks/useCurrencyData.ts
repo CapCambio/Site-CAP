@@ -36,22 +36,8 @@ export function useCurrencyData() {
       const currencies = await currenciesResponse.json();
       const history = historyResponse.ok ? await historyResponse.json() : [];
 
-      // Encontra o registro anterior mais recente
-      if (history.length > 1) {
-        const sortedHistory = history.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-        const latest = sortedHistory[0];
-        const previous = sortedHistory[1];
-
-        // Calcula a variação
-        currencies.forEach((currency: any) => {
-          if (currency.code === 'USD' && previous.sellPrice !== currency.sellPrice) {
-            const change = ((currency.sellPrice - previous.sellPrice) / previous.sellPrice) * 100;
-            currency.change = Number(change.toFixed(2));
-          } else {
-            currency.change = 0;
-          }
-        });
-      }
+      // Não sobrescrevemos a variação que vem do backend, pois ela já é calculada lá
+      // As variações são calculadas corretamente para todas as moedas no servidor
 
       return currencies;
     },
