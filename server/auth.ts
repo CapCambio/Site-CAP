@@ -37,8 +37,7 @@ router.post("/login", (req, res) => {
   }
   
   // Verifica se é um admin e se a senha está correta
-  const isAdmin = ADMIN_EMAILS.includes(email);
-  if (isAdmin && password !== "admin123") {
+  if (isAdmin && password !== "passo2012") {
     return res.status(401).json({ error: "Senha incorreta" });
   }
   
