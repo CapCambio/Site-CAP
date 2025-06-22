@@ -1,5 +1,10 @@
 
 {
-  "authorizedEmails": [],
-  "adminEmails": []
+  "authorizedEmails": [
+    "test@example.com",
+    "user@test.com"
+  ],
+  "adminEmails": [
+    "admin@example.com"
+  ]
 }
