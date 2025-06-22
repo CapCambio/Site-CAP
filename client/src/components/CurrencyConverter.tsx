@@ -43,12 +43,24 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     };
   }, [showFromDropdown, showToDropdown]);
 
-  // Aplicar regra de BRL automaticamente
+  // Aplicar regras automaticamente
   useEffect(() => {
-    if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
+    // Se ambas as moedas são iguais, mudar uma delas
+    if (fromCurrency === toCurrency) {
+      if (fromCurrency === "BRL") {
+        // Se ambas são BRL, mudar o campo "Para" para USD
+        const firstForeignCurrency = allCurrencies.find(c => c.code !== "BRL")?.code || "USD";
+        setToCurrency(firstForeignCurrency);
+      } else {
+        // Se ambas são moedas estrangeiras, mudar o campo "De" para BRL
+        setFromCurrency("BRL");
+      }
+    }
+    // Se nenhuma das moedas é BRL, forçar BRL no campo "De"
+    else if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
       setFromCurrency("BRL");
     }
-  }, [fromCurrency, toCurrency]);
+  }, [fromCurrency, toCurrency, allCurrencies]);
 
   useEffect(() => {
     const fromCurrencyData = allCurrencies.find(c => c.code === fromCurrency);
