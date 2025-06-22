@@ -1,10 +1,19 @@
+
 {
   "authorizedEmails": [
-    "mateus.m2o@live.com"
+    {
+      "email": "mateus.m2o@live.com",
+      "name": "Mateus Medeiros"
+    }
   ],
   "adminEmails": [
-    "admin@example.com",
-    "capcambiocx@gmail.com",
-    "capcambio_caxias@hotmail.com"
+    {
+      "email": "capcambiocx@gmail.com",
+      "name": "CAP Câmbio"
+    },
+    {
+      "email": "capcambio_caxias@hotmail.com",
+      "name": "CAP Câmbio"
+    }
   ]
 }

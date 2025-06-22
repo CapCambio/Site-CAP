@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Settings, Search, Trash2, LogOut } from "lucide-react";
+import { ArrowLeft, Settings, Search, Trash2, LogOut, Edit } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 interface AuthorizedEmail {
   email: string;
-  name?: string;
+  name: string;
   isAdmin: boolean;
   lastAccess?: string;
 }
@@ -25,6 +25,9 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [authorizedEmails, setAuthorizedEmails] = useState<AuthorizedEmail[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [editingEmail, setEditingEmail] = useState<string | null>(null);
+  const [editEmail, setEditEmail] = useState("");
+  const [editName, setEditName] = useState("");
 
   // Impedir scroll do body quando o painel está aberto
   useEffect(() => {
@@ -46,16 +49,16 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
         const data = await response.json();
         // Converter formato da resposta para o formato esperado
         const allEmails: AuthorizedEmail[] = [
-          ...data.authorized.map((email: string) => ({
-            email,
+          ...data.authorized.map((item: any) => ({
+            email: typeof item === 'string' ? item : item.email,
+            name: typeof item === 'string' ? 'Cliente' : item.name,
             isAdmin: false,
-            name: undefined,
             lastAccess: undefined
           })),
-          ...data.admin.map((email: string) => ({
-            email,
+          ...data.admin.map((item: any) => ({
+            email: typeof item === 'string' ? item : item.email,
+            name: typeof item === 'string' ? 'CAP Câmbio' : item.name,
             isAdmin: true,
-            name: undefined,
             lastAccess: undefined
           }))
         ];
@@ -68,7 +71,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
 
   const handleAddEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newEmail.trim()) return;
+    if (!newEmail.trim() || !newName.trim()) return;
 
     setIsLoading(true);
     try {
@@ -77,6 +80,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email: newEmail,
+          name: newName,
           type: 'authorized' // Por padrão adiciona como usuário comum
         })
       });
@@ -90,6 +94,35 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
       console.error('Erro ao adicionar email:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleEditEmail = async (oldEmail: string) => {
+    if (!editEmail.trim() || !editName.trim()) return;
+
+    const emailToEdit = authorizedEmails.find(item => item.email === oldEmail);
+    if (!emailToEdit) return;
+
+    try {
+      const response = await fetch('/api/admin/emails', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          oldEmail,
+          newEmail: editEmail,
+          name: editName,
+          type: emailToEdit.isAdmin ? 'admin' : 'authorized'
+        })
+      });
+
+      if (response.ok) {
+        setEditingEmail(null);
+        setEditEmail("");
+        setEditName("");
+        loadAuthorizedEmails();
+      }
+    } catch (error) {
+      console.error('Erro ao editar email:', error);
     }
   };
 
@@ -113,6 +146,18 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
     } catch (error) {
       console.error('Erro ao remover email:', error);
     }
+  };
+
+  const startEdit = (email: string, name: string) => {
+    setEditingEmail(email);
+    setEditEmail(email);
+    setEditName(name);
+  };
+
+  const cancelEdit = () => {
+    setEditingEmail(null);
+    setEditEmail("");
+    setEditName("");
   };
 
   const filteredEmails = authorizedEmails.filter(item =>
@@ -176,7 +221,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
               <form onSubmit={handleAddEmail} className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <Label className="text-white mb-1 text-sm">Email</Label>
+                    <Label className="text-white mb-1 text-sm">Email *</Label>
                     <Input 
                       type="email" 
                       placeholder="cliente@exemplo.com" 
@@ -187,13 +232,14 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                     />
                   </div>
                   <div>
-                    <Label className="text-white mb-1 text-sm">Nome (opcional)</Label>
+                    <Label className="text-white mb-1 text-sm">Nome *</Label>
                     <Input 
                       type="text" 
                       placeholder="Nome do cliente" 
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
                       className="bg-zinc-800 border-zinc-600 text-white placeholder:text-zinc-400 focus:ring-yellow-500 focus:border-yellow-500"
+                      required
                     />
                   </div>
                 </div>
@@ -201,7 +247,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                 <Button 
                   type="submit" 
                   className="w-full bg-yellow-500 text-black font-medium hover:bg-yellow-600 transition-colors"
-                  disabled={isLoading}
+                  disabled={isLoading || !newEmail.trim() || !newName.trim()}
                 >
                   {isLoading ? "Adicionando..." : "Adicionar Email"}
                 </Button>
@@ -236,34 +282,90 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                   </div>
                 ) : (
                   filteredEmails.map((item, index) => (
-                    <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-zinc-800 rounded-lg gap-3">
-                      <div className="flex items-center space-x-4 min-w-0 flex-1">
-                        <div className="min-w-0 flex-1">
-                          <h4 className="font-medium text-white truncate">{item.email}</h4>
-                          <p className="text-sm text-zinc-300">
-                            {item.name || (item.isAdmin ? "Administrador CAP Câmbio" : "Cliente")}
-                          </p>
+                    <div key={index} className="p-4 bg-zinc-800 rounded-lg">
+                      {editingEmail === item.email ? (
+                        // Modo de edição
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                              <Label className="text-white mb-1 text-sm">Email *</Label>
+                              <Input 
+                                type="email" 
+                                value={editEmail}
+                                onChange={(e) => setEditEmail(e.target.value)}
+                                className="bg-zinc-700 border-zinc-600 text-white"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-white mb-1 text-sm">Nome *</Label>
+                              <Input 
+                                type="text" 
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                className="bg-zinc-700 border-zinc-600 text-white"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button 
+                              onClick={() => handleEditEmail(item.email)}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                              disabled={!editEmail.trim() || !editName.trim()}
+                            >
+                              Salvar
+                            </Button>
+                            <Button 
+                              onClick={cancelEdit}
+                              variant="outline"
+                              className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                            >
+                              Cancelar
+                            </Button>
+                          </div>
                         </div>
-                        {item.isAdmin && (
-                          <span className="px-2 py-1 text-xs text-yellow-500 bg-yellow-500/10 rounded-full whitespace-nowrap">
-                            Admin
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-between sm:justify-end space-x-2">
-                        <span className="text-xs sm:text-sm text-zinc-400 truncate">
-                          {item.lastAccess ? `Último acesso: ${item.lastAccess}` : "Nunca acessou"}
-                        </span>
-                        {!item.isAdmin && (
-                          <button 
-                            onClick={() => handleRemoveEmail(item.email)}
-                            className="text-zinc-400 hover:text-red-400 transition-colors p-1"
-                            title="Remover email"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
+                      ) : (
+                        // Modo de visualização
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex items-center space-x-4 min-w-0 flex-1">
+                            <div className="min-w-0 flex-1">
+                              <h4 className="font-medium text-white truncate">{item.email}</h4>
+                              <p className="text-sm text-zinc-300">{item.name}</p>
+                            </div>
+                            {item.isAdmin && (
+                              <span className="px-2 py-1 text-xs text-yellow-500 bg-yellow-500/10 rounded-full whitespace-nowrap">
+                                Admin
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between sm:justify-end space-x-2">
+                            <span className="text-xs sm:text-sm text-zinc-400 truncate">
+                              {item.lastAccess ? `Último acesso: ${item.lastAccess}` : "Nunca acessou"}
+                            </span>
+                            <div className="flex space-x-1">
+                              {!item.isAdmin && (
+                                <>
+                                  <button 
+                                    onClick={() => startEdit(item.email, item.name)}
+                                    className="text-zinc-400 hover:text-blue-400 transition-colors p-1"
+                                    title="Editar usuário"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </button>
+                                  <button 
+                                    onClick={() => handleRemoveEmail(item.email)}
+                                    className="text-zinc-400 hover:text-red-400 transition-colors p-1"
+                                    title="Remover email"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))
                 )}

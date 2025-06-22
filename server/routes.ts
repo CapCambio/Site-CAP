@@ -82,15 +82,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const emailLower = email.toLowerCase();
 
       // Verificar se o email está autorizado (como usuário comum ou admin)
-      const isAuthorized = authorizedEmails.includes(emailLower) || adminEmails.includes(emailLower);
+      const isAuthorizedUser = authorizedEmails.some(e => 
+        typeof e === 'string' ? e === emailLower : e.email === emailLower
+      );
+      const isAdminUser = adminEmails.some(e => 
+        typeof e === 'string' ? e === emailLower : e.email === emailLower
+      );
 
-      if (!isAuthorized) {
+      if (!isAuthorizedUser && !isAdminUser) {
         return res.status(401).json({ error: "Email não autorizado" });
       }
 
       // Se for admin, verificar senha
-      const isAdmin = adminEmails.includes(emailLower);
-      if (isAdmin) {
+      if (isAdminUser) {
         if (!password || password !== "passo2012") {
           return res.status(401).json({ error: "Senha incorreta para administrador" });
         }
@@ -98,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ 
         success: true, 
-        isAdmin,
+        isAdmin: isAdminUser,
         email: emailLower
       });
     } catch (error) {
@@ -213,21 +217,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/emails", async (req, res) => {
     try {
-      const { email, type } = req.body;
+      const { email, name, type } = req.body;
 
-      if (!email || !type) {
-        return res.status(400).json({ error: "Email e tipo são obrigatórios" });
+      if (!email || !type || !name) {
+        return res.status(400).json({ error: "Email, nome e tipo são obrigatórios" });
       }
 
       const authorizedEmails = loadAuthorizedEmails();
 
       if (type === "authorized") {
-        if (!authorizedEmails.authorizedEmails.includes(email)) {
-          authorizedEmails.authorizedEmails.push(email);
+        // Verificar se email já existe
+        const existingIndex = authorizedEmails.authorizedEmails.findIndex(e => 
+          typeof e === 'string' ? e === email : e.email === email
+        );
+        if (existingIndex === -1) {
+          authorizedEmails.authorizedEmails.push({ email, name });
         }
       } else if (type === "admin") {
-        if (!authorizedEmails.adminEmails.includes(email)) {
-          authorizedEmails.adminEmails.push(email);
+        // Verificar se email já existe
+        const existingIndex = authorizedEmails.adminEmails.findIndex(e => 
+          typeof e === 'string' ? e === email : e.email === email
+        );
+        if (existingIndex === -1) {
+          authorizedEmails.adminEmails.push({ email, name });
         }
       }
 
@@ -238,6 +250,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Email adicionado com sucesso" });
     } catch (error) {
       res.status(500).json({ error: "Erro ao adicionar email" });
+    }
+  });
+
+  app.put("/api/admin/emails", async (req, res) => {
+    try {
+      const { oldEmail, newEmail, name, type } = req.body;
+
+      if (!oldEmail || !newEmail || !name || !type) {
+        return res.status(400).json({ error: "Todos os campos são obrigatórios" });
+      }
+
+      const authorizedEmails = loadAuthorizedEmails();
+
+      if (type === "authorized") {
+        const index = authorizedEmails.authorizedEmails.findIndex(e => 
+          typeof e === 'string' ? e === oldEmail : e.email === oldEmail
+        );
+        if (index !== -1) {
+          authorizedEmails.authorizedEmails[index] = { email: newEmail, name };
+        }
+      } else if (type === "admin") {
+        const index = authorizedEmails.adminEmails.findIndex(e => 
+          typeof e === 'string' ? e === oldEmail : e.email === oldEmail
+        );
+        if (index !== -1) {
+          authorizedEmails.adminEmails[index] = { email: newEmail, name };
+        }
+      }
+
+      // Salvar no arquivo
+      const configPath = path.join(__dirname, "config", "authorized-emails.json");
+      fs.writeFileSync(configPath, JSON.stringify(authorizedEmails, null, 2));
+
+      res.json({ message: "Email editado com sucesso" });
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao editar email" });
     }
   });
 
@@ -252,9 +300,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const authorizedEmails = loadAuthorizedEmails();
 
       if (type === "authorized") {
-        authorizedEmails.authorizedEmails = authorizedEmails.authorizedEmails.filter(e => e !== email);
+        authorizedEmails.authorizedEmails = authorizedEmails.authorizedEmails.filter(e => 
+          typeof e === 'string' ? e !== email : e.email !== email
+        );
       } else if (type === "admin") {
-        authorizedEmails.adminEmails = authorizedEmails.adminEmails.filter(e => e !== email);
+        authorizedEmails.adminEmails = authorizedEmails.adminEmails.filter(e => 
+          typeof e === 'string' ? e !== email : e.email !== email
+        );
       }
 
       // Salvar no arquivo
