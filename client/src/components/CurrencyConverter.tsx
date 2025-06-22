@@ -43,28 +43,12 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     };
   }, [showFromDropdown, showToDropdown]);
 
-  // Aplicar regras automaticamente com delay para evitar loops
+  // Aplicar regras apenas quando duas moedas estrangeiras são selecionadas
   useEffect(() => {
-    const timer = setTimeout(() => {
-      // Se ambas as moedas são iguais, mudar uma delas
-      if (fromCurrency === toCurrency) {
-        if (fromCurrency === "BRL") {
-          // Se ambas são BRL, mudar o campo "Para" para USD
-          const firstForeignCurrency = allCurrencies.find(c => c.code !== "BRL")?.code || "USD";
-          setToCurrency(firstForeignCurrency);
-        } else {
-          // Se ambas são moedas estrangeiras, mudar o campo "De" para BRL
-          setFromCurrency("BRL");
-        }
-      }
-      // Se nenhuma das moedas é BRL, forçar BRL no campo "De"
-      else if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
-        setFromCurrency("BRL");
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [fromCurrency, toCurrency, allCurrencies]);
+    if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
+      setFromCurrency("BRL");
+    }
+  }, [fromCurrency, toCurrency]);
 
   useEffect(() => {
     const fromCurrencyData = allCurrencies.find(c => c.code === fromCurrency);
@@ -259,6 +243,18 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                       const newToCurrency = currency.code;
                       setToCurrency(newToCurrency);
                       setShowToDropdown(false);
+                      
+                      // Se ambas as moedas ficaram iguais, ajustar o primeiro campo
+                      if (fromCurrency === newToCurrency) {
+                        if (newToCurrency === "BRL") {
+                          // Se ambas são BRL, mudar o primeiro campo para USD
+                          const firstForeignCurrency = allCurrencies.find(c => c.code !== "BRL")?.code || "USD";
+                          setFromCurrency(firstForeignCurrency);
+                        } else {
+                          // Se ambas são moedas estrangeiras, mudar o primeiro campo para BRL
+                          setFromCurrency("BRL");
+                        }
+                      }
                     }}
                   >
                     <CurrencyLogo code={currency.code} className="w-5 h-5 mr-3" />
