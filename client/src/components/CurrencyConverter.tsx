@@ -52,13 +52,19 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       if (!isNaN(numericAmount) && numericAmount >= 0) {
         let result;
 
-        if (fromCurrency === "BRL") {
+        // Só permitir conversões onde uma das moedas é BRL
+        if (fromCurrency === "BRL" && toCurrency !== "BRL") {
+          // BRL para moeda estrangeira
           result = numericAmount / toCurrencyData.sellPrice;
-        } else if (toCurrency === "BRL") {
+        } else if (fromCurrency !== "BRL" && toCurrency === "BRL") {
+          // Moeda estrangeira para BRL
           result = numericAmount * fromCurrencyData.buyPrice;
+        } else if (fromCurrency === "BRL" && toCurrency === "BRL") {
+          // BRL para BRL (mesmo valor)
+          result = numericAmount;
         } else {
-          const amountInBRL = numericAmount * fromCurrencyData.buyPrice;
-          result = amountInBRL / toCurrencyData.sellPrice;
+          // Evitar conversões entre duas moedas estrangeiras
+          result = 0;
         }
 
         const rawResult = result;
@@ -93,8 +99,9 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   const handleSwapCurrencies = () => {
-    // Always allow swap if one of the currencies is BRL
-    if (fromCurrency === "BRL" || toCurrency === "BRL") {
+    // Só permitir troca se uma das moedas for BRL
+    if ((fromCurrency === "BRL" && toCurrency !== "BRL") || 
+        (fromCurrency !== "BRL" && toCurrency === "BRL")) {
       setFromCurrency(toCurrency);
       setToCurrency(fromCurrency);
     }
@@ -221,7 +228,14 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 }}
               >
                 {allCurrencies
-                  .filter(currency => currency.code !== fromCurrency)
+                  .filter(currency => {
+                    // Se o campo "De" não for BRL, só permitir BRL no campo "Para"
+                    if (fromCurrency !== "BRL") {
+                      return currency.code === "BRL";
+                    }
+                    // Se o campo "De" for BRL, permitir qualquer moeda exceto BRL
+                    return currency.code !== "BRL";
+                  })
                   .sort((a, b) => (a.code === "BRL" ? -1 : b.code === "BRL" ? 1 : 0))
                   .map((currency) => (
                   <div 
