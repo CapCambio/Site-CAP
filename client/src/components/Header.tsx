@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, Settings } from "lucide-react";
 import { useState } from "react";
+import AdminPanel from "./AdminPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +15,8 @@ export function Header() {
   const [emails, setEmails] = useState({ authorized: [], admin: [] });
   const [newEmail, setNewEmail] = useState("");
   const [emailType, setEmailType] = useState<"authorized" | "admin">("authorized");
-  const { toast } = useToast();
+    const [showAdminPanel, setShowAdminPanel] = useState(false);
+    const { toast } = useToast();
 
   const loadEmails = async () => {
     try {
@@ -76,6 +78,15 @@ export function Header() {
     loadEmails();
   };
 
+
+  if (!user) {
+    return null;
+  }
+
+   if (showAdminPanel) {
+        return <AdminPanel onClose={() => setShowAdminPanel(false)} />;
+    }
+
   return (
     <>
       <header className="bg-[#000000] text-white px-4 py-1 shadow-md">
@@ -86,7 +97,7 @@ export function Header() {
               alt="CAP Câmbio Logo" 
               className="h-24 md:h-28"
             />
-            
+
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
               <div className="flex items-center gap-2 -mt-1">
@@ -94,7 +105,7 @@ export function Header() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={openSettings}
+                    onClick={() => setShowAdminPanel(true)}
                     className="text-white hover:bg-gray-800 p-1"
                     title="Configurações"
                   >
@@ -122,7 +133,7 @@ export function Header() {
           <DialogHeader>
             <DialogTitle>Gerenciar Emails Autorizados</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-6">
             {/* Adicionar novo email */}
             <div className="space-y-4">

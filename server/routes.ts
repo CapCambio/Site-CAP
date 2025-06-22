@@ -25,6 +25,31 @@ function loadAuthorizedEmails() {
   }
 }
 
+async function loadEmailConfig() {
+    try {
+      const configPath = path.join(__dirname, 'config', 'authorized-emails.json');
+      const configData = await fs.readFile(configPath, 'utf-8');
+      return JSON.parse(configData);
+    } catch (error) {
+      console.error('Erro ao carregar configuração de emails:', error);
+      // Retorna configuração padrão se houver erro
+      return {
+        authorizedEmails: [],
+        adminEmails: ["admin@example.com"]
+      };
+    }
+  }
+
+  async function saveEmailConfig(config: any) {
+    try {
+      const configPath = path.join(__dirname, 'config', 'authorized-emails.json');
+      await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
+    } catch (error) {
+      console.error('Erro ao salvar configuração de emails:', error);
+      throw error;
+    }
+  }
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Rotas de autenticação
   app.post("/api/auth/check-admin", (req, res) => {
@@ -239,6 +264,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Email removido com sucesso" });
     } catch (error) {
       res.status(500).json({ error: "Erro ao remover email" });
+    }
+  });
+
+  // Rota para verificar se um email é admin
+  app.post('/api/auth/check-admin', async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ error: 'Email é obrigatório' });
+      }
+
+      const config = await loadEmailConfig();
+      const isAdmin = config.adminEmails.includes(email.toLowerCase());
+
+      res.json({ isAdmin });
+    } catch (error) {
+      console.error('Erro ao verificar admin:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Rota para listar emails autorizados (apenas admins)
+  app.get('/api/auth/authorized-emails', async (req, res) => {
+    try {
+      const config = await loadEmailConfig();
+
+      const emails = [
+        ...config.adminEmails.map(email => ({
+          email,
+          isAdmin: true,
+          name: email.includes('capcambio') ? 'Administrador CAP Câmbio' : undefined
+        })),
+        ...config.authorizedEmails.map(email => ({
+          email,
+          isAdmin: false,
+          name: undefined
+        }))
+      ];
+
+      res.json({ emails });
+    } catch (error) {
+      console.error('Erro ao listar emails:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Rota para adicionar email autorizado (apenas admins)
+  app.post('/api/auth/add-email', async (req, res) => {
+    try {
+      const { email, name } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ error: 'Email é obrigatório' });
+      }
+
+      const config = await loadEmailConfig();
+      const emailLower = email.toLowerCase();
+
+      // Verificar se já existe
+      if (config.authorizedEmails.includes(emailLower) || config.adminEmails.includes(emailLower)) {
+        return res.status(400).json({ error: 'Email já está autorizado' });
+      }
+
+      // Adicionar à lista
+      config.authorizedEmails.push(emailLower);
+      await saveEmailConfig(config);
+
+      res.json({ success: true, message: 'Email adicionado com sucesso' });
+    } catch (error) {
+      console.error('Erro ao adicionar email:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Rota para remover email autorizado (apenas admins)
+  app.post('/api/auth/remove-email', async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ error: 'Email é obrigatório' });
+      }
+
+      const config = await loadEmailConfig();
+      const emailLower = email.toLowerCase();
+
+      // Não permitir remoção de admins
+      if (config.adminEmails.includes(emailLower)) {
+        return res.status(400).json({ error: 'Não é possível remover emails de administrador' });
+      }
+
+      // Remover da lista
+      config.authorizedEmails = config.authorizedEmails.filter(e => e !== emailLower);
+      await saveEmailConfig(config);
+
+      res.json({ success: true, message: 'Email removido com sucesso' });
+    } catch (error) {
+      console.error('Erro ao remover email:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });
 
