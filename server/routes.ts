@@ -5,11 +5,8 @@ import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
 import { InsertCurrencyHistory, currencyHistory } from "../shared/schema";
 import { eq, desc, and, lt } from "drizzle-orm";
 import { db } from "./db";
-import { Router } from "express";
 import fs from "fs";
 import path from "path";
-
-const router = Router();
 
 // Carregar emails autorizados
 function loadAuthorizedEmails() {
@@ -23,66 +20,62 @@ function loadAuthorizedEmails() {
   }
 }
 
-// Verificar se o email é de administrador
-router.post("/api/auth/check-admin", (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ error: "Email é obrigatório" });
-    }
-
-    const { adminEmails } = loadAuthorizedEmails();
-    const isAdmin = adminEmails.includes(email.toLowerCase());
-
-    res.json({ isAdmin });
-  } catch (error) {
-    console.error("Erro ao verificar admin:", error);
-    res.status(500).json({ error: "Erro interno do servidor" });
-  }
-});
-
-// Fazer login
-router.post("/api/auth/login", (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ error: "Email é obrigatório" });
-    }
-
-    const { authorizedEmails, adminEmails } = loadAuthorizedEmails();
-    const emailLower = email.toLowerCase();
-
-    // Verificar se o email está autorizado (como usuário comum ou admin)
-    const isAuthorized = authorizedEmails.includes(emailLower) || adminEmails.includes(emailLower);
-
-    if (!isAuthorized) {
-      return res.status(401).json({ error: "Email não autorizado" });
-    }
-
-    // Se for admin, verificar senha
-    const isAdmin = adminEmails.includes(emailLower);
-    if (isAdmin) {
-      if (!password || password !== "passo2012") {
-        return res.status(401).json({ error: "Senha incorreta para administrador" });
-      }
-    }
-
-    res.json({ 
-      success: true, 
-      isAdmin,
-      email: emailLower
-    });
-  } catch (error) {
-    console.error("Erro no login:", error);
-    res.status(500).json({ error: "Erro interno do servidor" });
-  }
-});
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Rotas de autenticação
-  app.use('/api/auth', router);
+  app.post("/api/auth/check-admin", (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ error: "Email é obrigatório" });
+      }
+
+      const { adminEmails } = loadAuthorizedEmails();
+      const isAdmin = adminEmails.includes(email.toLowerCase());
+
+      res.json({ isAdmin });
+    } catch (error) {
+      console.error("Erro ao verificar admin:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.post("/api/auth/login", (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ error: "Email é obrigatório" });
+      }
+
+      const { authorizedEmails, adminEmails } = loadAuthorizedEmails();
+      const emailLower = email.toLowerCase();
+
+      // Verificar se o email está autorizado (como usuário comum ou admin)
+      const isAuthorized = authorizedEmails.includes(emailLower) || adminEmails.includes(emailLower);
+
+      if (!isAuthorized) {
+        return res.status(401).json({ error: "Email não autorizado" });
+      }
+
+      // Se for admin, verificar senha
+      const isAdmin = adminEmails.includes(emailLower);
+      if (isAdmin) {
+        if (!password || password !== "passo2012") {
+          return res.status(401).json({ error: "Senha incorreta para administrador" });
+        }
+      }
+
+      res.json({ 
+        success: true, 
+        isAdmin,
+        email: emailLower
+      });
+    } catch (error) {
+      console.error("Erro no login:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
 
   // API routes
   app.get("/api/currencies", async (req, res) => {
