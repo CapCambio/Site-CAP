@@ -18,6 +18,7 @@ import { CurrencyLogo } from "../components/CurrencyLogo";
 import { CurrencyCard } from "../components/CurrencyCard";
 import { CurrencyConverter } from "../components/CurrencyConverter";
 import { DatePicker } from "../components/DatePicker";
+import { TabNavigation } from "../components/TabNavigation";
 
 
 export default function Home() {
@@ -34,6 +35,14 @@ export default function Home() {
     refreshData, 
     getFormattedLastUpdate 
   } = useCurrencyData();
+
+  // Debug logs
+  console.log('Home component debug:', {
+    activeTab,
+    currencies: currencies?.length || 0,
+    isLoadingCurrencies,
+    isRefreshing
+  });
 
   const {
     historicalData,
@@ -77,6 +86,11 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      
+      <TabNavigation 
+        activeTab={activeTab} 
+        onTabChange={handleTabChange}
+      />
 
       <main className="container mx-auto px-4 pb-12 flex-grow">
         {!isLoadingCurrencies && activeTab === "current" && (
