@@ -26,6 +26,14 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   const [authorizedEmails, setAuthorizedEmails] = useState<AuthorizedEmail[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Impedir scroll do body quando o painel está aberto
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   // Carregar emails autorizados
   useEffect(() => {
     loadAuthorizedEmails();
