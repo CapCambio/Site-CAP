@@ -89,7 +89,7 @@ export function Header() {
             
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
-              <div className="flex items-center gap-2 -mt-1"></div>
+              <div className="flex items-center gap-2 -mt-1">
                 {user.isAdmin && (
                   <Button
                     variant="ghost"
