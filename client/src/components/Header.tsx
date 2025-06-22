@@ -89,13 +89,13 @@ export function Header() {
             
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 mt-0">
                 {user.isAdmin && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={openSettings}
-                    className="text-white hover:bg-gray-800 p-2"
+                    className="text-white hover:bg-gray-800 p-1"
                     title="Configurações"
                   >
                     <Settings className="h-4 w-4" />
@@ -105,7 +105,7 @@ export function Header() {
                   variant="ghost"
                   size="sm"
                   onClick={logout}
-                  className="text-white hover:bg-gray-800 p-2"
+                  className="text-white hover:bg-gray-800 p-1"
                   title="Sair"
                 >
                   <LogOut className="h-4 w-4" />
