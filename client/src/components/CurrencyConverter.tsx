@@ -88,10 +88,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     }
   };
 
-  const handleToCurrencyChange = (code: string) => {
-    setToCurrency(code);
-    setShowToDropdown(false);
-  };
+
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^\d.]/g, '');
@@ -228,20 +225,22 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 }}
               >
                 {allCurrencies
-                  .filter(currency => {
-                    // Se o campo "De" não for BRL, só permitir BRL no campo "Para"
-                    if (fromCurrency !== "BRL") {
-                      return currency.code === "BRL";
-                    }
-                    // Se o campo "De" for BRL, permitir qualquer moeda exceto BRL
-                    return currency.code !== "BRL";
-                  })
+                  .filter(currency => currency.code !== fromCurrency)
                   .sort((a, b) => (a.code === "BRL" ? -1 : b.code === "BRL" ? 1 : 0))
                   .map((currency) => (
                   <div 
                     key={`to-${currency.code}`}
                     className="flex items-center p-3 hover:bg-[#f4ba4a] cursor-pointer border-b border-black/10"
-                    onClick={() => handleToCurrencyChange(currency.code)}
+                    onClick={() => {
+                      const newToCurrency = currency.code;
+                      // Se ambas as moedas não forem BRL, forçar BRL no campo "Para"
+                      if (fromCurrency !== "BRL" && newToCurrency !== "BRL") {
+                        setToCurrency("BRL");
+                      } else {
+                        setToCurrency(newToCurrency);
+                      }
+                      setShowToDropdown(false);
+                    }}
                   >
                     <CurrencyLogo code={currency.code} className="w-5 h-5 mr-3" />
                     <div className="flex flex-col">
