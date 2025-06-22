@@ -113,8 +113,8 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   );
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm overflow-y-auto">
-      <div className="min-h-screen bg-black text-white">
+    <div className="fixed inset-0 z-50 bg-black text-white overflow-y-auto">
+      <div className="min-h-full">
         {/* Header */}
         <header className="border-b border-yellow-500/20 bg-zinc-900/80 backdrop-blur-sm sticky top-0 z-10">
           <div className="container mx-auto flex justify-between items-center h-16 px-4">
