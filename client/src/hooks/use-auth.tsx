@@ -65,43 +65,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.error === "Email não autorizado") {
-          toast({
-            title: "Acesso não autorizado",
-            description: "Parece que seu e-mail não está autorizado, solicite seu acesso online aqui.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Erro no login",
-            description: data.error,
-            variant: "destructive",
-          });
-        }
         return;
       }
-
 
       // Login bem-sucedido
       const userData: AuthUser = {
         email,
-        isAdmin: data.isAdmin // Assuming the server returns isAdmin
+        isAdmin: data.isAdmin
       };
 
       setUser(userData);
       localStorage.setItem("auth_user", JSON.stringify(userData));
 
-      toast({
-        title: "Login realizado com sucesso",
-        description: `Bem-vindo, ${email}!`,
-      });
-
     } catch (error) {
-      toast({
-        title: "Erro no login",
-        description: "Ocorreu um erro ao tentar fazer login.",
-        variant: "destructive",
-      });
       console.error("Erro ao fazer login:", error);
     } finally {
       setIsLoading(false);
