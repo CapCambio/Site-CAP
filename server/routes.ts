@@ -244,5 +244,3 @@ async function refreshCurrencies() {
     throw error;
   }
 }
-export default router;
-```
