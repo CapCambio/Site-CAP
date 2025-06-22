@@ -78,18 +78,18 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-[#000000] text-white px-4 py-2 shadow-md">
+      <header className="bg-[#000000] text-white px-4 py-1 shadow-md">
         <div className="container mx-auto">
           <div className="flex flex-col items-center">
             <img 
               src={capLogo} 
               alt="CAP Câmbio Logo" 
-              className="h-24 md:h-28"
+              className="h-20 md:h-24"
             />
             
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
-              <div className="flex items-center gap-2 mt-0">
+              <div className="flex items-center gap-2 -mt-1"></div>
                 {user.isAdmin && (
                   <Button
                     variant="ghost"

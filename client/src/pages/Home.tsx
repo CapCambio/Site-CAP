@@ -80,7 +80,7 @@ export default function Home() {
 
       <main className="container mx-auto px-4 pb-12 flex-grow">
         {!isLoadingCurrencies && activeTab === "current" && (
-          <div className="my-2 max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             <CurrencyConverter currencies={currencies} />
           </div>
         )}
