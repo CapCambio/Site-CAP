@@ -43,23 +43,27 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     };
   }, [showFromDropdown, showToDropdown]);
 
-  // Aplicar regras automaticamente
+  // Aplicar regras automaticamente com delay para evitar loops
   useEffect(() => {
-    // Se ambas as moedas são iguais, mudar uma delas
-    if (fromCurrency === toCurrency) {
-      if (fromCurrency === "BRL") {
-        // Se ambas são BRL, mudar o campo "Para" para USD
-        const firstForeignCurrency = allCurrencies.find(c => c.code !== "BRL")?.code || "USD";
-        setToCurrency(firstForeignCurrency);
-      } else {
-        // Se ambas são moedas estrangeiras, mudar o campo "De" para BRL
+    const timer = setTimeout(() => {
+      // Se ambas as moedas são iguais, mudar uma delas
+      if (fromCurrency === toCurrency) {
+        if (fromCurrency === "BRL") {
+          // Se ambas são BRL, mudar o campo "Para" para USD
+          const firstForeignCurrency = allCurrencies.find(c => c.code !== "BRL")?.code || "USD";
+          setToCurrency(firstForeignCurrency);
+        } else {
+          // Se ambas são moedas estrangeiras, mudar o campo "De" para BRL
+          setFromCurrency("BRL");
+        }
+      }
+      // Se nenhuma das moedas é BRL, forçar BRL no campo "De"
+      else if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
         setFromCurrency("BRL");
       }
-    }
-    // Se nenhuma das moedas é BRL, forçar BRL no campo "De"
-    else if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
-      setFromCurrency("BRL");
-    }
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [fromCurrency, toCurrency, allCurrencies]);
 
   useEffect(() => {
