@@ -152,11 +152,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Configuração de atualização automática a cada minuto
   const server = createServer(app);
-  
+
   // Primeira atualização na inicialização
   console.log("Iniciando primeira atualização de moedas...");
   await refreshCurrencies();
-  
+
   // Configura atualização a cada minuto
   setInterval(async () => {
     console.log("Executando atualização automática de moedas...");
@@ -167,6 +167,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Erro na atualização automática:", error);
     }
   }, 60000); // 60 segundos
+
+  // Health check endpoint
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "OK", timestamp: new Date().toISOString() });
+  });
+
+  // Admin email management routes
+  app.get("/api/admin/emails", async (req, res) => {
+    try {
+      const authorizedEmails = loadAuthorizedEmails();
+      res.json({
+        authorized: authorizedEmails.authorizedEmails,
+        admin: authorizedEmails.adminEmails
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao carregar emails" });
+    }
+  });
+
+  app.post("/api/admin/emails", async (req, res) => {
+    try {
+      const { email, type } = req.body;
+
+      if (!email || !type) {
+        return res.status(400).json({ error: "Email e tipo são obrigatórios" });
+      }
+
+      const authorizedEmails = loadAuthorizedEmails();
+
+      if (type === "authorized") {
+        if (!authorizedEmails.authorizedEmails.includes(email)) {
+          authorizedEmails.authorizedEmails.push(email);
+        }
+      } else if (type === "admin") {
+        if (!authorizedEmails.adminEmails.includes(email)) {
+          authorizedEmails.adminEmails.push(email);
+        }
+      }
+
+      // Salvar no arquivo
+      const configPath = path.join(__dirname, "config", "authorized-emails.json");
+      fs.writeFileSync(configPath, JSON.stringify(authorizedEmails, null, 2));
+
+      res.json({ message: "Email adicionado com sucesso" });
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao adicionar email" });
+    }
+  });
+
+  app.delete("/api/admin/emails", async (req, res) => {
+    try {
+      const { email, type } = req.body;
+
+      if (!email || !type) {
+        return res.status(400).json({ error: "Email e tipo são obrigatórios" });
+      }
+
+      const authorizedEmails = loadAuthorizedEmails();
+
+      if (type === "authorized") {
+        authorizedEmails.authorizedEmails = authorizedEmails.authorizedEmails.filter(e => e !== email);
+      } else if (type === "admin") {
+        authorizedEmails.adminEmails = authorizedEmails.adminEmails.filter(e => e !== email);
+      }
+
+      // Salvar no arquivo
+      const configPath = path.join(__dirname, "config", "authorized-emails.json");
+      fs.writeFileSync(configPath, JSON.stringify(authorizedEmails, null, 2));
+
+      res.json({ message: "Email removido com sucesso" });
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao remover email" });
+    }
+  });
 
   return server;
 }

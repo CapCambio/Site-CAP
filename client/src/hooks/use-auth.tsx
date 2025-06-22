@@ -93,11 +93,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(null);
       localStorage.removeItem("auth_user");
-
-      toast({
-        title: "Logout realizado",
-        description: "Você saiu do sistema com sucesso.",
-      });
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
     } finally {
