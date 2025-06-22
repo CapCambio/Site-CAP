@@ -43,6 +43,13 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     };
   }, [showFromDropdown, showToDropdown]);
 
+  // Aplicar regra de BRL automaticamente
+  useEffect(() => {
+    if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
+      setToCurrency("BRL");
+    }
+  }, [fromCurrency, toCurrency]);
+
   useEffect(() => {
     const fromCurrencyData = allCurrencies.find(c => c.code === fromCurrency);
     const toCurrencyData = allCurrencies.find(c => c.code === toCurrency);
@@ -233,12 +240,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                     className="flex items-center p-3 hover:bg-[#f4ba4a] cursor-pointer border-b border-black/10"
                     onClick={() => {
                       const newToCurrency = currency.code;
-                      // Se ambas as moedas não forem BRL, forçar BRL no campo "Para"
-                      if (fromCurrency !== "BRL" && newToCurrency !== "BRL") {
-                        setToCurrency("BRL");
-                      } else {
-                        setToCurrency(newToCurrency);
-                      }
+                      setToCurrency(newToCurrency);
                       setShowToDropdown(false);
                     }}
                   >
