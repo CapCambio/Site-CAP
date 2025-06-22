@@ -1,8 +1,5 @@
-
 {
   "authorizedEmails": [
-    "test@example.com",
-    "user@test.com",
     "mateus.m2o@live.com"
   ],
   "adminEmails": [
