@@ -15,7 +15,6 @@ import { HistoryChart } from "../components/HistoryChart";
 import { HistoryTable } from "../components/HistoryTable";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 import { CurrencyLogo } from "../components/CurrencyLogo";
-import { CurrencyCard } from "../components/CurrencyCard";
 import { CurrencyConverter } from "../components/CurrencyConverter";
 import { DatePicker } from "../components/DatePicker";
 import { TabNavigation } from "../components/TabNavigation";
@@ -162,12 +161,14 @@ export default function Home() {
                         </div>
                       </div>
                       
-                      {/* Mini gráfico */}
-                      <div className="mt-4 h-20">
-                        <CurrencyMiniChart 
-                          currencyCode={currency.code}
-                          currentPrice={currency.buyPrice}
-                        />
+                      {/* Última atualização */}
+                      <div className="mt-4 text-center">
+                        <p className="text-xs text-gray-400">
+                          Atualizado: {new Date(currency.lastUpdate).toLocaleTimeString('pt-BR', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </p>
                       </div>
                     </div>
                   </div>
