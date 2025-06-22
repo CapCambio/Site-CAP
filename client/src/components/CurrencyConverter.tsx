@@ -46,7 +46,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   // Aplicar regra de BRL automaticamente
   useEffect(() => {
     if (fromCurrency !== "BRL" && toCurrency !== "BRL") {
-      setToCurrency("BRL");
+      setFromCurrency("BRL");
     }
   }, [fromCurrency, toCurrency]);
 
