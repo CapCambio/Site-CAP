@@ -118,6 +118,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1">
+            <label className="block text-white text-sm font-medium mb-2">Tenho</label>
             <div className="bg-white rounded-xl flex justify-between items-center p-3 mb-3 sm:mb-0 h-14 sm:h-[4.5rem]">
               <input
                 type="text"
@@ -201,6 +202,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           <div className="relative flex-1">
+            <label className="block text-white text-sm font-medium mb-2">Preciso de</label>
             <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem] mt-3 sm:mt-0">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
