@@ -101,35 +101,77 @@ export default function Home() {
 
         {activeTab === "current" && (
           <>
-            <div className="flex justify-center items-center mb-4 mt-4">
-              <DatePicker
-                selectedDate={selectedDate}
-                onDateChange={handleDateChange}
-              />
+            {/* Calculadora de Conversão */}
+            <div className="my-6 max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-bold text-[#1a1a1a] mb-4">Calculadora de Conversão</h2>
+              <CurrencyConverter currencies={currencies} />
+            </div>
+
+            {/* Seletor de Data */}
+            <div className="flex justify-center items-center mb-6">
+              <div className="bg-white rounded-lg shadow p-4">
+                <DatePicker
+                  selectedDate={selectedDate}
+                  onDateChange={handleDateChange}
+                />
+              </div>
             </div>
             
-            <div className={`${isMobile ? '' : 'currency-grid'}`}>
+            {/* Grid de Cards das Moedas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {isLoadingCurrencies || isLoadingDateSelection ? (
-                <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <div key={index} className="h-36 bg-gray-100 rounded-lg animate-pulse" />
-                  ))}
-                </div>
+                Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+                ))
               ) : (
-                <div className={`${isMobile ? '' : 'currency-desktop-layout'}`}>
-                  {currencies.map(currency => (
-                    <div key={currency.code} className="currency-item">
-                      <CurrencyCard 
-                        currency={currency}
-                        historicalPrice={historicalPrices[currency.code]} 
-                        selectedDate={selectedDate}
-                        isHistoricalView={isHistoricalView}
-                        isExpanded={expandedCards[currency.code] || false}
-                        onToggleExpand={() => handleToggleCardExpand(currency.code)}
-                      />
+                currencies.map(currency => (
+                  <div key={currency.code} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    {/* Header do Card */}
+                    <div className="bg-[#1a1a1a] text-white p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <CurrencyLogo code={currency.code} className="w-8 h-8" />
+                          <div>
+                            <h3 className="font-bold text-lg">{currency.code}</h3>
+                            <p className="text-sm opacity-80">{currency.name}</p>
+                          </div>
+                        </div>
+                        {currency.change !== null && (
+                          <div className={`flex items-center space-x-1 ${currency.change > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {currency.change > 0 ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
+                            <span className="text-sm font-medium">{formatPercentage(currency.change)}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  ))}
-                </div>
+
+                    {/* Conteúdo do Card */}
+                    <div className="p-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center">
+                          <p className="text-sm text-gray-500 mb-1">Compra</p>
+                          <p className="text-xl font-bold text-green-600">
+                            {formatCurrencyValue(currency.code, currency.buyPrice)}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-gray-500 mb-1">Venda</p>
+                          <p className="text-xl font-bold text-red-600">
+                            {formatCurrencyValue(currency.code, currency.sellPrice)}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Mini gráfico */}
+                      <div className="mt-4 h-20">
+                        <CurrencyMiniChart 
+                          currencyCode={currency.code}
+                          currentPrice={currency.buyPrice}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           </>
