@@ -7,6 +7,11 @@ import { eq, desc, and, lt } from "drizzle-orm";
 import { db } from "./db";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+// Get current directory for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Carregar emails autorizados
 function loadAuthorizedEmails() {
