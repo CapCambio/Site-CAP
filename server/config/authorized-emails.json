@@ -2,9 +2,12 @@
 {
   "authorizedEmails": [
     "test@example.com",
-    "user@test.com"
+    "user@test.com",
+    "mateus.m2o@live.com"
   ],
   "adminEmails": [
-    "admin@example.com"
+    "admin@example.com",
+    "capcambiocx@gmail.com",
+    "capcambio_caxias@hotmail.com"
   ]
 }
