@@ -43,7 +43,7 @@ export default function Home() {
     isLoading: isLoadingHistory,
     refetch: fetchHistoricalData
   } = useHistoricalData();
-  
+
   const {
     selectedDate,
     setSelectedDate,
@@ -57,16 +57,16 @@ export default function Home() {
       fetchHistoricalData();
     }
   };
-  
+
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
     setIsHistoricalView(true);
   };
-  
+
   const handleResetToCurrentView = () => {
     setIsHistoricalView(false);
   };
-  
+
   const handleToggleCardExpand = (code: string) => {
     setExpandedCards(prev => ({
       ...prev,
@@ -93,7 +93,7 @@ export default function Home() {
                 onDateChange={handleDateChange}
               />
             </div>
-            
+
             <div className={`${isMobile ? '' : 'currency-grid'}`}>
               {isLoadingCurrencies || isLoadingDateSelection ? (
                 <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
