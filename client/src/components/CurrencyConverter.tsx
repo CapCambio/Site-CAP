@@ -188,7 +188,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             )}
           </div>
 
-          <div className="flex justify-center items-center z-10 relative sm:mx-4 sm:self-center sm:flex-shrink-0">
+          <div className="flex justify-center items-center z-10 relative sm:mx-4 sm:flex-shrink-0 sm:mt-8">
             <button
               onClick={handleSwapCurrencies}
               className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2"
