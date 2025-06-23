@@ -183,7 +183,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
 
             <div className="flex items-center space-x-4">
               <div className="text-sm text-zinc-300 hidden sm:block">
-                Olá {user?.email}
+                Olá {user?.name || user?.email}
               </div>
               <button 
                 onClick={logout}

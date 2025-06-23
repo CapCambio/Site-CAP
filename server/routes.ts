@@ -101,18 +101,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Encontrar o nome do usuário
-      let userName = emailLower.split('@')[0];
+      let userName = emailLower.split('@')[0]; // fallback
 
       if (isAdminEmail) {
         const adminUser = emailConfig.adminEmails.find(admin => 
           typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
         );
-        userName = typeof adminUser === 'string' ? 'CAP Câmbio' : adminUser?.name || 'CAP Câmbio';
+        if (adminUser && typeof adminUser === 'object' && adminUser.name) {
+          userName = adminUser.name;
+        } else {
+          userName = 'CAP Câmbio';
+        }
       } else {
         const regularUser = emailConfig.authorizedEmails.find(user => 
           typeof user === 'string' ? user === emailLower : user.email === emailLower
         );
-        userName = typeof regularUser === 'string' ? emailLower.split('@')[0] : regularUser?.name || emailLower.split('@')[0];
+        if (regularUser && typeof regularUser === 'object' && regularUser.name) {
+          userName = regularUser.name;
+        } else {
+          userName = emailLower.split('@')[0];
+        }
       }
         
       return res.json({

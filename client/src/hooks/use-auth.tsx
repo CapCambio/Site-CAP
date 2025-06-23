@@ -44,7 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
+        // Garantir que os dados do usuário estão completos
+        if (parsedUser.email) {
+          setUser(parsedUser);
+        } else {
+          localStorage.removeItem("auth_user");
+        }
       } catch (error) {
         console.error("Erro ao restaurar sessão:", error);
         localStorage.removeItem("auth_user");
