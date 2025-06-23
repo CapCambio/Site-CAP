@@ -105,13 +105,14 @@ export default function Home() {
                 <div className={`${isMobile ? '' : 'currency-desktop-layout'}`}>
                   {currencies.map(currency => (
                     <div key={currency.code} className="currency-item">
-                      <CurrencyCard 
+                      <CurrencyCard
+                        key={currency.code}
                         currency={currency}
-                        historicalPrice={historicalPrices[currency.code]} 
-                        selectedDate={selectedDate}
-                        isHistoricalView={isHistoricalView}
                         isExpanded={expandedCards[currency.code] || false}
                         onToggleExpand={() => handleToggleCardExpand(currency.code)}
+                        isHistoricalView={isHistoricalView}
+                        historicalPrice={historicalPrices[currency.code]}
+                        selectedDate={selectedDate}
                       />
                     </div>
                   ))}

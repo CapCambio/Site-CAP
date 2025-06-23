@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format, getDate, startOfMonth, endOfMonth, isBefore, isSameDay } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -9,25 +8,34 @@ import { ptBR } from 'date-fns/locale';
 
 interface CurrencyMiniChartProps {
   currencyCode: string;
-  initialMonth?: Date;
   currentPrice?: number;
+  selectedDate?: Date;
 }
 
-export function CurrencyMiniChart({ currencyCode, initialMonth, currentPrice }: CurrencyMiniChartProps) {
+export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
   const today = new Date();
-  const [selectedMonth, setSelectedMonth] = useState<Date>(initialMonth || new Date());
-  
+  // Usar selectedDate se fornecida, senão usar hoje
+  const initialMonth = selectedDate || today;
+  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+
+  // Atualizar o mês quando selectedDate mudar
+  useEffect(() => {
+    if (selectedDate) {
+      setSelectedMonth(selectedDate);
+    }
+  }, [selectedDate]);
+
   // Calcular o limite de 12 meses para trás (1 ano)
   const minDate = new Date();
   minDate.setFullYear(minDate.getFullYear() - 1);
-  
+
   // Determinar o início e fim do mês selecionado
   const monthStart = startOfMonth(selectedMonth);
   const monthEnd = endOfMonth(selectedMonth);
-  
+
   // Garantir que não ultrapasse a data atual se estiver no mês atual
   const adjustedMonthEnd = isBefore(monthEnd, today) ? monthEnd : today;
-  
+
   // Converter para string para a API
   const startDateStr = monthStart.toISOString().split('T')[0];
   const endDateStr = adjustedMonthEnd.toISOString().split('T')[0];
@@ -41,11 +49,11 @@ export function CurrencyMiniChart({ currencyCode, initialMonth, currentPrice }: 
       const response = await fetch(
         `/api/history/${currencyCode}?startDate=${startDateStr}&endDate=${endDateStr}`
       );
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch historical data');
       }
-      
+
       const data = await response.json();
       return data.map((item: any) => ({
         ...item,
@@ -57,7 +65,7 @@ export function CurrencyMiniChart({ currencyCode, initialMonth, currentPrice }: 
 
   const isPreviousDisabled = isBefore(minDate, monthStart);
   const isNextDisabled = isSameDay(monthEnd, endOfMonth(today)) || isBefore(today, monthStart);
-  
+
   const goToPreviousMonth = () => {
     const newDate = new Date(selectedMonth);
     newDate.setMonth(newDate.getMonth() - 1);
@@ -65,7 +73,7 @@ export function CurrencyMiniChart({ currencyCode, initialMonth, currentPrice }: 
       setSelectedMonth(newDate);
     }
   };
-  
+
   const goToNextMonth = () => {
     const newDate = new Date(selectedMonth);
     newDate.setMonth(newDate.getMonth() + 1);
@@ -73,18 +81,18 @@ export function CurrencyMiniChart({ currencyCode, initialMonth, currentPrice }: 
       setSelectedMonth(newDate);
     }
   };
-  
+
   const capitalizedMonthName = format(selectedMonth, 'MMMM', { locale: ptBR });
 
   // Criar pontos no gráfico para todos os dias do mês até hoje
   const daysInMonth = Array.from({ length: getDate(adjustedMonthEnd) }, (_, i) => i + 1);
-  
+
   // Mapear dados históricos para cada dia do mês
   const chartData = daysInMonth.map(day => {
     // Formatar o dia no formato "dd/MM"
     const dayDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day);
     const formattedDay = format(dayDate, 'dd/MM');
-    
+
     // Se for o dia atual e tivermos o preço atual, use-o
     if (isSameDay(dayDate, today) && currentPrice) {
       return {
@@ -93,12 +101,12 @@ export function CurrencyMiniChart({ currencyCode, initialMonth, currentPrice }: 
         sellPrice: currentPrice
       };
     }
-    
+
     // Procurar se há dados históricos para este dia
     const historyEntry = historicalData?.find((entry: CurrencyHistory) => 
       getDate(entry.timestamp) === day
     );
-    
+
     return {
       date: formattedDay,
       day: day.toString(),
@@ -145,11 +153,11 @@ export function CurrencyMiniChart({ currencyCode, initialMonth, currentPrice }: 
   const validPrices = chartData
     .map(d => d.sellPrice)
     .filter((price): price is number => price !== null);
-  
+
   const minPrice = Math.min(...validPrices);
   const maxPrice = Math.max(...validPrices);
   const padding = (maxPrice - minPrice) * 0.1;
-  
+
   return (
     <div className="w-full h-[180px]">
       <div className="flex items-center justify-center mb-2">
@@ -169,7 +177,7 @@ export function CurrencyMiniChart({ currencyCode, initialMonth, currentPrice }: 
           <ChevronRight size={16} />
         </button>
       </div>
-      
+
       <ResponsiveContainer width="100%" height={140}>
         <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
           <defs>

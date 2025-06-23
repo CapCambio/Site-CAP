@@ -9,24 +9,24 @@ import { format, isSameDay } from 'date-fns';
 
 interface CurrencyCardProps {
   currency: Currency;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+  isHistoricalView?: boolean;
   historicalPrice?: {
     buyPrice: number | null;
     sellPrice: number | null;
     timestamp: Date | null;
   };
   selectedDate?: Date;
-  isHistoricalView?: boolean;
-  isExpanded?: boolean;
-  onToggleExpand?: () => void;
 }
 
 export function CurrencyCard({ 
   currency, 
-  historicalPrice, 
-  selectedDate,
-  isHistoricalView = false,
-  isExpanded = false,
-  onToggleExpand
+  isExpanded, 
+  onToggleExpand, 
+  isHistoricalView = false, 
+  historicalPrice,
+  selectedDate
 }: CurrencyCardProps) {
   const { name, code, buyPrice, sellPrice, change } = currency;
   const isMobile = useIsMobile();
@@ -123,8 +123,9 @@ export function CurrencyCard({
         {isExpanded && (
           <div className="mt-3 pt-3 border-t border-gray-200">
             <CurrencyMiniChart 
-              currencyCode={currency.code}
-              currentPrice={currency.sellPrice}
+              currencyCode={currency.code} 
+              currentPrice={displaySellPrice}
+              selectedDate={selectedDate}
             />
           </div>
         )}
