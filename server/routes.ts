@@ -28,7 +28,7 @@ function loadAuthorizedEmails() {
 async function loadEmailConfig() {
     try {
       const configPath = path.join(__dirname, 'config', 'authorized-emails.json');
-      const configData = await fs.readFile(configPath, 'utf-8');
+      const configData = fs.readFileSync(configPath, 'utf-8');
       return JSON.parse(configData);
     } catch (error) {
       console.error('Erro ao carregar configuração de emails:', error);
@@ -43,7 +43,8 @@ async function loadEmailConfig() {
   async function saveEmailConfig(config: any) {
     try {
       const configPath = path.join(__dirname, 'config', 'authorized-emails.json');
-      await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+      console.log('Arquivo de configuração salvo em:', configPath);
     } catch (error) {
       console.error('Erro ao salvar configuração de emails:', error);
       throw error;
@@ -55,11 +56,17 @@ async function loadEmailConfig() {
       const config = await loadEmailConfig();
       const now = new Date().toISOString();
 
+      console.log(`Atualizando último acesso para: ${email}, isAdmin: ${isAdmin}`);
+      console.log('Config antes da atualização:', JSON.stringify(config, null, 2));
+
       if (isAdmin) {
         // Atualizar último acesso do admin
         const adminIndex = config.adminEmails.findIndex(admin => 
           typeof admin === 'string' ? admin === email : admin.email === email
         );
+        
+        console.log(`Admin index encontrado: ${adminIndex}`);
+        
         if (adminIndex !== -1) {
           if (typeof config.adminEmails[adminIndex] === 'string') {
             config.adminEmails[adminIndex] = {
@@ -68,14 +75,21 @@ async function loadEmailConfig() {
               lastAccess: now
             };
           } else {
-            (config.adminEmails[adminIndex] as any).lastAccess = now;
+            config.adminEmails[adminIndex] = {
+              ...config.adminEmails[adminIndex],
+              lastAccess: now
+            };
           }
+          console.log(`Admin atualizado:`, config.adminEmails[adminIndex]);
         }
       } else {
         // Atualizar último acesso do usuário comum
         const userIndex = config.authorizedEmails.findIndex(user => 
           typeof user === 'string' ? user === email : user.email === email
         );
+        
+        console.log(`User index encontrado: ${userIndex}`);
+        
         if (userIndex !== -1) {
           if (typeof config.authorizedEmails[userIndex] === 'string') {
             config.authorizedEmails[userIndex] = {
@@ -84,12 +98,17 @@ async function loadEmailConfig() {
               lastAccess: now
             };
           } else {
-            (config.authorizedEmails[userIndex] as any).lastAccess = now;
+            config.authorizedEmails[userIndex] = {
+              ...config.authorizedEmails[userIndex],
+              lastAccess: now
+            };
           }
+          console.log(`User atualizado:`, config.authorizedEmails[userIndex]);
         }
       }
 
       await saveEmailConfig(config);
+      console.log('Config salva com sucesso');
     } catch (error) {
       console.error('Erro ao atualizar último acesso:', error);
     }
