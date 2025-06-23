@@ -693,6 +693,26 @@ async function refreshCurrencies() {
                       lastHistory.sellPrice !== currency.sellPrice || 
                       lastHistory.buyPrice !== currency.buyPrice;
 
+      // Verifica se já foi registrado hoje (evitar múltiplos registros no mesmo dia)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const todayHistory = await db
+        .select()
+        .from(currencyHistory)
+        .where(
+          and(
+            eq(currencyHistory.code, currency.code),
+            gte(currencyHistory.timestamp, today),
+            lt(currencyHistory.timestamp, tomorrow)
+          )
+        )
+        .limit(1);
+      
+      const hasRecordToday = todayHistory.length > 0;
+
       // Forçamos o cálculo da variação para todas as moedas, independente se o preço mudou
       // Busca o último registro com preço diferente para cálculo de variação (96 horas)
       let previousHistories = await db
@@ -728,8 +748,9 @@ async function refreshCurrencies() {
         lastUpdate: now
       });
 
-      // Adiciona ao histórico apenas se for um novo preço
-      if (isNewPrice) {
+      // Adiciona ao histórico se for um novo preço OU se não há registro hoje
+      // Isso garante que sempre haja pelo menos 1 registro por dia
+      if ((isNewPrice || !hasRecordToday) && !hasRecordToday) {
         await storage.addCurrencyHistory({
           code: currency.code,
           buyPrice: currency.buyPrice,

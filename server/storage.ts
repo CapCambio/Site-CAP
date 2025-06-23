@@ -5,7 +5,7 @@ import {
   type CurrencyHistory, type InsertCurrencyHistory
 } from "@shared/schema";
 import { db } from './db';
-import { eq, and, gte, lte, desc, not } from 'drizzle-orm';
+import { eq, and, gte, lte, desc, not, lt } from 'drizzle-orm';
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
