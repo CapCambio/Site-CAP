@@ -36,10 +36,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   // Garantir que não ultrapasse a data atual se estiver no mês atual
   const adjustedMonthEnd = isBefore(monthEnd, today) ? monthEnd : today;
 
-  // Converter para string para a API
-  const startDateStr = monthStart.toISOString().split('T')[0];
-  const endDateStr = adjustedMonthEnd.toISOString().split('T')[0];
-
   const { 
     data: historicalData, 
     isLoading
