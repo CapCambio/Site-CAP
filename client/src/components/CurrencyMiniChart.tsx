@@ -211,11 +211,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             scale="point"
             tickMargin={5}
             height={25}
-            tickFormatter={(value, index, ticks) => {
+            tickFormatter={(value) => {
               // Detectar se é mobile (largura menor que 768px)
               const isMobile = window.innerWidth < 768;
               
-              // Desktop: sempre mostrar todos os dias
+              // Desktop: SEMPRE mostrar todos os dias
               if (!isMobile) {
                 return value;
               }
