@@ -24,6 +24,7 @@ export default function LoginPage() {
   const [showBranchDialog, setShowBranchDialog] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -71,6 +72,10 @@ export default function LoginPage() {
   }, [watchEmail]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    if (isAdmin && (!values.password || values.password.trim() === '')) {
+      setShowValidationErrors(true);
+      return;
+    }
     login(values.email, values.password);
   };
 
@@ -119,13 +124,28 @@ export default function LoginPage() {
                       <FormLabel className="text-white">Senha de Administrador</FormLabel>
                       <FormControl>
                         <Input 
-                          type="password"
-                          placeholder="Digite sua senha" 
-                          className="bg-zinc-800 border-zinc-700 text-white" 
-                          {...field} 
-                        />
+                        type="password"
+                        placeholder="Digite sua senha" 
+                        className={`bg-zinc-800 text-white ${
+                          showValidationErrors && (!field.value || field.value.trim() === '') 
+                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                            : 'border-zinc-700'
+                        }`}
+                        {...field} 
+                        onChange={(e) => {
+                          field.onChange(e);
+                          if (showValidationErrors && e.target.value.trim()) {
+                            setShowValidationErrors(false);
+                          }
+                        }}
+                      />
                       </FormControl>
                       <FormMessage className="text-red-400" />
+                      {showValidationErrors && (!field.value || field.value.trim() === '') && (
+                        <div className="text-red-500 text-sm">
+                          Por favor, preencha a senha.
+                        </div>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -145,7 +165,7 @@ export default function LoginPage() {
                   "Acessar"
                 )}
               </Button>
-              
+
               {isAdmin && form.formState.errors.password && (
                 <div className="mt-4 text-red-500 text-sm">
                   Senha incorreta
