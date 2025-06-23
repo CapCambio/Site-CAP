@@ -125,7 +125,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { adminEmails } = loadAuthorizedEmails();
-      const isAdmin = adminEmails.includes(email.toLowerCase());
+      const emailLower = email.toLowerCase();
+      
+      // Verificar se o email está na lista de admins (pode ser string ou objeto)
+      const isAdmin = adminEmails.some(admin => 
+        typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
+      );
+
+      console.log(`Verificando admin para ${emailLower}: ${isAdmin}`);
+      console.log('Admin emails:', adminEmails);
 
       res.json({ isAdmin });
     } catch (error) {
@@ -455,24 +463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Rota para verificar se um email é admin
-  app.post('/api/auth/check-admin', async (req, res) => {
-    try {
-      const { email } = req.body;
-
-      if (!email) {
-        return res.status(400).json({ error: 'Email é obrigatório' });
-      }
-
-      const config = await loadEmailConfig();
-      const isAdmin = config.adminEmails.includes(email.toLowerCase());
-
-      res.json({ isAdmin });
-    } catch (error) {
-      console.error('Erro ao verificar admin:', error);
-      res.status(500).json({ error: 'Erro interno do servidor' });
-    }
-  });
+  
 
   // Rota para listar emails autorizados (apenas admins)
   app.get('/api/auth/authorized-emails', async (req, res) => {
