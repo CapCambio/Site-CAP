@@ -172,6 +172,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const minPrice = Math.min(...validPrices);
   const maxPrice = Math.max(...validPrices);
   const padding = (maxPrice - minPrice) * 0.1;
+  const isMobile =  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   return (
     <div className="w-full h-[180px]">
@@ -211,6 +212,23 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             scale="point"
             tickMargin={5}
             height={25}
+            tickFormatter={(value) => {
+              // Desktop: SEMPRE mostrar todos os dias
+              if (!isMobile) {
+                return value;
+              }
+
+              // Mobile: mostrar apenas dias ímpares + último dia do mês
+              const day = parseInt(value);
+              const isLastDay = day === daysInFullMonth;
+              const isOddDay = day % 2 === 1;
+
+              if (isOddDay || isLastDay) {
+                return value;
+              }
+
+              return '';
+            }}
           />
           <YAxis 
             hide={true}
