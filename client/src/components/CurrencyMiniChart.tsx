@@ -14,22 +14,27 @@ interface CurrencyMiniChartProps {
 
 export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
   const today = new Date();
-  // Usar selectedDate se fornecida, senão usar hoje
-  const initialMonth = selectedDate || today;
+  // Usar selectedDate se fornecida, senão usar hoje - mas sempre começar com o mês atual
+  const initialMonth = selectedDate ? startOfMonth(selectedDate) : startOfMonth(today);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
 
-  // Atualizar o mês quando selectedDate mudar (baseado no mês da data, não no dia específico)
+  // Atualizar o mês APENAS quando selectedDate mudar para um mês diferente
   useEffect(() => {
     if (selectedDate) {
-      setSelectedMonth(startOfMonth(selectedDate));
+      const selectedMonthStart = startOfMonth(selectedDate);
+      const currentMonthStart = startOfMonth(selectedMonth);
+      // Só atualizar se for um mês diferente do atual
+      if (selectedMonthStart.getTime() !== currentMonthStart.getTime()) {
+        setSelectedMonth(selectedMonthStart);
+      }
     }
-  }, [selectedDate]);
+  }, [selectedDate]); // Remover selectedMonth das dependências para evitar loops
 
   // Calcular o limite de 12 meses para trás (1 ano)
   const minDate = new Date();
   minDate.setFullYear(minDate.getFullYear() - 1);
 
-  // Determinar o início e fim do mês selecionado
+  // Determinar o início e fim do mês selecionado - SEMPRE mostrar o mês inteiro
   const monthStart = startOfMonth(selectedMonth);
   const monthEnd = endOfMonth(selectedMonth);
 
@@ -40,10 +45,10 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     data: historicalData, 
     isLoading
   } = useQuery({
-    queryKey: ['/api/history/mini', currencyCode, monthStart.toISOString().split('T')[0], adjustedMonthEnd.toISOString().split('T')[0]],
+    queryKey: ['/api/history/mini', currencyCode, monthStart.toISOString().split('T')[0], monthEnd.toISOString().split('T')[0]],
     queryFn: async () => {
       const monthStartStr = monthStart.toISOString().split('T')[0];
-      const monthEndStr = adjustedMonthEnd.toISOString().split('T')[0];
+      const monthEndStr = monthEnd.toISOString().split('T')[0];
       
       const response = await fetch(
         `/api/history/${currencyCode}?startDate=${monthStartStr}&endDate=${monthEndStr}`
@@ -83,14 +88,25 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
   const capitalizedMonthName = format(selectedMonth, 'MMMM yyyy', { locale: ptBR });
 
-  // Criar pontos no gráfico para todos os dias do mês até hoje
-  const daysInMonth = Array.from({ length: getDate(adjustedMonthEnd) }, (_, i) => i + 1);
+  // SEMPRE criar pontos para o mês COMPLETO - não limitar pelo adjustedMonthEnd
+  const fullMonthEnd = endOfMonth(selectedMonth);
+  const daysInFullMonth = getDate(fullMonthEnd);
+  const daysInMonth = Array.from({ length: daysInFullMonth }, (_, i) => i + 1);
 
   // Mapear dados históricos para cada dia do mês
   const chartData = daysInMonth.map(day => {
     // Formatar o dia no formato "dd/MM"
     const dayDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day);
     const formattedDay = format(dayDate, 'dd/MM');
+
+    // Se a data for no futuro (depois de hoje), não incluir dados
+    if (dayDate > today) {
+      return {
+        date: formattedDay,
+        day: day.toString(),
+        sellPrice: null
+      };
+    }
 
     // Se for o dia atual e tivermos o preço atual, use-o
     if (isSameDay(dayDate, today) && currentPrice) {
@@ -103,7 +119,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
     // Procurar se há dados históricos para este dia
     const historyEntry = historicalData?.find((entry: CurrencyHistory) => 
-      getDate(entry.timestamp) === day
+      isSameDay(entry.timestamp, dayDate)
     );
 
     return {

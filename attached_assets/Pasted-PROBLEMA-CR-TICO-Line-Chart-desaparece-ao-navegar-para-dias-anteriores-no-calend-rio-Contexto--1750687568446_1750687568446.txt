@@ -1,0 +1,47 @@
+PROBLEMA CRÍTICO: Line Chart desaparece ao navegar para dias anteriores no calendário
+
+Contexto:
+
+Aplicação React com line chart usando Recharts
+Componente CurrencyMiniChart.tsx que mostra gráfico histórico de moedas
+O componente tem calendário para navegação entre meses
+PROBLEMA: Quando o usuário navega para um dia anterior do mesmo mês no calendário, a linha do gráfico desaparece completamente
+Comportamento Esperado:
+
+O line chart deve sempre mostrar dados do mês inteiro, independente do dia específico selecionado no calendário
+Se estou em 23/06 e volto para 17/06 (mesmo mês), o gráfico deve continuar mostrando dados de todo o mês de junho
+Comportamento Atual:
+
+Ao selecionar um dia anterior no calendário, a linha do gráfico some
+O gráfico funciona corretamente apenas quando mostra o mês atual até hoje
+Código Relevante:
+
+// Em CurrencyMiniChart.tsx - A query que busca dados históricos
+const { 
+  data: historicalData, 
+  isLoading
+} = useQuery({
+  queryKey: ['/api/history/mini', currencyCode, monthStart.toISOString().split('T')[0], adjustedMonthEnd.toISOString().split('T')[0]],
+  queryFn: async () => {
+    const monthStartStr = monthStart.toISOString().split('T')[0];
+    const monthEndStr = adjustedMonthEnd.toISOString().split('T')[0];
+    
+    const response = await fetch(
+      `/api/history/${currencyCode}?startDate=${monthStartStr}&endDate=${monthEndStr}`
+    );
+    // ... resto da função
+  }
+});
+O que já foi tentado:
+
+Alteração da query para usar monthStart e adjustedMonthEnd em vez de datas específicas
+Remoção de limitações de navegação
+Verificação de que o componente está recebendo os dados corretos
+Solicitação:
+Analise o código do componente CurrencyMiniChart.tsx e identifique por que a linha do gráfico desaparece quando navegamos para dias anteriores do mesmo mês. O gráfico deve SEMPRE mostrar o mês inteiro, não importa qual dia específico foi selecionado no calendário.
+
+Arquivos principais para análise:
+
+client/src/components/CurrencyMiniChart.tsx
+client/src/hooks/useDateSelection.ts
+Por favor, forneça uma solução definitiva que garanta que o line chart sempre mostre dados do mês completo.
