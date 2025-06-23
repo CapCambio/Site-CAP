@@ -203,18 +203,10 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </defs>
           <XAxis 
             dataKey="day"
-            tick={{ fontSize: 10 }}
+            tick={{ fontSize: 8 }}
             tickLine={false}
             axisLine={false}
-            interval="preserveStartEnd"
-            tickFormatter={(value) => {
-              const day = parseInt(value);
-              // Mostrar apenas dias estratégicos: 1, 5, 10, 15, 20, 25, 30
-              if (day === 1 || day === 5 || day === 10 || day === 15 || day === 20 || day === 25 || day === 30) {
-                return value;
-              }
-              return '';
-            }}
+            interval={0}
           />
           <YAxis 
             hide={true}
