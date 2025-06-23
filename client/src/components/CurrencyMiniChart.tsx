@@ -17,9 +17,9 @@ export function CurrencyMiniChart({ currencyCode, initialMonth, currentPrice }: 
   const today = new Date();
   const [selectedMonth, setSelectedMonth] = useState<Date>(initialMonth || new Date());
   
-  // Calcular o limite de 12 meses para trás
+  // Calcular o limite de 12 meses para trás (1 ano)
   const minDate = new Date();
-  minDate.setMonth(minDate.getMonth() - 12);
+  minDate.setFullYear(minDate.getFullYear() - 1);
   
   // Determinar o início e fim do mês selecionado
   const monthStart = startOfMonth(selectedMonth);

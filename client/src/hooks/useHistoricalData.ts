@@ -42,7 +42,26 @@ export function useHistoricalData() {
 
   // Update filter and trigger refetch
   const updateFilter = (newFilter: Partial<HistoryFilter>) => {
-    setFilter(prev => ({ ...prev, ...newFilter }));
+    setFilter(prev => {
+      const updated = { ...prev, ...newFilter };
+      
+      // Limitar a 1 ano atrás no máximo
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      
+      // Se startDate for anterior a 1 ano, ajustar
+      if (updated.startDate < oneYearAgo) {
+        updated.startDate = oneYearAgo;
+      }
+      
+      // Se endDate for no futuro, ajustar para agora
+      const now = new Date();
+      if (updated.endDate > now) {
+        updated.endDate = now;
+      }
+      
+      return updated;
+    });
   };
 
   // Prepare chart data

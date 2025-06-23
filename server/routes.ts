@@ -241,8 +241,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/history/:code", async (req, res) => {
     try {
-      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
-      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      let startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      let endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+
+      // Limitar consultas a no máximo 1 ano atrás
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+      // Se startDate for anterior a 1 ano, ajustar para 1 ano atrás
+      if (startDate && startDate < oneYearAgo) {
+        startDate = oneYearAgo;
+      }
+
+      // Se endDate for no futuro, ajustar para agora
+      const now = new Date();
+      if (endDate && endDate > now) {
+        endDate = now;
+      }
+
+      // Se não foi fornecida startDate, limitar a 1 ano atrás
+      if (!startDate) {
+        startDate = oneYearAgo;
+      }
 
       const history = await storage.getCurrencyHistory(
         req.params.code, 
@@ -292,16 +312,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("Iniciando primeira atualização de moedas...");
   await refreshCurrencies();
 
+  // Limpeza inicial do histórico antigo
+  try {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const deletedCount = await storage.cleanupOldHistory(oneYearAgo);
+    if (deletedCount > 0) {
+      console.log(`🗑️ Limpeza inicial: ${deletedCount} registros antigos removidos.`);
+    }
+  } catch (error) {
+    console.error("Erro na limpeza inicial do histórico:", error);
+  }
+
   // Configurar atualização automática a cada 1 minuto
   setInterval(async () => {
     console.log('🔍 Executando verificação automática de mudanças...');
     try {
-      await refreshCurrencies();
+      const savedCurrencies = await refreshCurrencies();
       console.log(`✅ Verificação automática concluída. ${savedCurrencies.length} moedas processadas.`);
     } catch (error) {
       console.error("Erro na atualização automática:", error);
     }
   }, 60000); // 60 segundos
+
+  // Configurar limpeza automática do histórico a cada 24 horas
+  setInterval(async () => {
+    console.log('🧹 Executando limpeza automática do histórico...');
+    try {
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const deletedCount = await storage.cleanupOldHistory(oneYearAgo);
+      if (deletedCount > 0) {
+        console.log(`🗑️ Limpeza automática: ${deletedCount} registros antigos removidos.`);
+      } else {
+        console.log('✅ Nenhum registro antigo encontrado para remoção.');
+      }
+    } catch (error) {
+      console.error("Erro na limpeza automática do histórico:", error);
+    }
+  }, 24 * 60 * 60 * 1000); // 24 horas
 
   // Health check endpoint
   app.get("/api/health", (req, res) => {
@@ -557,7 +606,7 @@ async function refreshCurrencies() {
     const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
 
     const now = new Date();
-    const savedCurrencies = [];
+    const savedCurrencies: any[] = [];
 
     for (const currency of updatedCurrencies) {
       // Verifica se houve mudança real na cotação
