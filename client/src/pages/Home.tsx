@@ -19,6 +19,7 @@ import { CurrencyCard } from "../components/CurrencyCard";
 import { CurrencyConverter } from "../components/CurrencyConverter";
 import { DatePicker } from "../components/DatePicker";
 import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
+import { Toaster } from "@/components/ui/toaster";
 
 
 export default function Home() {
@@ -155,5 +156,3 @@ export default function Home() {
     </div>
   );
 }
-```Final Answer:
-The code implements a WhatsApp floating button that appears on all tabs except the admin tab.
