@@ -29,6 +29,14 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   const [editEmail, setEditEmail] = useState("");
   const [editName, setEditName] = useState("");
   const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
 
   // Impedir scroll do body quando o painel está aberto
   useEffect(() => {
@@ -40,30 +48,25 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
 
   // Carregar emails autorizados
   useEffect(() => {
-    loadAuthorizedEmails();
+    loadAuthorizedEmails(1);
   }, []);
 
-  const loadAuthorizedEmails = async () => {
+  const loadAuthorizedEmails = async (page: number = currentPage) => {
     try {
-      const response = await fetch('/api/admin/emails');
+      const response = await fetch(`/api/admin/emails?page=${page}&limit=${itemsPerPage}`);
       if (response.ok) {
         const data = await response.json();
-        // Converter formato da resposta para o formato esperado
-        const allEmails: AuthorizedEmail[] = [
-          ...data.authorized.map((item: any) => ({
-            email: typeof item === 'string' ? item : item.email,
-            name: typeof item === 'string' ? 'Cliente' : item.name,
-            isAdmin: false,
-            lastAccess: undefined
-          })),
-          ...data.admin.map((item: any) => ({
-            email: typeof item === 'string' ? item : item.email,
-            name: typeof item === 'string' ? 'CAP Câmbio' : item.name,
-            isAdmin: true,
-            lastAccess: undefined
-          }))
-        ];
+        
+        const allEmails: AuthorizedEmail[] = data.emails.map((item: any) => ({
+          email: item.email,
+          name: item.name,
+          isAdmin: item.isAdmin,
+          lastAccess: item.lastAccess ? new Date(item.lastAccess).toLocaleString('pt-BR') : undefined
+        }));
+
         setAuthorizedEmails(allEmails);
+        setPagination(data.pagination);
+        setCurrentPage(page);
       }
     } catch (error) {
       console.error('Erro ao carregar emails:', error);
@@ -95,7 +98,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
       if (response.ok) {
         setNewEmail("");
         setNewName("");
-        loadAuthorizedEmails();
+        loadAuthorizedEmails(currentPage);
       }
     } catch (error) {
       console.error('Erro ao adicionar email:', error);
@@ -126,7 +129,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
         setEditingEmail(null);
         setEditEmail("");
         setEditName("");
-        loadAuthorizedEmails();
+        loadAuthorizedEmails(currentPage);
       }
     } catch (error) {
       console.error('Erro ao editar email:', error);
@@ -148,7 +151,11 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
       });
 
       if (response.ok) {
-        loadAuthorizedEmails();
+        // Se a página atual ficou vazia após remoção, voltar para página anterior
+        const newTotal = pagination.total - 1;
+        const newTotalPages = Math.ceil(newTotal / itemsPerPage);
+        const pageToLoad = currentPage > newTotalPages ? Math.max(1, newTotalPages) : currentPage;
+        loadAuthorizedEmails(pageToLoad);
       }
     } catch (error) {
       console.error('Erro ao remover email:', error);
@@ -171,6 +178,12 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
     item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      loadAuthorizedEmails(newPage);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black text-white overflow-y-auto">
@@ -288,7 +301,13 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
           <Card className="bg-zinc-900 border-yellow-500/20">
             <CardContent className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
-                <h3 className="text-lg sm:text-xl font-bold text-white">Emails Autorizados ({filteredEmails.length})</h3>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-bold text-white">Emails Autorizados</h3>
+                  <p className="text-sm text-zinc-400">
+                    {searchTerm ? `${filteredEmails.length} resultado(s) encontrado(s)` : 
+                    `Página ${pagination.page} de ${pagination.totalPages} (${pagination.total} total)`}
+                  </p>
+                </div>
                 <div className="flex items-center space-x-2">
                   <Input 
                     type="text" 
@@ -399,6 +418,68 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                   ))
                 )}
               </div>
+
+              {/* Controles de Paginação */}
+              {!searchTerm && pagination.totalPages > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
+                  <div className="text-sm text-zinc-400">
+                    Mostrando {((pagination.page - 1) * pagination.limit) + 1} a{' '}
+                    {Math.min(pagination.page * pagination.limit, pagination.total)} de {pagination.total} emails
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(pagination.page - 1)}
+                      disabled={pagination.page === 1}
+                      className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                    >
+                      Anterior
+                    </Button>
+                    
+                    <div className="flex items-center space-x-1">
+                      {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                        let pageNum;
+                        if (pagination.totalPages <= 5) {
+                          pageNum = i + 1;
+                        } else if (pagination.page <= 3) {
+                          pageNum = i + 1;
+                        } else if (pagination.page >= pagination.totalPages - 2) {
+                          pageNum = pagination.totalPages - 4 + i;
+                        } else {
+                          pageNum = pagination.page - 2 + i;
+                        }
+                        
+                        return (
+                          <Button
+                            key={pageNum}
+                            variant={pageNum === pagination.page ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePageChange(pageNum)}
+                            className={pageNum === pagination.page 
+                              ? "bg-yellow-500 text-black hover:bg-yellow-600" 
+                              : "border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                            }
+                          >
+                            {pageNum}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(pagination.page + 1)}
+                      disabled={pagination.page === pagination.totalPages}
+                      className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                    >
+                      Próxima
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </main>

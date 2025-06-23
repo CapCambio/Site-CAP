@@ -50,6 +50,51 @@ async function loadEmailConfig() {
     }
   }
 
+  async function updateLastAccess(email: string, isAdmin: boolean) {
+    try {
+      const config = await loadEmailConfig();
+      const now = new Date().toISOString();
+
+      if (isAdmin) {
+        // Atualizar último acesso do admin
+        const adminIndex = config.adminEmails.findIndex(admin => 
+          typeof admin === 'string' ? admin === email : admin.email === email
+        );
+        if (adminIndex !== -1) {
+          if (typeof config.adminEmails[adminIndex] === 'string') {
+            config.adminEmails[adminIndex] = {
+              email: config.adminEmails[adminIndex] as string,
+              name: 'CAP Câmbio',
+              lastAccess: now
+            };
+          } else {
+            (config.adminEmails[adminIndex] as any).lastAccess = now;
+          }
+        }
+      } else {
+        // Atualizar último acesso do usuário comum
+        const userIndex = config.authorizedEmails.findIndex(user => 
+          typeof user === 'string' ? user === email : user.email === email
+        );
+        if (userIndex !== -1) {
+          if (typeof config.authorizedEmails[userIndex] === 'string') {
+            config.authorizedEmails[userIndex] = {
+              email: config.authorizedEmails[userIndex] as string,
+              name: email.split('@')[0],
+              lastAccess: now
+            };
+          } else {
+            (config.authorizedEmails[userIndex] as any).lastAccess = now;
+          }
+        }
+      }
+
+      await saveEmailConfig(config);
+    } catch (error) {
+      console.error('Erro ao atualizar último acesso:', error);
+    }
+  }
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Rotas de autenticação
   app.post("/api/auth/check-admin", (req, res) => {
@@ -124,6 +169,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log("User name resolved to:", userName);
+
+      // Atualizar último acesso
+      try {
+        await updateLastAccess(emailLower, isAdminEmail);
+      } catch (error) {
+        console.error("Erro ao atualizar último acesso:", error);
+      }
         
       return res.json({
         user: {
@@ -232,10 +284,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin email management routes
   app.get("/api/admin/emails", async (req, res) => {
     try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = (page - 1) * limit;
+
       const authorizedEmails = loadAuthorizedEmails();
+      
+      // Converter para formato uniforme e adicionar informações de último acesso
+      const allEmails = [
+        ...authorizedEmails.authorizedEmails.map((item: any) => ({
+          email: typeof item === 'string' ? item : item.email,
+          name: typeof item === 'string' ? 'Cliente' : item.name,
+          lastAccess: typeof item === 'object' ? item.lastAccess : null,
+          isAdmin: false
+        })),
+        ...authorizedEmails.adminEmails.map((item: any) => ({
+          email: typeof item === 'string' ? item : item.email,
+          name: typeof item === 'string' ? 'CAP Câmbio' : item.name,
+          lastAccess: typeof item === 'object' ? item.lastAccess : null,
+          isAdmin: true
+        }))
+      ];
+
+      // Ordenar por último acesso (mais recente primeiro), null por último
+      allEmails.sort((a, b) => {
+        if (!a.lastAccess && !b.lastAccess) return 0;
+        if (!a.lastAccess) return 1;
+        if (!b.lastAccess) return -1;
+        return new Date(b.lastAccess).getTime() - new Date(a.lastAccess).getTime();
+      });
+
+      // Aplicar paginação
+      const totalEmails = allEmails.length;
+      const paginatedEmails = allEmails.slice(offset, offset + limit);
+
       res.json({
-        authorized: authorizedEmails.authorizedEmails,
-        admin: authorizedEmails.adminEmails
+        emails: paginatedEmails,
+        pagination: {
+          page,
+          limit,
+          total: totalEmails,
+          totalPages: Math.ceil(totalEmails / limit)
+        }
       });
     } catch (error) {
       res.status(500).json({ error: "Erro ao carregar emails" });
