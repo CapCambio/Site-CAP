@@ -5,6 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { CurrencyHistory } from '../lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { ptBR } from 'date-fns/locale';
+import { useIsMobile } from '../hooks/use-mobile';
 
 interface CurrencyMiniChartProps {
   currencyCode: string;
@@ -14,6 +15,7 @@ interface CurrencyMiniChartProps {
 
 export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
   const today = new Date();
+  const isMobile = useIsMobile();
   // Usar selectedDate se fornecida, senão usar hoje - mas sempre começar com o mês atual
   const initialMonth = selectedDate ? startOfMonth(selectedDate) : startOfMonth(today);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
