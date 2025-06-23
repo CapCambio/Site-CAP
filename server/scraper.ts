@@ -1,15 +1,219 @@
 import { Currency, ScrapedCurrency } from '../shared/schema';
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
+import crypto from 'crypto';
+import fs from 'fs/promises';
+import path from 'path';
 
 // URL da fonte de dados
 const SOURCE_URL = 'https://www.ctrcambio.com.br/tvcaxias/';
 
+// Arquivo para armazenar o último hash
+const HASH_FILE_PATH = path.join(process.cwd(), 'server', 'config', 'last-hash.json');
+
+// Arquivo para cache dos dados de moedas
+const CACHE_FILE_PATH = path.join(process.cwd(), 'server', 'config', 'currency-cache.json');
+
+interface HashData {
+  lastHash: string;
+  lastUpdate: string;
+}
+
+interface CacheData {
+  lastUpdate: string | null;
+  currencies: ScrapedCurrency[];
+}
+
 /**
- * Função para extrair dados de câmbio usando Cheerio
+ * Gera um hash MD5 do conteúdo da tabela de preços
+ */
+function generateContentHash(tableContent: string): string {
+  return crypto.createHash('md5').update(tableContent).digest('hex');
+}
+
+/**
+ * Carrega o último hash salvo
+ */
+async function getLastHash(): Promise<string | null> {
+  try {
+    const data = await fs.readFile(HASH_FILE_PATH, 'utf-8');
+    const hashData: HashData = JSON.parse(data);
+    return hashData.lastHash;
+  } catch (error) {
+    console.log('Arquivo de hash não encontrado, será criado na primeira execução.');
+    return null;
+  }
+}
+
+/**
+ * Salva o hash atual
+ */
+async function saveHash(hash: string): Promise<void> {
+  try {
+    const hashData: HashData = {
+      lastHash: hash,
+      lastUpdate: new Date().toISOString()
+    };
+    
+    // Garante que o diretório existe
+    const dir = path.dirname(HASH_FILE_PATH);
+    await fs.mkdir(dir, { recursive: true });
+    
+    await fs.writeFile(HASH_FILE_PATH, JSON.stringify(hashData, null, 2));
+    console.log('Hash salvo com sucesso.');
+  } catch (error) {
+    console.error('Erro ao salvar hash:', error);
+  }
+}
+
+/**
+ * Carrega dados do cache
+ */
+async function getCachedData(): Promise<ScrapedCurrency[]> {
+  try {
+    const data = await fs.readFile(CACHE_FILE_PATH, 'utf-8');
+    const cacheData: CacheData = JSON.parse(data);
+    
+    if (cacheData.currencies && cacheData.currencies.length > 0) {
+      console.log(`📦 Carregando ${cacheData.currencies.length} moedas do cache (última atualização: ${cacheData.lastUpdate})`);
+      return cacheData.currencies;
+    }
+  } catch (error) {
+    console.log('Cache não encontrado ou inválido.');
+  }
+  
+  return [];
+}
+
+/**
+ * Salva dados no cache
+ */
+async function saveCachedData(currencies: ScrapedCurrency[]): Promise<void> {
+  try {
+    const cacheData: CacheData = {
+      lastUpdate: new Date().toISOString(),
+      currencies
+    };
+    
+    // Garante que o diretório existe
+    const dir = path.dirname(CACHE_FILE_PATH);
+    await fs.mkdir(dir, { recursive: true });
+    
+    await fs.writeFile(CACHE_FILE_PATH, JSON.stringify(cacheData, null, 2));
+    console.log(`💾 Cache atualizado com ${currencies.length} moedas.`);
+  } catch (error) {
+    console.error('Erro ao salvar cache:', error);
+  }
+}
+
+/**
+ * Verifica se houve mudança no conteúdo da página
+ */
+async function hasContentChanged(): Promise<{ changed: boolean; tableContent?: string }> {
+  console.log('Verificando mudanças no conteúdo da página...');
+
+  try {
+    // Busca a página
+    const response = await fetch(SOURCE_URL, { 
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Falha ao acessar a página fonte: ${response.status} ${response.statusText}`);
+    }
+
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    // Extrai apenas o conteúdo relevante da tabela de preços
+    let tableContent = '';
+    
+    $('table').each((tableIndex, tableElement) => {
+      const rows = $(tableElement).find('tr');
+      if (rows.length > 0) {
+        const headerTexts: string[] = [];
+        $(rows[0]).find('th, td').each((i, cell) => {
+          headerTexts.push($(cell).text().trim());
+        });
+
+        const headerText = headerTexts.join(' ').toLowerCase();
+        if (
+          headerText.includes('moeda') || 
+          headerText.includes('valor') || 
+          headerText.includes('compra') || 
+          headerText.includes('venda') ||
+          headerText.includes('câmbio') ||
+          headerText.includes('cotação')
+        ) {
+          // Esta é a tabela de cotações, extrair todo o conteúdo
+          $(rows).each((rowIndex, row) => {
+            const cells = $(row).find('td, th');
+            const rowContent: string[] = [];
+            
+            cells.each((cellIndex, cell) => {
+              rowContent.push($(cell).text().trim());
+            });
+            
+            tableContent += rowContent.join('|') + '\n';
+          });
+        }
+      }
+    });
+
+    if (!tableContent) {
+      console.log('Tabela de cotações não encontrada, usando conteúdo da página como fallback.');
+      // Se não encontrou a tabela, usa elementos que possam conter cotações
+      tableContent = $('div:contains("USD"), div:contains("EUR"), div:contains("R$")').text();
+    }
+
+    // Gera o hash do conteúdo
+    const currentHash = generateContentHash(tableContent);
+    console.log(`Hash atual: ${currentHash}`);
+
+    // Compara com o último hash salvo
+    const lastHash = await getLastHash();
+    console.log(`Último hash: ${lastHash || 'N/A'}`);
+
+    const changed = currentHash !== lastHash;
+    
+    if (changed) {
+      console.log('🔄 Conteúdo da página mudou! Iniciando scraping...');
+      await saveHash(currentHash);
+      return { changed: true, tableContent };
+    } else {
+      console.log('✅ Nenhuma mudança detectada no conteúdo.');
+      return { changed: false };
+    }
+
+  } catch (error) {
+    console.error('Erro ao verificar mudanças:', error);
+    // Em caso de erro, assume que houve mudança para tentar fazer o scraping
+    return { changed: true };
+  }
+}
+
+/**
+ * Função para extrair dados de câmbio usando Cheerio com verificação de hash
  */
 export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
-  console.log('Iniciando extração de dados com Cheerio...');
+  // Primeiro verifica se houve mudança no conteúdo
+  const { changed } = await hasContentChanged();
+  
+  if (!changed) {
+    console.log('📋 Sem mudanças detectadas. Tentando carregar do cache...');
+    
+    // Tenta carregar do cache
+    const cachedData = await getCachedData();
+    if (cachedData.length > 0) {
+      return cachedData;
+    }
+    
+    console.log('Cache vazio, fazendo scraping completo...');
+  }
+
+  console.log('🔄 Mudanças detectadas ou cache vazio. Iniciando extração de dados com Cheerio...');
 
   try {
     // Tenta buscar a página fonte
@@ -271,6 +475,10 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       // Se encontrou moedas na tabela
       if (tableFound && results.length > 0) {
         console.log(`Extração concluída. Encontradas ${results.length} moedas.`);
+        
+        // Salva no cache
+        await saveCachedData(results);
+        
         return results;
       }
     }
@@ -317,6 +525,10 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
     ];
 
     console.log(`Fallback concluído. Fornecidas ${currencies.length} moedas.`);
+    
+    // Salva dados de fallback no cache
+    await saveCachedData(currencies);
+    
     return currencies;
   } catch (error) {
     console.error('Erro ao fazer scraping dos dados de moedas:', error);
@@ -345,6 +557,9 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       { name: "Rand Africano", code: "ZAR", buyPrice: 0.28, sellPrice: 0.356 }
     ];
 
+    // Salva dados de fallback no cache
+    await saveCachedData(currencies);
+    
     return currencies;
   }
 }

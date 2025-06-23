@@ -64,9 +64,9 @@ async function loadEmailConfig() {
         const adminIndex = config.adminEmails.findIndex(admin => 
           typeof admin === 'string' ? admin === email : admin.email === email
         );
-        
+
         console.log(`Admin index encontrado: ${adminIndex}`);
-        
+
         if (adminIndex !== -1) {
           if (typeof config.adminEmails[adminIndex] === 'string') {
             config.adminEmails[adminIndex] = {
@@ -87,9 +87,9 @@ async function loadEmailConfig() {
         const userIndex = config.authorizedEmails.findIndex(user => 
           typeof user === 'string' ? user === email : user.email === email
         );
-        
+
         console.log(`User index encontrado: ${userIndex}`);
-        
+
         if (userIndex !== -1) {
           if (typeof config.authorizedEmails[userIndex] === 'string') {
             config.authorizedEmails[userIndex] = {
@@ -126,7 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { adminEmails } = loadAuthorizedEmails();
       const emailLower = email.toLowerCase();
-      
+
       // Verificar se o email está na lista de admins (pode ser string ou objeto)
       const isAdmin = adminEmails.some(admin => 
         typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
@@ -180,7 +180,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Determinar o nome do usuário
       let userName;
-      
+
       if (isAdminEmail) {
         if (typeof adminUser === 'object' && adminUser.name) {
           userName = adminUser.name;
@@ -203,7 +203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         console.error("Erro ao atualizar último acesso:", error);
       }
-        
+
       return res.json({
         user: {
           email: emailLower,
@@ -292,12 +292,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("Iniciando primeira atualização de moedas...");
   await refreshCurrencies();
 
-  // Configura atualização a cada minuto
+  // Configurar atualização automática a cada 1 minuto
   setInterval(async () => {
-    console.log("Executando atualização automática de moedas...");
+    console.log('🔍 Executando verificação automática de mudanças...');
     try {
       await refreshCurrencies();
-      console.log("Atualização automática concluída. 16 moedas atualizadas.");
+      console.log(`✅ Verificação automática concluída. ${savedCurrencies.length} moedas processadas.`);
     } catch (error) {
       console.error("Erro na atualização automática:", error);
     }
@@ -316,7 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const offset = (page - 1) * limit;
 
       const authorizedEmails = loadAuthorizedEmails();
-      
+
       // Converter para formato uniforme e adicionar informações de último acesso
       const allEmails = [
         ...authorizedEmails.authorizedEmails.map((item: any) => ({
@@ -463,7 +463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  
+
 
   // Rota para listar emails autorizados (apenas admins)
   app.get('/api/auth/authorized-emails', async (req, res) => {
