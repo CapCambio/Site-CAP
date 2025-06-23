@@ -44,10 +44,13 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     data: historicalData, 
     isLoading
   } = useQuery({
-    queryKey: ['/api/history/mini', currencyCode, startDateStr, endDateStr],
+    queryKey: ['/api/history/mini', currencyCode, monthStart.toISOString().split('T')[0], adjustedMonthEnd.toISOString().split('T')[0]],
     queryFn: async () => {
+      const monthStartStr = monthStart.toISOString().split('T')[0];
+      const monthEndStr = adjustedMonthEnd.toISOString().split('T')[0];
+      
       const response = await fetch(
-        `/api/history/${currencyCode}?startDate=${startDateStr}&endDate=${endDateStr}`
+        `/api/history/${currencyCode}?startDate=${monthStartStr}&endDate=${monthEndStr}`
       );
 
       if (!response.ok) {
