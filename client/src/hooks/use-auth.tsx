@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 // Tipo de usuário autenticado
 interface AuthUser {
   email: string;
+  name: string;
   isAdmin: boolean;
 }
 
@@ -70,8 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Login bem-sucedido
       const userData: AuthUser = {
-        email,
-        isAdmin: data.isAdmin
+        email: data.user.email,
+        name: data.user.name,
+        isAdmin: data.user.isAdmin
       };
 
       setUser(userData);

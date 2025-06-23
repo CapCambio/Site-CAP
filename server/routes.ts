@@ -93,14 +93,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Encontrar o nome do usuário
-      let userName = emailLower;
+      let userName = emailLower.split('@')[0];
 
       if (isAdminEmail) {
-        const adminUser = emailConfig.adminEmails.find(admin => admin === emailLower);
-        userName = 'Administrador CAP Câmbio';
+        const adminUser = emailConfig.adminEmails.find(admin => 
+          typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
+        );
+        userName = typeof adminUser === 'string' ? 'CAP Câmbio' : adminUser?.name || 'CAP Câmbio';
       } else {
-        const regularUser = emailConfig.authorizedEmails.find(user => user === emailLower);
-        userName = emailLower.split('@')[0];
+        const regularUser = emailConfig.authorizedEmails.find(user => 
+          typeof user === 'string' ? user === emailLower : user.email === emailLower
+        );
+        userName = typeof regularUser === 'string' ? emailLower.split('@')[0] : regularUser?.name || emailLower.split('@')[0];
       }
         
       return res.json({
