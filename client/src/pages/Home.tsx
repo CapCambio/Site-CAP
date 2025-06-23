@@ -4,6 +4,7 @@ import { useCurrencyData } from "../hooks/useCurrencyData";
 import { useHistoricalData } from "../hooks/useHistoricalData";
 import { useDateSelection } from "../hooks/useDateSelection";
 import { useIsMobile } from "../hooks/use-mobile";
+import { useAuth } from "../hooks/use-auth";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { formatCurrencyValue, formatPercentage } from "../lib/currency";
 import { format } from "date-fns";
@@ -27,7 +28,8 @@ export default function Home() {
   const isMobile = useIsMobile();
   const [showCalculator, setShowCalculator] = useState(false);
   const [isHistoricalView, setIsHistoricalView] = useState(false);
-  const [expandedCards, setExpandedCards] = useState<{[key: string]: boolean}>({}); // Para controlar individualmente cada card
+  const [expandedCards, setExpandedCards] = useState<{[key: string]: boolean}>({});
+  const { showAdminPanel } = useAuth(); // Para controlar individualmente cada card
 
   const { 
     currencies, 
@@ -149,8 +151,8 @@ export default function Home() {
       <LoadingOverlay isVisible={isLoadingCurrencies} type={isRefreshing ? 'silent' : 'full'} />
       <Footer />
 
-      {/* Botão flutuante do WhatsApp - não aparece na aba de gerenciamento */}
-      {activeTab !== 'admin' && <WhatsAppFloatingButton />}
+      {/* Botão flutuante do WhatsApp - não aparece na aba de gerenciamento ou quando AdminPanel está aberto */}
+      {activeTab !== 'admin' && !showAdminPanel && <WhatsAppFloatingButton />}
 
       <Toaster />
     </div>
