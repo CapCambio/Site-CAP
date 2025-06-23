@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
 import { InsertCurrencyHistory, currencyHistory } from "../shared/schema";
-import { eq, desc, and, lt } from "drizzle-orm";
+import { eq, desc, and, lt, gte } from "drizzle-orm";
 import { db } from "./db";
 import fs from "fs";
 import path from "path";
