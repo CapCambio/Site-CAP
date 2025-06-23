@@ -57,6 +57,9 @@ async function loadEmailConfig() {
       const twoYearsAgo = new Date();
       twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
       
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      
       let removedCount = 0;
       
       // Filtrar emails autorizados (não remove admins)
@@ -67,20 +70,31 @@ async function loadEmailConfig() {
           return true;
         }
         
-        // Se não tem lastAccess, considerar como muito antigo e remover
-        if (!email.lastAccess) {
-          console.log(`🗑️ Removendo email sem último acesso: ${email.email}`);
-          return false;
+        // Se tem lastAccess, verificar se foi há mais de 2 anos
+        if (email.lastAccess) {
+          const lastAccessDate = new Date(email.lastAccess);
+          if (lastAccessDate < twoYearsAgo) {
+            console.log(`🗑️ Removendo email inativo (>2 anos): ${email.email} (último acesso: ${email.lastAccess})`);
+            return false;
+          }
+          return true;
         }
         
-        // Verificar se o último acesso foi há mais de 2 anos
-        const lastAccessDate = new Date(email.lastAccess);
-        if (lastAccessDate < twoYearsAgo) {
-          console.log(`🗑️ Removendo email inativo (>2 anos): ${email.email} (último acesso: ${email.lastAccess})`);
-          return false;
+        // Se não tem lastAccess, verificar se foi criado há mais de 6 meses
+        if (email.createdAt) {
+          const createdDate = new Date(email.createdAt);
+          if (createdDate < sixMonthsAgo) {
+            console.log(`🗑️ Removendo email sem acesso (>6 meses desde criação): ${email.email} (criado em: ${email.createdAt})`);
+            return false;
+          }
+          return true;
         }
         
-        return true;
+        // Emails antigos sem createdAt nem lastAccess - remover apenas após 1 ano para segurança
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        console.log(`🗑️ Removendo email legado sem dados de acesso: ${email.email}`);
+        return false;
       });
       
       removedCount = originalCount - config.authorizedEmails.length;
@@ -414,7 +428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const deletedCount = await cleanupInactiveEmails();
       if (deletedCount > 0) {
-        console.log(`🗑️ Limpeza de emails: ${deletedCount} emails inativos removidos (>2 anos sem acesso).`);
+        console.log(`🗑️ Limpeza de emails: ${deletedCount} emails inativos removidos (>6 meses sem acesso inicial ou >2 anos inativos).`);
       } else {
         console.log('✅ Nenhum email inativo encontrado para remoção.');
       }
@@ -503,6 +517,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const authorizedEmails = loadAuthorizedEmails();
+      const now = new Date().toISOString();
 
       if (type === "authorized") {
         // Verificar se email já existe
@@ -510,7 +525,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           typeof e === 'string' ? e === email : e.email === email
         );
         if (existingIndex === -1) {
-          authorizedEmails.authorizedEmails.push({ email, name });
+          authorizedEmails.authorizedEmails.push({ 
+            email, 
+            name, 
+            createdAt: now 
+          });
         }
       } else if (type === "admin") {
         // Verificar se email já existe
@@ -518,7 +537,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           typeof e === 'string' ? e === email : e.email === email
         );
         if (existingIndex === -1) {
-          authorizedEmails.adminEmails.push({ email, name });
+          authorizedEmails.adminEmails.push({ 
+            email, 
+            name, 
+            createdAt: now 
+          });
         }
       }
 
