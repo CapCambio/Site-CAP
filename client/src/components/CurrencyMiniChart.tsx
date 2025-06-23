@@ -215,8 +215,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               // Detectar se é mobile (largura menor que 768px)
               const isMobile = window.innerWidth < 768;
               
+              // Desktop: sempre mostrar todos os dias
               if (!isMobile) {
-                // Desktop: mostrar todos os dias
                 return value;
               }
               
