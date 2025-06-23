@@ -21,6 +21,9 @@ import { CurrencyConverter } from "../components/CurrencyConverter";
 import { DatePicker } from "../components/DatePicker";
 import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 import { Toaster } from "@/components/ui/toaster";
+import { TabNavigation } from "@/components/TabNavigation";
+import { NotificationSettings } from "@/components/NotificationSettings";
+import { useNotifications } from "@/hooks/useNotifications";
 
 
 export default function Home() {
@@ -29,7 +32,10 @@ export default function Home() {
   const [showCalculator, setShowCalculator] = useState(false);
   const [isHistoricalView, setIsHistoricalView] = useState(false);
   const [expandedCards, setExpandedCards] = useState<{[key: string]: boolean}>({});
-  const { showAdminPanel } = useAuth();
+  const { user, showAdminPanel, setShowAdminPanel } = useAuth();
+
+  // Sistema de notificações
+  useNotifications(user?.email || null);
 
   const { 
     currencies, 
@@ -83,6 +89,13 @@ export default function Home() {
       <Header />
 
       <main className="container mx-auto px-4 pb-12 flex-grow">
+        <TabNavigation 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab}
+            showAdminTab={user?.isAdmin || false}
+            showNotificationsTab={true}
+          />
+
         {!isLoadingCurrencies && activeTab === "current" && (
           <div className="max-w-3xl mx-auto">
             <CurrencyConverter currencies={currencies} />
@@ -145,6 +158,16 @@ export default function Home() {
               code={filter.code}
               isLoading={isLoadingHistory}
             />
+          </div>
+        )}
+
+        {activeTab === 'admin' && user?.isAdmin && (
+          <AdminPanel />
+        )}
+
+        {activeTab === 'notifications' && user && (
+          <div className="max-w-4xl mx-auto p-4">
+            <NotificationSettings userEmail={user.email} />
           </div>
         )}
       </main>

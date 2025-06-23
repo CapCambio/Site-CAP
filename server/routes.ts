@@ -1,10 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { refreshCurrencies } from "./scraper";
 import { storage } from "./storage";
-import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
-import { InsertCurrencyHistory, currencyHistory } from "../shared/schema";
-import { eq, desc, and, lt, gte } from "drizzle-orm";
-import { db } from "./db";
+import { notificationSystem } from "./notification-system";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -536,17 +534,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const now = new Date();
       const twoYearsAgo = new Date(now.getTime() - 2 * 365 * 24 * 60 * 60 * 1000); // 2 anos
       const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000); // 6 meses
-      
+
       let removedCount = 0;
-      
+
       // Filtrar emails autorizados (não admins)
       const originalCount = config.authorizedEmails.length;
-      
+
       config.authorizedEmails = config.authorizedEmails.filter(user => {
         const email = typeof user === 'string' ? user : user.email;
         const lastAccess = typeof user === 'object' && user.lastAccess ? new Date(user.lastAccess) : null;
         const createdAt = typeof user === 'object' && user.createdAt ? new Date(user.createdAt) : null;
-        
+
         // Se nunca acessou, verificar data de criação
         if (!lastAccess) {
           if (createdAt) {
@@ -567,17 +565,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return false;
           }
         }
-        
+
         return true;
       });
-      
+
       removedCount = originalCount - config.authorizedEmails.length;
-      
+
       if (removedCount > 0) {
         await saveEmailConfig(config);
         console.log(`🧹 Limpeza de emails: ${removedCount} emails inativos removidos`);
       }
-      
+
       return removedCount;
     } catch (error) {
       console.error('Erro na limpeza de emails:', error);
@@ -698,7 +696,7 @@ async function refreshCurrencies() {
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      
+
       const todayHistory = await db
         .select()
         .from(currencyHistory)
@@ -710,7 +708,7 @@ async function refreshCurrencies() {
           )
         )
         .limit(1);
-      
+
       const hasRecordToday = todayHistory.length > 0;
 
       // Forçamos o cálculo da variação para todas as moedas, independente se o preço mudou
