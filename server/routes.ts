@@ -1,12 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { Request, Response } from "express";
+import { storage } from "./storage";
+import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
+import { InsertCurrencyHistory, currencyHistory } from "../shared/schema";
+import { eq, desc, and, lt, gte } from "drizzle-orm";
 import { db } from "./db";
-import { currencies, currencyHistory } from "../shared/schema";
-import { eq, desc, gte, lte, and } from "drizzle-orm";
-import { refreshCurrencies, scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
-import { requestAccess, authenticateUser } from "./auth";
-import { notificationSystem } from "./notification-system";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -118,37 +116,6 @@ async function loadEmailConfig() {
   }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Notification routes
-  app.get("/api/notifications/preferences/:email", async (req: Request, res: Response) => {
-    try {
-      const { email } = req.params;
-      const preferences = notificationSystem.getUserPreferences(email);
-      res.json(preferences);
-    } catch (error) {
-      res.status(500).json({ message: "Erro ao buscar preferências de notificação" });
-    }
-  });
-
-  app.post("/api/notifications/preferences", async (req: Request, res: Response) => {
-    try {
-      const { email, ...preferences } = req.body;
-      notificationSystem.updateUserPreferences(email, preferences);
-      res.json({ message: "Preferências atualizadas com sucesso" });
-    } catch (error) {
-      res.status(500).json({ message: "Erro ao atualizar preferências de notificação" });
-    }
-  });
-
-  app.delete("/api/notifications/unsubscribe/:email", async (req: Request, res: Response) => {
-    try {
-      const { email } = req.params;
-      notificationSystem.unsubscribeUser(email);
-      res.json({ message: "Usuário removido das notificações" });
-    } catch (error) {
-      res.status(500).json({ message: "Erro ao remover usuário das notificações" });
-    }
-  });
-
   // Rotas de autenticação
   app.post("/api/auth/check-admin", (req, res) => {
     try {
@@ -569,17 +536,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const now = new Date();
       const twoYearsAgo = new Date(now.getTime() - 2 * 365 * 24 * 60 * 60 * 1000); // 2 anos
       const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000); // 6 meses
-
+      
       let removedCount = 0;
-
+      
       // Filtrar emails autorizados (não admins)
       const originalCount = config.authorizedEmails.length;
-
+      
       config.authorizedEmails = config.authorizedEmails.filter(user => {
         const email = typeof user === 'string' ? user : user.email;
         const lastAccess = typeof user === 'object' && user.lastAccess ? new Date(user.lastAccess) : null;
         const createdAt = typeof user === 'object' && user.createdAt ? new Date(user.createdAt) : null;
-
+        
         // Se nunca acessou, verificar data de criação
         if (!lastAccess) {
           if (createdAt) {
@@ -600,17 +567,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return false;
           }
         }
-
+        
         return true;
       });
-
+      
       removedCount = originalCount - config.authorizedEmails.length;
-
+      
       if (removedCount > 0) {
         await saveEmailConfig(config);
         console.log(`🧹 Limpeza de emails: ${removedCount} emails inativos removidos`);
       }
-
+      
       return removedCount;
     } catch (error) {
       console.error('Erro na limpeza de emails:', error);
@@ -709,3 +676,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return server;
 }
 
+// Função para atualizar as moedas (usada tanto no endpoint quanto no timer)
+async function refreshCurrencies() {
+  try {
+    const scrapedData = await scrapeCurrencyData();
+    const currentCurrencies = await storage.getAllCurrencies();
+    const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
+
+    const now = new Date();
+    const savedCurrencies: any[] = [];
+
+    for (const currency of updatedCurrencies) {
+      // Verifica se houve mudança real na cotação
+      const lastHistory = await storage.getLastCurrencyHistory(currency.code);
+      let isNewPrice = !lastHistory || 
+                      lastHistory.sellPrice !== currency.sellPrice || 
+                      lastHistory.buyPrice !== currency.buyPrice;
+
+      // Verifica se já foi registrado hoje (evitar múltiplos registros no mesmo dia)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const todayHistory = await db
+        .select()
+        .from(currencyHistory)
+        .where(
+          and(
+            eq(currencyHistory.code, currency.code),
+            gte(currencyHistory.timestamp, today),
+            lt(currencyHistory.timestamp, tomorrow)
+          )
+        )
+        .limit(1);
+      
+      const hasRecordToday = todayHistory.length > 0;
+
+      // Forçamos o cálculo da variação para todas as moedas, independente se o preço mudou
+      // Busca o último registro com preço diferente para cálculo de variação (96 horas)
+      let previousHistories = await db
+        .select()
+        .from(currencyHistory)
+        .where(eq(currencyHistory.code, currency.code))
+        .orderBy(desc(currencyHistory.timestamp))
+        .limit(100);  // Pegamos vários registros para garantir que encontraremos um diferente
+
+      // Encontra o registro mais recente com preço diferente
+      let previousHistory = null;
+      if (previousHistories.length > 1) {
+        for (let i = 0; i < previousHistories.length; i++) {
+          if (previousHistories[i].sellPrice !== currency.sellPrice) {
+            previousHistory = previousHistories[i];
+            break;
+          }
+        }
+      }
+
+      // Calcula variação
+      let change = 0;
+      if (previousHistory && 
+          (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
+        change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
+        change = Number(change.toFixed(2));
+      }
+
+      // Atualiza moeda sempre, mesmo que o preço não tenha mudado, para atualizar a variação
+      const savedCurrency = await storage.upsertCurrency({
+        ...currency,
+        change,
+        lastUpdate: now
+      });
+
+      // Adiciona ao histórico se for um novo preço OU se não há registro hoje
+      // Isso garante que sempre haja pelo menos 1 registro por dia
+      if ((isNewPrice || !hasRecordToday) && !hasRecordToday) {
+        await storage.addCurrencyHistory({
+          code: currency.code,
+          buyPrice: currency.buyPrice,
+          sellPrice: currency.sellPrice,
+          timestamp: now
+        });
+      }
+
+      savedCurrencies.push(savedCurrency);
+    }
+
+    return savedCurrencies;
+  } catch (error) {
+    console.error("Erro ao atualizar moedas:", error);
+    throw error;
+  }
+}

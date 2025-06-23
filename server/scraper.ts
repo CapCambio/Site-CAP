@@ -54,11 +54,11 @@ async function saveHash(hash: string): Promise<void> {
       lastHash: hash,
       lastUpdate: new Date().toISOString()
     };
-
+    
     // Garante que o diretório existe
     const dir = path.dirname(HASH_FILE_PATH);
     await fs.mkdir(dir, { recursive: true });
-
+    
     await fs.writeFile(HASH_FILE_PATH, JSON.stringify(hashData, null, 2));
     console.log('Hash salvo com sucesso.');
   } catch (error) {
@@ -73,7 +73,7 @@ async function getCachedData(): Promise<ScrapedCurrency[]> {
   try {
     const data = await fs.readFile(CACHE_FILE_PATH, 'utf-8');
     const cacheData: CacheData = JSON.parse(data);
-
+    
     if (cacheData.currencies && cacheData.currencies.length > 0) {
       console.log(`📦 Carregando ${cacheData.currencies.length} moedas do cache (última atualização: ${cacheData.lastUpdate})`);
       return cacheData.currencies;
@@ -81,7 +81,7 @@ async function getCachedData(): Promise<ScrapedCurrency[]> {
   } catch (error) {
     console.log('Cache não encontrado ou inválido.');
   }
-
+  
   return [];
 }
 
@@ -94,11 +94,11 @@ async function saveCachedData(currencies: ScrapedCurrency[]): Promise<void> {
       lastUpdate: new Date().toISOString(),
       currencies
     };
-
+    
     // Garante que o diretório existe
     const dir = path.dirname(CACHE_FILE_PATH);
     await fs.mkdir(dir, { recursive: true });
-
+    
     await fs.writeFile(CACHE_FILE_PATH, JSON.stringify(cacheData, null, 2));
     console.log(`💾 Cache atualizado com ${currencies.length} moedas.`);
   } catch (error) {
@@ -129,7 +129,7 @@ async function hasContentChanged(): Promise<{ changed: boolean; tableContent?: s
 
     // Extrai apenas o conteúdo relevante da tabela de preços
     let tableContent = '';
-
+    
     $('table').each((tableIndex, tableElement) => {
       const rows = $(tableElement).find('tr');
       if (rows.length > 0) {
@@ -151,11 +151,11 @@ async function hasContentChanged(): Promise<{ changed: boolean; tableContent?: s
           $(rows).each((rowIndex, row) => {
             const cells = $(row).find('td, th');
             const rowContent: string[] = [];
-
+            
             cells.each((cellIndex, cell) => {
               rowContent.push($(cell).text().trim());
             });
-
+            
             tableContent += rowContent.join('|') + '\n';
           });
         }
@@ -177,7 +177,7 @@ async function hasContentChanged(): Promise<{ changed: boolean; tableContent?: s
     console.log(`Último hash: ${lastHash || 'N/A'}`);
 
     const changed = currentHash !== lastHash;
-
+    
     if (changed) {
       console.log('🔄 Conteúdo da página mudou! Iniciando scraping...');
       await saveHash(currentHash);
@@ -200,16 +200,16 @@ async function hasContentChanged(): Promise<{ changed: boolean; tableContent?: s
 export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
   // Primeiro verifica se houve mudança no conteúdo
   const { changed } = await hasContentChanged();
-
+  
   if (!changed) {
     console.log('📋 Sem mudanças detectadas. Tentando carregar do cache...');
-
+    
     // Tenta carregar do cache
     const cachedData = await getCachedData();
     if (cachedData.length > 0) {
       return cachedData;
     }
-
+    
     console.log('Cache vazio, fazendo scraping completo...');
   }
 
@@ -475,10 +475,10 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       // Se encontrou moedas na tabela
       if (tableFound && results.length > 0) {
         console.log(`Extração concluída. Encontradas ${results.length} moedas.`);
-
+        
         // Salva no cache
         await saveCachedData(results);
-
+        
         return results;
       }
     }
@@ -525,10 +525,10 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
     ];
 
     console.log(`Fallback concluído. Fornecidas ${currencies.length} moedas.`);
-
+    
     // Salva dados de fallback no cache
     await saveCachedData(currencies);
-
+    
     return currencies;
   } catch (error) {
     console.error('Erro ao fazer scraping dos dados de moedas:', error);
@@ -559,7 +559,7 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
 
     // Salva dados de fallback no cache
     await saveCachedData(currencies);
-
+    
     return currencies;
   }
 }
@@ -622,58 +622,3 @@ export function updateCurrenciesWithScrapedData(
     };
   });
 }
-import { storage } from "./storage";
-import { notificationSystem } from "./notification-system";
-import { Currency } from "./types";
-import cheerio from 'cheerio';
-import crypto from 'crypto';
-import { storage } from "./storage";
-import { notificationSystem } from "./notification-system";
-import { Currency } from "./types";
-import cheerio from 'cheerio';
-import crypto from 'crypto';
-const newBuyPrice = parseCurrencyValue(buyPriceText);
-      const newSellPrice = parseCurrencyValue(sellPriceText);
-
-      if (newBuyPrice > 0 && newSellPrice > 0) {
-        // Verificar se houve mudança significativa de preço (>= 2%)
-        const existingCurrency = await storage.getCurrency(currencyCode);
-        let hasSignificantChange = false;
-
-        if (existingCurrency) {
-          const buyChange = Math.abs((newBuyPrice - existingCurrency.buyPrice) / existingCurrency.buyPrice * 100);
-          const sellChange = Math.abs((newSellPrice - existingCurrency.sellPrice) / existingCurrency.sellPrice * 100);
-
-          if (buyChange >= 2 || sellChange >= 2) {
-            hasSignificantChange = true;
-          }
-        }
-
-        const currency: Currency = {
-          id: 0,
-          name: currencyName,
-          code: currencyCode,
-          buyPrice: newBuyPrice,
-          sellPrice: newSellPrice,
-          lastUpdated: new Date(),
-          variation: 0
-        };
-
-        savedCurrencies.push(currency);
-
-        // Enviar notificação se houver mudança significativa
-        if (hasSignificantChange && existingCurrency) {
-          const changePercent = ((newBuyPrice - existingCurrency.buyPrice) / existingCurrency.buyPrice * 100).toFixed(2);
-          await notificationSystem.sendNotification(
-            'priceChanges',
-            `Mudança significativa: ${currencyName}`,
-            `O ${currencyName} (${currencyCode}) teve uma variação de ${changePercent}%. Nova cotação de compra: R$ ${newBuyPrice.toFixed(5).replace('.', ',')}`,
-            {
-              currency: currencyCode,
-              oldPrice: existingCurrency.buyPrice,
-              newPrice: newBuyPrice,
-              change: changePercent + '%'
-            }
-          );
-        }
-      }

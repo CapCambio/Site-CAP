@@ -1,14 +1,11 @@
 import { TabType } from "../lib/types";
-import { TrendingUp, History, Calculator, Settings, Bell } from "lucide-react";
 
 interface TabNavigationProps {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-  showAdminTab?: boolean;
-  showNotificationsTab?: boolean;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
 }
 
-export function TabNavigation({ activeTab, onTabChange, showAdminTab = false, showNotificationsTab = false }: TabNavigationProps) {
+export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   return (
     <div className="mb-6">
       <div className="container mx-auto">
