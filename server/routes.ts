@@ -51,6 +51,52 @@ async function loadEmailConfig() {
     }
   }
 
+  async function cleanupInactiveEmails(): Promise<number> {
+    try {
+      const config = await loadEmailConfig();
+      const twoYearsAgo = new Date();
+      twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+      
+      let removedCount = 0;
+      
+      // Filtrar emails autorizados (não remove admins)
+      const originalCount = config.authorizedEmails.length;
+      config.authorizedEmails = config.authorizedEmails.filter((email: any) => {
+        // Se o email é uma string (formato antigo), manter por segurança
+        if (typeof email === 'string') {
+          return true;
+        }
+        
+        // Se não tem lastAccess, considerar como muito antigo e remover
+        if (!email.lastAccess) {
+          console.log(`🗑️ Removendo email sem último acesso: ${email.email}`);
+          return false;
+        }
+        
+        // Verificar se o último acesso foi há mais de 2 anos
+        const lastAccessDate = new Date(email.lastAccess);
+        if (lastAccessDate < twoYearsAgo) {
+          console.log(`🗑️ Removendo email inativo (>2 anos): ${email.email} (último acesso: ${email.lastAccess})`);
+          return false;
+        }
+        
+        return true;
+      });
+      
+      removedCount = originalCount - config.authorizedEmails.length;
+      
+      // Salvar apenas se houve mudanças
+      if (removedCount > 0) {
+        await saveEmailConfig(config);
+      }
+      
+      return removedCount;
+    } catch (error) {
+      console.error('Erro na limpeza de emails inativos:', error);
+      return 0;
+    }
+  }
+
   async function updateLastAccess(email: string, isAdmin: boolean) {
     try {
       const config = await loadEmailConfig();
@@ -324,6 +370,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error("Erro na limpeza inicial do histórico:", error);
   }
 
+  // Limpeza inicial de emails inativos
+  try {
+    const deletedEmailCount = await cleanupInactiveEmails();
+    if (deletedEmailCount > 0) {
+      console.log(`🗑️ Limpeza inicial de emails: ${deletedEmailCount} emails inativos removidos.`);
+    }
+  } catch (error) {
+    console.error("Erro na limpeza inicial de emails:", error);
+  }
+
   // Configurar atualização automática a cada 1 minuto
   setInterval(async () => {
     console.log('🔍 Executando verificação automática de mudanças...');
@@ -352,9 +408,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }, 24 * 60 * 60 * 1000); // 24 horas
 
+  // Configurar limpeza automática de emails inativos a cada 24 horas
+  setInterval(async () => {
+    console.log('🧹 Executando limpeza automática de emails inativos...');
+    try {
+      const deletedCount = await cleanupInactiveEmails();
+      if (deletedCount > 0) {
+        console.log(`🗑️ Limpeza de emails: ${deletedCount} emails inativos removidos (>2 anos sem acesso).`);
+      } else {
+        console.log('✅ Nenhum email inativo encontrado para remoção.');
+      }
+    } catch (error) {
+      console.error("Erro na limpeza automática de emails:", error);
+    }
+  }, 24 * 60 * 60 * 1000); // 24 horas
+
   // Health check endpoint
   app.get("/api/health", (req, res) => {
     res.json({ status: "OK", timestamp: new Date().toISOString() });
+  });
+
+  // Endpoint para limpeza manual de emails inativos
+  app.post("/api/admin/cleanup-inactive-emails", async (req, res) => {
+    try {
+      const deletedCount = await cleanupInactiveEmails();
+      res.json({ 
+        success: true, 
+        message: `${deletedCount} emails inativos removidos`,
+        deletedCount 
+      });
+    } catch (error) {
+      console.error('Erro na limpeza manual de emails:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
   });
 
   // Admin email management routes

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,7 +55,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
       const response = await fetch(`/api/admin/emails?page=${page}&limit=${itemsPerPage}`);
       if (response.ok) {
         const data = await response.json();
-        
+
         const allEmails: AuthorizedEmail[] = data.emails.map((item: any) => ({
           email: item.email,
           name: item.name,
@@ -75,7 +74,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
 
   const handleAddEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Verificar se os campos estão preenchidos
     if (!newEmail.trim() || !newName.trim()) {
       setShowValidationErrors(true);
@@ -137,9 +136,6 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   };
 
   const handleRemoveEmail = async (email: string) => {
-    const emailToRemove = authorizedEmails.find(item => item.email === email);
-    if (!emailToRemove) return;
-
     try {
       const response = await fetch('/api/admin/emails', {
         method: 'DELETE',
@@ -159,6 +155,31 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
       }
     } catch (error) {
       console.error('Erro ao remover email:', error);
+    }
+  };
+
+  const handleCleanupInactiveEmails = async () => {
+    if (!confirm('Tem certeza que deseja remover todos os emails que não acessaram por mais de 2 anos?')) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/admin/cleanup-inactive-emails", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(`${result.deletedCount} emails inativos foram removidos.`);
+        loadAuthorizedEmails(1);
+      }
+    } catch (error) {
+      console.error('Erro na limpeza de emails inativos:', error);
+      alert('Erro ao limpar emails inativos.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -294,6 +315,20 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                   {isLoading ? "Adicionando..." : "Adicionar Email"}
                 </Button>
               </form>
+
+              {/* Botão de limpeza de emails inativos */}
+              <div className="mt-4 pt-4 border-t border-zinc-600">
+                <Button 
+                  onClick={handleCleanupInactiveEmails}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white" 
+                  disabled={isLoading}
+                >
+                  🗑️ Limpar Emails Inativos (>2 anos)
+                </Button>
+                <p className="text-xs text-zinc-400 mt-2 text-center">
+                  Remove automaticamente emails que não acessaram por mais de 2 anos
+                </p>
+              </div>
             </CardContent>
           </Card>
 
@@ -426,7 +461,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                     Mostrando {((pagination.page - 1) * pagination.limit) + 1} a{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} de {pagination.total} emails
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
@@ -437,7 +472,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                     >
                       Anterior
                     </Button>
-                    
+
                     <div className="flex items-center space-x-1">
                       {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                         let pageNum;
@@ -450,7 +485,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                         } else {
                           pageNum = pagination.page - 2 + i;
                         }
-                        
+
                         return (
                           <Button
                             key={pageNum}
@@ -467,7 +502,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                         );
                       })}
                     </div>
-                    
+
                     <Button
                       variant="outline"
                       size="sm"
