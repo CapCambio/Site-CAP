@@ -28,6 +28,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   const [editingEmail, setEditingEmail] = useState<string | null>(null);
   const [editEmail, setEditEmail] = useState("");
   const [editName, setEditName] = useState("");
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   // Impedir scroll do body quando o painel está aberto
   useEffect(() => {
@@ -71,8 +72,14 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
 
   const handleAddEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newEmail.trim() || !newName.trim()) return;
+    
+    // Verificar se os campos estão preenchidos
+    if (!newEmail.trim() || !newName.trim()) {
+      setShowValidationErrors(true);
+      return;
+    }
 
+    setShowValidationErrors(false);
     setIsLoading(true);
     try {
       const response = await fetch('/api/admin/emails', {
@@ -226,9 +233,17 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                       type="email" 
                       placeholder="cliente@exemplo.com" 
                       value={newEmail}
-                      onChange={(e) => setNewEmail(e.target.value)}
-                      className="bg-zinc-800 border-zinc-600 text-white placeholder:text-zinc-400 focus:ring-yellow-500 focus:border-yellow-500"
-                      required
+                      onChange={(e) => {
+                        setNewEmail(e.target.value);
+                        if (showValidationErrors && e.target.value.trim()) {
+                          setShowValidationErrors(false);
+                        }
+                      }}
+                      className={`bg-zinc-800 text-white placeholder:text-zinc-400 focus:ring-yellow-500 focus:border-yellow-500 ${
+                        showValidationErrors && !newEmail.trim() 
+                          ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                          : 'border-zinc-600'
+                      }`}
                     />
                   </div>
                   <div>
@@ -237,17 +252,31 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                       type="text" 
                       placeholder="Nome do cliente" 
                       value={newName}
-                      onChange={(e) => setNewName(e.target.value)}
-                      className="bg-zinc-800 border-zinc-600 text-white placeholder:text-zinc-400 focus:ring-yellow-500 focus:border-yellow-500"
-                      required
+                      onChange={(e) => {
+                        setNewName(e.target.value);
+                        if (showValidationErrors && e.target.value.trim()) {
+                          setShowValidationErrors(false);
+                        }
+                      }}
+                      className={`bg-zinc-800 text-white placeholder:text-zinc-400 focus:ring-yellow-500 focus:border-yellow-500 ${
+                        showValidationErrors && !newName.trim() 
+                          ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                          : 'border-zinc-600'
+                      }`}
                     />
                   </div>
                 </div>
 
+                {showValidationErrors && (!newEmail.trim() || !newName.trim()) && (
+                  <div className="text-red-400 text-sm">
+                    Todos os campos devem ser preenchidos.
+                  </div>
+                )}
+
                 <Button 
                   type="submit" 
                   className="w-full bg-yellow-500 text-black font-medium hover:bg-yellow-600 transition-colors"
-                  disabled={isLoading || !newEmail.trim() || !newName.trim()}
+                  disabled={isLoading}
                 >
                   {isLoading ? "Adicionando..." : "Adicionar Email"}
                 </Button>
