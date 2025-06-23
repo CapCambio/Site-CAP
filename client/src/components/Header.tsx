@@ -10,13 +10,12 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 export function Header() {
-  const { user, logout } = useAuth();
+  const { user, logout, showAdminPanel, setShowAdminPanel } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [emails, setEmails] = useState({ authorized: [], admin: [] });
   const [newEmail, setNewEmail] = useState("");
   const [emailType, setEmailType] = useState<"authorized" | "admin">("authorized");
-    const [showAdminPanel, setShowAdminPanel] = useState(false);
-    const { toast } = useToast();
+  const { toast } = useToast();
 
   const loadEmails = async () => {
     try {

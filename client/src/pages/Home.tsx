@@ -29,7 +29,7 @@ export default function Home() {
   const [showCalculator, setShowCalculator] = useState(false);
   const [isHistoricalView, setIsHistoricalView] = useState(false);
   const [expandedCards, setExpandedCards] = useState<{[key: string]: boolean}>({});
-  const { showAdminPanel } = useAuth(); // Para controlar individualmente cada card
+  const { showAdminPanel } = useAuth();
 
   const { 
     currencies, 
@@ -151,8 +151,8 @@ export default function Home() {
       <LoadingOverlay isVisible={isLoadingCurrencies} type={isRefreshing ? 'silent' : 'full'} />
       <Footer />
 
-      {/* Botão flutuante do WhatsApp - não aparece na aba de gerenciamento ou quando AdminPanel está aberto */}
-      {activeTab !== 'admin' && !showAdminPanel && <WhatsAppFloatingButton />}
+      {/* Botão flutuante do WhatsApp - aparece apenas quando AdminPanel NÃO está aberto */}
+      {!showAdminPanel && <WhatsAppFloatingButton />}
 
       <Toaster />
     </div>

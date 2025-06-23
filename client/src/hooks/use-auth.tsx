@@ -13,6 +13,8 @@ interface AuthContextType {
   user: AuthUser | null;
   isAuthorized: boolean;
   isLoading: boolean;
+  showAdminPanel: boolean;
+  setShowAdminPanel: (show: boolean) => void;
   login: (email: string, password?: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -36,6 +38,7 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const { toast } = useToast();
 
   // Tenta restaurar a sessão ao carregar a página
@@ -118,6 +121,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthorized: !!user,
         isLoading,
+        showAdminPanel,
+        setShowAdminPanel,
         login,
         logout
       }}
