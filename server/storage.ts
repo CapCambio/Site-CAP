@@ -1,3 +1,4 @@
+
 import { 
   users, currencies, currencyHistory,
   type User, type InsertUser, 
@@ -25,30 +26,31 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const user = db.select().from(users).where(eq(users.id, id)).get();
     return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const user = db.select().from(users).where(eq(users.username, username)).get();
     return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
+    const user = db
       .insert(users)
       .values(insertUser)
-      .returning();
+      .returning()
+      .get();
     return user;
   }
 
   async getAllCurrencies(): Promise<Currency[]> {
     // Retorna todas as moedas ordenadas pelo campo displayOrder (ordem exata da página fonte)
-    return await db.select().from(currencies).orderBy(currencies.displayOrder);
+    return db.select().from(currencies).orderBy(currencies.displayOrder).all();
   }
 
   async getCurrencyByCode(code: string): Promise<Currency | undefined> {
-    const [currency] = await db.select().from(currencies).where(eq(currencies.code, code));
+    const currency = db.select().from(currencies).where(eq(currencies.code, code)).get();
     return currency || undefined;
   }
 
@@ -58,7 +60,7 @@ export class DatabaseStorage implements IStorage {
     
     if (existingCurrency) {
       // Atualiza a moeda existente
-      const [updatedCurrency] = await db
+      const updatedCurrency = db
         .update(currencies)
         .set({
           name: insertCurrency.name,
@@ -69,15 +71,17 @@ export class DatabaseStorage implements IStorage {
           displayOrder: insertCurrency.displayOrder
         })
         .where(eq(currencies.code, insertCurrency.code))
-        .returning();
+        .returning()
+        .get();
       
       return updatedCurrency;
     } else {
       // Insere uma nova moeda
-      const [newCurrency] = await db
+      const newCurrency = db
         .insert(currencies)
         .values(insertCurrency)
-        .returning();
+        .returning()
+        .get();
       
       return newCurrency;
     }
@@ -101,16 +105,17 @@ export class DatabaseStorage implements IStorage {
     }
     
     // Aplica todos os filtros
-    const result = await query.where(and(...filters)).orderBy(desc(currencyHistory.timestamp));
+    const result = query.where(and(...filters)).orderBy(desc(currencyHistory.timestamp)).all();
     
     return result;
   }
 
   async addCurrencyHistory(insertHistory: InsertCurrencyHistory): Promise<CurrencyHistory> {
-    const [history] = await db
+    const history = db
       .insert(currencyHistory)
       .values(insertHistory)
-      .returning();
+      .returning()
+      .get();
     
     return history;
   }
@@ -119,27 +124,29 @@ export class DatabaseStorage implements IStorage {
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     
-    const result = await db
+    const result = db
       .delete(currencyHistory)
       .where(lte(currencyHistory.timestamp, oneYearAgo))
-      .returning();
+      .returning()
+      .all();
     
     return result.length;
   }
 
   async getLastCurrencyHistory(code: string): Promise<CurrencyHistory | undefined> {
-    const [history] = await db
+    const history = db
       .select()
       .from(currencyHistory)
       .where(eq(currencyHistory.code, code))
       .orderBy(desc(currencyHistory.timestamp))
-      .limit(1);
+      .limit(1)
+      .get();
     
     return history;
   }
 
   async getPreviousDifferentPrice(code: string, currentPrice: number): Promise<CurrencyHistory | undefined> {
-    const [history] = await db
+    const history = db
       .select()
       .from(currencyHistory)
       .where(
@@ -149,7 +156,8 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(desc(currencyHistory.timestamp))
-      .limit(1);
+      .limit(1)
+      .get();
     
     return history;
   }
