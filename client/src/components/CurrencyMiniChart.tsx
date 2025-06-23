@@ -18,10 +18,10 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const initialMonth = selectedDate || today;
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
 
-  // Atualizar o mês quando selectedDate mudar
+  // Atualizar o mês quando selectedDate mudar (baseado no mês da data, não no dia específico)
   useEffect(() => {
     if (selectedDate) {
-      setSelectedMonth(selectedDate);
+      setSelectedMonth(startOfMonth(selectedDate));
     }
   }, [selectedDate]);
 
@@ -82,7 +82,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     }
   };
 
-  const capitalizedMonthName = format(selectedMonth, 'MMMM', { locale: ptBR });
+  const capitalizedMonthName = format(selectedMonth, 'MMMM yyyy', { locale: ptBR });
 
   // Criar pontos no gráfico para todos os dias do mês até hoje
   const daysInMonth = Array.from({ length: getDate(adjustedMonthEnd) }, (_, i) => i + 1);
@@ -144,7 +144,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             <ChevronRight size={16} />
           </button>
         </div>
-        <p className="text-gray-500 text-sm">Sem dados disponíveis para este mês</p>
+        <p className="text-gray-500 text-sm">Sem dados disponíveis para {capitalizedMonthName}</p>
       </div>
     );
   }
