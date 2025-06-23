@@ -203,10 +203,13 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </defs>
           <XAxis 
             dataKey="day"
-            tick={{ fontSize: 10 }}
+            tick={{ fontSize: 9 }}
             tickLine={false}
             axisLine={false}
-            interval="preserveStartEnd"
+            interval={0}
+            angle={-45}
+            textAnchor="end"
+            height={60}
           />
           <YAxis 
             hide={true}
