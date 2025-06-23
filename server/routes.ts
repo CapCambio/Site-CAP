@@ -95,7 +95,8 @@ async function loadEmailConfig() {
             config.authorizedEmails[userIndex] = {
               email: config.authorizedEmails[userIndex] as string,
               name: email.split('@')[0],
-              lastAccess: now
+              lastAccess: now,
+              createdAt: now // Para emails antigos, usar data atual como aproximação
             };
           } else {
             config.authorizedEmails[userIndex] = {
@@ -544,17 +545,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       config.authorizedEmails = config.authorizedEmails.filter(user => {
         const email = typeof user === 'string' ? user : user.email;
         const lastAccess = typeof user === 'object' && user.lastAccess ? new Date(user.lastAccess) : null;
+        const createdAt = typeof user === 'object' && user.createdAt ? new Date(user.createdAt) : null;
         
-        // Se nunca acessou, só remove após 6 meses
+        // Se nunca acessou, verificar data de criação
         if (!lastAccess) {
-          // Assumir que foi criado há mais de 6 meses se não tem lastAccess
-          return true; // Por enquanto não remove emails sem lastAccess
-        }
-        
-        // Se acessou há mais de 2 anos, remove
-        if (lastAccess < twoYearsAgo) {
-          console.log(`🗑️ Removendo email inativo há mais de 2 anos: ${email}`);
-          return false;
+          if (createdAt) {
+            // Se temos data de criação, verificar se passou 6 meses
+            if (createdAt < sixMonthsAgo) {
+              console.log(`🗑️ Removendo email sem acesso criado há mais de 6 meses: ${email} (criado em ${createdAt.toLocaleDateString()})`);
+              return false;
+            }
+          } else {
+            // Para emails antigos sem createdAt, assumir que são antigos e remover
+            console.log(`🗑️ Removendo email antigo sem registro de acesso: ${email}`);
+            return false;
+          }
+        } else {
+          // Se acessou há mais de 2 anos, remove
+          if (lastAccess < twoYearsAgo) {
+            console.log(`🗑️ Removendo email inativo há mais de 2 anos: ${email}`);
+            return false;
+          }
         }
         
         return true;
@@ -618,8 +629,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Email já está autorizado' });
       }
 
-      // Adicionar à lista
-      config.authorizedEmails.push(emailLower);
+      // Adicionar à lista com data de criação
+      const newEmail = {
+        email: emailLower,
+        name: emailLower.split('@')[0],
+        createdAt: new Date().toISOString()
+      };
+      config.authorizedEmails.push(newEmail);
       await saveEmailConfig(config);
 
       res.json({ success: true, message: 'Email adicionado com sucesso' });
