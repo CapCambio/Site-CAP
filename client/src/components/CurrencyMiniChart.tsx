@@ -211,6 +211,25 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             scale="point"
             tickMargin={5}
             height={25}
+            tickFormatter={(value, index, ticks) => {
+              // Detectar se é mobile (largura menor que 768px)
+              const isMobile = window.innerWidth < 768;
+              
+              if (!isMobile) {
+                // Desktop: mostrar todos os dias
+                return value;
+              }
+              
+              // Mobile: mostrar apenas dias ímpares + último dia do mês
+              const day = parseInt(value);
+              const isLastDay = day === daysInFullMonth;
+              const isOddDay = day % 2 === 1;
+              
+              if (isOddDay || isLastDay) {
+                return value;
+              }
+              return '';
+            }}
           />
           <YAxis 
             hide={true}
