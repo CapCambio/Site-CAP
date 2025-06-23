@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
+import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 import { useAuth } from "@/hooks/use-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -237,6 +238,9 @@ export default function LoginPage() {
           </div>
         </CardFooter>
       </Card>
+      
+      {/* Botão flutuante do WhatsApp para solicitar acesso */}
+      <WhatsAppFloatingButton />
     </div>
   );
 }

@@ -149,8 +149,7 @@ export default function Home() {
       <LoadingOverlay isVisible={isLoadingCurrencies} type={isRefreshing ? 'silent' : 'full'} />
       <Footer />
 
-      {/* Botão flutuante do WhatsApp - não aparece na aba de gerenciamento */}
-      {activeTab !== 'admin' && <WhatsAppFloatingButton />}
+      
 
       <Toaster />
     </div>
