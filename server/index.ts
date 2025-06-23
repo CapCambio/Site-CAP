@@ -21,7 +21,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 (async () => {
-  const server = registerRoutes(app);
+  const server = await registerRoutes(app);
 
   if (app.get("env") === "development") {
     await setupVite(app, server);

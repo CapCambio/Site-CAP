@@ -326,7 +326,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                   🗑️ Limpar Emails Inativos
                 </Button>
                 <p className="text-xs text-zinc-400 mt-2 text-center">
-                  Remove emails sem acesso há >6 meses ou inativos há >2 anos
+                  Remove emails sem acesso há {'>'} 6 meses ou inativos há {'>'} 2 anos
                 </p>
               </div>
             </CardContent>
