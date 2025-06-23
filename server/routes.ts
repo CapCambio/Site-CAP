@@ -352,6 +352,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }, 24 * 60 * 60 * 1000); // 24 horas
 
+  // Configurar limpeza automática de emails inativos a cada 7 dias
+  setInterval(async () => {
+    console.log('📧 Executando limpeza automática de emails inativos...');
+    try {
+      const removedCount = await cleanupInactiveEmails();
+      if (removedCount > 0) {
+        console.log(`📧 Limpeza de emails: ${removedCount} emails inativos removidos.`);
+      } else {
+        console.log('✅ Nenhum email inativo encontrado para remoção.');
+      }
+    } catch (error) {
+      console.error("Erro na limpeza automática de emails:", error);
+    }
+  }, 7 * 24 * 60 * 60 * 1000); // 7 dias
+
   // Health check endpoint
   app.get("/api/health", (req, res) => {
     res.json({ status: "OK", timestamp: new Date().toISOString() });
@@ -492,12 +507,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const authorizedEmails = loadAuthorizedEmails();
 
+      // Não permitir remoção de admins
+      if (type === "admin") {
+        return res.status(400).json({ error: "Não é possível remover emails de administrador" });
+      }
+
       if (type === "authorized") {
         authorizedEmails.authorizedEmails = authorizedEmails.authorizedEmails.filter(e => 
-          typeof e === 'string' ? e !== email : e.email !== email
-        );
-      } else if (type === "admin") {
-        authorizedEmails.adminEmails = authorizedEmails.adminEmails.filter(e => 
           typeof e === 'string' ? e !== email : e.email !== email
         );
       }
@@ -511,6 +527,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Erro ao remover email" });
     }
   });
+
+  // Função para limpeza automática de emails inativos
+  async function cleanupInactiveEmails() {
+    try {
+      const config = await loadEmailConfig();
+      const now = new Date();
+      const twoYearsAgo = new Date(now.getTime() - 2 * 365 * 24 * 60 * 60 * 1000); // 2 anos
+      const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000); // 6 meses
+      
+      let removedCount = 0;
+      
+      // Filtrar emails autorizados (não admins)
+      const originalCount = config.authorizedEmails.length;
+      
+      config.authorizedEmails = config.authorizedEmails.filter(user => {
+        const email = typeof user === 'string' ? user : user.email;
+        const lastAccess = typeof user === 'object' && user.lastAccess ? new Date(user.lastAccess) : null;
+        
+        // Se nunca acessou, só remove após 6 meses
+        if (!lastAccess) {
+          // Assumir que foi criado há mais de 6 meses se não tem lastAccess
+          return true; // Por enquanto não remove emails sem lastAccess
+        }
+        
+        // Se acessou há mais de 2 anos, remove
+        if (lastAccess < twoYearsAgo) {
+          console.log(`🗑️ Removendo email inativo há mais de 2 anos: ${email}`);
+          return false;
+        }
+        
+        return true;
+      });
+      
+      removedCount = originalCount - config.authorizedEmails.length;
+      
+      if (removedCount > 0) {
+        await saveEmailConfig(config);
+        console.log(`🧹 Limpeza de emails: ${removedCount} emails inativos removidos`);
+      }
+      
+      return removedCount;
+    } catch (error) {
+      console.error('Erro na limpeza de emails:', error);
+      return 0;
+    }
+  }
 
 
 
