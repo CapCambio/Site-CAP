@@ -102,7 +102,7 @@ export function Header() {
             {user && (
               <div className="flex items-center justify-center gap-3 -mt-1">
                 <span className="text-white text-sm">
-                  Olá {user.name || user.email}
+                  Olá {user?.name || user?.email || 'Usuário'}
                 </span>
                 {user.isAdmin && (
                   <button

@@ -81,15 +81,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const emailConfig = await loadEmailConfig();
       const emailLower = email.toLowerCase();
 
+      console.log("Login attempt for:", emailLower);
+      console.log("Config loaded:", JSON.stringify(emailConfig, null, 2));
+
       // Verificar se é admin
-      const isAdminEmail = emailConfig.adminEmails.some(admin => 
+      const adminUser = emailConfig.adminEmails.find(admin => 
         typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
       );
 
       // Verificar se é usuário autorizado
-      const isAuthorizedEmail = emailConfig.authorizedEmails.some(user => 
+      const regularUser = emailConfig.authorizedEmails.find(user => 
         typeof user === 'string' ? user === emailLower : user.email === emailLower
       );
+
+      const isAdminEmail = !!adminUser;
+      const isAuthorizedEmail = !!regularUser;
 
       if (!isAdminEmail && !isAuthorizedEmail) {
         return res.status(401).json({ error: "Email não autorizado" });
@@ -100,28 +106,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Senha incorreta para administrador" });
       }
 
-      // Encontrar o nome do usuário
-      let userName = emailLower.split('@')[0]; // fallback
-
+      // Determinar o nome do usuário
+      let userName;
+      
       if (isAdminEmail) {
-        const adminUser = emailConfig.adminEmails.find(admin => 
-          typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
-        );
-        if (adminUser && typeof adminUser === 'object' && adminUser.name) {
+        if (typeof adminUser === 'object' && adminUser.name) {
           userName = adminUser.name;
         } else {
           userName = 'CAP Câmbio';
         }
       } else {
-        const regularUser = emailConfig.authorizedEmails.find(user => 
-          typeof user === 'string' ? user === emailLower : user.email === emailLower
-        );
-        if (regularUser && typeof regularUser === 'object' && regularUser.name) {
+        if (typeof regularUser === 'object' && regularUser.name) {
           userName = regularUser.name;
         } else {
           userName = emailLower.split('@')[0];
         }
       }
+
+      console.log("User name resolved to:", userName);
         
       return res.json({
         user: {
