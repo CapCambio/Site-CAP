@@ -70,7 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/login", (req, res) => {
+  app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
 
@@ -78,32 +78,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email é obrigatório" });
       }
 
-      const { authorizedEmails, adminEmails } = loadAuthorizedEmails();
+      const emailConfig = await loadEmailConfig();
       const emailLower = email.toLowerCase();
 
-      // Verificar se o email está autorizado (como usuário comum ou admin)
-      const isAuthorizedUser = authorizedEmails.some(e => 
-        typeof e === 'string' ? e === emailLower : e.email === emailLower
-      );
-      const isAdminUser = adminEmails.some(e => 
-        typeof e === 'string' ? e === emailLower : e.email === emailLower
-      );
+      const isAdminEmail = emailConfig.adminEmails.some(adminEmail => adminEmail === emailLower);
+      const isAuthorizedEmail = emailConfig.authorizedEmails.some(authEmail => authEmail === emailLower);
 
-      if (!isAuthorizedUser && !isAdminUser) {
+      if (!isAdminEmail && !isAuthorizedEmail) {
         return res.status(401).json({ error: "Email não autorizado" });
       }
 
-      // Se for admin, verificar senha
-      if (isAdminUser) {
-        if (!password || password !== "passo2012") {
-          return res.status(401).json({ error: "Senha incorreta para administrador" });
-        }
+      if (isAdminEmail && password !== "passo2012") {
+        return res.status(401).json({ error: "Senha incorreta para administrador" });
       }
 
-      res.json({ 
-        success: true, 
-        isAdmin: isAdminUser,
-        email: emailLower
+      // Encontrar o nome do usuário
+      let userName = emailLower;
+
+      if (isAdminEmail) {
+        const adminUser = emailConfig.adminEmails.find(admin => admin === emailLower);
+        userName = 'Administrador CAP Câmbio';
+      } else {
+        const regularUser = emailConfig.authorizedEmails.find(user => user === emailLower);
+        userName = emailLower.split('@')[0];
+      }
+        
+      return res.json({
+        user: {
+          email: emailLower,
+          name: userName,
+          isAdmin: isAdminEmail
+        }
       });
     } catch (error) {
       console.error("Erro no login:", error);

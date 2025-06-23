@@ -100,27 +100,26 @@ export function Header() {
 
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
-              <div className="flex items-center gap-2 -mt-1">
+              <div className="flex items-center justify-center gap-3 -mt-1">
+                <span className="text-white text-sm">
+                  Olá {user.name || user.email}
+                </span>
                 {user.isAdmin && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <button
                     onClick={() => setShowAdminPanel(true)}
-                    className="text-white hover:bg-gray-800 p-1"
+                    className="text-white hover:text-[#f3b234] p-1 transition-colors duration-200"
                     title="Configurações"
                   >
                     <Settings className="h-4 w-4" />
-                  </Button>
+                  </button>
                 )}
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
                   onClick={logout}
-                  className="text-white hover:bg-gray-800 p-1"
+                  className="text-white hover:text-[#f3b234] p-1 transition-colors duration-200"
                   title="Sair"
                 >
                   <LogOut className="h-4 w-4" />
-                </Button>
+                </button>
               </div>
             )}
           </div>
