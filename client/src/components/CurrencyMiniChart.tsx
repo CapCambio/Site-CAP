@@ -206,7 +206,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             tick={{ fontSize: 8, fill: '#666' }}
             tickLine={false}
             axisLine={false}
-            interval="preserveStartEnd"
+            interval={0}
             type="category"
             scale="point"
             tickMargin={5}
