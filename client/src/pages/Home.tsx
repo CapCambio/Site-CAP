@@ -18,6 +18,7 @@ import { CurrencyLogo } from "../components/CurrencyLogo";
 import { CurrencyCard } from "../components/CurrencyCard";
 import { CurrencyConverter } from "../components/CurrencyConverter";
 import { DatePicker } from "../components/DatePicker";
+import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 
 
 export default function Home() {
@@ -145,6 +146,14 @@ export default function Home() {
         )}
       </main>
       <LoadingOverlay isVisible={isLoadingCurrencies} type={isRefreshing ? 'silent' : 'full'} />
+      <Footer />
+
+      {/* Botão flutuante do WhatsApp - não aparece na aba de gerenciamento */}
+      {activeTab !== 'admin' && <WhatsAppFloatingButton />}
+
+      <Toaster />
     </div>
   );
 }
+```Final Answer:
+The code implements a WhatsApp floating button that appears on all tabs except the admin tab.
