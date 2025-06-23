@@ -5,7 +5,6 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { CurrencyHistory } from '../lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { ptBR } from 'date-fns/locale';
-import { useIsMobile } from '../hooks/use-mobile';
 
 interface CurrencyMiniChartProps {
   currencyCode: string;
@@ -15,7 +14,6 @@ interface CurrencyMiniChartProps {
 
 export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
   const today = new Date();
-  const isMobile = useIsMobile();
   // Usar selectedDate se fornecida, senão usar hoje - mas sempre começar com o mês atual
   const initialMonth = selectedDate ? startOfMonth(selectedDate) : startOfMonth(today);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
@@ -210,26 +208,9 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             axisLine={false}
             interval={0}
             type="category"
-            scale="band"
-            padding={{ left: 0.02, right: 0.02 }}
+            scale="point"
             tickMargin={5}
             height={25}
-            tickFormatter={(value) => {
-              // Desktop: SEMPRE mostrar todos os dias
-              if (!isMobile) {
-                return value;
-              }
-
-              // Mobile: mostrar apenas dias ímpares + último dia do mês
-              const day = parseInt(value);
-              const isLastDay = day === daysInFullMonth;
-              const isOddDay = day % 2 === 1;
-
-              if (isOddDay || isLastDay) {
-                return value;
-              }
-              return '';
-            }}
           />
           <YAxis 
             hide={true}
