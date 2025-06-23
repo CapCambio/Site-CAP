@@ -206,11 +206,27 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             tick={{ fontSize: 8, fill: '#666' }}
             tickLine={false}
             axisLine={false}
-            interval={0}
+            interval="preserveStartEnd"
             type="category"
             scale="point"
             tickMargin={5}
             height={25}
+            tickFormatter={(value, index, ticks) => {
+              // Detectar se é mobile (largura menor que 768px)
+              const isMobile = window.innerWidth < 768;
+              
+              if (!isMobile) {
+                // Desktop: mostrar todos os dias
+                return value;
+              }
+              
+              // Mobile: mostrar apenas dias estratégicos
+              const day = parseInt(value);
+              if (day === 1 || day === 5 || day === 10 || day === 15 || day === 20 || day === 25 || day === 30 || day === 31) {
+                return value;
+              }
+              return '';
+            }}
           />
           <YAxis 
             hide={true}
