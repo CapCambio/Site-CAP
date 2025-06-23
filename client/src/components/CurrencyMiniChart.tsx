@@ -94,7 +94,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const daysInMonth = Array.from({ length: daysInFullMonth }, (_, i) => i + 1);
 
   // Mapear dados históricos para cada dia do mês
-  const chartData = daysInMonth.map(day => {
+  const allChartData = daysInMonth.map(day => {
     // Formatar o dia no formato "dd/MM"
     const dayDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day);
     const formattedDay = format(dayDate, 'dd/MM');
@@ -128,6 +128,16 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       sellPrice: historyEntry?.sellPrice || null
     };
   });
+
+  // Filtrar dados para mobile: apenas dias ímpares + último dia
+  const chartData = isMobile 
+    ? allChartData.filter(item => {
+        const day = parseInt(item.day);
+        const isLastDay = day === daysInFullMonth;
+        const isOddDay = day % 2 === 1;
+        return isOddDay || isLastDay;
+      })
+    : allChartData;
 
   if (isLoading) {
     return (
@@ -212,23 +222,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             scale="point"
             tickMargin={5}
             height={25}
-            tickFormatter={(value) => {
-              // Desktop: SEMPRE mostrar todos os dias
-              if (!isMobile) {
-                return value;
-              }
-
-              // Mobile: mostrar apenas dias ímpares + último dia do mês
-              const day = parseInt(value);
-              const isLastDay = day === daysInFullMonth;
-              const isOddDay = day % 2 === 1;
-
-              if (isOddDay || isLastDay) {
-                return value;
-              }
-
-              return '';
-            }}
           />
           <YAxis 
             hide={true}
