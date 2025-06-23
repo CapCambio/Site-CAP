@@ -210,7 +210,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             axisLine={false}
             interval={0}
             type="category"
-            scale="point"
+            scale="band"
+            padding={{ left: 0.02, right: 0.02 }}
             tickMargin={5}
             height={25}
             tickFormatter={(value) => {
