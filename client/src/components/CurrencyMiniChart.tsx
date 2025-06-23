@@ -194,7 +194,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       </div>
 
       <ResponsiveContainer width="100%" height={140}>
-        <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
+        <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 20 }}>
           <defs>
             <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#f3b234" stopOpacity={0.1}/>
@@ -203,12 +203,14 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </defs>
           <XAxis 
             dataKey="day"
-            tick={{ fontSize: 8 }}
+            tick={{ fontSize: 8, fill: '#666' }}
             tickLine={false}
             axisLine={false}
             interval={0}
             type="category"
             scale="point"
+            tickMargin={5}
+            height={25}
           />
           <YAxis 
             hide={true}
