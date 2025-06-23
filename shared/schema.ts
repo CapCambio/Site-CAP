@@ -1,10 +1,9 @@
-
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
 });
@@ -18,24 +17,15 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
 // Currency model
-export const currencies = sqliteTable("currencies", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const currencies = pgTable("currencies", {
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   code: text("code").notNull().unique(),
-  buyPrice: real("buy_price").notNull(),
-  sellPrice: real("sell_price").notNull(),
-  change: real("change"),
-  lastUpdate: integer("last_update", { mode: 'timestamp' }).notNull(),
-  displayOrder: integer("display_order").notNull().default(999),
-});
-
-// Currency history model
-export const currencyHistory = sqliteTable("currency_history", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  code: text("code").notNull(),
-  buyPrice: real("buy_price").notNull(),
-  sellPrice: real("sell_price").notNull(),
-  timestamp: integer("timestamp", { mode: 'timestamp' }).notNull(),
+  buyPrice: doublePrecision("buy_price").notNull(),
+  sellPrice: doublePrecision("sell_price").notNull(),
+  change: doublePrecision("change"),
+  lastUpdate: timestamp("last_update").notNull(),
+  displayOrder: integer("display_order").notNull().default(999), // Para manter a ordem exata da página fonte
 });
 
 export const insertCurrencySchema = createInsertSchema(currencies).pick({
@@ -48,6 +38,18 @@ export const insertCurrencySchema = createInsertSchema(currencies).pick({
   displayOrder: true,
 });
 
+export type InsertCurrency = z.infer<typeof insertCurrencySchema>;
+export type Currency = typeof currencies.$inferSelect;
+
+// Historical data model
+export const currencyHistory = pgTable("currency_history", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull(),
+  buyPrice: doublePrecision("buy_price").notNull(),
+  sellPrice: doublePrecision("sell_price").notNull(),
+  timestamp: timestamp("timestamp").notNull(),
+});
+
 export const insertCurrencyHistorySchema = createInsertSchema(currencyHistory).pick({
   code: true,
   buyPrice: true,
@@ -55,7 +57,13 @@ export const insertCurrencyHistorySchema = createInsertSchema(currencyHistory).p
   timestamp: true,
 });
 
-export type InsertCurrency = z.infer<typeof insertCurrencySchema>;
-export type Currency = typeof currencies.$inferSelect;
-export type CurrencyHistory = typeof currencyHistory.$inferSelect;
 export type InsertCurrencyHistory = z.infer<typeof insertCurrencyHistorySchema>;
+export type CurrencyHistory = typeof currencyHistory.$inferSelect;
+
+// Tipo para dados raspados da página fonte
+export interface ScrapedCurrency {
+  name: string;
+  code: string;
+  buyPrice: number;
+  sellPrice: number;
+}
