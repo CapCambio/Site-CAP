@@ -92,6 +92,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const fullMonthEnd = endOfMonth(selectedMonth);
   const daysInFullMonth = getDate(fullMonthEnd);
   const daysInMonth = Array.from({ length: daysInFullMonth }, (_, i) => i + 1);
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   // Mapear dados históricos para cada dia do mês
   const allChartData = daysInMonth.map(day => {
@@ -182,7 +183,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const minPrice = Math.min(...validPrices);
   const maxPrice = Math.max(...validPrices);
   const padding = (maxPrice - minPrice) * 0.1;
-  const isMobile =  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   return (
     <div className="w-full h-[180px]">
