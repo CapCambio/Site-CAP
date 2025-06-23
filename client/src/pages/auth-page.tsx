@@ -88,9 +88,10 @@ export default function LoginPage() {
     try {
       await login(values.email, values.password);
     } catch (error) {
-      // Se houver erro de senha incorreta, será tratado pelo hook useAuth
-      // mas vamos verificar se o erro foi de senha
-      setShowPasswordError(true);
+      // Verificar se é erro de senha incorreta
+      if (error instanceof Error && error.message.includes('Senha incorreta')) {
+        setShowPasswordError(true);
+      }
     }
   };
 

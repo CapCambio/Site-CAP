@@ -89,6 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
+      // Re-throw o erro para que possa ser capturado pelo componente
+      throw error;
     } finally {
       setIsLoading(false);
     }
