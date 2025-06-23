@@ -5,6 +5,7 @@ import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
 import { InsertCurrencyHistory } from "../shared/schema";
 import { jsonStorage } from "./json-storage";
 import { migrateToJSON } from "./migrate-to-json";
+import { alertSystem } from "./alert-system";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -669,6 +670,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rotas do sistema de alertas
+  
+  // Obter chave VAPID pública para push notifications
+  app.get('/api/alerts/vapid-key', (req, res) => {
+    res.json({ publicKey: alertSystem.getVapidPublicKey() });
+  });
+
+  // Registrar push subscription
+  app.post('/api/alerts/register-push', (req, res) => {
+    try {
+      const { email, subscription } = req.body;
+      alertSystem.registerPushSubscription(email, subscription);
+      res.json({ success: true, message: 'Push subscription registrada' });
+    } catch (error) {
+      res.status(500).json({ error: 'Erro ao registrar push subscription' });
+    }
+  });
+
+  // Criar alerta
+  app.post('/api/alerts/create', (req, res) => {
+    try {
+      const { email, currencyCode, limite, tipo } = req.body;
+      alertSystem.createAlert(email, currencyCode, limite, tipo);
+      res.json({ success: true, message: 'Alerta criado com sucesso' });
+    } catch (error) {
+      res.status(500).json({ error: 'Erro ao criar alerta' });
+    }
+  });
+
+  // Remover alerta
+  app.delete('/api/alerts/:email/:currencyCode', (req, res) => {
+    try {
+      const { email, currencyCode } = req.params;
+      alertSystem.removeAlert(email, currencyCode);
+      res.json({ success: true, message: 'Alerta removido' });
+    } catch (error) {
+      res.status(500).json({ error: 'Erro ao remover alerta' });
+    }
+  });
+
+  // Obter alertas do usuário
+  app.get('/api/alerts/:email', (req, res) => {
+    try {
+      const { email } = req.params;
+      const alerts = alertSystem.getUserAlerts(email);
+      res.json(alerts || { email, alerts: {} });
+    } catch (error) {
+      res.status(500).json({ error: 'Erro ao buscar alertas' });
+    }
+  });
+
+  // Obter todos os alertas (admin)
+  app.get('/api/alerts/admin/all', (req, res) => {
+    try {
+      const allAlerts = alertSystem.getAllAlerts();
+      res.json(allAlerts);
+    } catch (error) {
+      res.status(500).json({ error: 'Erro ao buscar alertas' });
+    }
+  });
+
   return server;
 }
 
@@ -722,6 +784,16 @@ async function refreshCurrencies() {
           (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
         change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
         change = Number(change.toFixed(2));
+      }
+
+      // Verifica alertas antes de salvar (usa preço anterior se disponível)
+      if (lastHistory && isNewPrice) {
+        await alertSystem.checkPriceAlerts(
+          currency.code, 
+          currency.buyPrice, 
+          currency.sellPrice, 
+          lastHistory.buyPrice
+        );
       }
 
       // Atualiza moeda sempre, mesmo que o preço não tenha mudado, para atualizar a variação

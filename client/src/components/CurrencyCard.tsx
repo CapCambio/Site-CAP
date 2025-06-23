@@ -1,11 +1,14 @@
-import { ArrowDown, ArrowUp, ChevronDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, Bell } from "lucide-react";
 import { Currency } from "../lib/types";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { CurrencyLogo } from "./CurrencyLogo";
+import { AlertModal } from "./AlertModal";
 import { formatCurrencyValue, formatPercentage } from "../lib/currency";
 import { CurrencyMiniChart } from "./CurrencyMiniChart";
 import { useIsMobile } from "../hooks/use-mobile";
 import { format, isSameDay } from 'date-fns';
+import { useState } from "react";
 
 interface CurrencyCardProps {
   currency: Currency;
@@ -30,6 +33,7 @@ export function CurrencyCard({
 }: CurrencyCardProps) {
   const { name, code, buyPrice, sellPrice, change } = currency;
   const isMobile = useIsMobile();
+  const [showAlertModal, setShowAlertModal] = useState(false);
 
   const isPositiveChange = change !== null && change > 0;
   const isNegativeChange = change !== null && change < 0;
@@ -52,9 +56,23 @@ export function CurrencyCard({
           <CurrencyLogo code={code} className="mr-3" />
           <h3 className="font-bold">{name}</h3>
         </div>
-        <span className="text-sm font-medium bg-[#f3b234] text-[#1a1a1a] px-2 py-1 rounded">
-          {code}
-        </span>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowAlertModal(true);
+            }}
+            className="h-8 w-8 p-0 hover:bg-gray-700 text-white"
+            title="Criar alerta de preço"
+          >
+            <Bell className="h-4 w-4" />
+          </Button>
+          <span className="text-sm font-medium bg-[#f3b234] text-[#1a1a1a] px-2 py-1 rounded">
+            {code}
+          </span>
+        </div>
       </div>
       <div className="p-4">
         <div className="flex justify-between mb-3">
@@ -124,12 +142,20 @@ export function CurrencyCard({
           <div className="mt-3 pt-3 border-t border-gray-200">
             <CurrencyMiniChart 
               currencyCode={currency.code} 
-              currentPrice={displaySellPrice}
+              currentPrice={displaySellPrice || undefined}
               selectedDate={selectedDate}
             />
           </div>
         )}
       </div>
+
+      {/* Modal de Alerta */}
+      <AlertModal
+        isOpen={showAlertModal}
+        onClose={() => setShowAlertModal(false)}
+        currencyCode={code}
+        currencyName={name}
+      />
     </Card>
   );
 }

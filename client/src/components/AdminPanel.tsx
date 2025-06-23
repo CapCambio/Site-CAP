@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Settings, Search, Trash2, LogOut, Edit } from "lucide-react";
+import { ArrowLeft, Settings, Search, Trash2, LogOut, Edit, Bell } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { AlertsPanel } from "./AlertsPanel";
 
 interface AuthorizedEmail {
   email: string;
@@ -482,6 +483,11 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
               )}
             </CardContent>
           </Card>
+
+          {/* Painel de Alertas do Usuário */}
+          <div className="mt-6">
+            <AlertsPanel />
+          </div>
         </main>
       </div>
     </div>
