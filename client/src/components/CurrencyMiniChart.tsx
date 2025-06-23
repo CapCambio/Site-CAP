@@ -49,7 +49,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     queryFn: async () => {
       const monthStartStr = monthStart.toISOString().split('T')[0];
       const monthEndStr = monthEnd.toISOString().split('T')[0];
-      
+
       const response = await fetch(
         `/api/history/${currencyCode}?startDate=${monthStartStr}&endDate=${monthEndStr}`
       );
@@ -194,7 +194,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       </div>
 
       <ResponsiveContainer width="100%" height={140}>
-        <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 20 }}>
+        <AreaChart data={chartData} margin={{ top: 5, right: 35, left: 35, bottom: 20 }}>
           <defs>
             <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#f3b234" stopOpacity={0.1}/>
@@ -211,22 +211,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             scale="point"
             tickMargin={5}
             height={25}
-            tickFormatter={(value, index, ticks) => {
-              // Detectar se é mobile (largura menor que 768px)
-              const isMobile = window.innerWidth < 768;
-              
-              if (!isMobile) {
-                // Desktop: mostrar todos os dias
-                return value;
-              }
-              
-              // Mobile: mostrar apenas dias estratégicos
-              const day = parseInt(value);
-              if (day === 1 || day === 5 || day === 10 || day === 15 || day === 20 || day === 25 || day === 30 || day === 31) {
-                return value;
-              }
-              return '';
-            }}
           />
           <YAxis 
             hide={true}
