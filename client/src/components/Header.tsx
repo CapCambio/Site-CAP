@@ -89,18 +89,18 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-[#000000] text-white px-4 py-1 shadow-md">
+      <header className="bg-[#000000] text-white px-4 py-3 shadow-md mb-6">
         <div className="container mx-auto">
           <div className="flex flex-col items-center">
             <img 
               src={capLogo} 
               alt="CAP Câmbio Logo" 
-              className="h-24 md:h-28"
+              className="h-24 md:h-28 mb-3"
             />
 
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
-              <div className="flex items-center justify-center gap-3 -mt-1">
+              <div className="flex items-center justify-center gap-3">
                 <span className="text-white text-sm">
                   Olá {user?.name || user?.email || 'Usuário'}
                 </span>
