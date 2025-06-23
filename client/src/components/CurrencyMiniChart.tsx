@@ -207,6 +207,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             tickLine={false}
             axisLine={false}
             interval={0}
+            type="category"
+            scale="point"
           />
           <YAxis 
             hide={true}
