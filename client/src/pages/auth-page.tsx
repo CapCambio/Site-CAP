@@ -25,6 +25,7 @@ export default function LoginPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const [showPasswordError, setShowPasswordError] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,17 +67,31 @@ export default function LoginPage() {
       const delayDebounceFn = setTimeout(() => {
         checkIfAdmin(watchEmail);
       }, 500);
+      
+      // Resetar erros quando email mudar
+      setShowValidationErrors(false);
+      setShowPasswordError(false);
 
       return () => clearTimeout(delayDebounceFn);
     }
   }, [watchEmail]);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (isAdmin && (!values.password || values.password.trim() === '')) {
       setShowValidationErrors(true);
       return;
     }
-    login(values.email, values.password);
+    
+    // Resetar erros antes de tentar login
+    setShowPasswordError(false);
+    
+    try {
+      await login(values.email, values.password);
+    } catch (error) {
+      // Se houver erro de senha incorreta, será tratado pelo hook useAuth
+      // mas vamos verificar se o erro foi de senha
+      setShowPasswordError(true);
+    }
   };
 
   // Verificar se já está autenticado
@@ -127,7 +142,7 @@ export default function LoginPage() {
                         type="password"
                         placeholder="Digite sua senha" 
                         className={`bg-zinc-800 text-white ${
-                          showValidationErrors && (!field.value || field.value.trim() === '') 
+                          (showValidationErrors && (!field.value || field.value.trim() === '')) || showPasswordError
                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
                             : 'border-zinc-700'
                         }`}
@@ -137,6 +152,9 @@ export default function LoginPage() {
                           if (showValidationErrors && e.target.value.trim()) {
                             setShowValidationErrors(false);
                           }
+                          if (showPasswordError) {
+                            setShowPasswordError(false);
+                          }
                         }}
                       />
                       </FormControl>
@@ -144,6 +162,11 @@ export default function LoginPage() {
                       {showValidationErrors && (!field.value || field.value.trim() === '') && (
                         <div className="text-red-500 text-sm">
                           Por favor, preencha a senha.
+                        </div>
+                      )}
+                      {showPasswordError && (
+                        <div className="text-red-500 text-sm">
+                          Senha incorreta.
                         </div>
                       )}
                     </FormItem>
@@ -166,11 +189,7 @@ export default function LoginPage() {
                 )}
               </Button>
 
-              {isAdmin && form.formState.errors.password && (
-                <div className="mt-4 text-red-500 text-sm">
-                  Senha incorreta
-                </div>
-              )}
+              
               {form.formState.isSubmitted && !isAuthorized && !isLoading && !isAdmin && (
                 <div className="mt-4 text-red-500 text-sm">
                   Parece que seu e-mail não está autorizado, solicite seu acesso online{" "}
