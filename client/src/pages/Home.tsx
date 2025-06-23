@@ -23,6 +23,8 @@ import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 import { Toaster } from "@/components/ui/toaster";
 import { TabNavigation } from "@/components/TabNavigation";
 import { NotificationSettings } from "@/components/NotificationSettings";
+import { AdminPanel } from "@/components/AdminPanel";
+import { useNotifications } from "../hooks/useNotifications";
 
 
 

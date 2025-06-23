@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { db } from "./db";
 import { currencies, currencyHistory } from "../shared/schema";
 import { eq, desc, gte, lte, and } from "drizzle-orm";
-import { refreshCurrencies } from "./scraper";
+import { refreshCurrencies, scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
 import { requestAccess, authenticateUser } from "./auth";
 import { notificationSystem } from "./notification-system";
 import fs from "fs";
@@ -709,95 +709,3 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return server;
 }
 
-// Função para atualizar as moedas (usada tanto no endpoint quanto no timer)
-async function refreshCurrencies() {
-  try {
-    const scrapedData = await scrapeCurrencyData();
-    const currentCurrencies = await storage.getAllCurrencies();
-    const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
-
-    const now = new Date();
-    const savedCurrencies: any[] = [];
-
-    for (const currency of updatedCurrencies) {
-      // Verifica se houve mudança real na cotação
-      const lastHistory = await storage.getLastCurrencyHistory(currency.code);
-      let isNewPrice = !lastHistory || 
-                      lastHistory.sellPrice !== currency.sellPrice || 
-                      lastHistory.buyPrice !== currency.buyPrice;
-
-      // Verifica se já foi registrado hoje (evitar múltiplos registros no mesmo dia)
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      const todayHistory = await db
-        .select()
-        .from(currencyHistory)
-        .where(
-          and(
-            eq(currencyHistory.code, currency.code),
-            gte(currencyHistory.timestamp, today),
-            lt(currencyHistory.timestamp, tomorrow)
-          )
-        )
-        .limit(1);
-
-      const hasRecordToday = todayHistory.length > 0;
-
-      // Forçamos o cálculo da variação para todas as moedas, independente se o preço mudou
-      // Busca o último registro com preço diferente para cálculo de variação (96 horas)
-      let previousHistories = await db
-        .select()
-        .from(currencyHistory)
-        .where(eq(currencyHistory.code, currency.code))
-        .orderBy(desc(currencyHistory.timestamp))
-        .limit(100);  // Pegamos vários registros para garantir que encontraremos um diferente
-
-      // Encontra o registro mais recente com preço diferente
-      let previousHistory = null;
-      if (previousHistories.length > 1) {
-        for (let i = 0; i < previousHistories.length; i++) {
-          if (previousHistories[i].sellPrice !== currency.sellPrice) {
-            previousHistory = previousHistories[i];
-            break;
-          }
-        }
-      }
-
-      // Calcula variação
-      let change = 0;
-      if (previousHistory && 
-          (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-        change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
-        change = Number(change.toFixed(2));
-      }
-
-      // Atualiza moeda sempre, mesmo que o preço não tenha mudado, para atualizar a variação
-      const savedCurrency = await storage.upsertCurrency({
-        ...currency,
-        change,
-        lastUpdate: now
-      });
-
-      // Adiciona ao histórico se for um novo preço OU se não há registro hoje
-      // Isso garante que sempre haja pelo menos 1 registro por dia
-      if ((isNewPrice || !hasRecordToday) && !hasRecordToday) {
-        await storage.addCurrencyHistory({
-          code: currency.code,
-          buyPrice: currency.buyPrice,
-          sellPrice: currency.sellPrice,
-          timestamp: now
-        });
-      }
-
-      savedCurrencies.push(savedCurrency);
-    }
-
-    return savedCurrencies;
-  } catch (error) {
-    console.error("Erro ao atualizar moedas:", error);
-    throw error;
-  }
-}
