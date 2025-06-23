@@ -81,13 +81,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const emailConfig = await loadEmailConfig();
       const emailLower = email.toLowerCase();
 
-      const isAdminEmail = emailConfig.adminEmails.some(adminEmail => adminEmail === emailLower);
-      const isAuthorizedEmail = emailConfig.authorizedEmails.some(authEmail => authEmail === emailLower);
+      // Verificar se é admin
+      const isAdminEmail = emailConfig.adminEmails.some(admin => 
+        typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
+      );
+
+      // Verificar se é usuário autorizado
+      const isAuthorizedEmail = emailConfig.authorizedEmails.some(user => 
+        typeof user === 'string' ? user === emailLower : user.email === emailLower
+      );
 
       if (!isAdminEmail && !isAuthorizedEmail) {
         return res.status(401).json({ error: "Email não autorizado" });
       }
 
+      // Verificar senha para admins
       if (isAdminEmail && password !== "passo2012") {
         return res.status(401).json({ error: "Senha incorreta para administrador" });
       }
