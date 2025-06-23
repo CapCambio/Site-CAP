@@ -74,3 +74,54 @@ export function useNotifications(userEmail: string | null) {
     }
   };
 }
+import { useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
+
+interface NotificationData {
+  type: string;
+  title: string;
+  message: string;
+  data?: any;
+  timestamp: string;
+}
+
+export function useNotifications() {
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [notifications, setNotifications] = useState<NotificationData[]>([]);
+
+  useEffect(() => {
+    const newSocket = io('/', {
+      autoConnect: false
+    });
+
+    newSocket.on('notification', (notification: NotificationData) => {
+      setNotifications(prev => [notification, ...prev.slice(0, 49)]); // Manter apenas 50 notificações
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.close();
+    };
+  }, []);
+
+  const subscribeToNotifications = (email: string) => {
+    if (socket) {
+      socket.connect();
+      socket.emit('subscribe', email);
+    }
+  };
+
+  const unsubscribe = () => {
+    if (socket) {
+      socket.disconnect();
+    }
+  };
+
+  return {
+    notifications,
+    subscribeToNotifications,
+    unsubscribe,
+    clearNotifications: () => setNotifications([])
+  };
+}

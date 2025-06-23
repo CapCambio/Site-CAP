@@ -1,7 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { Request, Response } from "express";
+import { db } from "./db";
+import { currencies, currencyHistory } from "../shared/schema";
+import { eq, desc, gte, lte, and } from "drizzle-orm";
 import { refreshCurrencies } from "./scraper";
-import { storage } from "./storage";
+import { requestAccess, authenticateUser } from "./auth";
 import { notificationSystem } from "./notification-system";
 import fs from "fs";
 import path from "path";
@@ -114,6 +118,37 @@ async function loadEmailConfig() {
   }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Notification routes
+  app.get("/api/notifications/preferences/:email", async (req: Request, res: Response) => {
+    try {
+      const { email } = req.params;
+      const preferences = notificationSystem.getUserPreferences(email);
+      res.json(preferences);
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao buscar preferências de notificação" });
+    }
+  });
+
+  app.post("/api/notifications/preferences", async (req: Request, res: Response) => {
+    try {
+      const { email, ...preferences } = req.body;
+      notificationSystem.updateUserPreferences(email, preferences);
+      res.json({ message: "Preferências atualizadas com sucesso" });
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao atualizar preferências de notificação" });
+    }
+  });
+
+  app.delete("/api/notifications/unsubscribe/:email", async (req: Request, res: Response) => {
+    try {
+      const { email } = req.params;
+      notificationSystem.unsubscribeUser(email);
+      res.json({ message: "Usuário removido das notificações" });
+    } catch (error) {
+      res.status(500).json({ message: "Erro ao remover usuário das notificações" });
+    }
+  });
+
   // Rotas de autenticação
   app.post("/api/auth/check-admin", (req, res) => {
     try {

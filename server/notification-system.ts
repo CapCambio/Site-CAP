@@ -4,6 +4,10 @@ import { Server as SocketIOServer } from 'socket.io';
 import { Server } from 'http';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 interface NotificationPreferences {
   email: string;
