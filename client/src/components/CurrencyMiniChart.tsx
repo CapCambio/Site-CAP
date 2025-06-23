@@ -63,15 +63,15 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     refetchOnWindowFocus: false,
   });
 
-  const isPreviousDisabled = isBefore(minDate, monthStart);
+  // Remover limitação de navegação - permitir navegar mesmo sem dados
+  const isPreviousDisabled = false; // Permitir sempre voltar
   const isNextDisabled = isSameDay(monthEnd, endOfMonth(today)) || isBefore(today, monthStart);
 
   const goToPreviousMonth = () => {
     const newDate = new Date(selectedMonth);
     newDate.setMonth(newDate.getMonth() - 1);
-    if (!isBefore(newDate, minDate)) {
-      setSelectedMonth(newDate);
-    }
+    // Sempre permitir voltar, mesmo sem dados
+    setSelectedMonth(newDate);
   };
 
   const goToNextMonth = () => {
