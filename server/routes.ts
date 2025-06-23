@@ -2,9 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
-import { InsertCurrencyHistory, currencyHistory } from "../shared/schema";
-import { eq, desc, and, lt, gte } from "drizzle-orm";
-import { db } from "./db";
+import { InsertCurrencyHistory } from "../shared/schema";
+import { jsonStorage } from "./json-storage";
+import { migrateToJSON } from "./migrate-to-json";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -13,16 +13,12 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Carregar emails autorizados
+// Usar sistema JSON integrado
 function loadAuthorizedEmails() {
-  try {
-    const configPath = path.join(__dirname, "config", "authorized-emails.json");
-    const data = fs.readFileSync(configPath, "utf8");
-    return JSON.parse(data);
-  } catch (error) {
-    console.error("Erro ao carregar emails autorizados:", error);
-    return { authorizedEmails: [], adminEmails: [] };
-  }
+  return {
+    authorizedEmails: jsonStorage.getAuthorizedEmails().filter(e => !e.isAdmin),
+    adminEmails: jsonStorage.getAuthorizedEmails().filter(e => e.isAdmin)
+  };
 }
 
 async function loadEmailConfig() {
@@ -699,28 +695,15 @@ async function refreshCurrencies() {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
       
-      const todayHistory = await db
-        .select()
-        .from(currencyHistory)
-        .where(
-          and(
-            eq(currencyHistory.code, currency.code),
-            gte(currencyHistory.timestamp, today),
-            lt(currencyHistory.timestamp, tomorrow)
-          )
-        )
-        .limit(1);
-      
+      const todayHistory = await storage.getCurrencyHistory(currency.code, today, tomorrow);
       const hasRecordToday = todayHistory.length > 0;
 
       // Forçamos o cálculo da variação para todas as moedas, independente se o preço mudou
       // Busca o último registro com preço diferente para cálculo de variação (96 horas)
-      let previousHistories = await db
-        .select()
-        .from(currencyHistory)
-        .where(eq(currencyHistory.code, currency.code))
-        .orderBy(desc(currencyHistory.timestamp))
-        .limit(100);  // Pegamos vários registros para garantir que encontraremos um diferente
+      const allHistory = await storage.getCurrencyHistory(currency.code);
+      const previousHistories = allHistory
+        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+        .slice(0, 100);
 
       // Encontra o registro mais recente com preço diferente
       let previousHistory = null;

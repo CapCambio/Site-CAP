@@ -1,0 +1,114 @@
+[
+  {
+    "id": 1,
+    "code": "USD",
+    "buyPrice": 5.5,
+    "sellPrice": 5.89,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 2,
+    "code": "EUR",
+    "buyPrice": 6.35,
+    "sellPrice": 6.82,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 3,
+    "code": "GBP",
+    "buyPrice": 7.3,
+    "sellPrice": 8.12,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 4,
+    "code": "AUD",
+    "buyPrice": 3.5,
+    "sellPrice": 3.91,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 5,
+    "code": "ARS",
+    "buyPrice": 0.005,
+    "sellPrice": 0.0068,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 6,
+    "code": "NZD",
+    "buyPrice": 3.25,
+    "sellPrice": 3.57,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 7,
+    "code": "CAD",
+    "buyPrice": 4,
+    "sellPrice": 4.41,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 8,
+    "code": "CHF",
+    "buyPrice": 6.65,
+    "sellPrice": 7.35,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 9,
+    "code": "UYU",
+    "buyPrice": 0.13,
+    "sellPrice": 0.17,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 10,
+    "code": "CLP",
+    "buyPrice": 0.0059,
+    "sellPrice": 0.007,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 11,
+    "code": "MXN",
+    "buyPrice": 0.28,
+    "sellPrice": 0.35,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 12,
+    "code": "COP",
+    "buyPrice": 0.0014,
+    "sellPrice": 0.00185,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 13,
+    "code": "CNY",
+    "buyPrice": 0.75,
+    "sellPrice": 0.89,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 14,
+    "code": "JPY",
+    "buyPrice": 0.033,
+    "sellPrice": 0.0433,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 15,
+    "code": "PEN",
+    "buyPrice": 1.63,
+    "sellPrice": 1.76,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  },
+  {
+    "id": 16,
+    "code": "ZAR",
+    "buyPrice": 0.28,
+    "sellPrice": 0.355,
+    "timestamp": "2025-06-23T21:00:18.461Z"
+  }
+]

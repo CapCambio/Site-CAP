@@ -1,0 +1,16 @@
+{
+  "authorized": [
+    {
+      "email": "capcambiocx@gmail.com",
+      "name": "CAP Câmbio Admin",
+      "isAdmin": true
+    }
+  ],
+  "admin": [
+    {
+      "email": "capcambiocx@gmail.com",
+      "name": "CAP Câmbio Admin",
+      "isAdmin": true
+    }
+  ]
+}

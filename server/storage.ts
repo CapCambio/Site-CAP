@@ -1,11 +1,9 @@
 import { 
-  users, currencies, currencyHistory,
   type User, type InsertUser, 
   type Currency, type InsertCurrency,
   type CurrencyHistory, type InsertCurrencyHistory
 } from "@shared/schema";
-import { db } from './db';
-import { eq, and, gte, lte, desc, not, lt } from 'drizzle-orm';
+import { jsonStorage } from './json-storage';
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -25,112 +23,47 @@ export interface IStorage {
 
 class Storage {
   async getAllCurrencies(): Promise<Currency[]> {
-    return await db.select().from(currencies).orderBy(currencies.displayOrder);
+    return await jsonStorage.getAllCurrencies();
   }
 
   async getCurrencyByCode(code: string): Promise<Currency | undefined> {
-    const result = await db.select().from(currencies).where(eq(currencies.code, code));
-    return result[0];
+    return await jsonStorage.getCurrencyByCode(code);
   }
 
   async upsertCurrency(insertCurrency: InsertCurrency): Promise<Currency> {
-    const existing = await this.getCurrencyByCode(insertCurrency.code);
-
-    if (existing) {
-      const [updated] = await db
-        .update(currencies)
-        .set(insertCurrency)
-        .where(eq(currencies.code, insertCurrency.code))
-        .returning();
-      return updated;
-    } else {
-      const [created] = await db
-        .insert(currencies)
-        .values(insertCurrency)
-        .returning();
-      return created;
-    }
+    return await jsonStorage.upsertCurrency(insertCurrency);
   }
 
   async getCurrencyHistory(code: string, startDate?: Date, endDate?: Date): Promise<CurrencyHistory[]> {
-    let query = db.select().from(currencyHistory);
-
-    const filters = [];
-    filters.push(eq(currencyHistory.code, code));
-
-    if (startDate) {
-      filters.push(gte(currencyHistory.timestamp, startDate));
-    }
-
-    if (endDate) {
-      filters.push(lte(currencyHistory.timestamp, endDate));
-    }
-
-    const result = await query.where(and(...filters)).orderBy(desc(currencyHistory.timestamp));
-
-    return result;
+    return await jsonStorage.getCurrencyHistory(code, startDate, endDate);
   }
 
   async addCurrencyHistory(insertHistory: InsertCurrencyHistory): Promise<CurrencyHistory> {
-    const [history] = await db
-      .insert(currencyHistory)
-      .values(insertHistory)
-      .returning();
-
-    return history;
+    return await jsonStorage.addCurrencyHistory(insertHistory);
   }
 
   async cleanupOldHistory(olderThan: Date): Promise<number> {
-    const result = await db
-      .delete(currencyHistory)
-      .where(lte(currencyHistory.timestamp, olderThan))
-      .returning();
-
-    return result.length;
+    return await jsonStorage.cleanupOldHistory(olderThan);
   }
+
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    return await jsonStorage.getUser(id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
+    return await jsonStorage.getUserByUsername(username);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
-    return user;
+    return await jsonStorage.createUser(insertUser);
   }
 
   async getLastCurrencyHistory(code: string): Promise<CurrencyHistory | undefined> {
-    const [history] = await db
-      .select()
-      .from(currencyHistory)
-      .where(eq(currencyHistory.code, code))
-      .orderBy(desc(currencyHistory.timestamp))
-      .limit(1);
-    
-    return history;
+    return await jsonStorage.getLastCurrencyHistory(code);
   }
 
   async getPreviousDifferentPrice(code: string, currentPrice: number): Promise<CurrencyHistory | undefined> {
-    const [history] = await db
-      .select()
-      .from(currencyHistory)
-      .where(
-        and(
-          eq(currencyHistory.code, code),
-          not(eq(currencyHistory.sellPrice, currentPrice))
-        )
-      )
-      .orderBy(desc(currencyHistory.timestamp))
-      .limit(1);
-    
-    return history;
+    return await jsonStorage.getPreviousDifferentPrice(code, currentPrice);
   }
 }
 
