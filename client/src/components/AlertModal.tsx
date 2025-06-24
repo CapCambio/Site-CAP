@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -19,13 +19,17 @@ interface AlertModalProps {
 interface CreateAlertData {
   email: string;
   currencyCode: string;
-  limite: number;
-  tipo: 'subida' | 'descida' | 'ambas';
+  tipo: 'subida' | 'descida' | 'valor-especifico';
+  valor?: number;
+  validade?: string | null;
 }
 
 export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: AlertModalProps) {
-  const [limite, setLimite] = useState("2");
-  const [tipo, setTipo] = useState<'subida' | 'descida' | 'ambas'>('ambas');
+  const [tipo, setTipo] = useState<'subida' | 'descida' | 'valor-especifico'>('subida');
+  const [valorEspecifico, setValorEspecifico] = useState("");
+  const [validade, setValidade] = useState("");
+  const [tempoIndeterminado, setTempoIndeterminado] = useState(false);
+  
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -41,14 +45,16 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
       return response.json();
     },
     onSuccess: () => {
+      const tipoTexto = tipo === 'subida' ? 'subidas' : tipo === 'descida' ? 'descidas' : 'valor específico';
+      const validadeTexto = tempoIndeterminado ? 'tempo indeterminado' : (validade ? `até ${validade}` : 'tempo indeterminado');
+      
       toast({
         title: "Alerta criado",
-        description: `Você será notificado quando ${currencyName} variar ${limite}% ou mais.`,
+        description: `Você será notificado sobre ${tipoTexto} de ${currencyName} ${validadeTexto}.`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/alerts', user?.email] });
       onClose();
-      setLimite("2");
-      setTipo('ambas');
+      resetForm();
     },
     onError: () => {
       toast({
@@ -58,6 +64,13 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
       });
     }
   });
+
+  const resetForm = () => {
+    setTipo('subida');
+    setValorEspecifico("");
+    setValidade("");
+    setTempoIndeterminado(false);
+  };
 
   const handleSubmit = async () => {
     if (!user?.email) {
@@ -69,14 +82,33 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
       return;
     }
 
-    const limiteNum = parseFloat(limite);
-    if (isNaN(limiteNum) || limiteNum <= 0) {
-      toast({
-        title: "Erro",
-        description: "Insira um limite válido maior que 0.",
-        variant: "destructive"
-      });
-      return;
+    // Validação para valor específico
+    if (tipo === 'valor-especifico') {
+      const valor = parseFloat(valorEspecifico);
+      if (isNaN(valor) || valor <= 0) {
+        toast({
+          title: "Erro",
+          description: "Insira um valor válido maior que 0.",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
+    // Validação de data
+    if (!tempoIndeterminado && validade) {
+      const dataValidade = new Date(validade);
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      
+      if (dataValidade < hoje) {
+        toast({
+          title: "Erro",
+          description: "A data de validade deve ser futura.",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     // Registrar notificações push se ainda não estiver registrado
@@ -85,8 +117,9 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
     createAlertMutation.mutate({
       email: user.email,
       currencyCode,
-      limite: limiteNum,
-      tipo
+      tipo,
+      valor: tipo === 'valor-especifico' ? parseFloat(valorEspecifico) : undefined,
+      validade: tempoIndeterminado ? null : (validade || null)
     });
   };
 
@@ -145,34 +178,69 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="limite">Limite de Variação (%)</Label>
-            <Input
-              id="limite"
-              type="number"
-              step="0.1"
-              min="0.1"
-              value={limite}
-              onChange={(e) => setLimite(e.target.value)}
-              placeholder="Ex: 2.5"
-              className="bg-zinc-800 border-zinc-700 text-white"
-            />
-            <p className="text-sm text-zinc-400">
-              Você será notificado quando a variação atingir este percentual.
-            </p>
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="tipo">Tipo de Alerta</Label>
-            <Select value={tipo} onValueChange={(value: 'subida' | 'descida' | 'ambas') => setTipo(value)}>
+            <Select value={tipo} onValueChange={(value: 'subida' | 'descida' | 'valor-especifico') => setTipo(value)}>
               <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-zinc-800 border-zinc-700">
-                <SelectItem value="ambas">Subida ou Descida</SelectItem>
-                <SelectItem value="subida">Apenas Subida</SelectItem>
-                <SelectItem value="descida">Apenas Descida</SelectItem>
+                <SelectItem value="subida">Subida</SelectItem>
+                <SelectItem value="descida">Descida</SelectItem>
+                <SelectItem value="valor-especifico">Valor Específico</SelectItem>
               </SelectContent>
             </Select>
+            <p className="text-sm text-zinc-400">
+              Os alertas se baseiam no preço de venda da moeda.
+            </p>
+          </div>
+
+          {tipo === 'valor-especifico' && (
+            <div className="space-y-2">
+              <Label htmlFor="valor">Valor Específico (R$)</Label>
+              <Input
+                id="valor"
+                type="number"
+                step="0.01"
+                min="0.01"
+                value={valorEspecifico}
+                onChange={(e) => setValorEspecifico(e.target.value)}
+                placeholder="Ex: 5.50"
+                className="bg-zinc-800 border-zinc-700 text-white"
+              />
+              <p className="text-sm text-zinc-400">
+                Você será notificado quando o preço atingir este valor.
+              </p>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label>Os alertas devem durar até:</Label>
+            <div className="flex items-center space-x-2">
+              <Input
+                type="date"
+                value={validade}
+                onChange={(e) => setValidade(e.target.value)}
+                disabled={tempoIndeterminado}
+                className="bg-zinc-800 border-zinc-700 text-white disabled:opacity-50"
+              />
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="tempo-indeterminado"
+                  checked={tempoIndeterminado}
+                  onChange={(e) => {
+                    setTempoIndeterminado(e.target.checked);
+                    if (e.target.checked) {
+                      setValidade("");
+                    }
+                  }}
+                  className="h-4 w-4"
+                />
+                <Label htmlFor="tempo-indeterminado" className="text-sm">
+                  Tempo indeterminado
+                </Label>
+              </div>
+            </div>
           </div>
 
           <div className="bg-zinc-800 p-3 rounded border border-zinc-700">
@@ -180,7 +248,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
               <strong>Como funciona:</strong><br/>
               • Você receberá email + notificação push<br/>
               • Alertas são verificados automaticamente<br/>
-              • Baseado na variação em relação ao último preço
+              • Baseado no preço de venda atual vs. anterior
             </p>
           </div>
         </div>
