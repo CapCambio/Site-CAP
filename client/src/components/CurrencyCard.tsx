@@ -64,9 +64,10 @@ export function CurrencyCard({
               e.stopPropagation();
               setShowAlertModal(true);
             }}
-            className="h-8 w-8 p-0 hover:bg-gray-700 text-white"
+            className="h-auto px-2 py-1 hover:bg-gray-700 text-white flex items-center gap-1"
             title="Criar alerta de preço"
           >
+            <span className="text-xs">Criar alerta</span>
             <Bell className="h-4 w-4" />
           </Button>
           <span className="text-sm font-medium bg-[#f3b234] text-[#1a1a1a] px-2 py-1 rounded">
