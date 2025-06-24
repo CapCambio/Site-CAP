@@ -184,9 +184,9 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-zinc-800 border-zinc-700">
-                <SelectItem value="subida" className="text-white focus:text-white">Subida</SelectItem>
-                <SelectItem value="descida" className="text-white focus:text-white">Descida</SelectItem>
-                <SelectItem value="valor-especifico" className="text-white focus:text-white">Valor Específico</SelectItem>
+                <SelectItem value="subida" className="text-white focus:text-black hover:text-black">Subida</SelectItem>
+                <SelectItem value="descida" className="text-white focus:text-black hover:text-black">Descida</SelectItem>
+                <SelectItem value="valor-especifico" className="text-white focus:text-black hover:text-black">Valor Específico</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-zinc-400">
@@ -258,7 +258,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
           <Button
             variant="outline"
             onClick={onClose}
-            className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
+            className="border-zinc-600 text-black hover:bg-zinc-800 hover:text-black"
           >
             Cancelar
           </Button>
