@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
   const [valorEspecifico, setValorEspecifico] = useState("");
   const [validade, setValidade] = useState("");
   const [tempoIndeterminado, setTempoIndeterminado] = useState(false);
-  
+
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -47,7 +46,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
     onSuccess: () => {
       const tipoTexto = tipo === 'subida' ? 'subidas' : tipo === 'descida' ? 'descidas' : 'valor específico';
       const validadeTexto = tempoIndeterminado ? 'tempo indeterminado' : (validade ? `até ${validade}` : 'tempo indeterminado');
-      
+
       toast({
         title: "Alerta criado",
         description: `Você será notificado sobre ${tipoTexto} de ${currencyName} ${validadeTexto}.`,
@@ -100,7 +99,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
       const dataValidade = new Date(validade);
       const hoje = new Date();
       hoje.setHours(0, 0, 0, 0);
-      
+
       if (dataValidade < hoje) {
         toast({
           title: "Erro",
@@ -175,7 +174,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
             Criar Alerta para {currencyName}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="tipo">Tipo de Alerta</Label>
@@ -215,6 +214,9 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
 
           <div className="space-y-2">
             <Label>Os alertas devem durar até:</Label>
+            <p className="text-xs text-zinc-400 md:hidden">
+              Selecione uma data (dd/mm/aaaa)
+            </p>
             <div className="flex items-center space-x-2">
               <Input
                 type="date"
@@ -222,7 +224,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
                 onChange={(e) => setValidade(e.target.value)}
                 disabled={tempoIndeterminado}
                 placeholder="dd/mm/aaaa"
-                className="bg-zinc-800 border-zinc-700 text-white disabled:opacity-50"
+                className="bg-zinc-800 border-zinc-700 text-white disabled:opacity-50 w-fit md:w-auto"
               />
               <div className="flex items-center space-x-2">
                 <input
