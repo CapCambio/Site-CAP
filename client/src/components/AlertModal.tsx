@@ -214,9 +214,6 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
 
           <div className="space-y-2">
             <Label>Os alertas devem durar até:</Label>
-            <p className="text-xs text-zinc-400 md:hidden">
-              Selecione uma data (dd/mm/aaaa)
-            </p>
             <div className="flex items-center space-x-2">
               <Input
                 type="date"
@@ -224,7 +221,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
                 onChange={(e) => setValidade(e.target.value)}
                 disabled={tempoIndeterminado}
                 placeholder="dd/mm/aaaa"
-                className="bg-zinc-800 border-zinc-700 text-white disabled:opacity-50 w-fit md:w-auto"
+                className="bg-zinc-800 border-zinc-700 text-white disabled:opacity-50 w-fit md:w-auto [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0"
               />
               <div className="flex items-center space-x-2">
                 <input
