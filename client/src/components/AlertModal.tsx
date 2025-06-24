@@ -184,9 +184,9 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-zinc-800 border-zinc-700">
-                <SelectItem value="subida">Subida</SelectItem>
-                <SelectItem value="descida">Descida</SelectItem>
-                <SelectItem value="valor-especifico">Valor Específico</SelectItem>
+                <SelectItem value="subida" className="text-white focus:text-white">Subida</SelectItem>
+                <SelectItem value="descida" className="text-white focus:text-white">Descida</SelectItem>
+                <SelectItem value="valor-especifico" className="text-white focus:text-white">Valor Específico</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-zinc-400">
@@ -221,6 +221,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
                 value={validade}
                 onChange={(e) => setValidade(e.target.value)}
                 disabled={tempoIndeterminado}
+                placeholder="dd/mm/aaaa"
                 className="bg-zinc-800 border-zinc-700 text-white disabled:opacity-50"
               />
               <div className="flex items-center space-x-2">
