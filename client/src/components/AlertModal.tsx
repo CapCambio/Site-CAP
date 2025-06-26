@@ -27,14 +27,14 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
   const [tipo, setTipo] = useState<'subida' | 'descida' | 'valor-especifico'>('subida');
   const [valorEspecifico, setValorEspecifico] = useState("");
   const [tempoIndeterminado, setTempoIndeterminado] = useState(true);
-  
+
   // Calcula a data de 1 mês à frente
   const getOneMonthAhead = () => {
     const date = new Date();
     date.setMonth(date.getMonth() + 1);
     return date.toISOString().split('T')[0];
   };
-  
+
   const [validade, setValidade] = useState(getOneMonthAhead());
 
   const { user } = useAuth();
@@ -53,11 +53,14 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
     },
     onSuccess: () => {
       const tipoTexto = tipo === 'subida' ? 'subidas' : tipo === 'descida' ? 'descidas' : 'valor específico';
-      const validadeTexto = tempoIndeterminado ? 'tempo indeterminado' : (validade ? `até ${validade}` : 'tempo indeterminado');
+      const validadeTexto = tempoIndeterminado 
+      ? 'por tempo indeterminado' 
+      : `até ${new Date(validade).toLocaleDateString('pt-BR')}`;
 
-      toast({
+    toast({
         title: "Alerta criado",
         description: `Você será notificado sobre ${tipoTexto} de ${currencyName} ${validadeTexto}.`,
+        duration: 4000,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/alerts', user?.email] });
       onClose();
