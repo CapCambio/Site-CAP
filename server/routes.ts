@@ -533,17 +533,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const now = new Date();
       const twoYearsAgo = new Date(now.getTime() - 2 * 365 * 24 * 60 * 60 * 1000); // 2 anos
       const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000); // 6 meses
-      
+
       let removedCount = 0;
-      
+
       // Filtrar emails autorizados (não admins)
       const originalCount = config.authorizedEmails.length;
-      
+
       config.authorizedEmails = config.authorizedEmails.filter(user => {
         const email = typeof user === 'string' ? user : user.email;
         const lastAccess = typeof user === 'object' && user.lastAccess ? new Date(user.lastAccess) : null;
         const createdAt = typeof user === 'object' && user.createdAt ? new Date(user.createdAt) : null;
-        
+
         // Se nunca acessou, verificar data de criação
         if (!lastAccess) {
           if (createdAt) {
@@ -564,17 +564,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return false;
           }
         }
-        
+
         return true;
       });
-      
+
       removedCount = originalCount - config.authorizedEmails.length;
-      
+
       if (removedCount > 0) {
         await saveEmailConfig(config);
         console.log(`🧹 Limpeza de emails: ${removedCount} emails inativos removidos`);
       }
-      
+
       return removedCount;
     } catch (error) {
       console.error('Erro na limpeza de emails:', error);
@@ -671,7 +671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Rotas do sistema de alertas
-  
+
   // Obter chave VAPID pública para push notifications
   app.get('/api/alerts/vapid-key', (req, res) => {
     res.json({ publicKey: alertSystem.getVapidPublicKey() });
@@ -689,13 +689,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Criar alerta
-  app.post('/api/alerts/create', (req, res) => {
+  app.post("/api/alerts/create", (req, res) => {
     try {
-      const { email, currencyCode, limite, tipo } = req.body;
-      alertSystem.createAlert(email, currencyCode, limite, tipo);
-      res.json({ success: true, message: 'Alerta criado com sucesso' });
+      const { email, currencyCode, limite, tipo, valor, validade } = req.body;
+
+      if (!email || !currencyCode || !tipo) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      alertSystem.createAlert(email, currencyCode, limite || 0, tipo, valor, validade);
+
+      res.json({ success: true, message: "Alerta criado com sucesso!" });
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao criar alerta' });
+      console.error("Erro ao criar alerta:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
@@ -756,7 +763,7 @@ async function refreshCurrencies() {
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      
+
       const todayHistory = await storage.getCurrencyHistory(currency.code, today, tomorrow);
       const hasRecordToday = todayHistory.length > 0;
 

@@ -87,7 +87,7 @@ class AlertSystem {
   }
 
   // Criar ou atualizar alerta
-  createAlert(email: string, currencyCode: string, limite: number, tipo: 'subida' | 'descida' | 'ambas') {
+  createAlert(email: string, currencyCode: string, limite: number, tipo: 'subida' | 'descida' | 'ambas' | 'valor-especifico', valor?: number, validade?: string | null) {
     if (!this.data[email]) {
       this.data[email] = {
         email,
@@ -95,11 +95,21 @@ class AlertSystem {
       };
     }
 
-    this.data[email].alerts[currencyCode] = {
+    const alertData: any = {
       limite,
       tipo,
       ativo: true
     };
+
+    if (tipo === 'valor-especifico' && valor !== undefined) {
+      alertData.valor = valor;
+    }
+
+    if (validade !== undefined) {
+      alertData.validade = validade;
+    }
+
+    this.data[email].alerts[currencyCode] = alertData;
 
     this.saveAlerts();
     console.log(`📢 Alerta criado: ${email} - ${currencyCode} (${limite}% - ${tipo})`);

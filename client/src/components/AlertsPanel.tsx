@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 
 interface UserAlert {
-  limite: number;
+  limite?: number;
   tipo: 'subida' | 'descida' | 'valor-especifico';
   valor?: number;
   validade?: string | null;
@@ -97,7 +97,8 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
       case 'descida':
         return 'Descida';
       case 'valor-especifico':
-        return `Quando chegar em R$ ${(alert?.valor || alert?.limite)?.toFixed(2) || '0,00'}`;
+        const valor = alert?.valor || alert?.limite || 0;
+        return `Quando chegar em R$ ${valor.toFixed(2).replace('.', ',')}`;
       default:
         return 'Ambas';
     }
