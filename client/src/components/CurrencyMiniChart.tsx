@@ -130,15 +130,18 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     };
   });
 
-  // Filtrar dados para mobile: apenas dias ímpares + último dia
-  const chartData = isMobile 
+  // Para mobile: usar todos os dados no gráfico, mas filtrar apenas os ticks do eixo X
+  const chartData = allChartData;
+  
+  // Filtrar apenas os ticks da legenda para mobile
+  const xAxisTicks = isMobile 
     ? allChartData.filter(item => {
         const day = parseInt(item.day);
         const isLastDay = day === daysInFullMonth;
         const isOddDay = day % 2 === 1;
         return isOddDay || isLastDay;
-      })
-    : allChartData;
+      }).map(item => item.day)
+    : undefined;
 
   if (isLoading) {
     return (
@@ -222,6 +225,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             scale="point"
             tickMargin={5}
             height={25}
+            ticks={xAxisTicks}
           />
           <YAxis 
             hide={true}
