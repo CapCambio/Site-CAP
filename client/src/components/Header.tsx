@@ -110,10 +110,11 @@ export function Header() {
                     onClick={() => setShowAlertsPanel(true)}
                     variant="ghost"
                     size="sm"
-                    className="text-yellow-400 hover:text-yellow-300 hover:bg-zinc-800 relative"
+                    className="text-white hover:text-yellow-400 hover:bg-zinc-800 relative"
                     title="Meus Alertas"
                   >
-                    <Bell className="h-5 w-5" />
+                    <Bell className="h-5 w-5 mr-2" />
+                    Meus Alertas
                     {alertCount > 0 && (
                       <Badge 
                         variant="destructive" 
@@ -128,7 +129,7 @@ export function Header() {
                       onClick={() => setShowAdminPanel(true)}
                       variant="ghost"
                       size="sm"
-                      className="text-yellow-400 hover:text-yellow-300 hover:bg-zinc-800"
+                      className="text-white hover:text-yellow-400 hover:bg-zinc-800"
                       title="Configurações"
                     >
                       <Settings className="h-5 w-5" />
@@ -138,10 +139,11 @@ export function Header() {
                     onClick={logout}
                     variant="ghost"
                     size="sm"
-                    className="text-yellow-400 hover:text-yellow-300 hover:bg-zinc-800"
+                    className="text-white hover:text-yellow-400 hover:bg-zinc-800"
                     title="Sair"
                   >
-                    <LogOut className="h-5 w-5" />
+                    <LogOut className="h-5 w-5 mr-2" />
+                    Sair
                   </Button>
                 </div>
               </div>
