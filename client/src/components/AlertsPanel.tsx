@@ -60,10 +60,6 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
       return response.json();
     },
     onSuccess: (_, { currencyCode }) => {
-      toast({
-        title: "Alerta removido",
-        description: `Alerta para ${currencyCode} foi removido com sucesso.`,
-      });
       queryClient.invalidateQueries({ queryKey: ['/api/alerts', user?.email] });
     },
     onError: () => {
