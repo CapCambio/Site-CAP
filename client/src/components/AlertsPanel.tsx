@@ -185,7 +185,7 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="bg-yellow-500 text-black rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">2</span>
-                        Clique no botão "Criar alerta" <Bell className="h-4 w-4 inline mx-1" /> em qualquer moeda
+                        Clique no botão " Criar alerta<Bell className="h-4 w-4 inline mx-0"/>" em qualquer moeda
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="bg-yellow-500 text-black rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">3</span>
