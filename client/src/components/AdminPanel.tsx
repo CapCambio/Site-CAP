@@ -57,17 +57,21 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
       const response = await fetch(`/api/admin/emails?page=${page}&limit=${itemsPerPage}`);
       if (response.ok) {
         const data = await response.json();
+        console.log('Dados recebidos da API:', data);
         
         const allEmails: AuthorizedEmail[] = data.emails.map((item: any) => ({
           email: item.email,
-          name: item.name,
-          isAdmin: item.isAdmin,
+          name: item.name || 'Sem nome',
+          isAdmin: item.isAdmin || false,
           lastAccess: item.lastAccess ? new Date(item.lastAccess).toLocaleString('pt-BR') : undefined
         }));
 
+        console.log('Emails processados:', allEmails);
         setAuthorizedEmails(allEmails);
         setPagination(data.pagination);
         setCurrentPage(page);
+      } else {
+        console.error('Erro na resposta da API:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Erro ao carregar emails:', error);
@@ -380,7 +384,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                           <div className="flex items-center space-x-4 min-w-0 flex-1">
                             <div className="min-w-0 flex-1">
                               <h4 className="font-medium text-white truncate">{item.email}</h4>
-                              <p className="text-sm text-zinc-300">{item.name}</p>
+                              <p className="text-sm text-zinc-300">{item.name || 'Sem nome'}</p>
                             </div>
                             {item.isAdmin && (
                               <span className="px-2 py-1 text-xs text-yellow-500 bg-yellow-500/10 rounded-full whitespace-nowrap">
@@ -390,7 +394,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                           </div>
                           <div className="flex items-center justify-between sm:justify-end space-x-2">
                             <span className="text-xs sm:text-sm text-zinc-400 truncate">
-                              {item.lastAccess ? `Último acesso: ${item.lastAccess}` : "Nunca acessou"}
+                              {item.lastAccess ? `Último acesso: ${new Date(item.lastAccess).toLocaleString('pt-BR')}` : "Nunca acessou"}
                             </span>
                             <div className="flex space-x-1">
                               {!item.isAdmin && (

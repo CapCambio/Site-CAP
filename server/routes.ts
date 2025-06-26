@@ -383,14 +383,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const allEmails = [
         ...authorizedEmails.authorizedEmails.map((item: any) => ({
           email: typeof item === 'string' ? item : item.email,
-          name: typeof item === 'string' ? 'Cliente' : item.name,
-          lastAccess: typeof item === 'object' ? item.lastAccess : null,
+          name: typeof item === 'string' ? 'Cliente' : (item.name || 'Cliente'),
+          lastAccess: typeof item === 'object' && item.lastAccess ? item.lastAccess : null,
           isAdmin: false
         })),
         ...authorizedEmails.adminEmails.map((item: any) => ({
           email: typeof item === 'string' ? item : item.email,
-          name: typeof item === 'string' ? 'CAP Câmbio' : item.name,
-          lastAccess: typeof item === 'object' ? item.lastAccess : null,
+          name: typeof item === 'string' ? 'CAP Câmbio' : (item.name || 'CAP Câmbio'),
+          lastAccess: typeof item === 'object' && item.lastAccess ? item.lastAccess : null,
           isAdmin: true
         }))
       ];
