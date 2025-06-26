@@ -264,7 +264,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
           <Button
             onClick={handleSubmit}
             disabled={createAlertMutation.isPending}
-            className="bg-yellow-500 hover:bg-yellow-400 text-black focus:ring-yellow-400 focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900"
+            className="bg-yellow-500 hover:bg-yellow-600 text-black"
           >
             {createAlertMutation.isPending ? "Criando..." : "Criar Alerta"}
           </Button>
