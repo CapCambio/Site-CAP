@@ -9,6 +9,7 @@ import { CurrencyMiniChart } from "./CurrencyMiniChart";
 import { useIsMobile } from "../hooks/use-mobile";
 import { format, isSameDay } from 'date-fns';
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 interface CurrencyCardProps {
   currency: Currency;
@@ -34,6 +35,7 @@ export function CurrencyCard({
   const { name, code, buyPrice, sellPrice, change } = currency;
   const isMobile = useIsMobile();
   const [showAlertModal, setShowAlertModal] = useState(false);
+  const { user } = useAuth();
 
   const isPositiveChange = change !== null && change > 0;
   const isNegativeChange = change !== null && change < 0;
@@ -57,19 +59,21 @@ export function CurrencyCard({
           <h3 className="font-bold">{name}</h3>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowAlertModal(true);
-            }}
-            className="h-auto px-2 py-1 hover:bg-yellow-500/20 hover:text-white text-white flex items-center gap-1"
-            title="Criar alerta de preço"
-          >
-            <span className="text-xs">Criar alerta</span>
-            <Bell className="h-4 w-4" />
-          </Button>
+          {!user?.isAdmin && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAlertModal(true);
+              }}
+              className="h-auto px-2 py-1 hover:bg-yellow-500/20 hover:text-white text-white flex items-center gap-1"
+              title="Criar alerta de preço"
+            >
+              <span className="text-xs">Criar alerta</span>
+              <Bell className="h-4 w-4" />
+            </Button>
+          )}
           <span className="text-sm font-medium bg-[#f3b234] text-[#1a1a1a] px-2 py-1 rounded">
             {code}
           </span>

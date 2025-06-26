@@ -106,24 +106,26 @@ export function Header() {
                   Olá {user?.name || 'Usuário'}
                 </span>
                 <div className="flex items-center justify-center gap-3">
-                  <Button
-                    onClick={() => setShowAlertsPanel(true)}
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:text-yellow-400 hover:bg-zinc-800 relative"
-                    title="Meus Alertas"
-                  >
-                    Meus Alertas
-                    <Bell className="h-5 w-5 ml-1" />
-                    {alertCount > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-red-600"
-                      >
-                        {alertCount}
-                      </Badge>
-                    )}
-                  </Button>
+                  {!user.isAdmin && (
+                    <Button
+                      onClick={() => setShowAlertsPanel(true)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:text-yellow-400 hover:bg-zinc-800 relative"
+                      title="Meus Alertas"
+                    >
+                      Meus Alertas
+                      <Bell className="h-5 w-5 ml-1" />
+                      {alertCount > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-red-600"
+                        >
+                          {alertCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  )}
                   {user.isAdmin && (
                     <Button
                       onClick={() => setShowAdminPanel(true)}
