@@ -2,9 +2,17 @@
   "mateus.m2o@live.com": {
     "email": "mateus.m2o@live.com",
     "alerts": {
-      "USD": {
-        "tipo": "valor-especifico",
-        "ativo": true
+      "GBP": {
+        "limite": 0,
+        "tipo": "subida",
+        "ativo": true,
+        "validade": null
+      },
+      "AUD": {
+        "limite": 0,
+        "tipo": "subida",
+        "ativo": true,
+        "validade": "2026-07-26"
       }
     }
   }
