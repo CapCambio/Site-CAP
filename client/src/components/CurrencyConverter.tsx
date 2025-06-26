@@ -136,13 +136,13 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1">
-            <div className="flex items-center mb-2">
+            <div className="flex items-center justify-center mb-2">
               <button
                 onClick={() => setMode("tenho")}
                 className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-colors ${
                   mode === "tenho" 
                     ? "bg-[#f3b234] text-[#1a1a1a]" 
-                    : "bg-gray-600 text-white hover:bg-gray-500"
+                    : "bg-black text-white hover:bg-gray-800"
                 }`}
               >
                 Tenho
@@ -152,7 +152,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-colors ${
                   mode === "preciso" 
                     ? "bg-[#f3b234] text-[#1a1a1a]" 
-                    : "bg-gray-600 text-white hover:bg-gray-500"
+                    : "bg-black text-white hover:bg-gray-800"
                 }`}
               >
                 Preciso de
@@ -241,6 +241,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           <div className="relative flex-1">
+            <div className="mb-2 h-6"></div>
             <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem] mt-3 sm:mt-0">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
