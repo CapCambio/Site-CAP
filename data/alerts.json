@@ -1,6 +1,11 @@
 {
   "mateus.m2o@live.com": {
     "email": "mateus.m2o@live.com",
-    "alerts": {}
+    "alerts": {
+      "USD": {
+        "tipo": "valor-especifico",
+        "ativo": true
+      }
+    }
   }
 }
