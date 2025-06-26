@@ -113,8 +113,8 @@ export function Header() {
                     className="text-white hover:text-yellow-400 hover:bg-zinc-800 relative"
                     title="Meus Alertas"
                   >
-                    <Bell className="h-5 w-5 mr-2" />
                     Meus Alertas
+                    <Bell className="h-5 w-5 ml-1" />
                     {alertCount > 0 && (
                       <Badge 
                         variant="destructive" 
@@ -142,8 +142,8 @@ export function Header() {
                     className="text-white hover:text-yellow-400 hover:bg-zinc-800"
                     title="Sair"
                   >
-                    <LogOut className="h-5 w-5 mr-2" />
                     Sair
+                    <LogOut className="h-5 w-5 ml-1" />
                   </Button>
                 </div>
               </div>
