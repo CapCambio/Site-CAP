@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { LogOut, Settings, Bell } from "lucide-react";
 import { useState } from "react";
 import AdminPanel from "./AdminPanel";
+import { AlertsPanel } from "./AlertsPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -87,6 +88,10 @@ export function Header() {
 
    if (showAdminPanel) {
         return <AdminPanel onClose={() => setShowAdminPanel(false)} />;
+    }
+
+    if (showAlertsPanel) {
+        return <AlertsPanel isOpen={showAlertsPanel} onClose={() => setShowAlertsPanel(false)} />;
     }
 
   return (
