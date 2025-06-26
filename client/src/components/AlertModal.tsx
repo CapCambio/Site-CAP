@@ -265,7 +265,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
           <Button
             variant="outline"
             onClick={onClose}
-            className="border-zinc-600 text-white bg-zinc-800 hover:bg-zinc-700 hover:text-white"
+            className="border-zinc-600 text-black bg-white hover:bg-zinc-200 hover:text-black"
           >
             Cancelar
           </Button>
