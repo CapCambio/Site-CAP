@@ -1,7 +1,8 @@
 import capLogo from "@assets/cap logo fundo.png";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { LogOut, Settings } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { LogOut, Settings, Bell } from "lucide-react";
 import { useState } from "react";
 import AdminPanel from "./AdminPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -12,6 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 export function Header() {
   const { user, logout, showAdminPanel, setShowAdminPanel } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showAlertsPanel, setShowAlertsPanel] = useState(false);
+  const [alertCount, setAlertCount] = useState(0);
   const [emails, setEmails] = useState({ authorized: [], admin: [] });
   const [newEmail, setNewEmail] = useState("");
   const [emailType, setEmailType] = useState<"authorized" | "admin">("authorized");
@@ -96,29 +99,51 @@ export function Header() {
               alt="CAP Câmbio Logo" 
               className="h-24 md:h-28 mb-1"
             />
-
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex flex-col items-center gap-2">
                 <span className="text-white text-sm">
-                  Olá {user?.name || user?.email || 'Usuário'}
+                  Olá {user?.name || 'Usuário'}
                 </span>
-                {user.isAdmin && (
-                  <button
-                    onClick={() => setShowAdminPanel(true)}
-                    className="text-white hover:text-[#f3b234] p-1 transition-colors duration-200"
-                    title="Configurações"
+                <div className="flex items-center justify-center gap-3">
+                  <Button
+                    onClick={() => setShowAlertsPanel(true)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-yellow-400 hover:text-yellow-300 hover:bg-zinc-800 relative"
+                    title="Meus Alertas"
                   >
-                    <Settings className="h-4 w-4" />
-                  </button>
-                )}
-                <button
-                  onClick={logout}
-                  className="text-white hover:text-[#f3b234] p-1 transition-colors duration-200"
-                  title="Sair"
-                >
-                  <LogOut className="h-4 w-4" />
-                </button>
+                    <Bell className="h-5 w-5" />
+                    {alertCount > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-red-600"
+                      >
+                        {alertCount}
+                      </Badge>
+                    )}
+                  </Button>
+                  {user.isAdmin && (
+                    <Button
+                      onClick={() => setShowAdminPanel(true)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-yellow-400 hover:text-yellow-300 hover:bg-zinc-800"
+                      title="Configurações"
+                    >
+                      <Settings className="h-5 w-5" />
+                    </Button>
+                  )}
+                  <Button
+                    onClick={logout}
+                    variant="ghost"
+                    size="sm"
+                    className="text-yellow-400 hover:text-yellow-300 hover:bg-zinc-800"
+                    title="Sair"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </div>
               </div>
             )}
           </div>
