@@ -242,7 +242,7 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
                       setValidade(getOneMonthAhead());
                     }
                   }}
-                  className="h-4 w-4"
+                  className="h-4 w-4 accent-yellow-500"
                 />
                 <Label htmlFor="tempo-indeterminado" className="text-sm">
                   Tempo indeterminado

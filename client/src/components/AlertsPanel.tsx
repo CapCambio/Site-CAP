@@ -97,7 +97,7 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
       case 'descida':
         return 'Descida';
       case 'valor-especifico':
-        return `Quando chegar em R$ ${alert?.valor?.toFixed(2) || '0,00'}`;
+        return `Quando chegar em R$ ${(alert?.valor || alert?.limite)?.toFixed(2) || '0,00'}`;
       default:
         return 'Ambas';
     }
