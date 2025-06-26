@@ -147,21 +147,6 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
 
         {/* Main Content */}
         <main className="container mx-auto py-4 sm:py-8 px-4">
-          {/* Título e Descrição */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-white">Gerenciar Alertas</h2>
-              <p className="text-zinc-300 mt-1 text-sm sm:text-base">
-                Visualize e gerencie todos os seus alertas de variação de moedas configurados.
-              </p>
-            </div>
-
-            <div className="flex items-center space-x-2 text-zinc-300 mt-4 sm:mt-0">
-              <Bell className="h-5 w-5" />
-              <span className="text-sm sm:text-base">CAP Câmbio - Alertas</span>
-            </div>
-          </div>
-
           {/* Card principal */}
           <Card className="bg-zinc-900 border-yellow-500/20">
             <CardContent className="p-4 sm:p-6">
@@ -229,10 +214,9 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
                           
                           <div className="flex gap-3 items-center flex-wrap">
                             <div className="text-center">
-                              <Badge variant="outline" className="text-zinc-300 border-zinc-500 mb-1">
+                              <Badge variant="outline" className="text-zinc-300 border-zinc-500">
                                 {getTipoLabel(alert.tipo, alert)}
                               </Badge>
-                              <p className="text-xs text-zinc-500">Tipo</p>
                             </div>
                           </div>
                         </div>
