@@ -139,20 +139,20 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             <div className="flex items-center justify-center mb-2">
               <button
                 onClick={() => setMode("tenho")}
-                className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-150 ${
                   mode === "tenho" 
-                    ? "bg-[#f3b234] text-[#1a1a1a] shadow-inner transform translate-y-0.5" 
-                    : "bg-white text-black hover:bg-gray-100 shadow-md transform translate-y-0"
+                    ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
+                    : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
                 }`}
               >
                 Tenho
               </button>
               <button
                 onClick={() => setMode("preciso")}
-                className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-all duration-150 ${
                   mode === "preciso" 
-                    ? "bg-[#f3b234] text-[#1a1a1a] shadow-inner transform translate-y-0.5" 
-                    : "bg-white text-black hover:bg-gray-100 shadow-md transform translate-y-0"
+                    ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
+                    : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
                 }`}
               >
                 Preciso de
