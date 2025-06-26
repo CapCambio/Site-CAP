@@ -142,7 +142,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-colors ${
                   mode === "tenho" 
                     ? "bg-[#f3b234] text-[#1a1a1a]" 
-                    : "bg-black text-white hover:bg-gray-800"
+                    : "bg-white text-black hover:bg-gray-100"
                 }`}
               >
                 Tenho
@@ -152,7 +152,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-colors ${
                   mode === "preciso" 
                     ? "bg-[#f3b234] text-[#1a1a1a]" 
-                    : "bg-black text-white hover:bg-gray-800"
+                    : "bg-white text-black hover:bg-gray-100"
                 }`}
               >
                 Preciso de
