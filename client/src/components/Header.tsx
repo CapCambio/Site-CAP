@@ -132,9 +132,10 @@ export function Header() {
                       variant="ghost"
                       size="sm"
                       className="text-white hover:text-yellow-400 hover:bg-zinc-800"
-                      title="Configurações"
+                      title="Gerenciamento"
                     >
-                      <Settings className="h-5 w-5" />
+                      Gerenciamento
+                      <Settings className="h-5 w-5 ml-1" />
                     </Button>
                   )}
                   <Button
