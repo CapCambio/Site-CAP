@@ -131,7 +131,7 @@ export function CurrencyCard({
             onClick={onToggleExpand}
             className="text-xs text-[#1a1a1a] hover:text-gray-700 flex items-center focus:outline-none"
           >
-            Mais informações de variação
+            Gráfico de variação
             <ChevronDown 
               className={`ml-1 h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
             />
