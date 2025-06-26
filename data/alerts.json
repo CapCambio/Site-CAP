@@ -9,5 +9,17 @@
         "validade": null
       }
     }
+  },
+  "japalleiro@hotmail.com": {
+    "email": "japalleiro@hotmail.com",
+    "alerts": {
+      "USD": {
+        "limite": 0,
+        "tipo": "valor-especifico",
+        "ativo": true,
+        "valor": 5.8,
+        "validade": null
+      }
+    }
   }
 }
