@@ -15,6 +15,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const [isApproximateValue, setIsApproximateValue] = useState<boolean>(false);
   const [showFromDropdown, setShowFromDropdown] = useState<boolean>(false);
   const [showToDropdown, setShowToDropdown] = useState<boolean>(false);
+  const [mode, setMode] = useState<"tenho" | "preciso">("tenho");
 
   const allCurrencies = [
     { 
@@ -59,19 +60,36 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       if (!isNaN(numericAmount) && numericAmount >= 0) {
         let result;
 
-        // Só permitir conversões onde uma das moedas é BRL
-        if (fromCurrency === "BRL" && toCurrency !== "BRL") {
-          // BRL para moeda estrangeira
-          result = numericAmount / toCurrencyData.sellPrice;
-        } else if (fromCurrency !== "BRL" && toCurrency === "BRL") {
-          // Moeda estrangeira para BRL
-          result = numericAmount * fromCurrencyData.buyPrice;
-        } else if (fromCurrency === "BRL" && toCurrency === "BRL") {
-          // BRL para BRL (mesmo valor)
-          result = numericAmount;
+        if (mode === "tenho") {
+          // Lógica original: "Tenho X, quanto preciso de Y"
+          if (fromCurrency === "BRL" && toCurrency !== "BRL") {
+            // BRL para moeda estrangeira
+            result = numericAmount / toCurrencyData.sellPrice;
+          } else if (fromCurrency !== "BRL" && toCurrency === "BRL") {
+            // Moeda estrangeira para BRL
+            result = numericAmount * fromCurrencyData.buyPrice;
+          } else if (fromCurrency === "BRL" && toCurrency === "BRL") {
+            // BRL para BRL (mesmo valor)
+            result = numericAmount;
+          } else {
+            // Evitar conversões entre duas moedas estrangeiras
+            result = 0;
+          }
         } else {
-          // Evitar conversões entre duas moedas estrangeiras
-          result = 0;
+          // Lógica inversa: "Preciso de X, quanto tenho que dar de Y"
+          if (fromCurrency === "BRL" && toCurrency !== "BRL") {
+            // Preciso de moeda estrangeira, quanto em BRL
+            result = numericAmount * toCurrencyData.sellPrice;
+          } else if (fromCurrency !== "BRL" && toCurrency === "BRL") {
+            // Preciso de BRL, quanto em moeda estrangeira
+            result = numericAmount / fromCurrencyData.buyPrice;
+          } else if (fromCurrency === "BRL" && toCurrency === "BRL") {
+            // BRL para BRL (mesmo valor)
+            result = numericAmount;
+          } else {
+            // Evitar conversões entre duas moedas estrangeiras
+            result = 0;
+          }
         }
 
         const rawResult = result;
@@ -84,7 +102,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         setIsApproximateValue(false);
       }
     }
-  }, [fromCurrency, toCurrency, amount, allCurrencies]);
+  }, [fromCurrency, toCurrency, amount, allCurrencies, mode]);
 
   const handleFromCurrencyChange = (code: string) => {
     setFromCurrency(code);
@@ -118,7 +136,28 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1">
-            <label className="block text-white text-sm font-medium mb-2">Tenho</label>
+            <div className="flex items-center mb-2">
+              <button
+                onClick={() => setMode("tenho")}
+                className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-colors ${
+                  mode === "tenho" 
+                    ? "bg-[#f3b234] text-[#1a1a1a]" 
+                    : "bg-gray-600 text-white hover:bg-gray-500"
+                }`}
+              >
+                Tenho
+              </button>
+              <button
+                onClick={() => setMode("preciso")}
+                className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-colors ${
+                  mode === "preciso" 
+                    ? "bg-[#f3b234] text-[#1a1a1a]" 
+                    : "bg-gray-600 text-white hover:bg-gray-500"
+                }`}
+              >
+                Preciso de
+              </button>
+            </div>
             <div className="bg-white rounded-xl flex justify-between items-center p-3 mb-3 sm:mb-0 h-14 sm:h-[4.5rem]">
               <input
                 type="text"
@@ -202,7 +241,6 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           <div className="relative flex-1">
-            <label className="block text-white text-sm font-medium mb-2">Preciso de</label>
             <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem] mt-3 sm:mt-0">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
