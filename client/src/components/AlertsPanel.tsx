@@ -10,7 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 
 interface UserAlert {
   limite: number;
-  tipo: 'subida' | 'descida' | 'ambas';
+  tipo: 'subida' | 'descida' | 'valor-especifico';
+  valor?: number;
+  validade?: string | null;
   ativo: boolean;
 }
 
@@ -88,15 +90,25 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
     }
   };
 
-  const getTipoLabel = (tipo: string) => {
+  const getTipoLabel = (tipo: string, alert?: UserAlert) => {
     switch (tipo) {
       case 'subida':
         return 'Subida';
       case 'descida':
         return 'Descida';
+      case 'valor-especifico':
+        return `Quando chegar em R$ ${alert?.valor?.toFixed(2) || '0,00'}`;
       default:
         return 'Ambas';
     }
+  };
+
+  const getValidadeLabel = (alert: UserAlert) => {
+    if (!alert.validade) {
+      return 'Tempo Indeterminado';
+    }
+    const date = new Date(alert.validade);
+    return `Até ${date.toLocaleDateString('pt-BR')}`;
   };
 
   if (!isOpen) return null;
@@ -217,34 +229,17 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
                           
                           <div className="flex gap-3 items-center flex-wrap">
                             <div className="text-center">
-                              <Badge variant="outline" className="text-yellow-400 border-yellow-400 mb-1">
-                                {alert.limite}%
-                              </Badge>
-                              <p className="text-xs text-zinc-500">Limite</p>
-                            </div>
-                            
-                            <div className="text-center">
                               <Badge variant="outline" className="text-zinc-300 border-zinc-500 mb-1">
-                                {getTipoLabel(alert.tipo)}
+                                {getTipoLabel(alert.tipo, alert)}
                               </Badge>
                               <p className="text-xs text-zinc-500">Tipo</p>
-                            </div>
-                            
-                            <div className="text-center">
-                              <Badge 
-                                variant="outline" 
-                                className={alert.ativo ? "text-green-400 border-green-400 mb-1" : "text-red-400 border-red-400 mb-1"}
-                              >
-                                {alert.ativo ? "Ativo" : "Inativo"}
-                              </Badge>
-                              <p className="text-xs text-zinc-500">Status</p>
                             </div>
                           </div>
                         </div>
                         
                         <div className="flex items-center justify-between sm:justify-end">
                           <span className="text-xs sm:text-sm text-zinc-400 mr-4">
-                            Configurado para {user?.name || user?.email}
+                            {getValidadeLabel(alert)}
                           </span>
                           <Button
                             size="sm"
