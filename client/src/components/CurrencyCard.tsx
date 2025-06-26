@@ -64,7 +64,7 @@ export function CurrencyCard({
               e.stopPropagation();
               setShowAlertModal(true);
             }}
-            className="h-auto px-2 py-1 hover:bg-gray-700 text-white flex items-center gap-1"
+            className="h-auto px-2 py-1 hover:bg-yellow-500/20 text-white flex items-center gap-1"
             title="Criar alerta de preço"
           >
             <span className="text-xs">Criar alerta</span>
