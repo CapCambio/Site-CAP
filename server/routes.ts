@@ -16,10 +16,20 @@ const __dirname = path.dirname(__filename);
 
 // Usar sistema JSON integrado
 function loadAuthorizedEmails() {
-  return {
-    authorizedEmails: jsonStorage.getAuthorizedEmails().filter(e => !e.isAdmin),
-    adminEmails: jsonStorage.getAuthorizedEmails().filter(e => e.isAdmin)
-  };
+  try {
+    const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config', 'authorized-emails.json'), 'utf-8'));
+    console.log('Configuração carregada do arquivo:', config);
+    return {
+      authorizedEmails: config.authorizedEmails || [],
+      adminEmails: config.adminEmails || []
+    };
+  } catch (error) {
+    console.error('Erro ao carregar emails do arquivo:', error);
+    return {
+      authorizedEmails: [],
+      adminEmails: []
+    };
+  }
 }
 
 async function loadEmailConfig() {
@@ -381,19 +391,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Converter para formato uniforme e adicionar informações de último acesso
       const allEmails = [
-        ...authorizedEmails.authorizedEmails.map((item: any) => ({
-          email: typeof item === 'string' ? item : item.email,
-          name: typeof item === 'string' ? 'Cliente' : (item.name || 'Cliente'),
-          lastAccess: typeof item === 'object' && item.lastAccess ? item.lastAccess : null,
-          isAdmin: false
-        })),
-        ...authorizedEmails.adminEmails.map((item: any) => ({
-          email: typeof item === 'string' ? item : item.email,
-          name: typeof item === 'string' ? 'CAP Câmbio' : (item.name || 'CAP Câmbio'),
-          lastAccess: typeof item === 'object' && item.lastAccess ? item.lastAccess : null,
-          isAdmin: true
-        }))
+        ...authorizedEmails.authorizedEmails.map((item: any) => {
+          console.log('Processando email autorizado:', item);
+          return {
+            email: typeof item === 'string' ? item : item.email,
+            name: typeof item === 'string' ? 'Cliente' : (item.name || 'Cliente'),
+            lastAccess: (typeof item === 'object' && item.lastAccess) ? item.lastAccess : null,
+            isAdmin: false
+          };
+        }),
+        ...authorizedEmails.adminEmails.map((item: any) => {
+          console.log('Processando email admin:', item);
+          return {
+            email: typeof item === 'string' ? item : item.email,
+            name: typeof item === 'string' ? 'CAP Câmbio' : (item.name || 'CAP Câmbio'),
+            lastAccess: (typeof item === 'object' && item.lastAccess) ? item.lastAccess : null,
+            isAdmin: true
+          };
+        })
       ];
+
+      console.log('Todos os emails processados:', allEmails);
 
       // Ordenar por último acesso (mais recente primeiro), null por último
       allEmails.sort((a, b) => {

@@ -63,7 +63,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
           email: item.email,
           name: item.name || 'Sem nome',
           isAdmin: item.isAdmin || false,
-          lastAccess: item.lastAccess ? new Date(item.lastAccess).toLocaleString('pt-BR') : undefined
+          lastAccess: item.lastAccess || undefined
         }));
 
         console.log('Emails processados:', allEmails);
@@ -394,7 +394,13 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                           </div>
                           <div className="flex items-center justify-between sm:justify-end space-x-2">
                             <span className="text-xs sm:text-sm text-zinc-400 truncate">
-                              {item.lastAccess ? `Último acesso: ${new Date(item.lastAccess).toLocaleString('pt-BR')}` : "Nunca acessou"}
+                              {item.lastAccess ? `Último acesso: ${new Date(item.lastAccess).toLocaleDateString('pt-BR', {
+                                day: '2-digit',
+                                month: '2-digit', 
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}` : "Nunca acessou"}
                             </span>
                             <div className="flex space-x-1">
                               {!item.isAdmin && (
