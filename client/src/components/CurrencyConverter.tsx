@@ -139,20 +139,20 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             <div className="flex items-center justify-center mb-2">
               <button
                 onClick={() => setMode("tenho")}
-                className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-200 ${
                   mode === "tenho" 
-                    ? "bg-[#f3b234] text-[#1a1a1a]" 
-                    : "bg-white text-black hover:bg-gray-100"
+                    ? "bg-[#f3b234] text-[#1a1a1a] shadow-inner transform translate-y-0.5" 
+                    : "bg-white text-black hover:bg-gray-100 shadow-md transform translate-y-0"
                 }`}
               >
                 Tenho
               </button>
               <button
                 onClick={() => setMode("preciso")}
-                className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-all duration-200 ${
                   mode === "preciso" 
-                    ? "bg-[#f3b234] text-[#1a1a1a]" 
-                    : "bg-white text-black hover:bg-gray-100"
+                    ? "bg-[#f3b234] text-[#1a1a1a] shadow-inner transform translate-y-0.5" 
+                    : "bg-white text-black hover:bg-gray-100 shadow-md transform translate-y-0"
                 }`}
               >
                 Preciso de
@@ -242,7 +242,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
           <div className="relative flex-1">
             <div className="mb-2 h-[1.75rem]"></div>
-            <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem] mt-3 sm:mt-0">
+            <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem] mt-1 sm:mt-0">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
               </div>
