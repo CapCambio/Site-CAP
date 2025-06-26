@@ -26,8 +26,16 @@ interface CreateAlertData {
 export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: AlertModalProps) {
   const [tipo, setTipo] = useState<'subida' | 'descida' | 'valor-especifico'>('subida');
   const [valorEspecifico, setValorEspecifico] = useState("");
-  const [validade, setValidade] = useState("");
-  const [tempoIndeterminado, setTempoIndeterminado] = useState(false);
+  const [tempoIndeterminado, setTempoIndeterminado] = useState(true);
+  
+  // Calcula a data de 1 mês à frente
+  const getOneMonthAhead = () => {
+    const date = new Date();
+    date.setMonth(date.getMonth() + 1);
+    return date.toISOString().split('T')[0];
+  };
+  
+  const [validade, setValidade] = useState(getOneMonthAhead());
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -67,8 +75,8 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
   const resetForm = () => {
     setTipo('subida');
     setValorEspecifico("");
-    setValidade("");
-    setTempoIndeterminado(false);
+    setValidade(getOneMonthAhead());
+    setTempoIndeterminado(true);
   };
 
   const handleSubmit = async () => {
@@ -230,8 +238,8 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
                   checked={tempoIndeterminado}
                   onChange={(e) => {
                     setTempoIndeterminado(e.target.checked);
-                    if (e.target.checked) {
-                      setValidade("");
+                    if (!e.target.checked) {
+                      setValidade(getOneMonthAhead());
                     }
                   }}
                   className="h-4 w-4"
