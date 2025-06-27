@@ -241,7 +241,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
           </div>
 
           <div className="relative flex-1">
-            <div className="mb-2 h-[1.75rem]"></div>
+            <div className="mb-2 h-[1.75rem] sm:h-[2.5rem]"></div>
             <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem]">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount ? convertedAmount : "0"}
