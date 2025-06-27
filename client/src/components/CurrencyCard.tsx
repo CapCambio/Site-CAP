@@ -8,7 +8,7 @@ import { formatCurrencyValue, formatPercentage } from "../lib/currency";
 import { CurrencyMiniChart } from "./CurrencyMiniChart";
 import { useIsMobile } from "../hooks/use-mobile";
 import { format, isSameDay } from 'date-fns';
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   Tooltip,
@@ -41,7 +41,9 @@ export function CurrencyCard({
   const { name, code, buyPrice, sellPrice, change } = currency;
   const isMobile = useIsMobile();
   const [showAlertModal, setShowAlertModal] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const { user } = useAuth();
+  const tooltipTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const isPositiveChange = change !== null && change > 0;
   const isNegativeChange = change !== null && change < 0;
@@ -56,6 +58,30 @@ export function CurrencyCard({
 
   // Só esconde a variação se estiver em modo histórico E não for data atual
   const shouldShowVariation = !isHistoricalView || isCurrentDate;
+
+  const handleTooltipOpen = () => {
+    setShowTooltip(true);
+    
+    // Limpa timer anterior se existir
+    if (tooltipTimerRef.current) {
+      clearTimeout(tooltipTimerRef.current);
+    }
+    
+    // Define timer para fechar após 8 segundos
+    tooltipTimerRef.current = setTimeout(() => {
+      setShowTooltip(false);
+    }, 8000);
+  };
+
+  const handleTooltipClose = () => {
+    setShowTooltip(false);
+    
+    // Limpa o timer
+    if (tooltipTimerRef.current) {
+      clearTimeout(tooltipTimerRef.current);
+      tooltipTimerRef.current = null;
+    }
+  };
 
   return (
     <Card className={`currency-card overflow-hidden hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
@@ -139,9 +165,22 @@ export function CurrencyCard({
             </div>
             {shouldShowVariation && (
               <TooltipProvider delayDuration={0}>
-                <Tooltip>
+                <Tooltip 
+                  open={showTooltip} 
+                  onOpenChange={(open) => {
+                    if (open) {
+                      handleTooltipOpen();
+                    } else {
+                      handleTooltipClose();
+                    }
+                  }}
+                >
                   <TooltipTrigger asChild>
-                    <button className="flex items-center justify-center p-0 border-none bg-transparent cursor-help">
+                    <button 
+                      className="flex items-center justify-center p-0 border-none bg-transparent cursor-help touch-manipulation"
+                      onClick={handleTooltipOpen}
+                      onMouseEnter={handleTooltipOpen}
+                    >
                       <Info className="h-4 w-4 text-yellow-500 hover:text-yellow-600 flex-shrink-0" />
                     </button>
                   </TooltipTrigger>
@@ -153,6 +192,8 @@ export function CurrencyCard({
                     avoidCollisions={true}
                     collisionPadding={20}
                     alignOffset={0}
+                    onPointerDownOutside={handleTooltipClose}
+                    onEscapeKeyDown={handleTooltipClose}
                   >
                     <p className="text-xs">
                       Variação em relação a cotação que a moeda encerrou no dia anterior.
