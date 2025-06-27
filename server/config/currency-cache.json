@@ -1,29 +1,29 @@
 {
-  "lastUpdate": "2025-06-27T13:09:56.305Z",
+  "lastUpdate": "2025-06-27T14:17:44.242Z",
   "currencies": [
     {
       "name": "Dólar Americano",
       "code": "USD",
       "buyPrice": 5.45,
-      "sellPrice": 5.86
+      "sellPrice": 5.76
     },
     {
       "name": "Euro",
       "code": "EUR",
       "buyPrice": 6.4,
-      "sellPrice": 6.9
+      "sellPrice": 6.77
     },
     {
       "name": "Libra Esterlina",
       "code": "GBP",
       "buyPrice": 7.3,
-      "sellPrice": 8.26
+      "sellPrice": 8.08
     },
     {
       "name": "Dólar Australiano",
       "code": "AUD",
       "buyPrice": 3.55,
-      "sellPrice": 3.93
+      "sellPrice": 3.86
     },
     {
       "name": "Peso Argentino",
@@ -35,19 +35,19 @@
       "name": "Dólar Neozelandês",
       "code": "NZD",
       "buyPrice": 3.25,
-      "sellPrice": 3.6
+      "sellPrice": 3.54
     },
     {
       "name": "Dólar Canadense",
       "code": "CAD",
       "buyPrice": 4,
-      "sellPrice": 4.4
+      "sellPrice": 4.34
     },
     {
       "name": "Franco Suíço",
       "code": "CHF",
       "buyPrice": 6.65,
-      "sellPrice": 7.52
+      "sellPrice": 7.37
     },
     {
       "name": "Peso Uruguaio",
@@ -83,19 +83,19 @@
       "name": "Iene Japonês",
       "code": "JPY",
       "buyPrice": 0.033,
-      "sellPrice": 0.0434
+      "sellPrice": 0.0427
     },
     {
       "name": "Novo Sol Peruano",
       "code": "PEN",
       "buyPrice": 1.63,
-      "sellPrice": 1.77
+      "sellPrice": 1.75
     },
     {
       "name": "Rand Africano",
       "code": "ZAR",
       "buyPrice": 0.28,
-      "sellPrice": 0.359
+      "sellPrice": 0.352
     }
   ]
 }
