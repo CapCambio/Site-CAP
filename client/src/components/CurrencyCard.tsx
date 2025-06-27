@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, ChevronDown, Bell } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, Bell, Info } from "lucide-react";
 import { Currency } from "../lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,12 @@ import { useIsMobile } from "../hooks/use-mobile";
 import { format, isSameDay } from 'date-fns';
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface CurrencyCardProps {
   currency: Currency;
@@ -111,23 +117,40 @@ export function CurrencyCard({
         )}
 
         <div className="flex items-center justify-between">
-          <div>
-            {isPositiveChange && shouldShowVariation && (
-              <span className="text-sm font-medium text-green-600 flex items-center">
-                <ArrowUp className="mr-1 h-4 w-4" />
-                {formatPercentage(Math.abs(change || 0))}
-              </span>
-            )}
-            {isNegativeChange && shouldShowVariation && (
-              <span className="text-sm font-medium text-red-600 flex items-center">
-                <ArrowDown className="mr-1 h-4 w-4" />
-                {formatPercentage(Math.abs(change || 0))}
-              </span>
-            )}
-            {((change === null || change === 0) && shouldShowVariation) && (
-              <span className="text-sm font-medium text-gray-500">
-                — 0,00%
-              </span>
+          <div className="flex items-center gap-1">
+            <div>
+              {isPositiveChange && shouldShowVariation && (
+                <span className="text-sm font-medium text-green-600 flex items-center">
+                  <ArrowUp className="mr-1 h-4 w-4" />
+                  {formatPercentage(Math.abs(change || 0))}
+                </span>
+              )}
+              {isNegativeChange && shouldShowVariation && (
+                <span className="text-sm font-medium text-red-600 flex items-center">
+                  <ArrowDown className="mr-1 h-4 w-4" />
+                  {formatPercentage(Math.abs(change || 0))}
+                </span>
+              )}
+              {((change === null || change === 0) && shouldShowVariation) && (
+                <span className="text-sm font-medium text-gray-500">
+                  — 0,00%
+                </span>
+              )}
+            </div>
+            {shouldShowVariation && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-3 w-3 text-gray-400 hover:text-gray-600 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs max-w-48">
+                      Variação calculada com base no último preço registrado do dia anterior. 
+                      Você pode consultar esse preço de referência no gráfico histórico.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
 

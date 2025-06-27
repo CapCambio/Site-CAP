@@ -787,12 +787,31 @@ async function refreshCurrencies() {
       const sortedTodayHistory = todayHistory
         .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
-      // Calcula variação baseada no primeiro preço do dia
+      // Calcula variação baseada no último preço do dia anterior
       let change = 0;
-      if (sortedTodayHistory.length > 0) {
-        const firstPriceToday = sortedTodayHistory[0].sellPrice;
-        change = ((currency.sellPrice - firstPriceToday) / firstPriceToday) * 100;
+      
+      // Buscar último preço do dia anterior
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const dayBeforeYesterday = new Date(yesterday);
+      dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
+      
+      const yesterdayHistory = await storage.getCurrencyHistory(currency.code, dayBeforeYesterday, today);
+      const yesterdayRecords = yesterdayHistory
+        .filter(record => {
+          const recordDate = new Date(record.timestamp);
+          return recordDate >= dayBeforeYesterday && recordDate < today;
+        })
+        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()); // Mais recente primeiro
+      
+      if (yesterdayRecords.length > 0) {
+        // Usar o último preço registrado do dia anterior
+        const lastPriceYesterday = yesterdayRecords[0].sellPrice;
+        change = ((currency.sellPrice - lastPriceYesterday) / lastPriceYesterday) * 100;
         change = Number(change.toFixed(2));
+      } else if (sortedTodayHistory.length > 0) {
+        // Fallback: se não há dados de ontem, usar primeiro preço de hoje (variação = 0)
+        change = 0;
       }
 
       // Verifica alertas antes de salvar (usa preço anterior se disponível)
