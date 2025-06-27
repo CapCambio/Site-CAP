@@ -144,14 +144,15 @@ export function CurrencyCard({
                     <Info className="h-4 w-4 text-yellow-500 hover:text-yellow-600 cursor-help flex-shrink-0" />
                   </TooltipTrigger>
                   <TooltipContent 
-                    side="top" 
+                    side="left" 
                     align="center"
-                    className="max-w-[280px] md:max-w-[320px] p-3 z-50"
-                    sideOffset={8}
+                    className="max-w-[200px] p-2 z-[9999] text-center break-words"
+                    sideOffset={10}
+                    avoidCollisions={true}
+                    collisionPadding={20}
                   >
-                    <p className="text-xs leading-relaxed">
-                      Variação calculada com base no último preço registrado do dia anterior. 
-                      Você pode consultar esse preço de referência no gráfico histórico.
+                    <p className="text-xs">
+                      Variação em relação a cotação que a moeda encerrou no dia anterior.
                     </p>
                   </TooltipContent>
                 </Tooltip>
