@@ -83,6 +83,24 @@ export function CurrencyCard({
     }
   };
 
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (showTooltip) {
+      handleTooltipClose();
+    } else {
+      handleTooltipOpen();
+    }
+  };
+
+  const handleMouseEnter = () => {
+    // Só executa hover em desktop
+    if (!isMobile) {
+      handleTooltipOpen();
+    }
+  };
+
   return (
     <Card className={`currency-card overflow-hidden hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
       <div className="bg-[#1a1a1a] text-white p-4 flex items-center justify-between">
@@ -168,18 +186,27 @@ export function CurrencyCard({
                 <Tooltip 
                   open={showTooltip} 
                   onOpenChange={(open) => {
-                    if (open) {
-                      handleTooltipOpen();
-                    } else {
-                      handleTooltipClose();
+                    // No mobile, controlamos manualmente via click
+                    if (!isMobile) {
+                      if (open) {
+                        handleTooltipOpen();
+                      } else {
+                        handleTooltipClose();
+                      }
                     }
                   }}
                 >
                   <TooltipTrigger asChild>
                     <button 
                       className="flex items-center justify-center p-0 border-none bg-transparent cursor-help touch-manipulation"
-                      onClick={handleTooltipOpen}
-                      onMouseEnter={handleTooltipOpen}
+                      onClick={handleButtonClick}
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={() => {
+                        // Só executa mouse leave em desktop
+                        if (!isMobile) {
+                          handleTooltipClose();
+                        }
+                      }}
                     >
                       <Info className="h-4 w-4 text-yellow-500 hover:text-yellow-600 flex-shrink-0" />
                     </button>
