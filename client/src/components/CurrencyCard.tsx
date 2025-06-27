@@ -138,10 +138,12 @@ export function CurrencyCard({
               )}
             </div>
             {shouldShowVariation && (
-              <TooltipProvider>
+              <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Info className="h-4 w-4 text-yellow-500 hover:text-yellow-600 cursor-help flex-shrink-0" />
+                    <button className="flex items-center justify-center p-0 border-none bg-transparent cursor-help">
+                      <Info className="h-4 w-4 text-yellow-500 hover:text-yellow-600 flex-shrink-0" />
+                    </button>
                   </TooltipTrigger>
                   <TooltipContent 
                     side="top" 
