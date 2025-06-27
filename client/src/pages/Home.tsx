@@ -91,12 +91,6 @@ export default function Home() {
 
         {activeTab === "current" && (
           <>
-            <div className="flex justify-center items-center mb-4 mt-4">
-              <DatePicker
-                selectedDate={selectedDate}
-                onDateChange={handleDateChange}
-              />
-            </div>
 
             <div className={`${isMobile ? '' : 'currency-grid'}`}>
               {isLoadingCurrencies || isLoadingDateSelection ? (
