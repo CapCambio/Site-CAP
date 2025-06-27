@@ -782,17 +782,13 @@ async function refreshCurrencies() {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
 
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
       const todayHistory = await storage.getCurrencyHistory(currency.code, today, tomorrow);
       const hasRecordToday = todayHistory.length > 0;
-
-      // Novo cálculo de variação baseado no primeiro preço do dia
-      // Busca o primeiro registro do dia atual
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      const todayEnd = new Date(todayStart);
-      todayEnd.setDate(todayEnd.getDate() + 1);
-
-      const todayHistory = await storage.getCurrencyHistory(currency.code, todayStart, todayEnd);
       const sortedTodayHistory = todayHistory
         .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
