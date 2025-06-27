@@ -785,29 +785,22 @@ async function refreshCurrencies() {
       const todayHistory = await storage.getCurrencyHistory(currency.code, today, tomorrow);
       const hasRecordToday = todayHistory.length > 0;
 
-      // Forçamos o cálculo da variação para todas as moedas, independente se o preço mudou
-      // Busca o último registro com preço diferente para cálculo de variação (96 horas)
-      const allHistory = await storage.getCurrencyHistory(currency.code);
-      const previousHistories = allHistory
-        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-        .slice(0, 100);
+      // Novo cálculo de variação baseado no primeiro preço do dia
+      // Busca o primeiro registro do dia atual
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date(todayStart);
+      todayEnd.setDate(todayEnd.getDate() + 1);
 
-      // Encontra o registro mais recente com preço diferente
-      let previousHistory = null;
-      if (previousHistories.length > 1) {
-        for (let i = 0; i < previousHistories.length; i++) {
-          if (previousHistories[i].sellPrice !== currency.sellPrice) {
-            previousHistory = previousHistories[i];
-            break;
-          }
-        }
-      }
+      const todayHistory = await storage.getCurrencyHistory(currency.code, todayStart, todayEnd);
+      const sortedTodayHistory = todayHistory
+        .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
-      // Calcula variação
+      // Calcula variação baseada no primeiro preço do dia
       let change = 0;
-      if (previousHistory && 
-          (now.getTime() - previousHistory.timestamp.getTime()) <= 96 * 60 * 60 * 1000) {
-        change = ((currency.sellPrice - previousHistory.sellPrice) / previousHistory.sellPrice) * 100;
+      if (sortedTodayHistory.length > 0) {
+        const firstPriceToday = sortedTodayHistory[0].sellPrice;
+        change = ((currency.sellPrice - firstPriceToday) / firstPriceToday) * 100;
         change = Number(change.toFixed(2));
       }
 
@@ -830,7 +823,7 @@ async function refreshCurrencies() {
 
       // Adiciona ao histórico se for um novo preço OU se não há registro hoje
       // Isso garante que sempre haja pelo menos 1 registro por dia
-      if ((isNewPrice || !hasRecordToday) && !hasRecordToday) {
+      if (isNewPrice || !hasRecordToday) {
         await storage.addCurrencyHistory({
           code: currency.code,
           buyPrice: currency.buyPrice,
