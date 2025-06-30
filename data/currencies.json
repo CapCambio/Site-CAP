@@ -5,9 +5,9 @@
     "code": "USD",
     "buyPrice": 5.45,
     "sellPrice": 5.76,
-    "change": -3.03,
+    "change": 0,
     "displayOrder": 1,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 2,
@@ -15,9 +15,9 @@
     "code": "EUR",
     "buyPrice": 6.4,
     "sellPrice": 6.77,
-    "change": -2.59,
+    "change": 0,
     "displayOrder": 2,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 3,
@@ -25,9 +25,9 @@
     "code": "GBP",
     "buyPrice": 7.3,
     "sellPrice": 8.08,
-    "change": -2.77,
+    "change": 0,
     "displayOrder": 3,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 4,
@@ -35,9 +35,9 @@
     "code": "AUD",
     "buyPrice": 3.55,
     "sellPrice": 3.86,
-    "change": -2.77,
+    "change": 0,
     "displayOrder": 4,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 5,
@@ -47,7 +47,7 @@
     "sellPrice": 0.0068,
     "change": 0,
     "displayOrder": 5,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 6,
@@ -55,9 +55,9 @@
     "code": "NZD",
     "buyPrice": 3.25,
     "sellPrice": 3.54,
-    "change": -2.75,
+    "change": 0,
     "displayOrder": 6,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 7,
@@ -65,9 +65,9 @@
     "code": "CAD",
     "buyPrice": 4,
     "sellPrice": 4.34,
-    "change": -2.03,
+    "change": 0,
     "displayOrder": 7,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 8,
@@ -75,9 +75,9 @@
     "code": "CHF",
     "buyPrice": 6.65,
     "sellPrice": 7.37,
-    "change": -2.38,
+    "change": 0,
     "displayOrder": 8,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 9,
@@ -87,7 +87,7 @@
     "sellPrice": 0.175,
     "change": 0,
     "displayOrder": 9,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 10,
@@ -97,7 +97,7 @@
     "sellPrice": 0.007,
     "change": 0,
     "displayOrder": 10,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 11,
@@ -107,7 +107,7 @@
     "sellPrice": 0.355,
     "change": 0,
     "displayOrder": 11,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 12,
@@ -117,7 +117,7 @@
     "sellPrice": 0.00185,
     "change": 0,
     "displayOrder": 12,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 13,
@@ -127,7 +127,7 @@
     "sellPrice": 0.9,
     "change": 0,
     "displayOrder": 13,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 14,
@@ -135,9 +135,9 @@
     "code": "JPY",
     "buyPrice": 0.033,
     "sellPrice": 0.0427,
-    "change": -2.95,
+    "change": 0,
     "displayOrder": 14,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 15,
@@ -145,9 +145,9 @@
     "code": "PEN",
     "buyPrice": 1.63,
     "sellPrice": 1.75,
-    "change": -1.69,
+    "change": 0,
     "displayOrder": 15,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   },
   {
     "id": 16,
@@ -155,8 +155,8 @@
     "code": "ZAR",
     "buyPrice": 0.28,
     "sellPrice": 0.352,
-    "change": -2.76,
+    "change": 0,
     "displayOrder": 16,
-    "lastUpdate": "2025-06-27T22:28:27.206Z"
+    "lastUpdate": "2025-06-30T12:41:59.572Z"
   }
 ]
