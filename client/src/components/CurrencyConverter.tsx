@@ -78,10 +78,10 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         } else {
           // Lógica inversa: "Preciso de X, quanto tenho que dar de Y"
           if (fromCurrency === "BRL" && toCurrency !== "BRL") {
-            // Preciso de moeda estrangeira, quanto em BRL
+            // Preciso de moeda estrangeira, quanto em BRL (usar preço de venda)
             result = numericAmount * toCurrencyData.sellPrice;
           } else if (fromCurrency !== "BRL" && toCurrency === "BRL") {
-            // Preciso de BRL, quanto em moeda estrangeira
+            // Preciso de BRL, quanto em moeda estrangeira (usar preço de compra)
             result = numericAmount / fromCurrencyData.buyPrice;
           } else if (fromCurrency === "BRL" && toCurrency === "BRL") {
             // BRL para BRL (mesmo valor)
