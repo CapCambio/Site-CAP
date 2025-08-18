@@ -234,13 +234,10 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </button>
           <button
             onClick={() => setChartType('day')}
-            disabled={!shouldShowIntradayChart}
             className={`px-3 py-1 text-sm rounded-md transition-all duration-300 ${
               chartType === 'day'
                 ? 'bg-[#f3b234] text-[#1a1a1a] shadow-sm'
-                : shouldShowIntradayChart
-                  ? 'text-gray-600 hover:text-[#1a1a1a]'
-                  : 'text-gray-300 cursor-not-allowed'
+                : 'text-gray-600 hover:text-[#1a1a1a]'
             }`}
           >
             Dia
@@ -285,7 +282,13 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       ) : !shouldShowChart ? (
         <div className="w-full h-[140px] flex items-center justify-center bg-gray-100 rounded">
           <p className="text-gray-500 text-sm">
-            {chartType === 'day' ? 'Sem variações no período' : `Sem dados disponíveis para ${capitalizedMonthName}`}
+            {chartType === 'day' 
+              ? (!shouldShowIntradayChart 
+                  ? 'Aguardando variações de preço no dia' 
+                  : 'Sem variações no período'
+                ) 
+              : `Sem dados disponíveis para ${capitalizedMonthName}`
+            }
           </p>
         </div>
       ) : (
