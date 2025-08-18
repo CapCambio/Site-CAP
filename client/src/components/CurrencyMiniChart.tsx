@@ -129,20 +129,25 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       return {
         date: formattedDay,
         day: day.toString(),
-        sellPrice: null
+        sellPrice: null,
+        buyPrice: null,
+        hasRealData: false
       };
     }
 
     // Se for o dia atual, usar preço mais recente disponível
     if (isSameDay(dayDate, today)) {
       // Priorizar: currentPrice > currentCurrencyData > dados históricos
-      const todaysPrice = currentPrice || currentCurrencyData?.sellPrice;
+      const todaysSellPrice = currentPrice || currentCurrencyData?.sellPrice;
+      const todaysBuyPrice = currentCurrencyData?.buyPrice;
       
-      if (todaysPrice) {
+      if (todaysSellPrice) {
         return {
           date: formattedDay,
           day: day.toString(),
-          sellPrice: todaysPrice
+          sellPrice: todaysSellPrice,
+          buyPrice: todaysBuyPrice,
+          hasRealData: true
         };
       }
     }
@@ -155,7 +160,9 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     return {
       date: formattedDay,
       day: day.toString(),
-      sellPrice: historyEntry?.sellPrice || null
+      sellPrice: historyEntry?.sellPrice || null,
+      buyPrice: historyEntry?.buyPrice || null,
+      hasRealData: !!historyEntry
     };
   });
 
@@ -341,18 +348,35 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               domain={validPrices.length > 0 ? [minPrice - padding, maxPrice + padding] : [0, 1]}
             />
             <Tooltip
-              formatter={(value: any) => [
-                `R$ ${Number(value).toFixed(4)}`,
-                "Venda"
-              ]}
-              labelFormatter={(label) => 
-                chartType === 'day' ? `${label}h` : `Dia ${label}`
-              }
-              contentStyle={{
-                backgroundColor: '#fff',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '12px'
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0].payload;
+                  const sellPrice = data.sellPrice;
+                  const buyPrice = data.buyPrice;
+                  const hasRealData = data.hasRealData;
+                  return (
+                    <div style={{
+                      backgroundColor: '#fff',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      padding: '6px',
+                      fontSize: '12px'
+                    }}>
+                      <p style={{ margin: '0 0 3px 0', fontWeight: 'bold' }}>
+                        {chartType === 'month' ? `Dia ${label}` : `${label}h`}
+                      </p>
+                      <p style={{ margin: '0 0 2px 0', color: '#000' }}>
+                        Venda: R$ {sellPrice ? sellPrice.toFixed(4) : 'N/A'}
+                      </p>
+                      {buyPrice && (
+                        <p style={{ margin: '0', color: '#000' }}>
+                          Compra: R$ {buyPrice.toFixed(4)}
+                        </p>
+                      )}
+                    </div>
+                  );
+                }
+                return null;
               }}
             />
             <Area

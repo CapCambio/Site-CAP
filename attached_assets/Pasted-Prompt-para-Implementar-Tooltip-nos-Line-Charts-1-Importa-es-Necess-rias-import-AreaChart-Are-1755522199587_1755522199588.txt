@@ -1,0 +1,83 @@
+Prompt para Implementar Tooltip nos Line Charts
+1. Importações Necessárias
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+2. Estrutura do Tooltip no AreaChart
+Dentro do componente <AreaChart>, adicione o componente <Tooltip> com a seguinte configuração:
+
+<Tooltip
+  content={({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const sellPrice = data.sellPrice;
+      const buyPrice = data.buyPrice;
+      const hasRealData = data.hasRealData;
+      return (
+        <div style={{
+          backgroundColor: '#fff',
+          border: '1px solid #ddd',
+          borderRadius: '4px',
+          padding: '6px',
+          fontSize: '12px'
+        }}>
+          <p style={{ margin: '0 0 3px 0', fontWeight: 'bold' }}>
+            {chartType === 'month' ? `Dia ${label}` : `${label}h`}
+          </p>
+          <p style={{ margin: '0 0 2px 0', color: '#000' }}>
+            Venda: R$ {sellPrice ? sellPrice.toFixed(4) : 'N/A'}
+          </p>
+          {buyPrice && (
+            <p style={{ margin: '0', color: '#000' }}>
+              Compra: R$ {buyPrice.toFixed(4)}
+            </p>
+          )}
+        </div>
+      );
+    }
+    return null;
+  }}
+/>
+3. Estrutura dos Dados Necessários
+O tooltip espera que cada item do array de dados tenha:
+
+Para gráfico mensal:
+
+{
+  day: "1", // dia do mês como string
+  sellPrice: 5.4123, // preço de venda como number
+  buyPrice: 5.3987, // preço de compra como number (opcional)
+  hasRealData: true // boolean indicando se são dados reais
+}
+Para gráfico intraday:
+
+{
+  hour: "09", // hora como string
+  sellPrice: 5.4123, // preço de venda como number
+  buyPrice: 5.3987, // preço de compra como number (opcional)
+  hasRealData: true // boolean indicando se são dados reais
+}
+4. Variável de Controle do Tipo de Gráfico
+Você precisa de uma variável chartType que alterna entre 'month' e 'day':
+
+const [chartType, setChartType] = useState<'month' | 'day'>('month');
+5. Estilos Específicos do Tooltip
+Fundo: backgroundColor: '#fff' (branco)
+Borda: border: '1px solid #ddd' (cinza claro)
+Cantos: borderRadius: '4px'
+Espaçamento: padding: '6px'
+Fonte: fontSize: '12px'
+Margens: Específicas para cada elemento <p>
+Título: fontWeight: 'bold'
+Cor do texto: color: '#000' (preto)
+6. Lógica do Tooltip
+Verificação: if (active && payload && payload.length)
+Extração de dados: const data = payload[0].payload;
+Título dinâmico: Mostra "Dia X" para mês e "Xh" para intraday
+Preço de venda: Sempre exibido com 4 casas decimais ou 'N/A'
+Preço de compra: Só exibido se existir ({buyPrice && (...)}
+Formatação: Usa toFixed(4) para 4 casas decimais
+Moeda: Prefixo "R$" em todos os preços
+7. Condições de Exibição
+Só aparece quando active é true (mouse sobre o gráfico)
+Só renderiza se há payload com dados
+Retorna null quando não há dados válidos
+Este tooltip funciona tanto para gráficos mensais quanto intraday, adaptando automaticamente o formato da data/hora e exibindo os preços de compra e venda conforme disponível nos dados.
