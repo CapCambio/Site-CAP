@@ -231,7 +231,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             )}
           </div>
 
-          <div className="flex justify-center items-center z-10 relative sm:mx-4 sm:flex-shrink-0 sm:mt-8">
+          <div className="flex justify-center items-center z-10 relative sm:mx-4 sm:flex-shrink-0">
             <button
               onClick={handleSwapCurrencies}
               className="bg-black hover:bg-gray-800 transition-colors rounded-lg p-2"
@@ -244,8 +244,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             </button>
           </div>
 
-          <div className="relative flex-1">
-            <div className="mb-2 h-[1.75rem]"></div>
+          <div className="relative flex-1 mt-3 sm:mt-0">
             <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem]">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount || "0,00"}
