@@ -363,6 +363,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               fill="url(#colorSell)"
               strokeWidth={2}
               connectNulls
+              dot={{ fill: '#f3b234', strokeWidth: 2, r: 3 }}
+              activeDot={{ r: 5, stroke: '#f3b234', strokeWidth: 2, fill: '#fff' }}
             />
           </AreaChart>
         </ResponsiveContainer>
