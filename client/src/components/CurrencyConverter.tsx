@@ -10,12 +10,12 @@ interface CurrencyConverterProps {
 export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const [fromCurrency, setFromCurrency] = useState<string>("BRL");
   const [toCurrency, setToCurrency] = useState<string>("USD");
-  const [amount, setAmount] = useState<string>("1000");
+  const [amount, setAmount] = useState<string>("");
   const [convertedAmount, setConvertedAmount] = useState<string>("");
   const [isApproximateValue, setIsApproximateValue] = useState<boolean>(false);
   const [showFromDropdown, setShowFromDropdown] = useState<boolean>(false);
   const [showToDropdown, setShowToDropdown] = useState<boolean>(false);
-  const [mode, setMode] = useState<"tenho" | "preciso">("tenho");
+  const [mode, setMode] = useState<"tenho" | "preciso">("preciso");
 
   const allCurrencies = [
     { 
@@ -134,37 +134,38 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
       <div className="bg-[#252525] p-3 pb-8 sm:p-6 sm:pb-12 rounded-xl">
         <h2 className="text-[#f3b234] text-xl font-semibold mb-2 sm:mb-3 text-center">Conversor de Moedas</h2>
 
+        <div className="flex items-center justify-center mb-2 sm:mb-3">
+          <button
+            onClick={() => setMode("preciso")}
+            className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-150 ${
+              mode === "preciso" 
+                ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
+                : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
+            }`}
+          >
+            Preciso de
+          </button>
+          <button
+            onClick={() => setMode("tenho")}
+            className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-all duration-150 ${
+              mode === "tenho" 
+                ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
+                : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
+              }`}
+            >
+            Tenho
+          </button>
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1">
-            <div className="flex items-center justify-center mb-2">
-              <button
-                onClick={() => setMode("tenho")}
-                className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-150 ${
-                  mode === "tenho" 
-                    ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
-                    : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
-                }`}
-              >
-                Tenho
-              </button>
-              <button
-                onClick={() => setMode("preciso")}
-                className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-all duration-150 ${
-                  mode === "preciso" 
-                    ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
-                    : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
-                }`}
-              >
-                Preciso de
-              </button>
-            </div>
             <div className="bg-white rounded-xl flex justify-between items-center p-3 mb-3 sm:mb-0 h-14 sm:h-[4.5rem]">
               <input
                 type="text"
                 value={amount}
                 onChange={handleAmountChange}
                 className="text-xl sm:text-2xl font-medium bg-white border-none focus:ring-0 focus:outline-none text-black w-3/5"
-                placeholder="0"
+                placeholder="Digite o valor"
               />
 
               <div 
@@ -244,7 +245,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             <div className="mb-2 h-[1.75rem]"></div>
             <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem]">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
-                {convertedAmount ? convertedAmount : "0"}
+                {convertedAmount || "0,00"}
               </div>
 
               <div 
