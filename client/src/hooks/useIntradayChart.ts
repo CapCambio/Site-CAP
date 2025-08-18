@@ -8,7 +8,7 @@ export interface IntradayChartData {
   hasRealData: boolean; // true se tem dado real da hora
 }
 
-export function useIntradayChart(currencyCode: string) {
+export function useIntradayChart(currencyCode: string, currentCurrencyData?: any) {
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
 
@@ -37,51 +37,71 @@ export function useIntradayChart(currencyCode: string) {
     refetchInterval: 5 * 60 * 1000, // Refetch a cada 5 minutos
   });
 
+  // Usar dados de fallback dos preços atuais (passados como parâmetro)
+
   // Processar dados intraday
   const processIntradayData = (): IntradayChartData[] => {
-    if (!intradayData || intradayData.length === 0) {
-      return [];
-    }
-
     const currentHour = today.getHours();
     const chartData: IntradayChartData[] = [];
-    let lastKnownPrice: number | null = null;
 
-    // Criar array de 24 horas (00 até 23)
+    // Se não há dados intraday para hoje, usar dados atuais da moeda
+    const hasTodayData = intradayData && intradayData.length > 0;
+    
+    // Preços de fallback dos dados atuais
+    const fallbackSellPrice = currentCurrencyData?.sellPrice || null;
+    const fallbackBuyPrice = currentCurrencyData?.buyPrice || null;
+    
+    let lastKnownSellPrice: number | null = null;
+    let lastKnownBuyPrice: number | null = null;
+
+    // Criar array de horas desde 0h até a hora atual
     for (let hour = 0; hour <= currentHour; hour++) {
       const hourStr = hour.toString().padStart(2, '0');
       
       // Procurar dados reais para esta hora
-      const hourData = intradayData.find((entry: any) => {
-        const entryDate = new Date(entry.timestamp);
-        return isSameDay(entryDate, today) && entryDate.getHours() === hour;
-      });
+      let hourData = null;
+      if (hasTodayData) {
+        hourData = intradayData.find((entry: any) => {
+          const entryDate = new Date(entry.timestamp);
+          return isSameDay(entryDate, today) && entryDate.getHours() === hour;
+        });
+      }
 
       if (hourData) {
         // Tem dados reais para esta hora
-        lastKnownPrice = hourData.sellPrice;
+        lastKnownSellPrice = hourData.sellPrice;
+        lastKnownBuyPrice = hourData.buyPrice;
         chartData.push({
           hour: hourStr,
           sellPrice: hourData.sellPrice,
           buyPrice: hourData.buyPrice,
           hasRealData: true
         });
-      } else if (lastKnownPrice !== null) {
-        // Usar último preço conhecido para preencher lacunas
-        chartData.push({
-          hour: hourStr,
-          sellPrice: lastKnownPrice,
-          buyPrice: lastKnownPrice,
-          hasRealData: false
-        });
       } else {
-        // Não há dados ainda
-        chartData.push({
-          hour: hourStr,
-          sellPrice: null,
-          buyPrice: null,
-          hasRealData: false
-        });
+        // Usar dados conhecidos ou fallback dos dados atuais
+        const sellPrice = lastKnownSellPrice || fallbackSellPrice;
+        const buyPrice = lastKnownBuyPrice || fallbackBuyPrice;
+        
+        if (sellPrice !== null) {
+          chartData.push({
+            hour: hourStr,
+            sellPrice: sellPrice,
+            buyPrice: buyPrice,
+            hasRealData: false
+          });
+          // Se ainda não temos preços conhecidos, usar os atuais
+          if (lastKnownSellPrice === null) {
+            lastKnownSellPrice = sellPrice;
+            lastKnownBuyPrice = buyPrice;
+          }
+        } else {
+          chartData.push({
+            hour: hourStr,
+            sellPrice: null,
+            buyPrice: null,
+            hasRealData: false
+          });
+        }
       }
     }
 
@@ -92,13 +112,15 @@ export function useIntradayChart(currencyCode: string) {
   
   // Verificar se há dados suficientes para mostrar gráfico
   const hasRealData = chartData.some(item => item.hasRealData);
+  const hasAnyValidData = chartData.some(item => item.sellPrice !== null);
   const uniquePricesCount = new Set(
     chartData
       .filter(item => item.sellPrice !== null)
       .map(item => item.sellPrice)
   ).size;
 
-  const shouldShowChart = hasRealData && uniquePricesCount > 1;
+  // Sempre mostrar o gráfico intraday se temos pelo menos dados atuais
+  const shouldShowChart = hasAnyValidData && (hasRealData || currentCurrencyData?.sellPrice);
 
   return {
     chartData,

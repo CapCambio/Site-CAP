@@ -20,12 +20,26 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [chartType, setChartType] = useState<'month' | 'day'>('month');
 
+  // Buscar dados atuais da moeda primeiro
+  const { data: currentCurrencyData } = useQuery({
+    queryKey: ['/api/currencies/current-for-intraday', currencyCode],
+    queryFn: async () => {
+      const response = await fetch('/api/currencies');
+      if (!response.ok) {
+        throw new Error('Failed to fetch current currencies');
+      }
+      const currencies = await response.json();
+      return currencies.find((c: any) => c.code === currencyCode);
+    },
+    refetchOnWindowFocus: false,
+  });
+
   // Hook para dados intraday
   const {
     chartData: intradayChartData,
     isLoading: isIntradayLoading,
     shouldShowChart: shouldShowIntradayChart
-  } = useIntradayChart(currencyCode);
+  } = useIntradayChart(currencyCode, currentCurrencyData);
 
   // Atualizar o mês APENAS quando selectedDate mudar para um mês diferente
   useEffect(() => {
@@ -76,20 +90,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     refetchOnWindowFocus: false,
   });
 
-  // Para o mês atual, também buscar o preço atual da moeda
-  const { data: currentCurrencyData } = useQuery({
-    queryKey: ['/api/currencies/current', currencyCode],
-    queryFn: async () => {
-      const response = await fetch('/api/currencies');
-      if (!response.ok) {
-        throw new Error('Failed to fetch current currencies');
-      }
-      const currencies = await response.json();
-      return currencies.find((c: any) => c.code === currencyCode);
-    },
-    enabled: isSameDay(selectedMonth, startOfMonth(today)), // Só buscar se estivermos no mês atual
-    refetchOnWindowFocus: false,
-  });
+
 
   // Remover limitação de navegação - permitir navegar mesmo sem dados
   const isPreviousDisabled = false; // Permitir sempre voltar
