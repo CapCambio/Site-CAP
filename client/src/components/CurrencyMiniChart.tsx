@@ -218,36 +218,34 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
   return (
     <div className="w-full h-[180px]">
-      {/* Título "Movimentação" */}
-      <div className="flex items-center justify-center mb-1">
-        <span className="text-xs text-gray-500">Movimentação</span>
-      </div>
-
-      {/* Toggle de Seleção de Período */}
-      <div className="flex items-center justify-center mb-2">
-        <button
-          onClick={() => setChartType('month')}
-          className={`px-2 py-1 rounded-l text-xs font-medium transition-all duration-150 ${
-            chartType === 'month'
-              ? 'bg-[#f3b234] text-[#1a1a1a]'
-              : 'bg-transparent text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Mês
-        </button>
-        <button
-          onClick={() => setChartType('day')}
-          disabled={!shouldShowIntradayChart}
-          className={`px-2 py-1 rounded-r text-xs font-medium transition-all duration-150 ${
-            chartType === 'day'
-              ? 'bg-[#f3b234] text-[#1a1a1a]'
-              : shouldShowIntradayChart
-                ? 'bg-transparent text-gray-500 hover:text-gray-700'
-                : 'bg-transparent text-gray-300 cursor-not-allowed'
-          }`}
-        >
-          Dia
-        </button>
+      {/* Título "Movimentação" e Toggle */}
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-sm font-medium text-gray-700">Movimentação</h4>
+        <div className="flex bg-gray-200 p-1 rounded-lg">
+          <button
+            onClick={() => setChartType('month')}
+            className={`px-3 py-1 text-sm rounded-md transition-all duration-300 ${
+              chartType === 'month'
+                ? 'bg-[#f3b234] text-[#1a1a1a] shadow-sm'
+                : 'text-gray-600 hover:text-[#1a1a1a]'
+            }`}
+          >
+            Mês
+          </button>
+          <button
+            onClick={() => setChartType('day')}
+            disabled={!shouldShowIntradayChart}
+            className={`px-3 py-1 text-sm rounded-md transition-all duration-300 ${
+              chartType === 'day'
+                ? 'bg-[#f3b234] text-[#1a1a1a] shadow-sm'
+                : shouldShowIntradayChart
+                  ? 'text-gray-600 hover:text-[#1a1a1a]'
+                  : 'text-gray-300 cursor-not-allowed'
+            }`}
+          >
+            Dia
+          </button>
+        </div>
       </div>
 
       {/* Navegação do mês (apenas para modo mensal) */}
