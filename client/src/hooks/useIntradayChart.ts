@@ -54,8 +54,8 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
     let lastKnownSellPrice: number | null = null;
     let lastKnownBuyPrice: number | null = null;
 
-    // Criar array de horas desde 0h até a hora atual
-    for (let hour = 0; hour <= currentHour; hour++) {
+    // Criar array de todas as 24 horas (00 até 23)
+    for (let hour = 0; hour <= 23; hour++) {
       const hourStr = hour.toString().padStart(2, '0');
       
       // Procurar dados reais para esta hora
@@ -77,8 +77,8 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
           buyPrice: hourData.buyPrice,
           hasRealData: true
         });
-      } else {
-        // Usar dados conhecidos ou fallback dos dados atuais
+      } else if (hour <= currentHour) {
+        // Para horas passadas e atual sem dados, usar dados conhecidos ou fallback
         const sellPrice = lastKnownSellPrice || fallbackSellPrice;
         const buyPrice = lastKnownBuyPrice || fallbackBuyPrice;
         
@@ -102,6 +102,14 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
             hasRealData: false
           });
         }
+      } else {
+        // Para horas futuras, não incluir dados (null)
+        chartData.push({
+          hour: hourStr,
+          sellPrice: null,
+          buyPrice: null,
+          hasRealData: false
+        });
       }
     }
 
