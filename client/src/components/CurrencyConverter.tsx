@@ -57,7 +57,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
     if (fromCurrencyData && toCurrencyData && amount) {
       const numericAmount = parseFloat(amount.replace(/[^\d.]/g, ''));
-      if (!isNaN(numericAmount) && numericAmount >= 0) {
+      if (!isNaN(numericAmount) && numericAmount > 0) {
         let result;
 
         if (mode === "tenho") {
@@ -101,6 +101,9 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
         setConvertedAmount("0");
         setIsApproximateValue(false);
       }
+    } else {
+      setConvertedAmount("0");
+      setIsApproximateValue(false);
     }
   }, [fromCurrency, toCurrency, amount, allCurrencies, mode]);
 
@@ -165,7 +168,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 value={amount}
                 onChange={handleAmountChange}
                 className="text-xl sm:text-2xl font-medium bg-white border-none focus:ring-0 focus:outline-none text-black w-3/5"
-                placeholder="Digite o valor"
+                placeholder="0,00"
               />
 
               <div 
