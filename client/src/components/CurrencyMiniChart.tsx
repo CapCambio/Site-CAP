@@ -76,6 +76,21 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     refetchOnWindowFocus: false,
   });
 
+  // Para o mês atual, também buscar o preço atual da moeda
+  const { data: currentCurrencyData } = useQuery({
+    queryKey: ['/api/currencies/current', currencyCode],
+    queryFn: async () => {
+      const response = await fetch('/api/currencies');
+      if (!response.ok) {
+        throw new Error('Failed to fetch current currencies');
+      }
+      const currencies = await response.json();
+      return currencies.find((c: any) => c.code === currencyCode);
+    },
+    enabled: isSameDay(selectedMonth, startOfMonth(today)), // Só buscar se estivermos no mês atual
+    refetchOnWindowFocus: false,
+  });
+
   // Remover limitação de navegação - permitir navegar mesmo sem dados
   const isPreviousDisabled = false; // Permitir sempre voltar
   const isNextDisabled = isSameDay(monthEnd, endOfMonth(today)) || isBefore(today, monthStart);
@@ -118,13 +133,18 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       };
     }
 
-    // Se for o dia atual e tivermos o preço atual, use-o
-    if (isSameDay(dayDate, today) && currentPrice) {
-      return {
-        date: formattedDay,
-        day: day.toString(),
-        sellPrice: currentPrice
-      };
+    // Se for o dia atual, usar preço mais recente disponível
+    if (isSameDay(dayDate, today)) {
+      // Priorizar: currentPrice > currentCurrencyData > dados históricos
+      const todaysPrice = currentPrice || currentCurrencyData?.sellPrice;
+      
+      if (todaysPrice) {
+        return {
+          date: formattedDay,
+          day: day.toString(),
+          sellPrice: todaysPrice
+        };
+      }
     }
 
     // Procurar se há dados históricos para este dia
@@ -162,7 +182,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     );
   }
 
-  if (!historicalData || historicalData.length === 0) {
+  // Verificar se temos dados válidos para mostrar no gráfico
+  const hasValidData = chartData.some(item => item.sellPrice !== null);
+  const isCurrentMonth = isSameDay(selectedMonth, startOfMonth(today));
+
+  if (!hasValidData && !isCurrentMonth) {
     return (
       <div className="w-full h-[180px] flex flex-col items-center justify-center bg-gray-100 rounded">
         <div className="flex items-center justify-center mb-2">
