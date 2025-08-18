@@ -5,6 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { CurrencyHistory } from '../lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { ptBR } from 'date-fns/locale';
+import { useIntradayChart } from '../hooks/useIntradayChart';
 
 interface CurrencyMiniChartProps {
   currencyCode: string;
@@ -17,6 +18,14 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   // Usar selectedDate se fornecida, senão usar hoje - mas sempre começar com o mês atual
   const initialMonth = selectedDate ? startOfMonth(selectedDate) : startOfMonth(today);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+  const [chartType, setChartType] = useState<'month' | 'day'>('month');
+
+  // Hook para dados intraday
+  const {
+    chartData: intradayChartData,
+    isLoading: isIntradayLoading,
+    shouldShowChart: shouldShowIntradayChart
+  } = useIntradayChart(currencyCode);
 
   // Atualizar o mês APENAS quando selectedDate mudar para um mês diferente
   useEffect(() => {
@@ -178,83 +187,161 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     );
   }
 
+  // Determinar qual dados usar baseado no tipo de gráfico
+  const activeChartData = chartType === 'day' ? intradayChartData : chartData;
+  const activeIsLoading = chartType === 'day' ? isIntradayLoading : isLoading;
+  
+  // Determinar se deve mostrar o gráfico
+  const shouldShowChart = chartType === 'day'
+    ? shouldShowIntradayChart
+    : activeChartData.length > 0;
+
   // Calculando valores para definir domínio do eixo Y
-  const validPrices = chartData
+  const validPrices = activeChartData
     .map(d => d.sellPrice)
     .filter((price): price is number => price !== null);
 
-  const minPrice = Math.min(...validPrices);
-  const maxPrice = Math.max(...validPrices);
-  const padding = (maxPrice - minPrice) * 0.1;
+  const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : 0;
+  const maxPrice = validPrices.length > 0 ? Math.max(...validPrices) : 0;
+  const padding = validPrices.length > 0 ? (maxPrice - minPrice) * 0.1 : 0;
+
+  // Configurar ticks do eixo X baseado no tipo de gráfico
+  const getXAxisTicks = () => {
+    if (chartType === 'day') {
+      // Para intraday: mostrar algumas horas selecionadas
+      return isMobile ? ['06', '12', '18'] : undefined;
+    } else {
+      // Para mensal: usar lógica existente
+      return xAxisTicks;
+    }
+  };
 
   return (
     <div className="w-full h-[180px]">
+      {/* Título "Movimentação" */}
+      <div className="flex items-center justify-center mb-1">
+        <span className="text-xs text-gray-500">Movimentação</span>
+      </div>
+
+      {/* Toggle de Seleção de Período */}
       <div className="flex items-center justify-center mb-2">
-        <button 
-          onClick={goToPreviousMonth}
-          disabled={isPreviousDisabled}
-          className={`p-1 rounded ${isPreviousDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
+        <button
+          onClick={() => setChartType('month')}
+          className={`px-2 py-1 rounded-l text-xs font-medium transition-all duration-150 ${
+            chartType === 'month'
+              ? 'bg-[#f3b234] text-[#1a1a1a]'
+              : 'bg-transparent text-gray-500 hover:text-gray-700'
+          }`}
         >
-          <ChevronLeft size={16} />
+          Mês
         </button>
-        <h4 className="text-sm font-medium mx-2 capitalize">{capitalizedMonthName}</h4>
-        <button 
-          onClick={goToNextMonth}
-          disabled={isNextDisabled}
-          className={`p-1 rounded ${isNextDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
+        <button
+          onClick={() => setChartType('day')}
+          disabled={!shouldShowIntradayChart}
+          className={`px-2 py-1 rounded-r text-xs font-medium transition-all duration-150 ${
+            chartType === 'day'
+              ? 'bg-[#f3b234] text-[#1a1a1a]'
+              : shouldShowIntradayChart
+                ? 'bg-transparent text-gray-500 hover:text-gray-700'
+                : 'bg-transparent text-gray-300 cursor-not-allowed'
+          }`}
         >
-          <ChevronRight size={16} />
+          Dia
         </button>
       </div>
 
-      <ResponsiveContainer width="100%" height={140}>
-        <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 20 }}>
-          <defs>
-            <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#f3b234" stopOpacity={0.1}/>
-              <stop offset="95%" stopColor="#f3b234" stopOpacity={0}/>
-            </linearGradient>
-          </defs>
-          <XAxis 
-            dataKey="day"
-            tick={{ fontSize: 8, fill: '#666' }}
-            tickLine={false}
-            axisLine={false}
-            interval={0}
-            type="category"
-            scale="point"
-            tickMargin={5}
-            height={25}
-            ticks={xAxisTicks}
-          />
-          <YAxis 
-            hide={true}
-            domain={[minPrice - padding, maxPrice + padding]}
-          />
-          <Tooltip
-            formatter={(value: any) => [
-              `R$ ${Number(value).toFixed(4)}`,
-              "Venda"
-            ]}
-            labelFormatter={(label) => `Dia ${label}`}
-            contentStyle={{
-              backgroundColor: '#fff',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              fontSize: '12px'
-            }}
-          />
-          <Area
-            type="monotone"
-            dataKey="sellPrice"
-            stroke="#f3b234"
-            fillOpacity={1}
-            fill="url(#colorSell)"
-            strokeWidth={2}
-            connectNulls
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      {/* Navegação do mês (apenas para modo mensal) */}
+      {chartType === 'month' && (
+        <div className="flex items-center justify-center mb-2">
+          <button 
+            onClick={goToPreviousMonth}
+            disabled={isPreviousDisabled}
+            className={`p-1 rounded ${isPreviousDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <h4 className="text-sm font-medium mx-2 capitalize">{capitalizedMonthName}</h4>
+          <button 
+            onClick={goToNextMonth}
+            disabled={isNextDisabled}
+            className={`p-1 rounded ${isNextDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* Título do dia atual para modo intraday */}
+      {chartType === 'day' && (
+        <div className="flex items-center justify-center mb-2">
+          <h4 className="text-sm font-medium">
+            {format(today, "dd 'de' MMMM", { locale: ptBR })}
+          </h4>
+        </div>
+      )}
+
+      {activeIsLoading ? (
+        <div className="w-full h-[140px] flex items-center justify-center bg-gray-100 rounded animate-pulse">
+          <p className="text-gray-500 text-sm">Carregando dados...</p>
+        </div>
+      ) : !shouldShowChart ? (
+        <div className="w-full h-[140px] flex items-center justify-center bg-gray-100 rounded">
+          <p className="text-gray-500 text-sm">
+            {chartType === 'day' ? 'Sem variações no período' : `Sem dados disponíveis para ${capitalizedMonthName}`}
+          </p>
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={140}>
+          <AreaChart data={activeChartData} margin={{ top: 5, right: 5, left: 5, bottom: 20 }}>
+            <defs>
+              <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#f3b234" stopOpacity={0.1}/>
+                <stop offset="95%" stopColor="#f3b234" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <XAxis 
+              dataKey={chartType === 'day' ? 'hour' : 'day'}
+              tick={{ fontSize: 8, fill: '#666' }}
+              tickLine={false}
+              axisLine={false}
+              interval={0}
+              type="category"
+              scale="point"
+              tickMargin={5}
+              height={25}
+              ticks={getXAxisTicks()}
+            />
+            <YAxis 
+              hide={true}
+              domain={validPrices.length > 0 ? [minPrice - padding, maxPrice + padding] : [0, 1]}
+            />
+            <Tooltip
+              formatter={(value: any) => [
+                `R$ ${Number(value).toFixed(4)}`,
+                "Venda"
+              ]}
+              labelFormatter={(label) => 
+                chartType === 'day' ? `${label}h` : `Dia ${label}`
+              }
+              contentStyle={{
+                backgroundColor: '#fff',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '12px'
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="sellPrice"
+              stroke="#f3b234"
+              fillOpacity={1}
+              fill="url(#colorSell)"
+              strokeWidth={2}
+              connectNulls
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 }

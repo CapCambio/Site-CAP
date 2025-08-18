@@ -1,0 +1,88 @@
+Prompt Detalhado para Implementar Função Intraday nos Cards
+1. Toggle de Seleção de Período
+No componente CurrencyMiniChart, adicione um sistema de toggle com dois botões:
+
+"Mês" (padrão) - para gráfico mensal existente
+"Dia" - para gráfico intraday
+const [chartType, setChartType] = useState<'month' | 'day'>('month');
+2. Título "Movimentação"
+Adicione um título acima dos botões de toggle:
+
+Texto: "Movimentação"
+Estilo: fonte pequena, cor cinza
+3. Estrutura Visual do Toggle
+Crie dois botões lado a lado:
+
+Botão ativo: fundo amarelo (#f3b234), texto preto
+Botão inativo: fundo transparente, texto cinza
+Transição suave entre estados
+Tamanho pequeno e compacto
+4. Hook useIntradayChart
+Crie um hook que busca dados do dia atual:
+
+Endpoint: /api/history/${currencyCode}?startDate=${hoje}&endDate=${hoje}
+Processamento: Organiza dados por hora (00h até 23h)
+Lógica:
+Cria array de 24 horas
+Preenche com dados reais quando disponíveis
+Usa último preço conhecido para preencher lacunas
+Não mostra horas futuras (baseado na hora atual)
+5. Estrutura de Dados Intraday
+interface IntradayChartData {
+  hour: string;        // "01", "02", "03"...
+  sellPrice: number | null;
+  buyPrice: number | null;
+  hasRealData: boolean; // true se tem dado real da hora
+}
+6. Lógica de Renderização do Gráfico
+Gráfico mensal: Eixo X mostra dias do mês (1, 2, 3...)
+Gráfico intraday: Eixo X mostra horas do dia (01h, 02h, 03h...)
+Cor da linha: Mantém o amarelo #f3b234
+Área do gráfico: Gradient do amarelo para transparente
+7. Sistema de Fallback
+Se não há mudanças de preço no dia: não exibir gráfico intraday
+Se só há um preço: não exibir gráfico intraday
+Mostrar mensagem: "Sem variações no período"
+8. Condições de Exibição
+Gráfico intraday só aparece quando:
+Há pelo menos 2 preços diferentes no dia
+Existem dados do dia atual
+Toggle está em "Dia"
+9. Atualização Automática
+Refetch a cada 5 minutos
+Integração com React Query
+Cache por código de moeda
+10. Estados de Loading
+Mostrar skeleton/loading quando buscando dados
+Manter UX consistente entre mês e dia
+11. Responsividade
+Manter a mesma altura do gráfico mensal
+Adaptar para mobile (mesma lógica atual)
+12. Tooltip Personalizado
+Para gráfico mensal: mostrar data completa
+Para gráfico intraday: mostrar hora e preço
+13. Legendas do Eixo X
+Mensal: dias do mês (1, 5, 10, 15, 20, 25, 30)
+Intraday: horas do dia (06h, 12h, 18h)
+14. Controle de Dados Válidos
+const shouldShowChart = chartType === 'day'
+  ? activeChartData.some(item => item.hasRealData) && 
+    uniquePricesCount > 1
+  : activeChartData.length > 0;
+15. Integração com Estado do Card
+Funcionar dentro da área expandível do card
+Manter a navegação de mês (setas esquerda/direita) apenas para modo "Mês"
+Para modo "Dia", sempre mostrar o dia atual
+16. Performance
+Usar React Query para cache
+Evitar re-renders desnecessários
+Lazy loading dos dados intraday
+17. Estilo Visual Exato
+Manter a mesma paleta de cores
+Botões com cantos arredondados
+Espaçamento consistente com o layout atual
+Fonte e tamanhos idênticos ao resto do card
+18. Detecção de Dados
+Verificar se existem múltiplos registros únicos no dia
+Se só há um preço, não mostrar opção "Dia"
+Desabilitar toggle "Dia" quando não há dados suficientes
