@@ -102,7 +102,7 @@ export function CurrencyCard({
   };
 
   return (
-    <Card className={`currency-card overflow-hidden hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
+    <Card className={`currency-card hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
       <div className="bg-[#1a1a1a] text-white p-4 flex items-center justify-between">
         <div className="flex items-center">
           <CurrencyLogo code={code} className="mr-3" />
@@ -244,7 +244,7 @@ export function CurrencyCard({
 
         {/* Área expandível com o gráfico */}
         {isExpanded && (
-          <div className="mt-3 pt-3 border-t border-gray-200">
+          <div className="mt-4 pt-4 border-t border-gray-200 pb-2">
             <CurrencyMiniChart 
               currencyCode={currency.code} 
               currentPrice={displaySellPrice || undefined}
