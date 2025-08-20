@@ -250,9 +250,31 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
   return (
     <div className="w-full h-[180px]">
-      {/* Título "Movimentação" e Toggle */}
+      {/* Título "Movimentação", Navegação dos Meses e Toggle */}
       <div className="flex items-center justify-between mb-4">
         <h4 className="text-sm font-medium text-gray-700">Movimentação</h4>
+        
+        {/* Navegação do mês no centro (apenas para modo mensal) */}
+        {chartType === 'month' && (
+          <div className="flex items-center">
+            <button 
+              onClick={goToPreviousMonth}
+              disabled={isPreviousDisabled}
+              className={`p-1 rounded ${isPreviousDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <h4 className="text-sm font-medium mx-3 capitalize min-w-[80px] text-center">{capitalizedMonthName}</h4>
+            <button 
+              onClick={goToNextMonth}
+              disabled={isNextDisabled}
+              className={`p-1 rounded ${isNextDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
+        
         <div className="flex bg-gray-200 p-1 rounded-lg">
           <button
             onClick={() => setChartType('month')}
@@ -276,27 +298,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </button>
         </div>
       </div>
-
-      {/* Navegação do mês (apenas para modo mensal) */}
-      {chartType === 'month' && (
-        <div className="flex items-center justify-center mb-2">
-          <button 
-            onClick={goToPreviousMonth}
-            disabled={isPreviousDisabled}
-            className={`p-1 rounded ${isPreviousDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <h4 className="text-sm font-medium mx-2 capitalize">{capitalizedMonthName}</h4>
-          <button 
-            onClick={goToNextMonth}
-            disabled={isNextDisabled}
-            className={`p-1 rounded ${isNextDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      )}
 
       {/* Título do dia atual para modo intraday */}
       {chartType === 'day' && (
