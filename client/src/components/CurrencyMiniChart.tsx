@@ -394,6 +394,15 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </AreaChart>
         </ResponsiveContainer>
       )}
+      
+      {/* Label embaixo do gráfico */}
+      {(shouldShowChart || activeIsLoading) && (
+        <div className="text-center mt-2">
+          <p className="text-xs text-gray-500 font-medium">
+            {chartType === 'month' ? 'Dias' : 'Horas'}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
