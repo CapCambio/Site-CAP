@@ -308,11 +308,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       )}
 
       {activeIsLoading ? (
-        <div className="w-full h-[140px] flex items-center justify-center bg-gray-100 rounded animate-pulse">
+        <div className="w-full h-[180px] flex items-center justify-center bg-gray-100 rounded animate-pulse">
           <p className="text-gray-500 text-sm">Carregando dados...</p>
         </div>
       ) : !shouldShowChart ? (
-        <div className="w-full h-[140px] flex items-center justify-center bg-gray-100 rounded">
+        <div className="w-full h-[180px] flex items-center justify-center bg-gray-100 rounded">
           <p className="text-gray-500 text-sm">
             {chartType === 'day' 
               ? (!shouldShowIntradayChart 
@@ -324,8 +324,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </p>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={140}>
-          <AreaChart data={activeChartData} margin={{ top: 5, right: 5, left: 5, bottom: 20 }}>
+        <ResponsiveContainer width="100%" height={180}>
+          <AreaChart data={activeChartData} margin={{ top: 5, right: 5, left: 5, bottom: 35 }}>
             <defs>
               <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#f3b234" stopOpacity={0.1}/>
@@ -340,8 +340,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               interval={0}
               type="category"
               scale="point"
-              tickMargin={5}
-              height={25}
+              tickMargin={8}
+              height={35}
               ticks={getXAxisTicks()}
             />
             <YAxis 
