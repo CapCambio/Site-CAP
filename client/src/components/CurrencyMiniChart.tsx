@@ -250,7 +250,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
   return (
     <div className="w-full h-[180px]">
-      {/* Título "Movimentação", Navegação dos Meses e Toggle */}
+      {/* Título "Movimentação", Navegação/Data e Toggle */}
       <div className="flex items-center justify-between mb-4">
         <h4 className="text-sm font-medium text-gray-700">Movimentação</h4>
         
@@ -272,6 +272,15 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             >
               <ChevronRight size={16} />
             </button>
+          </div>
+        )}
+
+        {/* Título do dia atual no centro (apenas para modo intraday) */}
+        {chartType === 'day' && (
+          <div className="flex items-center">
+            <h4 className="text-sm font-medium min-w-[120px] text-center">
+              {format(today, "dd 'de' MMMM", { locale: ptBR })}
+            </h4>
           </div>
         )}
         
@@ -298,15 +307,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </button>
         </div>
       </div>
-
-      {/* Título do dia atual para modo intraday */}
-      {chartType === 'day' && (
-        <div className="flex items-center justify-center mb-2">
-          <h4 className="text-sm font-medium">
-            {format(today, "dd 'de' MMMM", { locale: ptBR })}
-          </h4>
-        </div>
-      )}
 
       {activeIsLoading ? (
         <div className="w-full h-[200px] flex items-center justify-center bg-gray-100 rounded animate-pulse">
