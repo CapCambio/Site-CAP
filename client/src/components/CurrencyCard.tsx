@@ -129,7 +129,7 @@ export function CurrencyCard({
           </span>
         </div>
       </div>
-      <div className="p-4">
+      <div className="p-6">
         <div className="flex justify-between mb-3">
           <div>
             <p className="text-sm text-gray-500">Compra</p>
@@ -244,7 +244,7 @@ export function CurrencyCard({
 
         {/* Área expandível com o gráfico */}
         {isExpanded && (
-          <div className="mt-4 pt-4 border-t border-gray-200 pb-2">
+          <div className="mt-6 pt-6 border-t border-gray-200 pb-4">
             <CurrencyMiniChart 
               currencyCode={currency.code} 
               currentPrice={displaySellPrice || undefined}
