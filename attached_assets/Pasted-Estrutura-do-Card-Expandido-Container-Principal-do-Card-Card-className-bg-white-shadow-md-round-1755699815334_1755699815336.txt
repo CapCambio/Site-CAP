@@ -1,0 +1,70 @@
+Estrutura do Card Expandido
+Container Principal do Card
+<Card className={`bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
+Margem inferior quando expandido: mb-4 = 16px
+Fundo: bg-white (branco)
+Sombra: shadow-md (sombra média)
+Cantos: rounded-lg (8px de border-radius)
+Overflow: overflow-hidden
+Transição: transition-all duration-300
+Área Expandível (Gráfico)
+{isExpanded && !isOffline && (
+  <div className="mt-3 pt-3 border-t border-gray-200">
+    <CurrencyMiniChart 
+      currencyCode={currency.code} 
+      currentPrice={displaySellPrice || undefined}
+      selectedDate={selectedDate}
+    />
+  </div>
+)}
+Medidas exatas da área expandível:
+
+Container: mt-3 pt-3 border-t border-gray-200
+Margem superior: mt-3 = 12px
+Padding superior: pt-3 = 12px
+Borda superior: border-t border-gray-200 (1px sólida cinza claro)
+Total de espaçamento: 12px + 12px = 24px entre o conteúdo principal e o gráfico
+Padding do Conteúdo Principal
+<div className="p-4">
+Padding em todas as direções: p-4 = 16px
+Posicionamento Interno
+Cabeçalho do card: bg-[#1a1a1a] text-white p-4
+
+Padding: 16px em todas as direções
+Fundo preto com texto branco
+Área de preços: p-4
+
+Padding: 16px em todas as direções
+Contém os preços de compra e venda
+Área de variação: flex items-center justify-between
+
+Alinhamento horizontal entre o botão "Mais informações" e a variação
+Área expandível:
+
+Posição: Dentro do p-4 (com padding de 16px)
+Separação: mt-3 pt-3 = 24px do conteúdo acima
+Borda: 1px sólida no topo
+Largura: Ocupa toda a largura disponível (menos os 32px de padding total)
+Hierarquia Visual Correta
+Card (bg-white, shadow-md, rounded-lg)
+├── Header (bg-[#1a1a1a], p-4)
+└── Content Container (p-4) [16px padding]
+    ├── Preços (mb-3)
+    ├── Mensagens (mb-3)
+    ├── Botão + Variação (flex justify-between)
+    └── [SE EXPANDIDO] Área do Gráfico (mt-3 pt-3 border-t)
+        └── CurrencyMiniChart (dentro da área)
+Problema Identificado
+Se no seu outro projeto as legendas estão fora dos cards, provavelmente:
+
+Falta o container com padding: A área expandível deve estar dentro do <div className="p-4">
+Positioning incorreto: O gráfico pode estar com position: absolute ou similar
+Overflow não configurado: O card pode não ter overflow-hidden
+Z-index conflitante: Elementos podem estar sobrepostos incorretamente
+Medidas Específicas para Replicar
+Card total: Largura responsiva, altura automática
+Padding lateral: 16px em cada lado (total 32px)
+Espaçamento do gráfico: 24px acima (12px margin + 12px padding)
+Borda de separação: 1px sólida #e5e7eb (gray-200)
+Margem inferior do card expandido: 16px
+O gráfico DEVE estar contido dentro da área com p-4 para manter o alinhamento correto com o resto do conteúdo do card.

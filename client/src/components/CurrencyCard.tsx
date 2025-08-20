@@ -244,7 +244,7 @@ export function CurrencyCard({
 
         {/* Área expandível com o gráfico */}
         {isExpanded && (
-          <div className="mt-4 pt-4 border-t border-gray-200 pb-6">
+          <div className="mt-3 pt-3 border-t border-gray-200">
             <CurrencyMiniChart 
               currencyCode={currency.code} 
               currentPrice={displaySellPrice || undefined}
