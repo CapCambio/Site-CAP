@@ -397,8 +397,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       
       {/* Label embaixo do gráfico */}
       {(shouldShowChart || activeIsLoading) && (
-        <div className="relative">
-          <p className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-[-8px] text-xs text-gray-500 font-medium">
+        <div className="text-center mt-2">
+          <p className="text-xs text-gray-500 font-medium">
             {chartType === 'month' ? 'Dias' : 'Horas'}
           </p>
         </div>
