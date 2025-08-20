@@ -252,7 +252,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     <div className="w-full h-[180px]">
       {/* Título "Movimentação", Navegação/Data e Toggle */}
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-medium text-gray-700">Movimentação</h4>
+        <h4 className="text-sm font-medium text-gray-700 -translate-y-0.5">Movimentação</h4>
         
         {/* Navegação do mês no centro (apenas para modo mensal) */}
         {chartType === 'month' && (
