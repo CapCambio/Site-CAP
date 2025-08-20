@@ -308,11 +308,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       )}
 
       {activeIsLoading ? (
-        <div className="w-full h-[220px] flex items-center justify-center bg-gray-100 rounded animate-pulse">
+        <div className="w-full h-[200px] flex items-center justify-center bg-gray-100 rounded animate-pulse">
           <p className="text-gray-500 text-sm">Carregando dados...</p>
         </div>
       ) : !shouldShowChart ? (
-        <div className="w-full h-[220px] flex items-center justify-center bg-gray-100 rounded">
+        <div className="w-full h-[200px] flex items-center justify-center bg-gray-100 rounded">
           <p className="text-gray-500 text-sm">
             {chartType === 'day' 
               ? (!shouldShowIntradayChart 
@@ -324,8 +324,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </p>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={220}>
-          <AreaChart data={activeChartData} margin={{ top: 10, right: 10, left: 10, bottom: 45 }}>
+        <ResponsiveContainer width="100%" height={200}>
+          <AreaChart data={activeChartData} margin={{ top: 10, right: 15, left: 15, bottom: 40 }}>
             <defs>
               <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#f3b234" stopOpacity={0.1}/>

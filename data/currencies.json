@@ -7,7 +7,7 @@
     "sellPrice": 5.88,
     "change": 1.38,
     "displayOrder": 1,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 2,
@@ -17,7 +17,7 @@
     "sellPrice": 6.88,
     "change": 1.33,
     "displayOrder": 2,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 3,
@@ -27,7 +27,7 @@
     "sellPrice": 8.11,
     "change": 0.75,
     "displayOrder": 3,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 4,
@@ -37,7 +37,7 @@
     "sellPrice": 3.89,
     "change": 0.52,
     "displayOrder": 4,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 5,
@@ -47,7 +47,7 @@
     "sellPrice": 0.0061,
     "change": 0,
     "displayOrder": 5,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 6,
@@ -57,7 +57,7 @@
     "sellPrice": 3.51,
     "change": 0.57,
     "displayOrder": 6,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 7,
@@ -67,7 +67,7 @@
     "sellPrice": 4.35,
     "change": 0.93,
     "displayOrder": 7,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 8,
@@ -77,7 +77,7 @@
     "sellPrice": 7.44,
     "change": 1.64,
     "displayOrder": 8,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 9,
@@ -87,7 +87,7 @@
     "sellPrice": 0.172,
     "change": 0,
     "displayOrder": 9,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 10,
@@ -97,7 +97,7 @@
     "sellPrice": 0.0069,
     "change": 0,
     "displayOrder": 10,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 11,
@@ -107,7 +107,7 @@
     "sellPrice": 0.365,
     "change": 0,
     "displayOrder": 11,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 12,
@@ -117,7 +117,7 @@
     "sellPrice": 0.00188,
     "change": 0,
     "displayOrder": 12,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 13,
@@ -127,7 +127,7 @@
     "sellPrice": 0.88,
     "change": 0,
     "displayOrder": 13,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 14,
@@ -137,7 +137,7 @@
     "sellPrice": 0.0425,
     "change": 1.19,
     "displayOrder": 14,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 15,
@@ -147,7 +147,7 @@
     "sellPrice": 1.77,
     "change": 0.28,
     "displayOrder": 15,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   },
   {
     "id": 16,
@@ -157,6 +157,6 @@
     "sellPrice": 0.36,
     "change": 1.98,
     "displayOrder": 16,
-    "lastUpdate": "2025-08-20T13:58:45.441Z"
+    "lastUpdate": "2025-08-20T14:00:51.980Z"
   }
 ]
