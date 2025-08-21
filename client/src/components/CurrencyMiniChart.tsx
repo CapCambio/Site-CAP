@@ -336,7 +336,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           <AreaChart data={activeChartData} margin={chartType === 'day' ? { top: 5, right: 5, left: 5, bottom: 20 } : { top: 10, right: 15, left: 15, bottom: 25 }}>
             <defs>
               <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f3b234" stopOpacity={chartType === 'day' ? 0.6 : 0.1}/>
+                <stop offset="5%" stopColor="#f3b234" stopOpacity={chartType === 'day' ? 0.3 : 0.1}/>
                 <stop offset="95%" stopColor="#f3b234" stopOpacity={0}/>
               </linearGradient>
             </defs>
