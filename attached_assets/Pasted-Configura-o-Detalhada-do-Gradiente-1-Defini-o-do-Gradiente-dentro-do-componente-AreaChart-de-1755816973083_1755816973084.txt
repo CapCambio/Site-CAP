@@ -1,0 +1,76 @@
+Configuração Detalhada do Gradiente
+1. Definição do Gradiente (dentro do componente AreaChart)
+<defs>
+  <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="5%" stopColor="#f3b234" stopOpacity={0.3}/>
+    <stop offset="95%" stopColor="#f3b234" stopOpacity={0}/>
+  </linearGradient>
+</defs>
+2. Especificações Técnicas do Gradiente:
+Identificador único:
+
+id="colorSell" - Nome único para referenciar o gradiente
+Direção e orientação:
+
+x1="0" - Início horizontal (esquerda)
+y1="0" - Início vertical (topo)
+x2="0" - Fim horizontal (mesma posição = vertical)
+y2="1" - Fim vertical (base = 100%)
+Pontos de parada (stops):
+
+Primeiro stop (topo):
+
+offset="5%" - Começa em 5% da altura do gradiente
+stopColor="#f3b234" - Cor exata: amarelo/dourado
+stopOpacity={0.3} - 30% de opacidade
+Segundo stop (base):
+
+offset="95%" - Termina em 95% da altura do gradiente
+stopColor="#f3b234" - Mesma cor
+stopOpacity={0} - 0% de opacidade (transparente)
+3. Aplicação no Area Component:
+<Area
+  type="monotone"
+  dataKey="sellPrice"
+  stroke="#f3b234"
+  fillOpacity={1}
+  fill="url(#colorSell)"
+  strokeWidth={2}
+  connectNulls={false}
+  dot={validDataCount === 1 || isConstantPrice ? 
+    { fill: '#f3b234', strokeWidth: 1, r: 2 } : 
+    false
+  }
+/>
+4. Propriedades Críticas para Visibilidade:
+fillOpacity:
+
+fillOpacity={1} - CRUCIAL: Deve ser 1 (100%) para que o gradiente seja visível
+fill:
+
+fill="url(#colorSell)" - Referência ao gradiente definido
+stroke:
+
+stroke="#f3b234" - Cor da linha (mesma do gradiente)
+5. Container e Contexto:
+<ResponsiveContainer width="100%" height={140}>
+  <AreaChart data={activeChartData} margin={{ top: 5, right: 5, left: 5, bottom: 20 }}>
+    {/* Gradiente aqui */}
+  </AreaChart>
+</ResponsiveContainer>
+6. Possíveis Causas da Baixa Visibilidade:
+fillOpacity diferente de 1
+stopOpacity muito baixo (menor que 0.3)
+Altura do container muito pequena
+Dados insuficientes (poucos pontos no gráfico)
+CSS conflitante sobrescrevendo opacidades
+7. Verificações Essenciais:
+No seu outro projeto, confirme se:
+
+fillOpacity={1} está definido
+As stopOpacity estão exatamente {0.3} e {0}
+O container tem altura adequada (mínimo 100px)
+Não há CSS externo afetando .recharts-area
+8. Cor Hexadecimal Exata:
+#f3b234 = RGB(243, 178, 52)
+HSL(42°, 90%, 58%)

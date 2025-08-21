@@ -336,7 +336,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           <AreaChart data={activeChartData} margin={chartType === 'day' ? { top: 5, right: 5, left: 5, bottom: 20 } : { top: 10, right: 15, left: 15, bottom: 25 }}>
             <defs>
               <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f3b234" stopOpacity={chartType === 'day' ? 0.3 : 0.1}/>
+                <stop offset="5%" stopColor="#f3b234" stopOpacity={0.3}/>
                 <stop offset="95%" stopColor="#f3b234" stopOpacity={0}/>
               </linearGradient>
             </defs>
@@ -395,14 +395,10 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               fillOpacity={1}
               fill="url(#colorSell)"
               strokeWidth={2}
-              connectNulls={chartType === 'month'}
-              dot={chartType === 'day' && (validDataCount === 1 || isConstantPrice) ? 
+              connectNulls={false}
+              dot={validDataCount === 1 || isConstantPrice ? 
                 { fill: '#f3b234', strokeWidth: 1, r: 2 } : 
                 false
-              }
-              activeDot={chartType === 'day' ? 
-                { r: 4, stroke: '#f3b234', strokeWidth: 1, fill: '#fff' } :
-                { r: 5, stroke: '#f3b234', strokeWidth: 2, fill: '#fff' }
               }
             />
           </AreaChart>
