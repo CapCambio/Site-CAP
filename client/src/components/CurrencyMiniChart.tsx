@@ -235,7 +235,14 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
   const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : 0;
   const maxPrice = validPrices.length > 0 ? Math.max(...validPrices) : 0;
-  const padding = validPrices.length > 0 ? (maxPrice - minPrice) * 0.1 : 0;
+  const priceRange = maxPrice - minPrice;
+  const isConstantPrice = priceRange === 0;
+  const validDataCount = validPrices.length;
+  
+  // Cálculo da margem conforme especificação
+  const padding = isConstantPrice 
+    ? Math.max(minPrice * 0.001, 0.001) 
+    : priceRange * 0.1;
 
   // Configurar ticks do eixo X baseado no tipo de gráfico
   const getXAxisTicks = () => {
@@ -325,11 +332,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </p>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={activeChartData} margin={{ top: 10, right: 15, left: 15, bottom: 25 }}>
+        <ResponsiveContainer width="100%" height={chartType === 'day' ? 140 : 200}>
+          <AreaChart data={activeChartData} margin={chartType === 'day' ? { top: 5, right: 5, left: 5, bottom: 20 } : { top: 10, right: 15, left: 15, bottom: 25 }}>
             <defs>
               <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f3b234" stopOpacity={0.1}/>
+                <stop offset="5%" stopColor="#f3b234" stopOpacity={chartType === 'day' ? 0.3 : 0.1}/>
                 <stop offset="95%" stopColor="#f3b234" stopOpacity={0}/>
               </linearGradient>
             </defs>
@@ -341,7 +348,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               interval={0}
               type="category"
               scale="point"
-              tickMargin={2}
+              tickMargin={chartType === 'day' ? 5 : 2}
               height={25}
               ticks={getXAxisTicks()}
             />
@@ -388,9 +395,15 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               fillOpacity={1}
               fill="url(#colorSell)"
               strokeWidth={2}
-              connectNulls
-              dot={{ fill: '#f3b234', strokeWidth: 2, r: 3 }}
-              activeDot={{ r: 5, stroke: '#f3b234', strokeWidth: 2, fill: '#fff' }}
+              connectNulls={chartType === 'month'}
+              dot={chartType === 'day' && (validDataCount === 1 || isConstantPrice) ? 
+                { fill: '#f3b234', strokeWidth: 1, r: 2 } : 
+                false
+              }
+              activeDot={chartType === 'day' ? 
+                { r: 4, stroke: '#f3b234', strokeWidth: 1, fill: '#fff' } :
+                { r: 5, stroke: '#f3b234', strokeWidth: 2, fill: '#fff' }
+              }
             />
           </AreaChart>
         </ResponsiveContainer>

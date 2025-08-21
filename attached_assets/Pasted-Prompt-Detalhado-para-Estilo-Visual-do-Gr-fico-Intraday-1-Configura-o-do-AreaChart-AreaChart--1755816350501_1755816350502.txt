@@ -1,0 +1,146 @@
+Prompt Detalhado para Estilo Visual do Gráfico Intraday
+1. Configuração do AreaChart
+<AreaChart 
+  data={activeChartData} 
+  margin={{ top: 5, right: 5, left: 5, bottom: 20 }}
+>
+2. Gradiente Linear (Essencial)
+<defs>
+  <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="5%" stopColor="#f3b234" stopOpacity={0.3}/>
+    <stop offset="95%" stopColor="#f3b234" stopOpacity={0}/>
+  </linearGradient>
+</defs>
+Especificações do gradiente:
+
+Cor: #f3b234 (amarelo/dourado)
+Direção: Vertical (de cima para baixo)
+Opacidade inicial: 0.3 (30%) no topo
+Opacidade final: 0 (transparente) na base
+Transição: Do offset 5% ao 95%
+3. Configuração do Eixo X
+<XAxis
+  dataKey="hour" // ou "day" para mensal
+  tick={{ fontSize: 8, fill: '#666' }}
+  tickLine={false}
+  axisLine={false}
+  interval={0} // Mostrar todas as horas
+  type="category"
+  scale="point"
+  tickMargin={5}
+  height={25}
+/>
+Especificações:
+
+Fonte: 8px de tamanho
+Cor: #666 (cinza médio)
+Sem linhas: tickLine={false} e axisLine={false}
+Margem: 5px entre texto e gráfico
+Altura: 25px reservados para o eixo
+4. Configuração do Eixo Y
+<YAxis
+  hide={true}
+  domain={[minPrice - margin, maxPrice + margin]}
+/>
+Especificações:
+
+Invisível: hide={true}
+Domínio: Calculado dinamicamente com margem de 10%
+5. Área do Gráfico (Principal)
+<Area
+  type="monotone"
+  dataKey="sellPrice"
+  stroke="#f3b234"
+  fillOpacity={1}
+  fill="url(#colorSell)"
+  strokeWidth={2}
+  connectNulls={false}
+  dot={validDataCount === 1 || isConstantPrice ? 
+    { fill: '#f3b234', strokeWidth: 1, r: 2 } : 
+    false
+  }
+/>
+Especificações da Área:
+
+Tipo: monotone (curva suave)
+Cor da linha: #f3b234 (mesmo amarelo)
+Espessura da linha: 2px
+Preenchimento: Gradiente url(#colorSell)
+Opacidade do preenchimento: 1 (100%)
+Conectar pontos nulos: false
+Especificações das Bolinhas:
+
+Raio: r: 2 (tamanho pequeno)
+Cor de preenchimento: #f3b234
+Espessura da borda: strokeWidth: 1
+Quando aparecem: Apenas quando há um único ponto de dados OU quando o preço é constante
+6. Tooltip Customizado
+<Tooltip
+  content={({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const sellPrice = data.sellPrice;
+      const buyPrice = data.buyPrice;
+      return (
+        <div style={{
+          backgroundColor: '#fff',
+          border: '1px solid #ddd',
+          borderRadius: '4px',
+          padding: '6px',
+          fontSize: '12px'
+        }}>
+          <p style={{ margin: '0 0 3px 0', fontWeight: 'bold' }}>
+            {`${label}h`}
+          </p>
+          <p style={{ margin: '0 0 2px 0', color: '#000' }}>
+            Venda: R$ {sellPrice ? sellPrice.toFixed(4) : 'N/A'}
+          </p>
+          {buyPrice && (
+            <p style={{ margin: '0', color: '#000' }}>
+              Compra: R$ {buyPrice.toFixed(4)}
+            </p>
+          )}
+        </div>
+      );
+    }
+    return null;
+  }}
+/>
+7. Container Responsivo
+<ResponsiveContainer width="100%" height={140}>
+  {/* AreaChart aqui */}
+</ResponsiveContainer>
+Especificações:
+
+Largura: 100% do container pai
+Altura: Exatamente 140px
+8. Condições para Mostrar Bolinhas
+As bolinhas (dots) só aparecem quando:
+
+validDataCount === 1 (apenas um ponto de dados)
+OU isConstantPrice === true (preço não varia)
+9. Cálculo da Margem do Eixo Y
+const validPrices = activeChartData
+  .map(d => d.sellPrice)
+  .filter((price): price is number => price !== null);
+const minPrice = Math.min(...validPrices);
+const maxPrice = Math.max(...validPrices);
+const priceRange = maxPrice - minPrice;
+const isConstantPrice = priceRange === 0;
+const margin = isConstantPrice ? Math.max(minPrice * 0.001, 0.001) : priceRange * 0.1;
+10. Estrutura dos Dados
+Cada item do array deve ter:
+
+{
+  hour: "09", // hora como string
+  sellPrice: 5.4123, // preço como number ou null
+  buyPrice: 5.3987, // preço como number ou null (opcional)
+  hasRealData: true // boolean
+}
+Resumo Visual:
+Linha: 2px de espessura, cor #f3b234
+Preenchimento: Gradiente de #f3b234 com 30% opacidade no topo para transparente na base
+Bolinhas: Raio 2px, cor #f3b234, apenas em casos especiais
+Eixos: X visível (8px, cinza), Y invisível
+Altura total: 140px
+Margem: 5px em todos os lados, 20px na base
