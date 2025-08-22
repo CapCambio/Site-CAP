@@ -247,8 +247,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   // Configurar ticks do eixo X baseado no tipo de gráfico
   const getXAxisTicks = () => {
     if (chartType === 'day') {
-      // Para intraday: mostrar algumas horas selecionadas
-      return isMobile ? ['06', '12', '18'] : undefined;
+      // Para intraday: mostrar todas as horas (00-23)
+      return undefined; // Deixa o Recharts mostrar todos os ticks automaticamente
     } else {
       // Para mensal: usar lógica existente
       return xAxisTicks;
