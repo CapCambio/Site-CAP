@@ -256,7 +256,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   };
 
   return (
-    <div className="w-full h-[180px]">
+    <div className="w-full h-[220px] sm:h-[180px]">
       {/* Layout para Desktop e Mobile Landscape */}
       <div className="hidden sm:flex md:flex items-center justify-between mb-4">
         <h4 className="text-sm font-medium text-gray-700 -translate-y-0.5">Movimentação</h4>
