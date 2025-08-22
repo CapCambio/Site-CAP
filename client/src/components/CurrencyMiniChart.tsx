@@ -195,6 +195,20 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   // Usar todos os dados no gráfico
   const chartData = allChartData;
 
+  // Para mobile portrait: filtrar ticks para mostrar apenas ímpares + último dia
+  const getCustomTicks = () => {
+    if (isMobilePortrait && chartType === 'month') {
+      const daysInMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0).getDate();
+      return allChartData.filter(item => {
+        const day = parseInt(item.day);
+        const isOddDay = day % 2 === 1;
+        const isLastDay = day === daysInMonth;
+        return isOddDay || isLastDay;
+      }).map(item => item.day);
+    }
+    return undefined;
+  };
+
   if (isLoading) {
     return (
       <div className="w-full h-[180px] flex items-center justify-center bg-gray-100 rounded animate-pulse">
@@ -415,7 +429,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               tick={{ fontSize: 8, fill: '#666' }}
               tickLine={false}
               axisLine={false}
-              interval={(isMobileLandscape || isMobilePortrait) && chartType === 'month' ? 1 : 0}
+              interval={isMobileLandscape && chartType === 'month' ? 1 : 0}
+              ticks={getCustomTicks()}
               type="category"
               scale="point"
               tickMargin={chartType === 'day' ? 5 : 2}
