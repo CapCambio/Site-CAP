@@ -466,8 +466,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               ticks={getCustomTicks()}
               type="category"
               scale="point"
-              tickMargin={chartType === 'day' ? 5 : 2}
-              height={25}
+              tickMargin={chartType === 'day' ? 5 : (isMobilePortrait ? 4 : 2)}
+              height={isMobilePortrait ? 30 : 25}
             />
             <YAxis 
               hide={true}
