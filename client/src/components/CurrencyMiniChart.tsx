@@ -169,18 +169,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     };
   });
 
-  // Para mobile: usar todos os dados no gráfico, mas filtrar apenas os ticks do eixo X
+  // Usar todos os dados no gráfico
   const chartData = allChartData;
-  
-  // Filtrar apenas os ticks da legenda para mobile
-  const xAxisTicks = isMobile 
-    ? allChartData.filter(item => {
-        const day = parseInt(item.day);
-        const isLastDay = day === daysInFullMonth;
-        const isOddDay = day % 2 === 1;
-        return isOddDay || isLastDay;
-      }).map(item => item.day)
-    : undefined;
 
   if (isLoading) {
     return (
@@ -246,16 +236,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     ? Math.max(minPrice * 0.001, 0.001) 
     : priceRange * 0.1;
 
-  // Configurar ticks do eixo X baseado no tipo de gráfico
-  const getXAxisTicks = () => {
-    if (chartType === 'day') {
-      // Para intraday: mostrar todas as horas (00-23)
-      return undefined; // Deixa o Recharts mostrar todos os ticks automaticamente
-    } else {
-      // Para mensal: usar lógica existente
-      return xAxisTicks;
-    }
-  };
+
 
   return (
     <div className="w-full h-[220px] sm:h-[180px]">
@@ -416,7 +397,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               scale="point"
               tickMargin={chartType === 'day' ? 5 : 2}
               height={25}
-              ticks={getXAxisTicks()}
             />
             <YAxis 
               hide={true}
