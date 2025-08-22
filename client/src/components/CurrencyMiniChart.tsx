@@ -19,6 +19,25 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const initialMonth = selectedDate ? startOfMonth(selectedDate) : startOfMonth(today);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [chartType, setChartType] = useState<'month' | 'day'>('month');
+  const [isMobileLandscape, setIsMobileLandscape] = useState(false);
+
+  // Detectar mobile landscape
+  useEffect(() => {
+    const checkOrientation = () => {
+      const isMobile = window.innerWidth < 640; // Tailwind's sm breakpoint
+      const isLandscape = window.innerWidth > window.innerHeight;
+      setIsMobileLandscape(isMobile && isLandscape);
+    };
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
 
 
 
@@ -392,7 +411,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               tick={{ fontSize: 8, fill: '#666' }}
               tickLine={false}
               axisLine={false}
-              interval={0}
+              interval={isMobileLandscape && chartType === 'month' ? 1 : 0}
               type="category"
               scale="point"
               tickMargin={chartType === 'day' ? 5 : 2}
