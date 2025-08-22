@@ -257,8 +257,8 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
   return (
     <div className="w-full h-[180px]">
-      {/* Título "Movimentação", Navegação/Data e Toggle */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Layout para Desktop e Mobile Landscape */}
+      <div className="hidden sm:flex md:flex items-center justify-between mb-4">
         <h4 className="text-sm font-medium text-gray-700 -translate-y-0.5">Movimentação</h4>
         
         {/* Navegação do mês no centro (apenas para modo mensal) */}
@@ -312,6 +312,70 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           >
             Dia
           </button>
+        </div>
+      </div>
+
+      {/* Layout para Mobile Portrait */}
+      <div className="block sm:hidden">
+        {/* Primeira linha: Título "Movimentação" e Toggle */}
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-sm font-medium text-gray-700 -translate-y-0.5">Movimentação</h4>
+          
+          <div className="flex bg-gray-200 p-1 rounded-lg">
+            <button
+              onClick={() => setChartType('month')}
+              className={`px-3 py-1 text-sm rounded-md transition-all duration-300 ${
+                chartType === 'month'
+                  ? 'bg-[#f3b234] text-[#1a1a1a] shadow-sm'
+                  : 'text-gray-600 hover:text-[#1a1a1a]'
+              }`}
+            >
+              Mês
+            </button>
+            <button
+              onClick={() => setChartType('day')}
+              className={`px-3 py-1 text-sm rounded-md transition-all duration-300 ${
+                chartType === 'day'
+                  ? 'bg-[#f3b234] text-[#1a1a1a] shadow-sm'
+                  : 'text-gray-600 hover:text-[#1a1a1a]'
+              }`}
+            >
+              Dia
+            </button>
+          </div>
+        </div>
+
+        {/* Segunda linha: Navegação/Data centralizada */}
+        <div className="flex justify-center mb-4">
+          {/* Navegação do mês (apenas para modo mensal) */}
+          {chartType === 'month' && (
+            <div className="flex items-center">
+              <button 
+                onClick={goToPreviousMonth}
+                disabled={isPreviousDisabled}
+                className={`p-1 rounded ${isPreviousDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <h4 className="text-sm font-medium mx-3 capitalize min-w-[80px] text-center">{capitalizedMonthName}</h4>
+              <button 
+                onClick={goToNextMonth}
+                disabled={isNextDisabled}
+                className={`p-1 rounded ${isNextDisabled ? 'text-gray-400' : 'text-[#1a1a1a] hover:bg-gray-200'}`}
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+
+          {/* Título do dia atual (apenas para modo intraday) */}
+          {chartType === 'day' && (
+            <div className="flex items-center">
+              <h4 className="text-sm font-medium min-w-[120px] text-center">
+                {format(today, "dd 'de' MMMM", { locale: ptBR })}
+              </h4>
+            </div>
+          )}
         </div>
       </div>
 
