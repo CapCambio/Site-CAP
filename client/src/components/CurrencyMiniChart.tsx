@@ -19,6 +19,25 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const initialMonth = selectedDate ? startOfMonth(selectedDate) : startOfMonth(today);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [chartType, setChartType] = useState<'month' | 'day'>('month');
+  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
+
+  // Detectar mobile portrait
+  useEffect(() => {
+    const checkOrientation = () => {
+      const isMobile = window.innerWidth < 640; // Tailwind's sm breakpoint
+      const isPortrait = window.innerHeight > window.innerWidth;
+      setIsMobilePortrait(isMobile && isPortrait);
+    };
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
 
   // Buscar dados atuais da moeda primeiro
   const { data: currentCurrencyData } = useQuery({
@@ -409,7 +428,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               tick={{ fontSize: 8, fill: '#666' }}
               tickLine={false}
               axisLine={false}
-              interval={isMobile && chartType === 'month' && window.innerHeight > window.innerWidth ? 1 : 0}
+              interval={isMobilePortrait && chartType === 'month' ? 1 : 0}
               type="category"
               scale="point"
               tickMargin={chartType === 'day' ? 5 : 2}
