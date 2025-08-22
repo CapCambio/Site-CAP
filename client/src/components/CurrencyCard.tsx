@@ -161,6 +161,16 @@ export function CurrencyCard({
         )}
 
         <div className="flex items-center justify-between">
+          <button 
+            onClick={onToggleExpand}
+            className="text-xs text-[#1a1a1a] hover:text-gray-700 flex items-center focus:outline-none"
+          >
+            Gráfico de variação
+            <ChevronDown 
+              className={`ml-1 h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+            />
+          </button>
+
           <div className="flex items-center gap-1">
             <div>
               {isPositiveChange && shouldShowVariation && (
@@ -230,16 +240,6 @@ export function CurrencyCard({
               </TooltipProvider>
             )}
           </div>
-
-          <button 
-            onClick={onToggleExpand}
-            className="text-xs text-[#1a1a1a] hover:text-gray-700 flex items-center focus:outline-none"
-          >
-            Gráfico de variação
-            <ChevronDown 
-              className={`ml-1 h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
-            />
-          </button>
         </div>
 
         {/* Área expandível com o gráfico */}
