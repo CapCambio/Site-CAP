@@ -397,7 +397,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={activeChartData} margin={{ top: 10, right: 15, left: 15, bottom: 25 }}>
+          <AreaChart data={activeChartData} margin={isMobile ? { top: 10, right: 5, left: 5, bottom: 25 } : { top: 10, right: 15, left: 15, bottom: 25 }}>
             <defs>
               <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#f3b234" stopOpacity={0.3}/>
@@ -409,7 +409,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               tick={{ fontSize: 8, fill: '#666' }}
               tickLine={false}
               axisLine={false}
-              interval={0}
+              interval={isMobile && chartType === 'day' ? 1 : 0}
               type="category"
               scale="point"
               tickMargin={chartType === 'day' ? 5 : 2}
