@@ -26,7 +26,9 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     const checkOrientation = () => {
       const isMobile = window.innerWidth < 640; // Tailwind's sm breakpoint
       const isPortrait = window.innerHeight > window.innerWidth;
-      setIsMobilePortrait(isMobile && isPortrait);
+      const isMobilePortraitResult = isMobile && isPortrait;
+      console.log(`Mobile detection - width: ${window.innerWidth}, height: ${window.innerHeight}, isMobile: ${isMobile}, isPortrait: ${isPortrait}, isMobilePortrait: ${isMobilePortraitResult}`);
+      setIsMobilePortrait(isMobilePortraitResult);
     };
 
     checkOrientation();
@@ -428,7 +430,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               tick={{ fontSize: 8, fill: '#666' }}
               tickLine={false}
               axisLine={false}
-              interval={isMobilePortrait && chartType === 'month' ? 1 : 0}
+              interval={(() => {
+                const interval = isMobilePortrait && chartType === 'month' ? 1 : 0;
+                console.log(`Chart interval calculation - isMobilePortrait: ${isMobilePortrait}, chartType: ${chartType}, interval: ${interval}`);
+                return interval;
+              })()}
               type="category"
               scale="point"
               tickMargin={chartType === 'day' ? 5 : 2}
