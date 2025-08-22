@@ -199,18 +199,13 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const getCustomTicks = () => {
     if (isMobilePortrait && chartType === 'month') {
       const daysInMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0).getDate();
-      const isLastDayEven = daysInMonth % 2 === 0;
       
       return allChartData.filter(item => {
         const day = parseInt(item.day);
         const isOddDay = day % 2 === 1;
         const isLastDay = day === daysInMonth;
         
-        // Se o último dia é par, remover apenas o penúltimo ímpar para criar espaço
-        if (isLastDayEven && day === daysInMonth - 1) {
-          return false;
-        }
-        
+        // Mostrar todos os ímpares + último dia (mesmo se par)
         return isOddDay || isLastDay;
       }).map(item => item.day);
     }
@@ -434,10 +429,36 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             </defs>
             <XAxis 
               dataKey={chartType === 'day' ? 'hour' : 'day'}
-              tick={{ 
-                fontSize: 8, 
-                fill: '#666',
-                ...(isMobilePortrait && chartType === 'month' ? { textAnchor: 'middle', dx: 0 } : {})
+              tick={(props) => {
+                if (isMobilePortrait && chartType === 'month') {
+                  const daysInMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0).getDate();
+                  const isLastDay = parseInt(props.payload.value) === daysInMonth;
+                  const isLastDayEven = daysInMonth % 2 === 0;
+                  
+                  return (
+                    <text
+                      x={props.x}
+                      y={props.y}
+                      fill="#666"
+                      fontSize="8"
+                      textAnchor="middle"
+                      dx={isLastDay && isLastDayEven ? 3 : 0}
+                    >
+                      {props.payload.value}
+                    </text>
+                  );
+                }
+                return (
+                  <text
+                    x={props.x}
+                    y={props.y}
+                    fill="#666"
+                    fontSize="8"
+                    textAnchor="middle"
+                  >
+                    {props.payload.value}
+                  </text>
+                );
               }}
               tickLine={false}
               axisLine={false}
