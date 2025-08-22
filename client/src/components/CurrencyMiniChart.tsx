@@ -201,33 +201,15 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       const daysInMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0).getDate();
       const isLastDayEven = daysInMonth % 2 === 0;
       
-      // Se o último dia é par e consecutivo ao penúltimo ímpar (ex: 29, 30)
-      // remover alguns ímpares do final para criar espaçamento
-      if (isLastDayEven && daysInMonth > 28) {
-        return allChartData.filter(item => {
-          const day = parseInt(item.day);
-          const isOddDay = day % 2 === 1;
-          const isLastDay = day === daysInMonth;
-          
-          // Se é o último dia par, sempre incluir
-          if (isLastDay) return true;
-          
-          // Se é ímpar, incluir mas pular alguns no final para criar espaço
-          if (isOddDay) {
-            // Pular os 2 últimos ímpares antes do último dia par para criar espaço
-            if (day >= daysInMonth - 4) return false;
-            return true;
-          }
-          
-          return false;
-        }).map(item => item.day).concat([daysInMonth.toString()]);
-      }
-      
-      // Caso normal: todos os ímpares + último dia
       return allChartData.filter(item => {
         const day = parseInt(item.day);
         const isOddDay = day % 2 === 1;
         const isLastDay = day === daysInMonth;
+        
+        // Se o último dia é par, remover apenas o penúltimo ímpar para criar espaço
+        if (isLastDayEven && day === daysInMonth - 1) {
+          return false;
+        }
         
         return isOddDay || isLastDay;
       }).map(item => item.day);
