@@ -442,7 +442,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
                       fill="#666"
                       fontSize="8"
                       textAnchor="middle"
-                      dx={isLastDay && isLastDayEven ? 3 : 0}
+                      dx={0}
                     >
                       {props.payload.value}
                     </text>
