@@ -199,10 +199,18 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const getCustomTicks = () => {
     if (isMobilePortrait && chartType === 'month') {
       const daysInMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0).getDate();
+      const isLastDayEven = daysInMonth % 2 === 0;
+      
       return allChartData.filter(item => {
         const day = parseInt(item.day);
         const isOddDay = day % 2 === 1;
         const isLastDay = day === daysInMonth;
+        
+        // Se o último dia é par, não mostrar o penúltimo (que seria ímpar)
+        if (isLastDayEven && day === daysInMonth - 1) {
+          return false;
+        }
+        
         return isOddDay || isLastDay;
       }).map(item => item.day);
     }
