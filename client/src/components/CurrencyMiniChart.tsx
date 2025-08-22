@@ -396,9 +396,9 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               fill="url(#colorSell)"
               strokeWidth={2}
               connectNulls={false}
-              dot={validDataCount === 1 || isConstantPrice ? 
-                { fill: '#f3b234', strokeWidth: 1, r: 2 } : 
-                false
+              dot={chartType === 'day' ? 
+                (validDataCount === 1 || isConstantPrice ? { fill: '#f3b234', strokeWidth: 1, r: 2 } : false) :
+                { fill: '#f3b234', strokeWidth: 1, r: 2 }
               }
             />
           </AreaChart>
