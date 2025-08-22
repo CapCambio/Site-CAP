@@ -419,7 +419,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           </p>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer 
+          width="100%" 
+          height={200}
+          style={isMobilePortrait && chartType === 'month' ? { paddingRight: '6px' } : {}}
+        >
           <AreaChart data={activeChartData} margin={isMobile ? { top: 10, right: 5, left: 5, bottom: 25 } : { top: 10, right: 15, left: 15, bottom: 25 }}>
             <defs>
               <linearGradient id="colorSell" x1="0" y1="0" x2="0" y2="1">
@@ -432,8 +436,15 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               tick={(props) => {
                 if (isMobilePortrait && chartType === 'month') {
                   const daysInMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0).getDate();
-                  const isLastDay = parseInt(props.payload.value) === daysInMonth;
+                  const currentDay = parseInt(props.payload.value);
+                  const isLastDay = currentDay === daysInMonth;
                   const isLastDayEven = daysInMonth % 2 === 0;
+                  
+                  // Criar espaçamento especial entre penúltimo e último quando último é par
+                  let dx = 0;
+                  if (isLastDayEven && isLastDay) {
+                    dx = 1; // Move último ligeiramente para direita
+                  }
                   
                   return (
                     <text
@@ -442,7 +453,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
                       fill="#666"
                       fontSize="8"
                       textAnchor="middle"
-                      dx={0}
+                      dx={dx}
                     >
                       {props.payload.value}
                     </text>
