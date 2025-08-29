@@ -132,12 +132,6 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
               <div className="text-sm text-zinc-300 hidden sm:block">
                 Olá {user?.name || user?.email || 'Usuário'}
               </div>
-              <button 
-                onClick={logout}
-                className="text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full p-2 transition-colors"
-              >
-                <LogOut className="h-5 w-5" />
-              </button>
             </div>
           </div>
         </header>
