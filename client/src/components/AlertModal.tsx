@@ -260,7 +260,6 @@ export function AlertModal({ isOpen, onClose, currencyCode, currencyName }: Aler
               • Você receberá email + notificação push<br/>
               • Alertas são verificados automaticamente<br/>
               • Baseado na variação do preço de venda<br/>
-              • Você será notificado quando o preço atingir este valor.<br/>
               • Cada usuário pode configurar um alerta para cada moeda
             </p>
           </div>
