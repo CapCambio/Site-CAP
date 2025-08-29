@@ -168,7 +168,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 value={amount}
                 onChange={handleAmountChange}
                 className="text-xl sm:text-2xl font-medium bg-white border-none focus:ring-0 focus:outline-none text-black w-3/5"
-                placeholder="0,00"
+                placeholder="Digite o valor"
               />
 
               <div 
