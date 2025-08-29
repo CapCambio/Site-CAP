@@ -103,7 +103,7 @@ export function CurrencyCard({
 
   return (
     <Card className={`currency-card hover:shadow-lg transition-all duration-300 ${isExpanded ? 'mb-4' : ''}`}>
-      <div className="bg-[#1a1a1a] text-white p-4 flex items-center justify-between">
+      <div className="bg-[#1a1a1a] text-white p-4 flex items-center justify-between rounded-t-lg">
         <div className="flex items-center">
           <CurrencyLogo code={code} className="mr-3" />
           <h3 className="font-bold">{name}</h3>
