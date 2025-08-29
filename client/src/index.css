@@ -129,7 +129,8 @@
 .currency-desktop-layout {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.25rem;
+  column-gap: 1rem;
+  row-gap: 0.25rem;
 }
 
 .currency-item {
