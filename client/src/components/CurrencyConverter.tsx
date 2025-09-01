@@ -8,8 +8,8 @@ interface CurrencyConverterProps {
 }
 
 export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
-  const [fromCurrency, setFromCurrency] = useState<string>("BRL");
-  const [toCurrency, setToCurrency] = useState<string>("USD");
+  const [fromCurrency, setFromCurrency] = useState<string>("USD");
+  const [toCurrency, setToCurrency] = useState<string>("BRL");
   const [amount, setAmount] = useState<string>("");
   const [convertedAmount, setConvertedAmount] = useState<string>("");
   const [isApproximateValue, setIsApproximateValue] = useState<boolean>(false);
