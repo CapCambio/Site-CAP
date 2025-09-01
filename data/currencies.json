@@ -7,17 +7,17 @@
     "sellPrice": 5.82,
     "change": 0,
     "displayOrder": 1,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 2,
     "name": "Euro",
     "code": "EUR",
     "buyPrice": 6.3,
-    "sellPrice": 6.8,
+    "sellPrice": 6.83,
     "change": 0,
     "displayOrder": 2,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 3,
@@ -27,17 +27,17 @@
     "sellPrice": 8.04,
     "change": 0,
     "displayOrder": 3,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 4,
     "name": "Dólar Australiano",
     "code": "AUD",
     "buyPrice": 3.46,
-    "sellPrice": 3.88,
+    "sellPrice": 3.91,
     "change": 0,
     "displayOrder": 4,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 5,
@@ -47,37 +47,37 @@
     "sellPrice": 0.0061,
     "change": 0,
     "displayOrder": 5,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 6,
     "name": "Dólar Neozelandês",
     "code": "NZD",
     "buyPrice": 3.25,
-    "sellPrice": 3.45,
+    "sellPrice": 3.47,
     "change": 0,
     "displayOrder": 6,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 7,
     "name": "Dólar Canadense",
     "code": "CAD",
     "buyPrice": 3.85,
-    "sellPrice": 4.33,
+    "sellPrice": 4.35,
     "change": 0,
     "displayOrder": 7,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 8,
     "name": "Franco Suíço",
     "code": "CHF",
     "buyPrice": 6.65,
-    "sellPrice": 7.42,
+    "sellPrice": 7.44,
     "change": 0,
     "displayOrder": 8,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 9,
@@ -87,7 +87,7 @@
     "sellPrice": 0.174,
     "change": 0,
     "displayOrder": 9,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 10,
@@ -97,17 +97,17 @@
     "sellPrice": 0.0069,
     "change": 0,
     "displayOrder": 10,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 11,
     "name": "Peso Mexicano",
     "code": "MXN",
     "buyPrice": 0.28,
-    "sellPrice": 0.365,
+    "sellPrice": 0.367,
     "change": 0,
     "displayOrder": 11,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 12,
@@ -117,7 +117,7 @@
     "sellPrice": 0.0019,
     "change": 0,
     "displayOrder": 12,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 13,
@@ -127,17 +127,17 @@
     "sellPrice": 0.89,
     "change": 0,
     "displayOrder": 13,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 14,
     "name": "Iene Japonês",
     "code": "JPY",
     "buyPrice": 0.03,
-    "sellPrice": 0.0423,
+    "sellPrice": 0.0424,
     "change": 0,
     "displayOrder": 14,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 15,
@@ -147,7 +147,7 @@
     "sellPrice": 1.77,
     "change": 0,
     "displayOrder": 15,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   },
   {
     "id": 16,
@@ -157,6 +157,6 @@
     "sellPrice": 0.357,
     "change": 0,
     "displayOrder": 16,
-    "lastUpdate": "2025-08-29T14:14:03.712Z"
+    "lastUpdate": "2025-09-01T12:20:33.101Z"
   }
 ]

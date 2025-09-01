@@ -1545,5 +1545,117 @@
     "buyPrice": 0.28,
     "sellPrice": 0.357,
     "timestamp": "2025-08-29T12:17:41.863Z"
+  },
+  {
+    "id": 222,
+    "code": "USD",
+    "buyPrice": 5.4,
+    "sellPrice": 5.82,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 223,
+    "code": "EUR",
+    "buyPrice": 6.3,
+    "sellPrice": 6.83,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 224,
+    "code": "GBP",
+    "buyPrice": 7.25,
+    "sellPrice": 8.04,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 225,
+    "code": "AUD",
+    "buyPrice": 3.46,
+    "sellPrice": 3.91,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 226,
+    "code": "ARS",
+    "buyPrice": 0.0047,
+    "sellPrice": 0.0061,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 227,
+    "code": "NZD",
+    "buyPrice": 3.25,
+    "sellPrice": 3.47,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 228,
+    "code": "CAD",
+    "buyPrice": 3.85,
+    "sellPrice": 4.35,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 229,
+    "code": "CHF",
+    "buyPrice": 6.65,
+    "sellPrice": 7.44,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 230,
+    "code": "UYU",
+    "buyPrice": 0.13,
+    "sellPrice": 0.174,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 231,
+    "code": "CLP",
+    "buyPrice": 0.0055,
+    "sellPrice": 0.0069,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 232,
+    "code": "MXN",
+    "buyPrice": 0.28,
+    "sellPrice": 0.367,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 233,
+    "code": "COP",
+    "buyPrice": 0.00135,
+    "sellPrice": 0.0019,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 234,
+    "code": "CNY",
+    "buyPrice": 0.75,
+    "sellPrice": 0.89,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 235,
+    "code": "JPY",
+    "buyPrice": 0.03,
+    "sellPrice": 0.0424,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 236,
+    "code": "PEN",
+    "buyPrice": 1.62,
+    "sellPrice": 1.77,
+    "timestamp": "2025-09-01T12:11:29.465Z"
+  },
+  {
+    "id": 237,
+    "code": "ZAR",
+    "buyPrice": 0.28,
+    "sellPrice": 0.357,
+    "timestamp": "2025-09-01T12:11:29.465Z"
   }
 ]
