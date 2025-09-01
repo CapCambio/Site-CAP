@@ -387,8 +387,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = parseInt(req.query.limit as string) || 10;
       const offset = (page - 1) * limit;
 
-      // Carregar todos os alertas
-      const allAlerts = loadAlerts();
+      // Carregar todos os alertas usando o alertSystem
+      const allAlerts = alertSystem.getAllAlerts();
       
       // Filtrar apenas usuários que têm alertas configurados
       const usersWithAlerts = Object.entries(allAlerts).filter(([email, userData]: [string, any]) => 
