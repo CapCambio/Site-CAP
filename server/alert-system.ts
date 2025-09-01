@@ -59,7 +59,7 @@ class AlertSystem {
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER || 'capcambiocx@gmail.com',
-        pass: process.env.EMAIL_PASS || 'sua-senha-de-app'
+        pass: process.env.EMAIL_PASS || 'qqdx duau khpg hnzt'
       }
     });
   }
