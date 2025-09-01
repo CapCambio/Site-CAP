@@ -380,6 +380,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "OK", timestamp: new Date().toISOString() });
   });
 
+  // Admin route to get all user alerts
+  app.get("/api/alerts/admin/all", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = (page - 1) * limit;
+
+      // Carregar todos os alertas
+      const allAlerts = loadAlerts();
+      
+      // Filtrar apenas usuários que têm alertas configurados
+      const usersWithAlerts = Object.entries(allAlerts).filter(([email, userData]: [string, any]) => 
+        userData && userData.alerts && Object.keys(userData.alerts).length > 0
+      );
+
+      // Calcular paginação
+      const total = usersWithAlerts.length;
+      const totalPages = Math.ceil(total / limit);
+      const paginatedUsers = usersWithAlerts.slice(offset, offset + limit);
+
+      // Construir resposta paginada
+      const paginatedAlerts: any = {};
+      paginatedUsers.forEach(([email, userData]) => {
+        paginatedAlerts[email] = userData;
+      });
+
+      res.json({
+        alerts: paginatedAlerts,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages
+        }
+      });
+    } catch (error) {
+      console.error('Erro ao carregar alertas:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   // Admin email management routes
   app.get("/api/admin/emails", async (req, res) => {
     try {

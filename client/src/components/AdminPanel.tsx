@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Settings, Search, Trash2, LogOut, Edit, Bell } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Settings, Search, Trash2, LogOut, Edit, Bell, TrendingUp, TrendingDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { AlertsPanel } from "./AlertsPanel";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthorizedEmail {
   email: string;
@@ -15,8 +17,270 @@ interface AuthorizedEmail {
   lastAccess?: string;
 }
 
+interface AlertsManagementProps {
+  authorizedEmails: AuthorizedEmail[];
+}
+
 interface AdminPanelProps {
   onClose: () => void;
+}
+
+function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
+  const { toast } = useToast();
+  const [allAlerts, setAllAlerts] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
+
+  const loadAllAlerts = async (page: number = currentPage) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/alerts/admin/all?page=${page}&limit=${itemsPerPage}`);
+      if (response.ok) {
+        const data = await response.json();
+        setAllAlerts(data.alerts);
+        setPagination(data.pagination);
+        setCurrentPage(page);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar alertas:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const removeAlert = async (email: string, currencyCode: string) => {
+    try {
+      const response = await fetch(`/api/alerts/${email}/${currencyCode}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        toast({
+          title: "Alerta removido",
+          description: `Alerta de ${currencyCode} para ${email} foi removido com sucesso.`
+        });
+        const newTotal = pagination.total - 1;
+        const newTotalPages = Math.ceil(newTotal / itemsPerPage);
+        const pageToLoad = currentPage > newTotalPages ? Math.max(1, newTotalPages) : currentPage;
+        loadAllAlerts(pageToLoad);
+      }
+    } catch (error) {
+      console.error('Erro ao remover alerta:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível remover o alerta.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getTipoIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'subida':
+        return <TrendingUp className="h-4 w-4 text-green-600" />;
+      case 'descida':
+        return <TrendingDown className="h-4 w-4 text-red-600" />;
+      default:
+        return <Bell className="h-4 w-4 text-yellow-600" />;
+    }
+  };
+
+  const getTipoLabel = (tipo: string, alert: any) => {
+    switch (tipo) {
+      case 'subida':
+        return 'Subida';
+      case 'descida':
+        return 'Descida';
+      case 'valor-especifico':
+        const valor = alert.valor || alert.limite || 0;
+        return `Valor específico R$ ${valor.toFixed(2).replace('.', ',')}`;
+      default:
+        return 'Ambas';
+    }
+  };
+
+  const getValidadeLabel = (alert: any) => {
+    if (!alert.validade) {
+      return 'Tempo Indeterminado';
+    }
+    const date = new Date(alert.validade);
+    return `Até ${date.toLocaleDateString('pt-BR')}`;
+  };
+
+  const getUserName = (email: string) => {
+    const user = authorizedEmails.find(user => user.email === email);
+    return user?.name || 'Nome não encontrado';
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      loadAllAlerts(newPage);
+    }
+  };
+
+  useEffect(() => {
+    loadAllAlerts(1);
+  }, []);
+
+  const usersWithAlerts = Object.entries(allAlerts).filter(([email, userData]: [string, any]) => 
+    userData && userData.alerts && Object.keys(userData.alerts).length > 0
+  );
+
+  return (
+    <Card className="bg-zinc-900 border-yellow-500/20 mt-6">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <Bell className="h-5 w-5 text-yellow-400" />
+              Alertas dos Usuários
+            </h3>
+            <p className="text-zinc-300 text-sm sm:text-base">
+              Gerencie todos os alertas configurados pelos usuários do sistema.
+            </p>
+            {!isLoading && pagination.total > 0 && (
+              <p className="text-sm text-zinc-400 mt-1">
+                Página {pagination.page} de {pagination.totalPages} ({pagination.total} usuário(s) com alertas)
+              </p>
+            )}
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400 mx-auto mb-4"></div>
+            <p className="text-zinc-400">Carregando alertas...</p>
+          </div>
+        ) : usersWithAlerts.length === 0 ? (
+          <div className="text-center py-12">
+            <Bell className="h-16 w-16 text-zinc-600 mx-auto mb-4" />
+            <h4 className="text-lg font-medium text-white mb-2">Nenhum alerta configurado</h4>
+            <p className="text-zinc-400">
+              Ainda não há alertas configurados por nenhum usuário do sistema.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {usersWithAlerts.map(([email, userData]: [string, any]) => (
+              <div key={email} className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="bg-yellow-500/10 p-2 rounded-full">
+                    <Bell className="h-5 w-5 text-yellow-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-white text-lg">{getUserName(email)}</h4>
+                    <p className="text-sm text-zinc-400">{email}</p>
+                    <p className="text-sm text-zinc-400">
+                      {Object.keys(userData.alerts).length} alerta(s) configurado(s)
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-3">
+                  {Object.entries(userData.alerts).map(([currencyCode, alert]: [string, any]) => (
+                    <div key={currencyCode} className="bg-zinc-700/50 rounded-lg p-3 border border-zinc-600">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {getTipoIcon(alert.tipo)}
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-white">{currencyCode}</span>
+                              <Badge variant="outline" className="text-zinc-300 border-zinc-500 text-xs">
+                                {getTipoLabel(alert.tipo, alert)}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-zinc-400">
+                              {getValidadeLabel(alert)} • {alert.ativo ? 'Ativo' : 'Inativo'}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => removeAlert(email, currencyCode)}
+                          className="h-8 w-8 p-0 hover:bg-red-600 text-red-400 hover:text-white"
+                          title="Remover alerta"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {pagination.totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
+            <div className="text-sm text-zinc-400">
+              Mostrando {((pagination.page - 1) * pagination.limit) + 1} a{' '}
+              {Math.min(pagination.page * pagination.limit, pagination.total)} de {pagination.total} usuários
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
+                className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+              >
+                Anterior
+              </Button>
+              
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (pagination.totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (pagination.page <= 3) {
+                    pageNum = i + 1;
+                  } else if (pagination.page >= pagination.totalPages - 2) {
+                    pageNum = pagination.totalPages - 4 + i;
+                  } else {
+                    pageNum = pagination.page - 2 + i;
+                  }
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={pageNum === pagination.page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                      className={pageNum === pagination.page 
+                        ? "bg-yellow-500 text-black hover:bg-yellow-600" 
+                        : "border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                      }
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page === pagination.totalPages}
+                className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+              >
+                Próxima
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function AdminPanel({ onClose }: AdminPanelProps) {
@@ -492,6 +756,9 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
           <div className="mt-6">
             <AlertsPanel />
           </div>
+
+          {/* Gerenciamento de Alertas dos Usuários */}
+          <AlertsManagement authorizedEmails={authorizedEmails} />
         </main>
       </div>
     </div>
