@@ -1,7 +1,14 @@
 {
   "mateus.m2o@live.com": {
     "email": "mateus.m2o@live.com",
-    "alerts": {}
+    "alerts": {
+      "USD": {
+        "limite": 0,
+        "tipo": "subida",
+        "ativo": true,
+        "validade": null
+      }
+    }
   },
   "japalleiro@hotmail.com": {
     "email": "japalleiro@hotmail.com",
