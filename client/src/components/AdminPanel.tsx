@@ -61,9 +61,10 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
         method: 'DELETE'
       });
       if (response.ok) {
+        const userName = getUserName(email);
         toast({
           title: "Alerta removido",
-          description: `Alerta de ${currencyCode} para ${email} foi removido com sucesso.`
+          description: `Alerta de ${currencyCode} para ${userName} foi removido com sucesso.`
         });
         const newTotal = pagination.total - 1;
         const newTotalPages = Math.ceil(newTotal / itemsPerPage);
