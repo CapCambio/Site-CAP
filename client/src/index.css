@@ -136,3 +136,15 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Espaçamento entre cards no mobile */
+@media (max-width: 639px) {
+  .currency-item {
+    margin-bottom: 1rem;
+  }
+  
+  .currency-item:last-child {
+    margin-bottom: 0;
+  }
+}
+}
