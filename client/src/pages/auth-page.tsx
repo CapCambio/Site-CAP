@@ -39,41 +39,34 @@ export default function LoginPage() {
   // Verificar se o email é de administrador quando mudar
   const watchEmail = form.watch('email');
 
-  const checkIfAdmin = async (email: string) => {
+  // Lista de emails admin conhecidos (verificação local instantânea)
+  const adminEmails = [
+    'capcambiocx@gmail.com',
+    'capcambio_caxias@hotmail.com'
+  ];
+
+  const checkIfAdmin = (email: string) => {
     if (!email || !email.match(/^[^@]+@[^@]+\.[^@]+$/)) {
       setIsAdmin(false);
       setEmailVerified(false);
       return;
     }
 
-    try {
-      const res = await fetch('/api/auth/check-admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-
-      const data = await res.json();
-      setIsAdmin(data.isAdmin || false);
-      setEmailVerified(true);
-    } catch (error) {
-      console.error('Erro ao verificar email de admin:', error);
-      setIsAdmin(false);
-      setEmailVerified(false);
-    }
+    const emailLower = email.toLowerCase();
+    const isAdminEmail = adminEmails.includes(emailLower);
+    
+    setIsAdmin(isAdminEmail);
+    setEmailVerified(true);
   };
 
   useEffect(() => {
     if (watchEmail) {
-      const delayDebounceFn = setTimeout(() => {
-        checkIfAdmin(watchEmail);
-      }, 500);
+      // Verificação instantânea sem debounce
+      checkIfAdmin(watchEmail);
       
       // Resetar erros quando email mudar
       setShowValidationErrors(false);
       setShowPasswordError(false);
-
-      return () => clearTimeout(delayDebounceFn);
     }
   }, [watchEmail]);
 
