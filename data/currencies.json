@@ -4,90 +4,90 @@
     "name": "Dólar Americano",
     "code": "USD",
     "buyPrice": 5.35,
-    "sellPrice": 5.79,
-    "change": 0,
+    "sellPrice": 5.77,
+    "change": -0.35,
     "displayOrder": 1,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 2,
     "name": "Euro",
     "code": "EUR",
-    "buyPrice": 6.35,
-    "sellPrice": 6.8,
-    "change": 0,
+    "buyPrice": 6.28,
+    "sellPrice": 6.77,
+    "change": -0.44,
     "displayOrder": 2,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 3,
     "name": "Libra Esterlina",
     "code": "GBP",
-    "buyPrice": 7.25,
-    "sellPrice": 8.02,
-    "change": 0,
+    "buyPrice": 7.2,
+    "sellPrice": 7.98,
+    "change": -0.5,
     "displayOrder": 3,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 4,
     "name": "Dólar Australiano",
     "code": "AUD",
     "buyPrice": 3.5,
-    "sellPrice": 3.94,
-    "change": 0,
+    "sellPrice": 3.92,
+    "change": -0.51,
     "displayOrder": 4,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 5,
     "name": "Peso Argentino",
     "code": "ARS",
     "buyPrice": 0.002,
-    "sellPrice": 0.0057,
-    "change": 0,
+    "sellPrice": 0.0056,
+    "change": -1.75,
     "displayOrder": 5,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 6,
     "name": "Dólar Neozelandês",
     "code": "NZD",
-    "buyPrice": 3.25,
-    "sellPrice": 3.5,
-    "change": 0,
+    "buyPrice": 3.2,
+    "sellPrice": 3.48,
+    "change": -0.57,
     "displayOrder": 6,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 7,
     "name": "Dólar Canadense",
     "code": "CAD",
-    "buyPrice": 3.9,
-    "sellPrice": 4.29,
-    "change": 0,
+    "buyPrice": 3.8,
+    "sellPrice": 4.26,
+    "change": -0.7,
     "displayOrder": 7,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 8,
     "name": "Franco Suíço",
     "code": "CHF",
     "buyPrice": 6.6,
-    "sellPrice": 7.41,
-    "change": 0,
+    "sellPrice": 7.38,
+    "change": -0.4,
     "displayOrder": 8,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 9,
     "name": "Peso Uruguaio",
     "code": "UYU",
     "buyPrice": 0.13,
-    "sellPrice": 0.173,
-    "change": 0,
+    "sellPrice": 0.172,
+    "change": -0.58,
     "displayOrder": 9,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 10,
@@ -97,7 +97,7 @@
     "sellPrice": 0.0069,
     "change": 0,
     "displayOrder": 10,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 11,
@@ -107,7 +107,7 @@
     "sellPrice": 0.37,
     "change": 0,
     "displayOrder": 11,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 12,
@@ -117,7 +117,7 @@
     "sellPrice": 0.0019,
     "change": 0,
     "displayOrder": 12,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 13,
@@ -127,27 +127,27 @@
     "sellPrice": 0.9,
     "change": 0,
     "displayOrder": 13,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 14,
     "name": "Iene Japonês",
     "code": "JPY",
     "buyPrice": 0.03,
-    "sellPrice": 0.042,
-    "change": 0,
+    "sellPrice": 0.0419,
+    "change": -0.24,
     "displayOrder": 14,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 15,
     "name": "Novo Sol Peruano",
     "code": "PEN",
     "buyPrice": 1.62,
-    "sellPrice": 1.78,
-    "change": 0,
+    "sellPrice": 1.77,
+    "change": -0.56,
     "displayOrder": 15,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   },
   {
     "id": 16,
@@ -157,6 +157,6 @@
     "sellPrice": 0.36,
     "change": 0,
     "displayOrder": 16,
-    "lastUpdate": "2025-09-12T14:02:42.931Z"
+    "lastUpdate": "2025-09-14T02:44:36.991Z"
   }
 ]
