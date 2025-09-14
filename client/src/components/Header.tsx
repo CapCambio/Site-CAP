@@ -102,7 +102,7 @@ export function Header() {
             <img 
               src={capLogo} 
               alt="CAP Câmbio Logo" 
-              className="h-24 md:h-36 mb-1"
+              className="h-24 md:h-32 mb-1"
             />
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
