@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useEffect, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
+import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -95,7 +96,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-yellow-400/20 bg-zinc-900 text-white">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold tracking-tight">CAP Câmbio Cotações</CardTitle>
@@ -233,7 +235,11 @@ export default function LoginPage() {
       </Card>
       
       {/* Botão flutuante do WhatsApp para solicitar acesso */}
-      <WhatsAppFloatingButton />
+        <WhatsAppFloatingButton />
+      </div>
+      
+      {/* Rodapé */}
+      <Footer />
     </div>
   );
 }
