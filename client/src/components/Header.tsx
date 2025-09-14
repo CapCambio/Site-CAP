@@ -107,7 +107,7 @@ export function Header() {
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
               <div className="flex flex-col items-center gap-2">
-                <span className="text-white text-sm">
+                <span className="text-white text-xs sm:text-sm lg:text-base">
                   Olá {user?.name || 'Usuário'}
                 </span>
                 <div className="flex items-center justify-center gap-3">
