@@ -11,7 +11,7 @@ export function WhatsAppFloatingButton() {
       {/* Botão flutuante */}
       <button
         onClick={() => setShowBranchDialog(true)}
-        className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-black"
+        className="fixed bottom-20 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-black"
         aria-label="Contato via WhatsApp"
       >
         <FaWhatsapp className="text-2xl" />
