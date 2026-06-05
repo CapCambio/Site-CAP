@@ -1,0 +1,34 @@
+{
+  "authorizedEmails": [
+    {
+      "email": "mateus.m2o@live.com",
+      "name": "Mateus Medeiros",
+      "lastAccess": "2026-06-05T19:29:36.331Z",
+      "isAdmin": false
+    }
+  ],
+  "adminEmails": [
+    {
+      "email": "capcambiocx@gmail.com",
+      "name": "CAP Câmbio Caxias",
+      "lastAccess": "2026-05-18T20:07:11.249Z",
+      "isAdmin": true
+    },
+    {
+      "email": "capcambio_caxias@hotmail.com",
+      "name": "CAP Câmbio Caxias"
+    },
+    {
+      "email": "capcambio.bento@gmail.com",
+      "name": "CAP Câmbio Bento",
+      "lastAccess": "2026-05-06T16:40:13.065Z",
+      "isAdmin": true
+    },
+    {
+      "email": "capcambio_passo@hotmail.com",
+      "name": "CAP Câmbio Passo",
+      "lastAccess": "2026-05-06T16:45:52.800Z",
+      "isAdmin": true
+    }
+  ]
+}

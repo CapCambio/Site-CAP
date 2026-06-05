@@ -57,7 +57,7 @@ vite.config.ts.*
 *.tar.gz
 
 # Proteger dados sensíveis
-data/
-server/config/
+# data/ - REMOVIDO: dados essenciais do projeto
+# server/config/ - REMOVIDO: configurações essenciais
 server/logs/
 *.log

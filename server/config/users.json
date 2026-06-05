@@ -1,0 +1,10 @@
+{
+  "users": [
+    {
+      "email": "capcambiocx@gmail.com",
+      "name": "CAP Câmbio Admin",
+      "isAdmin": true,
+      "createdAt": "2026-05-11T19:23:16.659Z"
+    }
+  ]
+}

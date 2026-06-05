@@ -1,0 +1,11 @@
+[
+  {
+    "email": "mateus.m2o@live.com",
+    "endpoint": "https://fcm.googleapis.com/fcm/send/dZYsdhkbVPw:APA91bFctKQaSstyOCmlkneYbAuZzRusIh6n7Rt_6jax31gWXk3RIx-6eG1d30-vWyimik25EoQXCKehAvXirrladu8B8p6Gr4ZJAE0duW8HWtvXf_xMxCDZLTPxKSHwulOV8JJkkUcn",
+    "keys": {
+      "p256dh": "BNGJsnNBHOPtFtV1tei-7dMDtWkFuLVBEj8jcOIsulStCO2uM3ppyOVykBlzPxOsbDgYIY-jThJFU_Ggy9mAsfs",
+      "auth": "IPIEWyeebHtrOnHRMSbY4A"
+    },
+    "timestamp": "2025-10-10T17:46:51.572Z"
+  }
+]
