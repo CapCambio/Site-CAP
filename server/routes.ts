@@ -80,6 +80,7 @@ async function loadEmailConfig() {
   try {
     // Primeiro tenta ler da variável de ambiente (para Railway/produção)
     const authorizedEmailsEnv = process.env.AUTHORIZED_EMAILS;
+    console.log('🔍 Verificando AUTHORIZED_EMAILS:', authorizedEmailsEnv ? 'EXISTS' : 'NOT FOUND');
     if (authorizedEmailsEnv) {
       try {
         const emails = JSON.parse(authorizedEmailsEnv);
@@ -89,7 +90,7 @@ async function loadEmailConfig() {
           adminEmails: emails // Usa a mesma lista para admins por enquanto
         };
       } catch (parseError) {
-        console.error('Erro ao fazer parse de AUTHORIZED_EMAILS:', parseError);
+        console.error('❌ Erro ao fazer parse de AUTHORIZED_EMAILS:', parseError);
       }
     }
 
