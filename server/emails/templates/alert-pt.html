@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerta de Cotações</title>
+    <!-- Fallback para Outlook -->
+    <!--[if gte mso 9]>
+    <style>
+        .btn-primary, .header-line {
+            background-color: #f3b234 !important;
+        }
+    </style>
+    <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #333333; background-color: #f5f5f5;">
+    <div style="max-width: 600px; margin: 0 auto; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <!-- Cabeçalho -->
+        <div style="width: 100%; background: #000000; position: relative; overflow: hidden;">
+            <!-- Linha superior -->
+            <div class="header-line" style="height: 6px; background-color: #f3b234;">
+                <!-- Fallback para Outlook -->
+                <!--[if !mso]><!-- -->
+                <div style="display: none; font-size: 0; max-height: 0; overflow: hidden; mso-hide: all;">
+                    &nbsp;
+                </div>
+                <!--<![endif]-->
+            </div>
+            
+            <div style="padding: 20px 20px 15px; text-align: center; position: relative; z-index: 2;">
+                <img src="https://capcambio.com.br/wp-content/uploads/2022/11/LogoSecundario-CAPCAMBIO.png" alt="CAP Câmbio" style="max-width: 200px; height: auto; display: block; margin: 0 auto 5px;">
+                <h1 style="color: #fff; font-size: 1.7rem; font-weight: 700; margin: 0 0 15px 0; line-height: 1.1; text-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    Alerta de Cotações
+                </h1>
+            </div>
+            
+            <!-- Linha inferior -->
+            <div class="header-line" style="height: 6px; background-color: #f3b234;">
+                <!-- Fallback para Outlook -->
+                <!--[if !mso]><!-- -->
+                <div style="display: none; font-size: 0; max-height: 0; overflow: hidden; mso-hide: all;">
+                    &nbsp;
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div style="padding: 20px; color: #333; font-size: 16px; line-height: 1.6;">
+            <p>Olá <strong>{{userName}}</strong>!</p>
+            
+            <p style="margin: 0 0 10px 0; text-align: left;">
+                {{#if multipleAlerts}}
+                    Algumas moedas que você acompanha tiveram alterações de valor!
+                {{else}}
+                    Uma moeda que você acompanha teve alteração de valor!
+                {{/if}}
+            </p>
+            
+            <div style="margin: 20px 0;">
+                {{#each alerts}}
+                <div style="background: #fff9e6; border-left: 4px solid #fcab23; padding: 15px; margin: 0 0 15px 0; border-radius: 4px;">
+                    <h3 style="margin: 0 0 10px 0; color: #000; font-size: 18px;">
+                        {{#if (gt this.variation 0)}}📈{{else}}📉{{/if}}
+                        {{this.currencyCode}} - {{getCurrencyName this.currencyCode ../language}}
+                    </h3>
+                    <p style="margin: 0;"><strong>Valor atual:</strong> R$ {{formatCurrency this.sellPrice}}</p>
+                    <p style="margin: 5px 0 0 0; color: {{#if (gt this.variation 0)}}#10b981{{else}}#ef4444{{/if}};">
+                        <strong>Variação:</strong> {{#if (gt this.variation 0)}}+{{/if}}{{formatNumber this.variation 2}}%
+                    </p>
+                </div>
+                {{/each}}
+            </div>
+            
+            <p style="margin: 0 0 10px 0; text-align: center; color: #333; font-style: italic;">
+                Confira seu painel de cotações para mais detalhes.
+            </p>
+            
+            <div style="text-align: center; margin: 0 0 20px 0;">
+                <a href="https://capcambio.com.br/cotacoes" class="btn-primary" style="display: inline-block; padding: 12px 30px; background-color: #f3b234; color: #1a1a1a !important; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px; border: 1px solid #d49f1f; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                    Acessar Painel de Cotações
+                </a>
+            </div>
+            
+            <p style="margin: 0 0 15px 0; font-size: 14px; color: #666; text-align: center;">
+                Este é um e-mail automático, por favor não responda.
+            </p>
+        </div>
+        
+        <!-- Rodapé -->
+        <div style="background: #f9f9f9; padding: 15px 20px; border-top: 1px solid #eee; text-align: center; font-size: 11px; color: #777; line-height: 1.5;">
+            <p style="margin: 0;">
+                © {{currentYear}} CAP Câmbio. Todos os direitos reservados.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+/* Estilo personalizado para os radio buttons */
+.custom-radio {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #71717a; /* zinc-500 */
+  border-radius: 50%;
+  background-color: #27272a; /* zinc-800 */
+  cursor: pointer;
+  position: relative;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-radio:checked {
+  border-color: #eab308; /* yellow-500 */
+  background-color: #27272a; /* zinc-800 */
+}
+
+.custom-radio:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: #eab308; /* yellow-500 */
+}
+
+.custom-radio:focus {
+  box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.5); /* focus ring amarelo */
+}

@@ -1,10 +1,23 @@
 {
   "mateus.m2o@live.com": {
     "email": "mateus.m2o@live.com",
-    "alerts": {}
+    "alerts": {
+      "USD": {
+        "tipo": "valor-especifico",
+        "ativo": true,
+        "valor": 5.7,
+        "condicaoValor": "acima"
+      }
+    },
+    "pushSubscriptions": []
   },
   "japalleiro@hotmail.com": {
     "email": "japalleiro@hotmail.com",
     "alerts": {}
+  },
+  "capcambiocx@gmail.com": {
+    "email": "capcambiocx@gmail.com",
+    "alerts": {},
+    "pushSubscriptions": []
   }
 }

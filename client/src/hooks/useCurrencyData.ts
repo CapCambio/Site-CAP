@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Currency } from '../lib/types';
+import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 import { 
   scrapeCurrencyData, 
   storeCurrencyData, 
@@ -9,8 +11,10 @@ import {
 } from '../lib/currency';
 
 export function useCurrencyData() {
+  const { t } = useTranslation();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const { toast } = useToast();
 
   // Get currency data from API
   const { 
@@ -65,10 +69,15 @@ export function useCurrencyData() {
       setLastUpdated(new Date());
     } catch (err) {
       console.error('Error refreshing data:', err);
+      toast({
+        title: t('toasts.refreshError'),
+        description: t('toasts.refreshErrorDesc'),
+        variant: "destructive"
+      });
     } finally {
       setIsRefreshing(false);
     }
-  }, [refetch]);
+  }, [refetch, toast]);
 
   // Initialize last updated time
   useEffect(() => {
@@ -86,12 +95,16 @@ export function useCurrencyData() {
   // Configura a atualização automática a cada minuto
   useEffect(() => {
     // Atualiza imediatamente na primeira carga
-    refreshData();
+    refreshData().catch(err => {
+      console.error('Erro na atualização inicial:', err);
+    });
 
     // Configura o timer para atualizar a cada minuto
     const timer = setInterval(() => {
       console.log('Executando atualização automática...');
-      refreshData();
+      refreshData().catch(err => {
+        console.error('Erro na atualização automática:', err);
+      });
     }, 60000); // 1 minuto
 
     // Limpa o timer quando o componente é desmontado

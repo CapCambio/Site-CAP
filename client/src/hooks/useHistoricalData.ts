@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CurrencyHistory, HistoryFilter } from '../lib/types';
 import { formatDate } from '../lib/currency';
+import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 export function useHistoricalData() {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<HistoryFilter>({
     code: 'USD',
     startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
     endDate: new Date(),
   });
+  const { toast } = useToast();
 
   // Get historical data from API
   const { 
@@ -37,8 +41,20 @@ export function useHistoricalData() {
       }));
     },
     refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutos
     enabled: !!filter.code,
   });
+
+  // Mostrar erro ao usuário quando houver erro
+  useEffect(() => {
+    if (isError && error) {
+      toast({
+        title: t('toasts.errorLoadHistory'),
+        description: t('toasts.errorLoadHistoryDesc'),
+        variant: "destructive"
+      });
+    }
+  }, [isError, error, toast]);
 
   // Update filter and trigger refetch
   const updateFilter = (newFilter: Partial<HistoryFilter>) => {
@@ -66,7 +82,7 @@ export function useHistoricalData() {
 
   // Prepare chart data
   const chartData = historicalData ? historicalData
-    .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+    .sort((a: CurrencyHistory, b: CurrencyHistory) => a.timestamp.getTime() - b.timestamp.getTime())
     .map((entry: CurrencyHistory) => ({
       date: formatDate(entry.timestamp),
       compra: entry.buyPrice,
@@ -75,11 +91,11 @@ export function useHistoricalData() {
 
   // Calculate average prices
   const averageBuy = historicalData && historicalData.length > 0
-    ? historicalData.reduce((sum, item) => sum + item.buyPrice, 0) / historicalData.length
+    ? historicalData.reduce((sum: number, item: CurrencyHistory) => sum + item.buyPrice, 0) / historicalData.length
     : 0;
     
   const averageSell = historicalData && historicalData.length > 0
-    ? historicalData.reduce((sum, item) => sum + item.sellPrice, 0) / historicalData.length
+    ? historicalData.reduce((sum: number, item: CurrencyHistory) => sum + item.sellPrice, 0) / historicalData.length
     : 0;
 
   return {

@@ -4,6 +4,7 @@ import { format, isBefore, isAfter, subMonths, addMonths, getMonth, getYear, sta
 import { ptBR } from 'date-fns/locale';
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
+import { useTranslation } from "react-i18next";
 
 interface DatePickerProps {
   selectedDate: Date;
@@ -11,15 +12,16 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ selectedDate, onDateChange }: DatePickerProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(selectedDate);
   const calendarRef = useRef<HTMLDivElement>(null);
   
   const today = new Date();
   
-  // Calcular o limite de 12 meses para trás
+  // Calcular o limite de 1 ano para trás
   const minDate = new Date();
-  minDate.setMonth(minDate.getMonth() - 12);
+  minDate.setFullYear(minDate.getFullYear() - 1);
   
   // Formatar a data selecionada para exibição
   const formattedDate = format(selectedDate, 'dd/MM/yyyy');
@@ -53,7 +55,7 @@ export function DatePicker({ selectedDate, onDateChange }: DatePickerProps) {
   const capitalizedMonthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
 
   // Criar array com os dias da semana
-  const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const weekDays = [t('common.sunday'), t('common.monday'), t('common.tuesday'), t('common.wednesday'), t('common.thursday'), t('common.friday'), t('common.saturday')];
   
   // Calcular dias no mês atual
   const monthStart = startOfMonth(currentMonth);

@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { format, getDate, startOfMonth, endOfMonth, isBefore, isSameDay } from 'date-fns';
+import { format, getDate, startOfMonth, endOfMonth, isBefore, isSameDay, getMonth, getYear } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { CurrencyHistory } from '../lib/types';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { ptBR } from 'date-fns/locale';
 import { useIntradayChart } from '../hooks/useIntradayChart';
+import { api } from '@/lib/http';
 
 interface CurrencyMiniChartProps {
   currencyCode: string;
@@ -14,6 +16,7 @@ interface CurrencyMiniChartProps {
 }
 
 export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
+  const { t, i18n } = useTranslation();
   const today = new Date();
   // Usar selectedDate se fornecida, senão usar hoje - mas sempre começar com o mês atual
   const initialMonth = selectedDate ? startOfMonth(selectedDate) : startOfMonth(today);
@@ -49,11 +52,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const { data: currentCurrencyData } = useQuery({
     queryKey: ['/api/currencies/current-for-intraday', currencyCode],
     queryFn: async () => {
-      const response = await fetch('/api/currencies');
-      if (!response.ok) {
-        throw new Error('Failed to fetch current currencies');
-      }
-      const currencies = await response.json();
+      const currencies = await api.currencies.getAll();
       return currencies.find((c: any) => c.code === currencyCode);
     },
     refetchOnWindowFocus: false,
@@ -98,15 +97,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       const monthStartStr = monthStart.toISOString().split('T')[0];
       const monthEndStr = monthEnd.toISOString().split('T')[0];
 
-      const response = await fetch(
-        `/api/history/${currencyCode}?startDate=${monthStartStr}&endDate=${monthEndStr}`
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch historical data');
-      }
-
-      const data = await response.json();
+      const data = await api.history.getForCurrency(currencyCode, monthStartStr, monthEndStr);
       return data.map((item: any) => ({
         ...item,
         timestamp: new Date(item.timestamp)
@@ -117,15 +108,18 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
 
 
-  // Remover limitação de navegação - permitir navegar mesmo sem dados
-  const isPreviousDisabled = false; // Permitir sempre voltar
+  // Aplicar trava de 1 ano na navegação
+  const isPreviousDisabled = isBefore(selectedMonth, minDate) || 
+                            (getMonth(selectedMonth) === getMonth(minDate) && getYear(selectedMonth) === getYear(minDate));
   const isNextDisabled = isSameDay(monthEnd, endOfMonth(today)) || isBefore(today, monthStart);
 
   const goToPreviousMonth = () => {
     const newDate = new Date(selectedMonth);
     newDate.setMonth(newDate.getMonth() - 1);
-    // Sempre permitir voltar, mesmo sem dados
-    setSelectedMonth(newDate);
+    // Só permitir voltar se não ultrapassar 1 ano
+    if (!isPreviousDisabled) {
+      setSelectedMonth(newDate);
+    }
   };
 
   const goToNextMonth = () => {
@@ -136,7 +130,23 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     }
   };
 
-  const capitalizedMonthName = format(selectedMonth, 'MMMM yyyy', { locale: ptBR });
+  const getLocale = () => {
+    const localeMap: Record<string, any> = {
+      pt: () => import('date-fns/locale/pt-BR'),
+      en: () => import('date-fns/locale/en-US'),
+      es: () => import('date-fns/locale/es'),
+      fr: () => import('date-fns/locale/fr')
+    };
+    return localeMap[i18n.language.split('-')[0]]?.() || import('date-fns/locale/pt-BR');
+  };
+
+  const [locale, setLocale] = useState<any>(null);
+
+  useEffect(() => {
+    getLocale().then((mod: any) => setLocale(mod.default));
+  }, [i18n.language]);
+
+  const capitalizedMonthName = locale ? format(selectedMonth, 'MMMM yyyy', { locale }) : format(selectedMonth, 'MMMM yyyy', { locale: ptBR });
 
   // SEMPRE criar pontos para o mês COMPLETO - não limitar pelo adjustedMonthEnd
   const fullMonthEnd = endOfMonth(selectedMonth);
@@ -216,7 +226,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     return (
       <div className="w-full h-[180px] flex items-center justify-center bg-gray-100 rounded animate-pulse">
         <div className="text-center">
-          <p className="text-gray-500 text-sm">Carregando dados...</p>
+          <p className="text-gray-500 text-sm">{t('chart.loadingData')}</p>
         </div>
       </div>
     );
@@ -246,7 +256,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
             <ChevronRight size={16} />
           </button>
         </div>
-        <p className="text-gray-500 text-sm">Sem dados disponíveis para {capitalizedMonthName}</p>
+        <p className="text-gray-500 text-sm">{t('chart.noDataForMonth', { month: capitalizedMonthName })}</p>
       </div>
     );
   }
@@ -282,7 +292,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     <div className="w-full h-[220px] sm:h-[180px]">
       {/* Layout para Desktop e Mobile Landscape */}
       <div className="hidden sm:flex md:flex items-center justify-between mb-4">
-        <h4 className="text-sm font-medium text-gray-700 -translate-y-0.5">Movimentação</h4>
+        <h4 className="text-sm font-medium text-gray-700 -translate-y-0.5">{t('chart.movement')}</h4>
         
         {/* Navegação do mês no centro (apenas para modo mensal) */}
         {chartType === 'month' && (
@@ -309,7 +319,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
         {chartType === 'day' && (
           <div className="flex items-center">
             <h4 className="text-sm font-medium min-w-[120px] text-center">
-              {format(today, "dd 'de' MMMM", { locale: ptBR })}
+              {locale ? format(today, "dd MMMM", { locale }) : format(today, "dd MMMM", { locale: ptBR })}
             </h4>
           </div>
         )}
@@ -323,7 +333,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
                 : 'text-gray-600 hover:text-[#1a1a1a]'
             }`}
           >
-            Mês
+            {t('chart.month')}
           </button>
           <button
             onClick={() => setChartType('day')}
@@ -333,7 +343,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
                 : 'text-gray-600 hover:text-[#1a1a1a]'
             }`}
           >
-            Dia
+            {t('chart.day')}
           </button>
         </div>
       </div>
@@ -342,7 +352,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       <div className="block sm:hidden">
         {/* Primeira linha: Título "Movimentação" e Toggle */}
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-medium text-gray-700 -translate-y-0.5">Movimentação</h4>
+          <h4 className="text-sm font-medium text-gray-700 -translate-y-0.5">{t('chart.movement')}</h4>
           
           <div className="flex bg-gray-200 p-1 rounded-lg">
             <button
@@ -353,7 +363,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
                   : 'text-gray-600 hover:text-[#1a1a1a]'
               }`}
             >
-              Mês
+              {t('chart.month')}
             </button>
             <button
               onClick={() => setChartType('day')}
@@ -363,7 +373,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
                   : 'text-gray-600 hover:text-[#1a1a1a]'
               }`}
             >
-              Dia
+              {t('chart.day')}
             </button>
           </div>
         </div>
@@ -395,7 +405,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
           {chartType === 'day' && (
             <div className="flex items-center">
               <h4 className="text-sm font-medium min-w-[120px] text-center">
-                {format(today, "dd 'de' MMMM", { locale: ptBR })}
+                {locale ? format(today, "dd MMMM", { locale }) : format(today, "dd MMMM", { locale: ptBR })}
               </h4>
             </div>
           )}
@@ -404,17 +414,17 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
       {activeIsLoading ? (
         <div className="w-full h-[200px] flex items-center justify-center bg-gray-100 rounded animate-pulse">
-          <p className="text-gray-500 text-sm">Carregando dados...</p>
+          <p className="text-gray-500 text-sm">{t('chart.loadingData')}</p>
         </div>
       ) : !shouldShowChart ? (
         <div className="w-full h-[200px] flex items-center justify-center bg-gray-100 rounded">
           <p className="text-gray-500 text-sm">
             {chartType === 'day' 
               ? (!shouldShowIntradayChart 
-                  ? 'Aguardando variações de preço no dia' 
-                  : 'Sem variações no período'
+                  ? t('chart.waitingPriceVariations')
+                  : t('chart.noVariationsInPeriod')
                 ) 
-              : `Sem dados disponíveis para ${capitalizedMonthName}`
+              : t('chart.noDataForMonth', { month: capitalizedMonthName })
             }
           </p>
         </div>
@@ -500,14 +510,14 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
                       fontSize: '12px'
                     }}>
                       <p style={{ margin: '0 0 3px 0', fontWeight: 'bold' }}>
-                        {chartType === 'month' ? `Dia ${label}` : `${label}h`}
+                        {chartType === 'month' ? `${t('chart.dayLabel')} ${label}` : `${label}${t('chart.hourLabel')}`}
                       </p>
                       <p style={{ margin: '0 0 2px 0', color: '#000' }}>
-                        Venda: R$ {sellPrice ? sellPrice.toFixed(4) : 'N/A'}
+                        {t('chart.sellLabel')} R$ {sellPrice ? sellPrice.toFixed(4) : 'N/A'}
                       </p>
                       {buyPrice && (
                         <p style={{ margin: '0', color: '#000' }}>
-                          Compra: R$ {buyPrice.toFixed(4)}
+                          {t('chart.buyLabel')} R$ {buyPrice.toFixed(4)}
                         </p>
                       )}
                     </div>
@@ -537,7 +547,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       {(shouldShowChart || activeIsLoading) && (
         <div className="text-center -mt-6">
           <p className="text-xs text-gray-500 font-medium">
-            {chartType === 'month' ? 'Dias' : 'Horas'}
+            {chartType === 'month' ? t('chart.daysLabel') : t('chart.hoursLabel')}
           </p>
         </div>
       )}

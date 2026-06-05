@@ -16,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
 
 interface CurrencyCardProps {
   currency: Currency;
@@ -38,7 +39,9 @@ export function CurrencyCard({
   historicalPrice,
   selectedDate
 }: CurrencyCardProps) {
-  const { name, code, buyPrice, sellPrice, change } = currency;
+  const { t } = useTranslation();
+  const { code, buyPrice, sellPrice, change } = currency;
+  const name = t(`currencies.${code}`) || currency.name;
   const isMobile = useIsMobile();
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -117,11 +120,11 @@ export function CurrencyCard({
                 e.stopPropagation();
                 setShowAlertModal(true);
               }}
-              className="h-auto px-2 py-1 hover:bg-yellow-500/20 hover:text-white text-white flex items-center gap-1"
-              title="Criar alerta de preço"
+              className="h-auto px-3 py-2 border border-white/40 text-white hover:bg-white/10 hover:border-white hover:text-gray-200 flex items-center gap-2 transition-all duration-200 font-medium"
+              title={t('alerts.createAlert')}
             >
-              <span className="text-xs">Criar alerta</span>
               <Bell className="h-4 w-4" />
+              <span className="text-xs">{t('alerts.createAlert')}</span>
             </Button>
           )}
           <span className="text-sm font-medium bg-[#f3b234] text-[#1a1a1a] px-2 py-1 rounded">
@@ -132,13 +135,13 @@ export function CurrencyCard({
       <div className="p-4">
         <div className="flex justify-between mb-3">
           <div>
-            <p className="text-sm text-gray-500">Compra</p>
+            <p className="text-sm text-gray-500">{t('currency.buy')}</p>
             <p className={`text-xl font-bold text-[#1a1a1a] ${!hasHistoricalData && isHistoricalView ? 'opacity-50' : ''}`}>
               {hasHistoricalData || !isHistoricalView ? `R$ ${formatCurrencyValue(code, displayBuyPrice || 0)}` : '—'}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-500">Venda</p>
+            <p className="text-sm text-gray-500">{t('currency.sell')}</p>
             <p className={`text-xl font-bold text-[#1a1a1a] ${!hasHistoricalData && isHistoricalView ? 'opacity-50' : ''}`}>
               {hasHistoricalData || !isHistoricalView ? `R$ ${formatCurrencyValue(code, displaySellPrice || 0)}` : '—'}
             </p>
@@ -150,11 +153,11 @@ export function CurrencyCard({
           <div className="mb-3 text-center">
             {hasHistoricalData ? (
               <p className="text-sm font-bold text-[#f3b234]">
-                Cotação ao final do dia {format(selectedDate, 'dd/MM/yyyy')}
+                {t('history.quoteAtEndOfDay', { date: format(selectedDate, 'dd/MM/yyyy') })}
               </p>
             ) : (
               <p className="text-sm font-bold text-[#f3b234]">
-                Sem registros da data selecionada
+                {t('history.noRecordsForDate')}
               </p>
             )}
           </div>
@@ -165,7 +168,7 @@ export function CurrencyCard({
             onClick={onToggleExpand}
             className="text-xs text-[#1a1a1a] hover:text-gray-700 flex items-center focus:outline-none"
           >
-            Mais informações de variação
+            {t('currency.details')}
             <ChevronDown 
               className={`ml-1 h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
             />
@@ -223,17 +226,17 @@ export function CurrencyCard({
                   </TooltipTrigger>
                   <TooltipContent 
                     side="top" 
-                    align="center"
-                    className="max-w-[180px] p-2 z-[9999] text-center break-words"
-                    sideOffset={12}
+                    align="start"
+                    className="max-w-[150px] p-2 text-center break-words"
+                    sideOffset={4}
                     avoidCollisions={true}
                     collisionPadding={20}
-                    alignOffset={0}
+                    alignOffset={-130}
                     onPointerDownOutside={handleTooltipClose}
                     onEscapeKeyDown={handleTooltipClose}
                   >
                     <p className="text-xs">
-                      Variação em relação a cotação que a moeda encerrou no dia anterior.
+                      {t('currency.variationTooltip')}
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -260,6 +263,7 @@ export function CurrencyCard({
         onClose={() => setShowAlertModal(false)}
         currencyCode={code}
         currencyName={name}
+        currentSellPrice={sellPrice}
       />
     </Card>
   );

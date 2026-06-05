@@ -67,6 +67,31 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+// Whitelist de formatos de cores seguros
+const isValidColor = (color: string): boolean => {
+  // Hex colors: #fff, #ffffff
+  const hexPattern = /^#([A-Fa-f0-9]{3}){1,2}$/;
+  // RGB/RGBA: rgb(255,255,255), rgba(255,255,255,0.5)
+  const rgbPattern = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([01]?\.\d+)\s*)?\)$/;
+  // HSL/HSLA: hsl(0,100%,50%), hsla(0,100%,50%,0.5)
+  const hslPattern = /^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*(?:,\s*([01]?\.\d+)\s*)?\)$/;
+  // CSS variables: var(--color-primary)
+  const cssVarPattern = /^var\(--[a-zA-Z0-9_-]+\)$/;
+  // Named colors: red, blue, transparent
+  const namedColors = [
+    'transparent', 'inherit', 'initial', 'unset',
+    'black', 'white', 'gray', 'grey', 'red', 'blue', 'green', 'yellow',
+    'orange', 'purple', 'pink', 'brown', 'cyan', 'magenta', 'lime',
+    'navy', 'teal', 'olive', 'maroon', 'aqua', 'fuchsia', 'silver'
+  ];
+
+  return hexPattern.test(color) ||
+         rgbPattern.test(color) ||
+         hslPattern.test(color) ||
+         cssVarPattern.test(color) ||
+         namedColors.includes(color.toLowerCase());
+};
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -76,25 +101,43 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
+  // Sanitiza e valida as cores antes de injetar no CSS
+  const sanitizedCSS = Object.entries(THEMES)
+    .map(([theme, prefix]) => {
+      const cssRules = colorConfig
+        .map(([key, itemConfig]) => {
+          const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+          
+          // Validação de segurança - só permite cores seguras
+          if (!color || !isValidColor(color)) {
+            console.warn(`Cor inválida ou insegura ignorada: ${color} para chave: ${key}`);
+            return null;
+          }
+
+          // Sanitização adicional: remove caracteres perigosos
+          const sanitizedColor = color
+            .replace(/[<>]/g, '') // Remove potential HTML tags
+            .replace(/javascript:/gi, '') // Remove javascript: URLs
+            .replace(/expression\(/gi, ''); // Remove CSS expressions
+
+          return `  --color-${key}: ${sanitizedColor};`;
+        })
+        .filter(Boolean)
+        .join('\n');
+
+      return cssRules ? `${prefix} [data-chart=${id}] {\n${cssRules}\n}` : null;
+    })
+    .filter(Boolean)
+    .join('\n');
+
+  if (!sanitizedCSS) {
+    return null;
+  }
+
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join("\n")}
-}
-`
-          )
-          .join("\n"),
+        __html: sanitizedCSS,
       }}
     />
   )

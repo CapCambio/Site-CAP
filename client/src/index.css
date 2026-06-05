@@ -37,6 +37,48 @@
   --chart-5: 0 0% 85%; /* very light gray */
 }
 
+/* Estilo para o calendário do input date no tema escuro */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) invert(1) !important;
+  cursor: pointer;
+}
+
+input[type="date"]::-moz-calendar-picker-indicator {
+  filter: brightness(0) invert(1) !important;
+  cursor: pointer;
+}
+
+/* Estilos adicionais para input date em tema escuro */
+input[type="date"] {
+  color-scheme: dark !important;
+  background-color: #27272a !important;
+  color: white !important;
+  border-color: #52525b !important;
+}
+
+input[type="date"]:focus {
+  border-color: #eab308 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2) !important;
+}
+
+/* Forçar texto branco no calendário */
+input[type="date"]::-webkit-datetime-edit-text {
+  color: white !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field {
+  color: white !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-day-field {
+  color: white !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: white !important;
+}
+
 .dark {
   --background: 0 0% 10%; /* brand-dark: #1a1a1a */
   --foreground: 0 0% 98%;
@@ -140,7 +182,7 @@
 /* Espaçamento entre cards no mobile */
 @media (max-width: 639px) {
   .currency-item {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
   
   .currency-item:last-child {

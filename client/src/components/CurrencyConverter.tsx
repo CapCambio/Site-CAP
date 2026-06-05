@@ -1,13 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Currency } from "@/lib/types";
 import { formatCurrencyValue } from "@/lib/currency";
 import { CurrencyLogo } from "./CurrencyLogo";
+import { useTranslation } from "react-i18next";
 
 interface CurrencyConverterProps {
   currencies: Currency[];
+  userEmail: string | null;
 }
 
-export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
+export function CurrencyConverter({ currencies, userEmail }: CurrencyConverterProps) {
+  const { t } = useTranslation();
   const [fromCurrency, setFromCurrency] = useState<string>("USD");
   const [toCurrency, setToCurrency] = useState<string>("BRL");
   const [amount, setAmount] = useState<string>("");
@@ -17,15 +20,72 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   const [showToDropdown, setShowToDropdown] = useState<boolean>(false);
   const [mode, setMode] = useState<"tenho" | "preciso">("preciso");
 
-  const allCurrencies = [
+  // Função para obter ordem dos cards
+  const getCardOrder = () => {
+    if (typeof window !== 'undefined' && userEmail) {
+      console.log('CurrencyConverter - userEmail:', userEmail);
+      
+      const orderKey = `currency-order-${userEmail}`;
+      const savedOrder = localStorage.getItem(orderKey);
+      console.log('CurrencyConverter - orderKey:', orderKey);
+      console.log('CurrencyConverter - savedOrder:', savedOrder);
+      
+      if (savedOrder) {
+        try {
+          const parsedOrder = JSON.parse(savedOrder);
+          console.log('CurrencyConverter - parsedOrder:', parsedOrder);
+          return parsedOrder;
+        } catch (error) {
+          console.error('Erro ao carregar ordem dos cards:', error);
+        }
+      }
+    }
+    console.log('CurrencyConverter - retornando null');
+    return null;
+  };
+
+  // Ordenar moedas conforme ordem dos cards
+  const getOrderedCurrencies = () => {
+    const cardOrder = getCardOrder();
+    console.log('CurrencyConverter - cardOrder em getOrderedCurrencies:', cardOrder);
+    
+    if (cardOrder && cardOrder.length > 0) {
+      // Ordenar moedas conforme ordem dos cards
+      const orderedCurrencies = currencies
+        .filter(currency => cardOrder.includes(currency.code))
+        .sort((a, b) => {
+          const indexA = cardOrder.indexOf(a.code);
+          const indexB = cardOrder.indexOf(b.code);
+          return indexA - indexB;
+        });
+      
+      // Adicionar moedas que não estão na ordem (novas)
+      const unorderedCurrencies = currencies
+        .filter(currency => !cardOrder.includes(currency.code))
+        .sort((a, b) => a.code.localeCompare(b.code));
+      
+      const result = [...orderedCurrencies, ...unorderedCurrencies];
+      console.log('CurrencyConverter - orderedCurrencies:', orderedCurrencies);
+      console.log('CurrencyConverter - unorderedCurrencies:', unorderedCurrencies);
+      console.log('CurrencyConverter - result final:', result);
+      
+      return result;
+    }
+    
+    // Se não há ordem salva, usar ordem padrão
+    console.log('CurrencyConverter - usando ordem padrão:', currencies);
+    return currencies;
+  };
+
+  const allCurrencies = useMemo(() => [
     { 
       code: "BRL", 
-      name: "Real Brasileiro",
+      name: t('converter.brazilianReal'),
       buyPrice: 1,
       sellPrice: 1
     },
-    ...currencies
-  ];
+    ...getOrderedCurrencies()
+  ], [currencies, userEmail]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,12 +111,13 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
     }
   }, [fromCurrency, toCurrency]);
 
-  useEffect(() => {
+  // Calcular conversão usando useMemo para performance
+  const { convertedAmount: calculatedAmount, isApproximateValue: calculatedApproximate } = useMemo(() => {
     const fromCurrencyData = allCurrencies.find(c => c.code === fromCurrency);
     const toCurrencyData = allCurrencies.find(c => c.code === toCurrency);
 
     if (fromCurrencyData && toCurrencyData && amount) {
-      const numericAmount = parseFloat(amount.replace(/[^\d.]/g, ''));
+      const numericAmount = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
       if (!isNaN(numericAmount) && numericAmount > 0) {
         let result;
 
@@ -96,18 +157,23 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
         const rawResult = result;
         const roundedResult = toCurrency === "BRL" ? result : Math.round(result);
-        setIsApproximateValue(rawResult !== roundedResult);
-
-        setConvertedAmount(formatCurrencyValue(toCurrency, roundedResult));
-      } else {
-        setConvertedAmount("0");
-        setIsApproximateValue(false);
+        return {
+          convertedAmount: formatCurrencyValue(toCurrency, roundedResult),
+          isApproximateValue: rawResult !== roundedResult
+        };
       }
-    } else {
-      setConvertedAmount("0");
-      setIsApproximateValue(false);
     }
+    return {
+      convertedAmount: "0",
+      isApproximateValue: false
+    };
   }, [fromCurrency, toCurrency, amount, allCurrencies, mode]);
+
+  // Atualizar estado com o valor calculado
+  useEffect(() => {
+    setConvertedAmount(calculatedAmount);
+    setIsApproximateValue(calculatedApproximate);
+  }, [calculatedAmount, calculatedApproximate]);
 
   const handleFromCurrencyChange = (code: string) => {
     setFromCurrency(code);
@@ -121,7 +187,18 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
 
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^\d.]/g, '');
+    let value = e.target.value.replace(/[^\d.]/g, '');
+    
+    // Formatação automática com pontos de milhar
+    if (value) {
+      const cleanValue = value.replace(/\./g, '');
+      const number = parseInt(cleanValue, 10);
+      
+      if (!isNaN(number)) {
+        value = number.toLocaleString('pt-BR');
+      }
+    }
+    
     setAmount(value);
   };
 
@@ -135,11 +212,11 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
   };
 
   return (
-    <div className="currency-converter relative max-w-3xl mx-auto mt-1 mb-4">
-      <div className="bg-[#252525] p-3 pb-8 sm:p-6 sm:pb-12 rounded-xl">
-        <h2 className="text-[#f3b234] text-xl font-semibold mb-2 sm:mb-3 text-center">Conversor de Moedas</h2>
+    <div className="currency-converter relative max-w-3xl mx-auto mt-1 mb-2 sm:mt-0 sm:mb-3">
+      <div className="bg-[#252525] px-3 pt-2 pb-6 sm:px-6 sm:pt-2 sm:pb-6 rounded-xl">
+        <h2 className="text-[#f3b234] text-xl font-semibold mb-2 sm:mb-3 text-center">{t('converter.title')}</h2>
 
-        <div className="flex items-center justify-center mb-2 sm:mb-3">
+        <div className="flex items-center justify-center mb-2 sm:mb-2">
           <button
             onClick={() => setMode("preciso")}
             className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-150 ${
@@ -148,7 +225,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                 : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
             }`}
           >
-            Preciso de
+            {t('converter.iNeed')}
           </button>
           <button
             onClick={() => setMode("tenho")}
@@ -156,21 +233,21 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
               mode === "tenho" 
                 ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
                 : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
-              }`}
-            >
-            Tenho
+            }`}
+          >
+            {t('converter.iHave')}
           </button>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1">
-            <div className="bg-white rounded-xl flex justify-between items-center p-3 mb-3 sm:mb-0 h-14 sm:h-[4.5rem]">
+            <div className="bg-white rounded-xl flex justify-between items-center p-3 mb-2 sm:mb-0 h-14 sm:h-[4.5rem]">
               <input
                 type="text"
                 value={amount}
                 onChange={handleAmountChange}
-                className="text-xl sm:text-2xl font-medium bg-white border-none focus:ring-0 focus:outline-none text-black w-3/5"
-                placeholder="Digite o valor"
+                className="text-xl sm:text-2xl font-medium bg-white border-none focus:ring-0 focus:outline-none text-black w-3/5 landscape:[&::placeholder]:text-lg"
+                placeholder={t('converter.enterValue')}
               />
 
               <div 
@@ -198,9 +275,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                   marginTop: '-1px'
                 }}
               >
-                {allCurrencies
-                  .sort((a, b) => (a.code === "BRL" ? -1 : b.code === "BRL" ? 1 : 0))
-                  .map((currency) => (
+                {allCurrencies.map((currency) => (
                   <div 
                     key={`from-${currency.code}`}
                     className="flex items-center p-3 hover:bg-[#f4ba4a] cursor-pointer border-b border-black/10"
@@ -225,7 +300,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                     <CurrencyLogo code={currency.code} className="w-5 h-5 mr-3" />
                     <div className="flex flex-col">
                       <span className="font-medium text-sm text-black">{currency.code}</span>
-                      <span className="text-xs text-black/70">{currency.name}</span>
+                      <span className="text-xs text-black/70">{t(`currencies.${currency.code}`) || currency.name}</span>
                     </div>
                   </div>
                 ))}
@@ -246,7 +321,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             </button>
           </div>
 
-          <div className="relative flex-1 mt-3 sm:mt-0">
+          <div className="relative flex-1 mt-2 sm:mt-0">
             <div className="bg-white rounded-xl flex justify-between items-center p-3 h-14 sm:h-[4.5rem]">
               <div className="text-xl sm:text-2xl font-medium text-black truncate w-3/5">
                 {convertedAmount || "0,00"}
@@ -277,9 +352,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                   marginTop: '-1px'
                 }}
               >
-                {allCurrencies
-                  .sort((a, b) => (a.code === "BRL" ? -1 : b.code === "BRL" ? 1 : 0))
-                  .map((currency) => (
+                {allCurrencies.map((currency) => (
                   <div 
                     key={`to-${currency.code}`}
                     className="flex items-center p-3 hover:bg-[#f4ba4a] cursor-pointer border-b border-black/10"
@@ -304,7 +377,7 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
                     <CurrencyLogo code={currency.code} className="w-5 h-5 mr-3" />
                     <div className="flex flex-col">
                       <span className="font-medium text-sm text-black">{currency.code}</span>
-                      <span className="text-xs text-black/70">{currency.name}</span>
+                      <span className="text-xs text-black/70">{t(`currencies.${currency.code}`) || currency.name}</span>
                     </div>
                   </div>
                 ))}
@@ -312,8 +385,8 @@ export function CurrencyConverter({ currencies }: CurrencyConverterProps) {
             )}
 
             {isApproximateValue && (
-              <div className="text-center mt-1 absolute w-full">
-                <span className="text-[#f3b234] text-xs">Valor aproximado</span>
+              <div className="text-center mt-0 absolute w-full">
+                <span className="text-[#f3b234] text-xs">{t('converter.approximate')}</span>
               </div>
             )}
           </div>

@@ -1,4 +1,4 @@
-import capLogo from "@assets/cap logo fundo.png";
+import capLogo from "/optimized/cap-logo-fundo-optimized.webp";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +10,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { LanguageSelector } from "./LanguageSelector";
+import { useTranslation } from "react-i18next";
 
 export function Header() {
+  const { t } = useTranslation();
   const { user, logout, showAdminPanel, setShowAdminPanel } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showAlertsPanel, setShowAlertsPanel] = useState(false);
@@ -29,7 +32,7 @@ export function Header() {
         setEmails(data);
       }
     } catch (error) {
-      console.error('Erro ao carregar emails:', error);
+      console.error(t('header.errorLoadEmails'), error);
     }
   };
 
@@ -47,12 +50,12 @@ export function Header() {
         setNewEmail("");
         loadEmails();
         toast({
-          title: "Email adicionado",
-          description: `Email ${newEmail} adicionado com sucesso.`
+          title: t('toasts.emailAdded'),
+          description: t('header.emailAddedDesc', { email: newEmail })
         });
       }
     } catch (error) {
-      console.error('Erro ao adicionar email:', error);
+      console.error(t('header.errorAddEmail'), error);
     }
   };
 
@@ -67,12 +70,12 @@ export function Header() {
       if (response.ok) {
         loadEmails();
         toast({
-          title: "Email removido",
-          description: `Email ${email} removido com sucesso.`
+          title: t('header.emailRemoved'),
+          description: t('header.emailRemovedDesc', { email })
         });
       }
     } catch (error) {
-      console.error('Erro ao remover email:', error);
+      console.error(t('header.errorRemoveEmail'), error);
     }
   };
 
@@ -98,17 +101,21 @@ export function Header() {
     <>
       <header className="bg-[#000000] text-white px-4 py-2 shadow-md mb-2">
         <div className="container mx-auto">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center relative">
+            {/* LanguageSelector no canto direito superior */}
+            <div className="absolute top-0 right-3 md:right-6">
+              <LanguageSelector />
+            </div>
             <img 
               src={capLogo} 
-              alt="CAP Câmbio Logo" 
+              alt={t('header.logoAlt')} 
               className="h-24 md:h-32 mb-1"
             />
             {/* Botões do usuário - sempre abaixo do logo */}
             {user && (
               <div className="flex flex-col items-center gap-2">
                 <span className="text-white text-xs sm:text-sm lg:text-base">
-                  Olá {user?.name || 'Usuário'}
+                  {t('header.welcome', { name: user?.name || t('header.userFallback') })}
                 </span>
                 <div className="flex items-center justify-center gap-3">
                   {!user.isAdmin && (
@@ -117,9 +124,9 @@ export function Header() {
                       variant="ghost"
                       size="sm"
                       className="text-white hover:text-yellow-400 hover:bg-zinc-800 relative"
-                      title="Meus Alertas"
+                      title={t('header.alerts')}
                     >
-                      Meus Alertas
+                      {t('header.alerts')}
                       <Bell className="h-5 w-5 ml-1" />
                       {alertCount > 0 && (
                         <Badge 
@@ -137,9 +144,9 @@ export function Header() {
                       variant="ghost"
                       size="sm"
                       className="text-white hover:text-yellow-400 hover:bg-zinc-800"
-                      title="Gerenciamento"
+                      title={t('header.adminPanel')}
                     >
-                      Gerenciamento
+                      {t('header.adminPanel')}
                       <Settings className="h-5 w-5 ml-1" />
                     </Button>
                   )}
@@ -148,9 +155,9 @@ export function Header() {
                     variant="ghost"
                     size="sm"
                     className="text-white hover:text-yellow-400 hover:bg-zinc-800"
-                    title="Sair"
+                    title={t('header.logout')}
                   >
-                    Sair
+                    {t('header.logout')}
                     <LogOut className="h-5 w-5 ml-1" />
                   </Button>
                 </div>
@@ -164,16 +171,16 @@ export function Header() {
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Gerenciar Emails Autorizados</DialogTitle>
+            <DialogTitle>{t('header.manageAuthorizedEmails')}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6">
             {/* Adicionar novo email */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Adicionar Email</h3>
+              <h3 className="text-lg font-semibold">{t('header.addEmail')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="new-email">Email</Label>
+                  <Label htmlFor="new-email">{t('header.emailLabel')}</Label>
                   <Input
                     id="new-email"
                     value={newEmail}
@@ -182,20 +189,20 @@ export function Header() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email-type">Tipo</Label>
+                  <Label htmlFor="email-type">{t('header.typeLabel')}</Label>
                   <select
                     id="email-type"
                     value={emailType}
                     onChange={(e) => setEmailType(e.target.value as "authorized" | "admin")}
                     className="w-full p-2 border rounded"
                   >
-                    <option value="authorized">Usuário Comum</option>
-                    <option value="admin">Administrador</option>
+                    <option value="authorized">{t('header.commonUser')}</option>
+                    <option value="admin">{t('header.adminLabel')}</option>
                   </select>
                 </div>
                 <div className="flex items-end">
                   <Button onClick={addEmail} className="w-full">
-                    Adicionar
+                    {t('header.addUserBtn')}
                   </Button>
                 </div>
               </div>
@@ -203,7 +210,7 @@ export function Header() {
 
             {/* Lista de emails autorizados */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Usuários Comuns</h3>
+              <h3 className="text-lg font-semibold">{t('header.commonUsers')}</h3>
               <div className="space-y-2">
                 {emails.authorized.map((email: string) => (
                   <div key={email} className="flex justify-between items-center p-2 bg-gray-100 rounded">
@@ -213,7 +220,7 @@ export function Header() {
                       size="sm"
                       onClick={() => removeEmail(email, "authorized")}
                     >
-                      Remover
+                      {t('header.removeBtn')}
                     </Button>
                   </div>
                 ))}
@@ -222,7 +229,7 @@ export function Header() {
 
             {/* Lista de emails admin */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Administradores</h3>
+              <h3 className="text-lg font-semibold">{t('header.admins')}</h3>
               <div className="space-y-2">
                 {emails.admin.map((email: string) => (
                   <div key={email} className="flex justify-between items-center p-2 bg-gray-100 rounded">
@@ -232,7 +239,7 @@ export function Header() {
                       size="sm"
                       onClick={() => removeEmail(email, "admin")}
                     >
-                      Remover
+                      {t('header.removeBtn')}
                     </Button>
                   </div>
                 ))}

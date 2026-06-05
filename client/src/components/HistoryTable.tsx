@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CurrencyHistory } from "../lib/types";
 import { formatDate, formatCurrencyValue } from "../lib/currency";
+import { useTranslation } from "react-i18next";
 
 interface HistoryTableProps {
   data: CurrencyHistory[];
@@ -25,6 +26,7 @@ interface HistoryTableProps {
 }
 
 export function HistoryTable({ data, code, isLoading }: HistoryTableProps) {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -56,7 +58,7 @@ export function HistoryTable({ data, code, isLoading }: HistoryTableProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Registros Históricos</CardTitle>
+          <CardTitle className="text-lg">{t('table.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex justify-center p-8">
@@ -71,11 +73,11 @@ export function HistoryTable({ data, code, isLoading }: HistoryTableProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Registros Históricos</CardTitle>
+          <CardTitle className="text-lg">{t('table.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-gray-500">Nenhum registro histórico encontrado para o período selecionado.</p>
+            <p className="text-gray-500">{t('table.noRecords')}</p>
           </div>
         </CardContent>
       </Card>
@@ -85,17 +87,17 @@ export function HistoryTable({ data, code, isLoading }: HistoryTableProps) {
   return (
     <Card>
       <CardHeader className="bg-gray-50 border-b">
-        <CardTitle className="text-lg">Registros Históricos</CardTitle>
+        <CardTitle className="text-lg">{t('table.title')}</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
             <thead>
               <tr className="bg-gray-100 text-gray-600 uppercase text-base">
-                <th className="py-4 px-4 text-left">Data</th>
-                <th className="py-4 px-4 text-right">Compra</th>
-                <th className="py-4 px-4 text-right">Venda</th>
-                <th className="py-4 px-4 text-right">Variação</th>
+                <th className="py-4 px-4 text-left">{t('table.date')}</th>
+                <th className="py-4 px-4 text-right">{t('table.buy')}</th>
+                <th className="py-4 px-4 text-right">{t('table.sell')}</th>
+                <th className="py-4 px-4 text-right">{t('table.variation')}</th>
               </tr>
             </thead>
             <tbody className="text-gray-600 text-base">
@@ -139,7 +141,7 @@ export function HistoryTable({ data, code, isLoading }: HistoryTableProps) {
       </CardContent>
       <CardFooter className="border-t p-4 flex justify-between items-center">
         <p className="text-sm text-gray-600">
-          Exibindo {Math.min(itemsPerPage, data.length)} de {data.length} registros
+          {t('table.showing', { items: Math.min(itemsPerPage, data.length), total: data.length })}
         </p>
         {totalPages > 1 && (
           <div className="flex space-x-1">

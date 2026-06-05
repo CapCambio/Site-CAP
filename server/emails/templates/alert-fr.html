@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerte de Devises</title>
+    <!-- Fallback pour Outlook -->
+    <!--[if gte mso 9]>
+    <style>
+        .btn-primary, .header-line {
+            background-color: #f3b234 !important;
+        }
+    </style>
+    <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #333333; background-color: #f5f5f5;">
+    <div style="max-width: 600px; margin: 0 auto; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <!-- En-tête -->
+        <div style="width: 100%; background: #000000; position: relative; overflow: hidden;">
+            <!-- Ligne supérieure -->
+            <div class="header-line" style="height: 6px; background-color: #f3b234;">
+                <!-- Fallback pour Outlook -->
+                <!--[if !mso]><!-- -->
+                <div style="display: none; font-size: 0; max-height: 0; overflow: hidden; mso-hide: all;">
+                    &nbsp;
+                </div>
+                <!--<![endif]-->
+            </div>
+            
+            <div style="padding: 20px 20px 15px; text-align: center; position: relative; z-index: 2;">
+                <img src="https://capcambio.com.br/wp-content/uploads/2022/11/LogoSecundario-CAPCAMBIO.png" alt="CAP Câmbio" style="max-width: 200px; height: auto; display: block; margin: 0 auto 5px;">
+                <h1 style="color: #fff; font-size: 1.7rem; font-weight: 700; margin: 0 0 15px 0; line-height: 1.1; text-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                    Alerte de Devises
+                </h1>
+            </div>
+            
+            <!-- Ligne inférieure -->
+            <div class="header-line" style="height: 6px; background-color: #f3b234;">
+                <!-- Fallback pour Outlook -->
+                <!--[if !mso]><!-- -->
+                <div style="display: none; font-size: 0; max-height: 0; overflow: hidden; mso-hide: all;">
+                    &nbsp;
+                </div>
+                <!--<![endif]-->
+            </div>
+        </div>
+        
+        <!-- Contenu Principal -->
+        <div style="padding: 20px; color: #333; font-size: 16px; line-height: 1.6;">
+            <p>Bonjour <strong>{{userName}}</strong>!</p>
+            
+            <p style="margin: 0 0 10px 0; text-align: left;">
+                {{#if multipleAlerts}}
+                    Certaines devises que vous suivez ont changé de valeur !
+                {{else}}
+                    Une devise que vous suivez a changé de valeur !
+                {{/if}}
+            </p>
+            
+            <div style="margin: 20px 0;">
+                {{#each alerts}}
+                <div style="background: #fff9e6; border-left: 4px solid #fcab23; padding: 15px; margin: 0 0 15px 0; border-radius: 4px;">
+                    <h3 style="margin: 0 0 10px 0; color: #000; font-size: 18px;">
+                        {{#if (gt this.variation 0)}}📈{{else}}📉{{/if}}
+                        {{this.currencyCode}} - {{getCurrencyName this.currencyCode ../language}}
+                    </h3>
+                    <p style="margin: 0;"><strong>Valeur actuelle:</strong> R$ {{formatCurrency this.sellPrice}}</p>
+                    <p style="margin: 5px 0 0 0; color: {{#if (gt this.variation 0)}}#10b981{{else}}#ef4444{{/if}};">
+                        <strong>Variation:</strong> {{#if (gt this.variation 0)}}+{{/if}}{{formatNumber this.variation 2}}%
+                    </p>
+                </div>
+                {{/each}}
+            </div>
+            
+            <p style="margin: 0 0 10px 0; text-align: center; color: #333; font-style: italic;">
+                Consultez votre panneau de devises pour plus de détails.
+            </p>
+            
+            <div style="text-align: center; margin: 0 0 20px 0;">
+                <a href="https://capcambio.com.br/cotacoes" class="btn-primary" style="display: inline-block; padding: 12px 30px; background-color: #f3b234; color: #1a1a1a !important; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px; border: 1px solid #d49f1f; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                    Accéder au Panneau de Devises
+                </a>
+            </div>
+            
+            <p style="margin: 0 0 15px 0; font-size: 14px; color: #666; text-align: center;">
+                Ceci est un email automatique, veuillez ne pas répondre.
+            </p>
+        </div>
+        
+        <!-- Pied de page -->
+        <div style="background: #f9f9f9; padding: 15px 20px; border-top: 1px solid #eee; text-align: center; font-size: 11px; color: #777; line-height: 1.5;">
+            <p style="margin: 0;">
+                © {{currentYear}} CAP Câmbio. Tous droits réservés.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

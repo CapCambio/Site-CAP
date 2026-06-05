@@ -13,6 +13,7 @@ build
 .vercel
 
 # Ambiente
+.env
 .env.local
 .env.development
 .env.production
@@ -55,6 +56,8 @@ server/public
 vite.config.ts.*
 *.tar.gz
 
-# Manter dados essenciais (NÃO ignorar)
-# data/
-# server/config/
+# Proteger dados sensíveis
+data/
+server/config/
+server/logs/
+*.log

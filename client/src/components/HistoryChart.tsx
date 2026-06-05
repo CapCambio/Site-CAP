@@ -11,16 +11,17 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HistoryFilter } from "../lib/types";
-import { currencyDetails, formatDate } from "../lib/currency";
+import { formatDate } from "../lib/currency";
+import { useTranslation } from "react-i18next";
 
 interface HistoryChartProps {
-  data: Array<{ date: string; compra: number; venda: number }>;
+  data: Array<{ date: string; venda: number }>;
   filter: HistoryFilter;
   isLoading: boolean;
 }
 
 // Função para calcular o domínio do eixo Y com base nas regras definidas
-function calculateYAxisDomain(data: Array<{ date: string; compra: number; venda: number }>): [number, number] {
+function calculateYAxisDomain(data: Array<{ date: string; venda: number }>): [number, number] {
   // Se não houver dados, retorna um domínio padrão
   if (!data || data.length === 0) {
     return [0, 10];
@@ -34,8 +35,8 @@ function calculateYAxisDomain(data: Array<{ date: string; compra: number; venda:
   const tenPercentUp = baseValue * 1.1;
   const tenPercentDown = baseValue * 0.9;
   
-  // Encontrando valores min e max reais nos dados
-  const allValues = data.flatMap(item => [item.compra, item.venda]);
+  // Encontrando valores min e max nos dados (só venda)
+  const allValues = data.map(item => item.venda);
   const minValue = Math.min(...allValues);
   const maxValue = Math.max(...allValues);
   
@@ -47,12 +48,13 @@ function calculateYAxisDomain(data: Array<{ date: string; compra: number; venda:
 }
 
 export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
-  const currencyName = currencyDetails[filter.code]?.name || filter.code;
+  const { t } = useTranslation();
+  const currencyName = t(`currencies.${filter.code}`);
   
   const title = useMemo(() => {
     const dateRange = `${formatDate(filter.startDate)} a ${formatDate(filter.endDate)}`;
     return `${currencyName} (${filter.code}) - ${dateRange}`;
-  }, [currencyName, filter]);
+  }, [currencyName, filter, t]);
 
   if (isLoading) {
     return (
@@ -64,7 +66,7 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
           <div className="h-80 w-full flex items-center justify-center bg-gray-100 rounded">
             <div className="text-center">
               <div className="w-12 h-12 border-4 border-[#f3b234] border-t-transparent rounded-full animate-spin mb-3 mx-auto"></div>
-              <p className="text-gray-500">Carregando dados...</p>
+              <p className="text-gray-500">{t('chart.loading')}</p>
             </div>
           </div>
         </CardContent>
@@ -81,7 +83,7 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
         <CardContent>
           <div className="h-80 w-full flex items-center justify-center bg-gray-100 rounded">
             <div className="text-center">
-              <p className="text-gray-500">Nenhum dado disponível para o período selecionado</p>
+              <p className="text-gray-500">{t('chart.noData')}</p>
             </div>
           </div>
         </CardContent>
@@ -107,7 +109,7 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
                   const parts = value.split('/');
                   return `${parts[0]}/${parts[1]}`;
                 }}
-                label={{ value: "Data", position: "insideBottom", offset: -15, fill: "#000000", fontSize: 12 }}
+                label={{ value: t('chart.date'), position: "insideBottom", offset: -15, fill: "#000000", fontSize: 12 }}
               />
               <YAxis 
                 tick={{ fontSize: 0 }}
@@ -116,27 +118,19 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
                 width={35}
                 axisLine={true}
                 tickLine={true}
-                label={{ value: "Cotação", angle: -90, position: "insideLeft", offset: 10, style: { textAnchor: 'middle', fill: '#666', fontSize: 12 } }}
+                label={{ value: t('chart.rate'), angle: -90, position: "insideLeft", offset: 10, style: { textAnchor: 'middle', fill: '#666', fontSize: 12 } }}
               />
               <Tooltip 
                 formatter={(value: number) => [`R$ ${value.toFixed(5).replace(/\.?0+$/, '')}`, '']}
-                labelFormatter={(label) => `Data: ${label}`}
+                labelFormatter={(label) => `${t('chart.date')}: ${label}`}
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
               />
               <Legend />
               <Line 
                 type="monotone" 
                 dataKey="venda" 
-                name="Venda" 
+                name={t('chart.sell')} 
                 stroke="#f3b234" 
-                activeDot={{ r: 8 }} 
-                strokeWidth={2}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="compra" 
-                name="Compra" 
-                stroke="#1a1a1a" 
                 activeDot={{ r: 8 }} 
                 strokeWidth={2}
               />

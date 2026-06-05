@@ -1,0 +1,6 @@
+=== Chaves VAPID geradas ===
+
+VAPID_PUBLIC_KEY=BL9-cnBD0We5zZUfrgcP7--C6o6cIWS6RYMO8dI0XPmMgfiwf4vPYIa3Tc6OvvqKSIHsqYDmE6xHD8sG5Z-_Zmk
+VAPID_PRIVATE_KEY=tz-FMRJNIlH_JX1En9k4dan5oozLZsoHRB3h9TEADcw
+
+Adicione estas chaves ao seu arquivo .env

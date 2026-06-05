@@ -22,17 +22,16 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
       const response = await fetch(
         `/api/history/${currencyCode}?startDate=${todayStr}&endDate=${todayStr}`
       );
-
       if (!response.ok) {
         throw new Error('Failed to fetch intraday data');
       }
-
       const data = await response.json();
       return data.map((item: any) => ({
         ...item,
         timestamp: new Date(item.timestamp)
       }));
     },
+    staleTime: 1 * 60 * 1000, // 1 minuto
     refetchOnWindowFocus: false,
     refetchInterval: 5 * 60 * 1000, // Refetch a cada 5 minutos
   });

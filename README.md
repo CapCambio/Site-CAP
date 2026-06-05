@@ -28,11 +28,12 @@ Sistema completo de cotações de moedas em tempo real com conversão, históric
    ```
 
 4. **Acessar a aplicação:**
-   - Abrir o navegador em: `http://localhost:5000`
+   - Abrir o navegador em: `http://localhost:8080`
 
 ### Scripts disponíveis:
 - `npm run setup` - Instala todas as dependências
-- `npm run dev` - Executa em modo desenvolvimento
+- `npm run dev` - Executa em modo desenvolvimento (Linux/Mac)
+- `npm run dev:win` - Executa em modo desenvolvimento (Windows)
 - `npm run build` - Gera build de produção
 - `npm run start` - Executa build de produção
 
@@ -62,9 +63,9 @@ O arquivo `.env` já está configurado com valores padrão. Você pode modificá
 
 ```env
 NODE_ENV=development
-PORT=5000
+PORT=8080
 APP_NAME="CAP Cotações"
-APP_URL="http://localhost:5000"
+APP_URL="http://localhost:8080"
 ```
 
 ### Dados Iniciais
@@ -92,8 +93,8 @@ Para acessar o painel administrativo, use:
 
 ### Erro de porta em uso:
 ```bash
-# Matar processos na porta 5000
-npx kill-port 5000
+# Matar processos na porta 8080
+npx kill-port 8080
 # Ou usar outra porta modificando o arquivo .env
 ```
 

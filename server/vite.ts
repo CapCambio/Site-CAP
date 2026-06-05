@@ -20,7 +20,7 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
-  const serverOptions = {
+  const serverOptions: any = {
     middlewareMode: true,
     hmr: { server },
     allowedHosts: true,
@@ -69,6 +69,7 @@ export async function setupVite(app: Express, server: Server) {
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(import.meta.dirname, "public");
+  const optimizedPath = path.resolve(import.meta.dirname, "..", "public", "optimized");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
@@ -76,7 +77,11 @@ export function serveStatic(app: Express) {
     );
   }
 
+  // Servir arquivos estáticos da pasta public
   app.use(express.static(distPath));
+  
+  // Servir arquivos da pasta optimized
+  app.use('/optimized', express.static(optimizedPath));
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {

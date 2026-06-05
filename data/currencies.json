@@ -3,61 +3,61 @@
     "id": 1,
     "name": "Dólar Americano",
     "code": "USD",
-    "buyPrice": 5.3,
-    "sellPrice": 5.7,
+    "buyPrice": 5.29,
+    "sellPrice": 5.69,
     "change": 0,
     "displayOrder": 1,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 2,
     "name": "Euro",
     "code": "EUR",
-    "buyPrice": 6.25,
-    "sellPrice": 6.77,
+    "buyPrice": 6.2,
+    "sellPrice": 6.98,
     "change": 0,
     "displayOrder": 2,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 3,
     "name": "Libra Esterlina",
     "code": "GBP",
-    "buyPrice": 7.2,
-    "sellPrice": 7.96,
+    "buyPrice": 7.05,
+    "sellPrice": 7.9,
     "change": 0,
     "displayOrder": 3,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 4,
     "name": "Dólar Australiano",
     "code": "AUD",
-    "buyPrice": 3.5,
-    "sellPrice": 3.91,
+    "buyPrice": 3.55,
+    "sellPrice": 4.03,
     "change": 0,
     "displayOrder": 4,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 5,
     "name": "Peso Argentino",
     "code": "ARS",
-    "buyPrice": 0.002,
-    "sellPrice": 0.0055,
+    "buyPrice": 0.003,
+    "sellPrice": 0.0053,
     "change": 0,
     "displayOrder": 5,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 6,
     "name": "Dólar Neozelandês",
     "code": "NZD",
-    "buyPrice": 3.2,
-    "sellPrice": 3.46,
+    "buyPrice": 2.95,
+    "sellPrice": 3.43,
     "change": 0,
     "displayOrder": 6,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 7,
@@ -67,96 +67,96 @@
     "sellPrice": 4.25,
     "change": 0,
     "displayOrder": 7,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 8,
     "name": "Franco Suíço",
     "code": "CHF",
     "buyPrice": 6.6,
-    "sellPrice": 7.38,
+    "sellPrice": 7.43,
     "change": 0,
     "displayOrder": 8,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 9,
     "name": "Peso Uruguaio",
     "code": "UYU",
     "buyPrice": 0.13,
-    "sellPrice": 0.17,
+    "sellPrice": 0.179,
     "change": 0,
     "displayOrder": 9,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 10,
     "name": "Peso Chileno",
     "code": "CLP",
     "buyPrice": 0.0055,
-    "sellPrice": 0.0069,
+    "sellPrice": 0.0073,
     "change": 0,
     "displayOrder": 10,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 11,
     "name": "Peso Mexicano",
     "code": "MXN",
     "buyPrice": 0.28,
-    "sellPrice": 0.37,
+    "sellPrice": 0.38,
     "change": 0,
     "displayOrder": 11,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 12,
     "name": "Peso Colombiano",
     "code": "COP",
-    "buyPrice": 0.00135,
-    "sellPrice": 0.0019,
+    "buyPrice": 0.0014,
+    "sellPrice": 0.002,
     "change": 0,
     "displayOrder": 12,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 13,
     "name": "Yuan Chinês",
     "code": "CNY",
-    "buyPrice": 0.75,
+    "buyPrice": 0.7,
     "sellPrice": 0.9,
     "change": 0,
     "displayOrder": 13,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 14,
     "name": "Iene Japonês",
     "code": "JPY",
     "buyPrice": 0.03,
-    "sellPrice": 0.0418,
+    "sellPrice": 0.0394,
     "change": 0,
     "displayOrder": 14,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 15,
     "name": "Novo Sol Peruano",
     "code": "PEN",
-    "buyPrice": 1.62,
-    "sellPrice": 1.75,
+    "buyPrice": 1.6,
+    "sellPrice": 1.82,
     "change": 0,
     "displayOrder": 15,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   },
   {
     "id": 16,
     "name": "Rand Africano",
     "code": "ZAR",
-    "buyPrice": 0.28,
-    "sellPrice": 0.357,
+    "buyPrice": 0.27,
+    "sellPrice": 0.383,
     "change": 0,
     "displayOrder": 16,
-    "lastUpdate": "2025-09-17T13:46:12.409Z"
+    "lastUpdate": "2026-06-01T21:45:03.164Z"
   }
 ]

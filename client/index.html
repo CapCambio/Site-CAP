@@ -2,14 +2,149 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>CAP Cotações - Câmbio Atualizado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+    <title>CAP Cotações</title>
     <meta name="description" content="Acompanhe as cotações de moedas em tempo real - CAP Cotações" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <!-- PWA Config -->
+    <meta name="application-name" content="CAP Cotações">
+    <meta name="apple-mobile-web-app-title" content="CAP Cotações">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    
+    <!-- Favicons e ícones PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/webp" href="/optimized/favicon-32x32.webp" sizes="32x32">
+    <link rel="icon" type="image/webp" href="/optimized/favicon-16x16.webp" sizes="16x16">
+    <link rel="apple-touch-icon" href="/optimized/apple-touch-icon.webp" sizes="180x180">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000">
+    
+    <!-- Pré-conexão e pré-carregamento de recursos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    
+    <!-- Fonte do Google com carregamento otimizado -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
+    
+    <!-- Meta tags para redes sociais -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="CAP Cotações">
+    <meta property="og:description" content="Acompanhe as cotações de moedas em tempo real - CAP Cotações">
+    <meta property="og:image" content="/og-image.jpg">
+    <meta property="og:url" content="https://capcotacoes.com">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- Verificação de propriedade para ferramentas de desenvolvedor -->
+    <meta name="google-site-verification" content="YOUR_GOOGLE_SITE_VERIFICATION">
+    
+    <!-- Configurações para instalação do PWA -->
+    <link rel="canonical" href="https://capcotacoes.com">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    
+    <!-- Configurações para iOS -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-startup-image" href="/splash/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <!-- Adicione mais splash screens para diferentes dispositivos se necessário -->
+    
+    <!-- Configurações para Windows -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+    
+    <!-- Configurações para o Safari -->
+    <meta name="apple-mobile-web-app-title" content="CAP Cotações">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Preload de recursos críticos -->
+    
+    <!-- Configuração para instalação do PWA -->
+    <script>
+      // Função para registrar o service worker
+      const registerServiceWorker = async () => {
+        if (!('serviceWorker' in navigator)) {
+          console.log('Navegador não suporta Service Workers');
+          return null;
+        }
+        
+        try {
+          console.log('Tentando registrar o Service Worker...');
+          
+          // Força a atualização do service worker em cada carregamento em desenvolvimento
+          const registration = await navigator.serviceWorker.register('/sw.js', {
+            scope: '/',
+            updateViaCache: 'none'  // Sempre busca a versão mais recente
+          });
+          
+          console.log('Service Worker registrado com sucesso: ', registration.scope);
+          
+          // Verificar o estado do service worker
+          if (registration.installing) {
+            console.log('Service Worker está instalando...');
+            registration.installing.addEventListener('statechange', (event) => {
+              console.log('Estado do Service Worker:', event.target.state);
+            });
+          } else if (registration.waiting) {
+            console.log('Service Worker instalado e esperando...');
+          } else if (registration.active) {
+            console.log('Service Worker ativo e rodando');
+          }
+          
+          // Forçar atualização do service worker
+          registration.update().catch(err => 
+            console.log('Erro ao atualizar o Service Worker:', err)
+          );
+          
+          return registration;
+        } catch (error) {
+          console.error('Falha ao registrar o Service Worker:', error);
+          return null;
+        }
+      };
+      
+      // Registrar o service worker após o carregamento da página
+      window.addEventListener('load', () => {
+        // Verificar se estamos em um contexto seguro (HTTPS ou localhost)
+        const isLocalhost = window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1';
+                          
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || isLocalhost)) {
+          registerServiceWorker().catch(console.error);
+        } else {
+          console.log('Service Worker não suportado neste ambiente');
+        }
+      });
+      
+      // Detecta quando o PWA é instalado
+      window.addEventListener('appinstalled', (evt) => {
+        console.log('Aplicativo instalado com sucesso!');
+        // Aqui você pode adicionar lógica adicional após a instalação
+      });
+      
+      // Detecta se o aplicativo foi aberto a partir da tela inicial
+      window.addEventListener('DOMContentLoaded', () => {
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            window.navigator.standalone === true || 
+            document.referrer.includes('android-app://')) {
+          console.log('Aplicativo aberto como PWA');
+          // Adicione aqui lógica específica para quando o aplicativo é aberto como PWA
+        }
+      });
+    </script>
+    
+    <!-- Pré-carregar recursos críticos -->
+    <link rel="preload" href="/optimized/favicon-32x32.webp" as="image" type="image/webp" fetchpriority="high">
+    <link rel="preload" href="/optimized/cap-logo-fundo-optimized.webp" as="image" type="image/webp" fetchpriority="high">
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script src="/sw-register.js"></script>
   </body>
 </html>

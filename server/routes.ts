@@ -1,14 +1,58 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
 import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
 import { InsertCurrencyHistory } from "../shared/schema";
 import { jsonStorage } from "./json-storage";
-import { migrateToJSON } from "./migrate-to-json";
-import { alertSystem } from "./alert-system";
+import { alertSystem } from "./init-alert-system";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { authService } from './auth/AuthService';
+import { authenticate, requireAdmin, optionalAuth } from './auth/AuthMiddleware';
+import { sessionRegistry } from './auth/SessionRegistry';
+import monitoringRoutes from './monitoring/MonitoringRoutes';
+
+// Interface para tipar os administradores
+interface AdminUser {
+  email: string;
+  name?: string;
+  lastAccess?: string;
+}
+
+// Interface para o objeto de configuração
+interface EmailConfig {
+  adminEmails: (string | AdminUser)[];
+  userEmails?: (string | AdminUser)[];
+}
+
+// Interface para o objeto de erro
+interface ErrorWithMessage extends Error {
+  message: string;
+  status?: number;
+}
+
+// Declare session type
+declare module 'express-session' {
+  interface SessionData {
+    user?: {
+      email: string;
+      name: string;
+      isAdmin: boolean;
+    };
+  }
+}
+
+// Interface para o tipo Alert
+interface Alert {
+  tipo: 'subida' | 'descida' | 'valor-especifico';
+  ativo: boolean;
+  ultimoValor?: number;
+  validade: string | null;
+  limite?: number;
+  valor?: number;
+  valorEspecifico?: number;
+  condicaoValor?: 'acima' | 'abaixo';
+}
 
 // Get current directory for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -33,98 +77,170 @@ function loadAuthorizedEmails() {
 }
 
 async function loadEmailConfig() {
+  try {
+    const configPath = path.join(__dirname, 'config', 'email-config.json');
+    // Verifica se o arquivo existe
     try {
-      const configPath = path.join(__dirname, 'config', 'authorized-emails.json');
-      const configData = fs.readFileSync(configPath, 'utf-8');
-      return JSON.parse(configData);
-    } catch (error) {
-      console.error('Erro ao carregar configuração de emails:', error);
-      // Retorna configuração padrão se houver erro
-      return {
-        authorizedEmails: [],
-        adminEmails: ["admin@example.com"]
-      };
+      await fs.promises.access(configPath, fs.constants.F_OK);
+    } catch (err) {
+      // Se o arquivo não existir, retorna um objeto vazio
+      return { authorizedEmails: [], adminEmails: [] };
     }
+    
+    // Se o arquivo existir, lê e retorna o conteúdo
+    const configData = await fs.promises.readFile(configPath, 'utf-8');
+    const config = JSON.parse(configData);
+    
+    // Garante que as propriedades necessárias existam
+    return {
+      authorizedEmails: config.authorizedEmails || [],
+      adminEmails: config.adminEmails || []
+    };
+  } catch (error) {
+    console.error('Erro ao carregar configuração de emails:', error);
+    // Retorna configuração padrão se houver erro
+    return {
+      authorizedEmails: [],
+      adminEmails: []
+    };
   }
+}
+
+  // Caminho para o arquivo de configuração de e-mails
+  const configPath = path.join(__dirname, 'config', 'email-config.json');
 
   async function saveEmailConfig(config: any) {
     try {
-      const configPath = path.join(__dirname, 'config', 'authorized-emails.json');
-      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+      // Garante que o diretório existe
+      await fs.promises.mkdir(path.dirname(configPath), { recursive: true });
+      
+      // Salva o arquivo de configuração
+      await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2));
       console.log('Arquivo de configuração salvo em:', configPath);
     } catch (error) {
-      console.error('Erro ao salvar configuração de emails:', error);
-      throw error;
+      console.error('Erro ao salvar configuração de e-mails:', error);
+      throw error; // Re-throw para que o chamador saiba que houve um erro
     }
   }
+  
+  /**
+ * Atualiza o último acesso do usuário
+ * @param email E-mail do usuário (em minúsculas)
+ * @param isAdmin Indica se o usuário é administrador
+ */
+async function updateLastAccess(email: string, isAdmin: boolean): Promise<void> {
+  try {
+    // Garante que o email está em minúsculas
+    const emailLower = email.toLowerCase();
+    
+    // Carrega a configuração atual
+    const config = await loadEmailConfig();
+    const now = new Date().toISOString();
 
-  async function updateLastAccess(email: string, isAdmin: boolean) {
-    try {
-      const config = await loadEmailConfig();
-      const now = new Date().toISOString();
+    console.log(`[${new Date().toISOString()}] Atualizando último acesso para: ${emailLower}, isAdmin: ${isAdmin}`);
+    
+    let updated = false;
 
-      console.log(`Atualizando último acesso para: ${email}, isAdmin: ${isAdmin}`);
-      console.log('Config antes da atualização:', JSON.stringify(config, null, 2));
-
-      if (isAdmin) {
-        // Atualizar último acesso do admin
-        const adminIndex = config.adminEmails.findIndex(admin => 
-          typeof admin === 'string' ? admin === email : admin.email === email
-        );
-
-        console.log(`Admin index encontrado: ${adminIndex}`);
-
-        if (adminIndex !== -1) {
-          if (typeof config.adminEmails[adminIndex] === 'string') {
-            config.adminEmails[adminIndex] = {
-              email: config.adminEmails[adminIndex] as string,
+    if (isAdmin) {
+      // Atualizar último acesso do admin
+      for (let i = 0; i < config.adminEmails.length; i++) {
+        const admin = config.adminEmails[i];
+        const adminEmail = typeof admin === 'string' ? admin : admin.email;
+        
+        if (adminEmail && adminEmail.toLowerCase() === emailLower) {
+          // Se for uma string, converte para objeto
+          if (typeof config.adminEmails[i] === 'string') {
+            config.adminEmails[i] = {
+              email: config.adminEmails[i] as string,
               name: 'CAP Câmbio',
-              lastAccess: now
-            };
-          } else {
-            config.adminEmails[adminIndex] = {
-              ...config.adminEmails[adminIndex],
-              lastAccess: now
-            };
-          }
-          console.log(`Admin atualizado:`, config.adminEmails[adminIndex]);
-        }
-      } else {
-        // Atualizar último acesso do usuário comum
-        const userIndex = config.authorizedEmails.findIndex(user => 
-          typeof user === 'string' ? user === email : user.email === email
-        );
-
-        console.log(`User index encontrado: ${userIndex}`);
-
-        if (userIndex !== -1) {
-          if (typeof config.authorizedEmails[userIndex] === 'string') {
-            config.authorizedEmails[userIndex] = {
-              email: config.authorizedEmails[userIndex] as string,
-              name: email.split('@')[0],
               lastAccess: now,
-              createdAt: now // Para emails antigos, usar data atual como aproximação
+              isAdmin: true
             };
           } else {
-            config.authorizedEmails[userIndex] = {
-              ...config.authorizedEmails[userIndex],
-              lastAccess: now
+            // Atualiza apenas o lastAccess, mantendo outras propriedades
+            config.adminEmails[i] = {
+              ...config.adminEmails[i],
+              lastAccess: now,
+              isAdmin: true
             };
           }
-          console.log(`User atualizado:`, config.authorizedEmails[userIndex]);
+          console.log(`Admin atualizado:`, config.adminEmails[i]);
+          updated = true;
+          break;
         }
       }
-
-      await saveEmailConfig(config);
-      console.log('Config salva com sucesso');
-    } catch (error) {
-      console.error('Erro ao atualizar último acesso:', error);
+    } else {
+      // Atualizar último acesso do usuário comum
+      for (let i = 0; i < config.authorizedEmails.length; i++) {
+        const user = config.authorizedEmails[i];
+        const userEmail = typeof user === 'string' ? user : user.email;
+        
+        if (userEmail && userEmail.toLowerCase() === emailLower) {
+          // Se for uma string, converte para objeto
+          if (typeof config.authorizedEmails[i] === 'string') {
+            config.authorizedEmails[i] = {
+              email: config.authorizedEmails[i] as string,
+              name: emailLower.split('@')[0],
+              lastAccess: now,
+              createdAt: now,
+              isAdmin: false
+            };
+          } else {
+            // Atualiza apenas o lastAccess, mantendo outras propriedades
+            config.authorizedEmails[i] = {
+              ...config.authorizedEmails[i],
+              lastAccess: now,
+              isAdmin: false
+            };
+          }
+          console.log(`Usuário atualizado:`, config.authorizedEmails[i]);
+          updated = true;
+          break;
+        }
+      }
     }
+
+    if (updated) {
+      // Salva as alterações
+      await saveEmailConfig(config);
+      console.log(`[${new Date().toISOString()}] Último acesso atualizado para ${emailLower}`);
+    } else {
+      console.warn(`[${new Date().toISOString()}] Usuário não encontrado: ${emailLower}, isAdmin: ${isAdmin}`);
+      
+      // Se não encontrou o usuário, tenta adicioná-lo (pode ser um novo usuário)
+      try {
+        if (isAdmin) {
+          config.adminEmails.push({
+            email: emailLower,
+            name: 'CAP Câmbio',
+            lastAccess: now,
+            createdAt: now,
+            isAdmin: true
+          });
+        } else {
+          config.authorizedEmails.push({
+            email: emailLower,
+            name: emailLower.split('@')[0],
+            lastAccess: now,
+            createdAt: now,
+            isAdmin: false
+          });
+        }
+        await saveEmailConfig(config);
+        console.log(`[${new Date().toISOString()}] Novo usuário adicionado: ${emailLower}`);
+      } catch (addError) {
+        console.error(`[${new Date().toISOString()}] Erro ao adicionar novo usuário ${emailLower}:`, addError);
+      }
+    }
+  } catch (error) {
+    console.error(`[${new Date().toISOString()}] Erro ao atualizar último acesso para ${email}:`, error);
+    // Não lança o erro para não quebrar o fluxo de login
   }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Rotas de autenticação
-  app.post("/api/auth/check-admin", (req, res) => {
+  app.post("/api/auth/check-admin", async (req, res) => {
     try {
       const { email } = req.body;
 
@@ -132,16 +248,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email é obrigatório" });
       }
 
-      const { adminEmails } = loadAuthorizedEmails();
-      const emailLower = email.toLowerCase();
+      // Mantém a mesma fonte de verdade usada no login: email-config.json
+      const emailConfig = await loadEmailConfig();
+      const emailLower = String(email).toLowerCase();
 
-      // Verificar se o email está na lista de admins (pode ser string ou objeto)
-      const isAdmin = adminEmails.some(admin => 
+      const isAdmin = emailConfig.adminEmails.some((admin: { email: string; name?: string } | string) =>
         typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
       );
-
-      console.log(`Verificando admin para ${emailLower}: ${isAdmin}`);
-      console.log('Admin emails:', adminEmails);
 
       res.json({ isAdmin });
     } catch (error) {
@@ -149,6 +262,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
+
+  function loadAdminPasswords(): Record<string, string> {
+    try {
+      const raw = process.env.ADMIN_PASSWORDS_JSON;
+      if (!raw) return {};
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return {};
+
+      const normalized: Record<string, string> = {};
+      for (const [email, pass] of Object.entries(parsed)) {
+        if (typeof email === 'string' && typeof pass === 'string') {
+          normalized[email.toLowerCase()] = pass;
+        }
+      }
+
+      return normalized;
+    } catch (error) {
+      console.error('Erro ao carregar ADMIN_PASSWORDS_JSON:', error);
+      return {};
+    }
+  }
 
   app.post("/api/auth/login", async (req, res) => {
     try {
@@ -162,15 +296,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const emailLower = email.toLowerCase();
 
       console.log("Login attempt for:", emailLower);
-      console.log("Config loaded:", JSON.stringify(emailConfig, null, 2));
 
       // Verificar se é admin
-      const adminUser = emailConfig.adminEmails.find(admin => 
+      const adminUser = emailConfig.adminEmails.find((admin: { email: string; name?: string } | string) => 
         typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
       );
 
       // Verificar se é usuário autorizado
-      const regularUser = emailConfig.authorizedEmails.find(user => 
+      const regularUser = emailConfig.authorizedEmails.find((user: { email: string; name?: string } | string) => 
         typeof user === 'string' ? user === emailLower : user.email === emailLower
       );
 
@@ -182,8 +315,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verificar senha para admins
-      if (isAdminEmail && password !== "passo2012") {
-        return res.status(401).json({ error: "Senha incorreta para administrador" });
+      if (isAdminEmail) {
+        const adminPasswords = loadAdminPasswords();
+        const expectedPassword = adminPasswords[emailLower];
+
+        if (!expectedPassword) {
+          console.error(`Senha de admin não configurada para ${emailLower} (ADMIN_PASSWORDS_JSON)`);
+          return res.status(500).json({ error: "Senha de administrador não configurada" });
+        }
+
+        if (password !== expectedPassword) {
+          return res.status(401).json({ error: "Senha incorreta para administrador" });
+        }
       }
 
       // Determinar o nome do usuário
@@ -199,17 +342,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (typeof regularUser === 'object' && regularUser.name) {
           userName = regularUser.name;
         } else {
-          userName = emailLower.split('@')[0];
+          userName = (typeof emailLower === 'string' ? emailLower : String(emailLower)).split('@')[0];
         }
       }
 
       console.log("User name resolved to:", userName);
+
+      // Usuários comuns: primeira sessão prevalece — bloqueia novo login se já houver sessão ativa
+      if (!isAdminEmail) {
+        const canLogin = await sessionRegistry.canLogin(
+          emailLower,
+          req.sessionStore,
+          req.sessionID
+        );
+        if (!canLogin) {
+          return res.status(409).json({
+            error: 'SESSION_ALREADY_ACTIVE',
+            message:
+              'Não foi possível entrar. Já existe uma sessão ativa com este usuário no momento.',
+          });
+        }
+      }
 
       // Atualizar último acesso
       try {
         await updateLastAccess(emailLower, isAdminEmail);
       } catch (error) {
         console.error("Erro ao atualizar último acesso:", error);
+      }
+
+      // Definir dados da sessão
+      req.session.user = {
+        email: emailLower,
+        name: userName,
+        isAdmin: isAdminEmail
+      };
+
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => (err ? reject(err) : resolve()));
+      });
+
+      if (!isAdminEmail) {
+        sessionRegistry.setActive(emailLower, req.sessionID);
       }
 
       return res.json({
@@ -225,10 +399,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/auth/me", authenticate, (req, res) => {
+    res.json({ user: req.user });
+  });
+
+  app.post("/api/auth/release-stale", async (req, res) => {
+    try {
+      const { email, orphan } = req.body;
+      if (!email || typeof email !== 'string') {
+        return res.status(400).json({ error: 'Email é obrigatório' });
+      }
+
+      const emailLower = email.toLowerCase();
+      const released = orphan === true
+        ? await sessionRegistry.releaseOrphan(
+            emailLower,
+            req.sessionStore,
+            req.sessionID
+          )
+        : await sessionRegistry.tryReleaseStale(
+            emailLower,
+            req.sessionStore,
+            req.sessionID
+          );
+
+      res.json({
+        released,
+        message: released
+          ? 'Sessão anterior liberada'
+          : 'Ainda existe uma sessão ativa em outro dispositivo',
+      });
+    } catch (error) {
+      console.error('Erro ao liberar sessão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    const email = req.session?.user?.email;
+    const isAdmin = req.session?.user?.isAdmin;
+    const sessionId = req.sessionID;
+
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Erro ao destruir sessão:', err);
+        return res.status(500).json({ error: 'Erro ao fazer logout' });
+      }
+
+      if (email && !isAdmin) {
+        sessionRegistry.release(email, sessionId);
+      }
+
+      res.json({ message: 'Logout realizado com sucesso' });
+    });
+  });
+
   // API routes
   app.get("/api/currencies", async (req, res) => {
     try {
-      const currencies = await storage.getAllCurrencies();
+      const currencies = await jsonStorage.getAllCurrencies();
       res.json(currencies);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch currencies" });
@@ -237,7 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/currencies/:code", async (req, res) => {
     try {
-      const currency = await storage.getCurrencyByCode(req.params.code);
+      const currency = await jsonStorage.getCurrencyByCode(req.params.code);
       if (!currency) {
         return res.status(404).json({ message: "Currency not found" });
       }
@@ -272,7 +501,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         startDate = oneYearAgo;
       }
 
-      const history = await storage.getCurrencyHistory(
+      const history = await jsonStorage.getCurrencyHistory(
         req.params.code, 
         startDate, 
         endDate
@@ -286,7 +515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/currencies", async (req, res) => {
     try {
-      const currency = await storage.upsertCurrency(req.body);
+      const currency = await jsonStorage.upsertCurrency(req.body);
       res.status(201).json(currency);
     } catch (error) {
       res.status(500).json({ message: "Failed to create currency" });
@@ -295,10 +524,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/history", async (req, res) => {
     try {
-      const historyEntry = await storage.addCurrencyHistory(req.body);
+      const historyEntry = await jsonStorage.addCurrencyHistory(req.body);
       res.status(201).json(historyEntry);
     } catch (error) {
       res.status(500).json({ message: "Failed to add history record" });
+    }
+  });
+
+  // Endpoint para estatísticas de alertas do admin
+  app.get("/api/alerts/admin/stats", authenticate, requireAdmin, async (req, res) => {
+    try {
+      const { month } = req.query;
+
+      const allAlerts = alertSystem.getAllAlerts();
+
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+      const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+      let monthStart: Date;
+      let monthEnd: Date;
+
+      if (month) {
+        const [year, monthNum] = String(month).split('-');
+        monthStart = new Date(parseInt(year, 10), parseInt(monthNum, 10) - 1, 1, 0, 0, 0, 0);
+        monthEnd = new Date(parseInt(year, 10), parseInt(monthNum, 10), 0, 23, 59, 59, 999);
+      } else {
+        monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      }
+
+      let todayCount = 0;
+      let monthCount = 0;
+      let totalCount = 0;
+
+      for (const userData of Object.values(allAlerts) as any[]) {
+        if (!userData?.lastNotificationSent) continue;
+        totalCount++;
+
+        const lastSent = new Date(userData.lastNotificationSent);
+        if (lastSent >= todayStart && lastSent <= todayEnd) {
+          todayCount++;
+        }
+
+        if (lastSent >= monthStart && lastSent <= monthEnd) {
+          monthCount++;
+        }
+      }
+
+      res.json({
+        today: todayCount,
+        month: monthCount,
+        total: totalCount,
+        selectedMonth: month || null,
+      });
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas:', error);
+      res.status(500).json({ error: 'Erro ao carregar estatísticas' });
     }
   });
 
@@ -313,18 +595,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para salvar ordem dos cards do usuário
+  app.post("/api/user/card-order", authenticate, async (req: Request, res: Response) => {
+    try {
+      const { order } = req.body;
+      
+      if (!Array.isArray(order)) {
+        return res.status(400).json({ error: 'Ordem inválida' });
+      }
+      
+      // Salvar ordem usando o alertSystem
+      const userEmail = req.user?.email;
+      if (!userEmail) {
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+      }
+      
+      alertSystem.saveCardOrder(userEmail, order);
+      
+      console.log(`✅ Ordem dos cards salva para ${userEmail}:`, order);
+      
+      res.json({ success: true, order });
+    } catch (error) {
+      console.error('Erro ao salvar ordem dos cards:', error);
+      res.status(500).json({ error: 'Erro ao salvar ordem dos cards' });
+    }
+  });
+
+  // Endpoint para carregar ordem dos cards do usuário
+  app.get("/api/user/card-order", authenticate, async (req: Request, res: Response) => {
+    try {
+      const userEmail = req.user?.email;
+      if (!userEmail) {
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+      }
+
+      const order = alertSystem.getCardOrder(userEmail);
+
+      console.log(`📋 Carregando ordem dos cards para ${userEmail}:`, order);
+
+      res.json({ order });
+    } catch (error) {
+      console.error('Erro ao carregar ordem dos cards:', error);
+      res.status(500).json({ error: 'Erro ao carregar ordem dos cards' });
+    }
+  });
+
+  // Endpoint para salvar idioma preferido do usuário
+  app.post("/api/user/language", authenticate, async (req: Request, res: Response) => {
+    try {
+      const { language } = req.body;
+      const userEmail = req.user?.email;
+
+      if (!userEmail) {
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+      }
+
+      if (!language || !['pt', 'en', 'es', 'fr'].includes(language)) {
+        return res.status(400).json({ error: 'Idioma inválido' });
+      }
+
+      alertSystem.saveLanguage(userEmail, language);
+
+      console.log(`✅ Idioma salvo para ${userEmail}:`, language);
+
+      res.json({ success: true, language });
+    } catch (error) {
+      console.error('Erro ao salvar idioma:', error);
+      res.status(500).json({ error: 'Erro ao salvar idioma' });
+    }
+  });
+
+  // Endpoint para carregar idioma preferido do usuário
+  app.get("/api/user/language", authenticate, async (req: Request, res: Response) => {
+    try {
+      const userEmail = req.user?.email;
+      if (!userEmail) {
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+      }
+
+      const language = alertSystem.getLanguage(userEmail);
+
+      console.log(`📋 Carregando idioma para ${userEmail}:`, language);
+
+      res.json({ language });
+    } catch (error) {
+      console.error('Erro ao carregar idioma:', error);
+      res.status(500).json({ error: 'Erro ao carregar idioma' });
+    }
+  });
+
   // Configuração de atualização automática a cada minuto
   const server = createServer(app);
-
-  // Primeira atualização na inicialização
-  console.log("Iniciando primeira atualização de moedas...");
-  await refreshCurrencies();
 
   // Limpeza inicial do histórico antigo
   try {
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const deletedCount = await storage.cleanupOldHistory(oneYearAgo);
+    const deletedCount = await jsonStorage.cleanupOldHistory(oneYearAgo);
     if (deletedCount > 0) {
       console.log(`🗑️ Limpeza inicial: ${deletedCount} registros antigos removidos.`);
     }
@@ -332,24 +699,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error("Erro na limpeza inicial do histórico:", error);
   }
 
-  // Configurar atualização automática a cada 1 minuto
-  setInterval(async () => {
-    console.log('🔍 Executando verificação automática de mudanças...');
-    try {
-      const savedCurrencies = await refreshCurrencies();
-      console.log(`✅ Verificação automática concluída. ${savedCurrencies.length} moedas processadas.`);
-    } catch (error) {
-      console.error("Erro na atualização automática:", error);
-    }
-  }, 60000); // 60 segundos
-
   // Configurar limpeza automática do histórico a cada 24 horas
   setInterval(async () => {
     console.log('🧹 Executando limpeza automática do histórico...');
     try {
       const oneYearAgo = new Date();
       oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-      const deletedCount = await storage.cleanupOldHistory(oneYearAgo);
+      const deletedCount = await jsonStorage.cleanupOldHistory(oneYearAgo);
       if (deletedCount > 0) {
         console.log(`🗑️ Limpeza automática: ${deletedCount} registros antigos removidos.`);
       } else {
@@ -375,13 +731,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }, 7 * 24 * 60 * 60 * 1000); // 7 dias
 
-  // Health check endpoint
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "OK", timestamp: new Date().toISOString() });
+  // Rotas de monitoramento
+  app.use("/api/monitoring", monitoringRoutes);
+  
+  // Health check endpoint (redireciona para novo sistema)
+  app.get("/api/health", async (req, res) => {
+    try {
+      const { healthChecker } = await import('./monitoring/HealthChecker');
+      const health = await healthChecker.runHealthChecks();
+      res.json({ 
+        status: health.status, 
+        timestamp: health.timestamp,
+        uptime: health.uptime 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        status: "unhealthy", 
+        timestamp: new Date().toISOString() 
+      });
+    }
   });
 
   // Admin route to get all user alerts
-  app.get("/api/alerts/admin/all", async (req, res) => {
+  app.get("/api/alerts/admin/all", authenticate, requireAdmin, async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
@@ -422,17 +794,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin email management routes
-  app.get("/api/admin/emails", async (req, res) => {
+  app.get("/api/admin/emails", authenticate, requireAdmin, async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const offset = (page - 1) * limit;
 
-      const authorizedEmails = loadAuthorizedEmails();
+      // Usar loadEmailConfig() em vez de loadAuthorizedEmails()
+      const emailConfig = await loadEmailConfig();
 
       // Converter para formato uniforme e adicionar informações de último acesso
       const allEmails = [
-        ...authorizedEmails.authorizedEmails.map((item: any) => {
+        ...emailConfig.authorizedEmails.map((item: any) => {
           console.log('Processando email autorizado:', item);
           return {
             email: typeof item === 'string' ? item : item.email,
@@ -441,7 +814,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             isAdmin: false
           };
         }),
-        ...authorizedEmails.adminEmails.map((item: any) => {
+        ...emailConfig.adminEmails.map((item: any) => {
           console.log('Processando email admin:', item);
           return {
             email: typeof item === 'string' ? item : item.email,
@@ -480,7 +853,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/emails", async (req, res) => {
+  app.post("/api/admin/emails", authenticate, requireAdmin, async (req, res) => {
     try {
       const { email, name, type } = req.body;
 
@@ -488,37 +861,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email, nome e tipo são obrigatórios" });
       }
 
-      const authorizedEmails = loadAuthorizedEmails();
+      const emailConfig = await loadEmailConfig();
 
       if (type === "authorized") {
         // Verificar se email já existe
-        const existingIndex = authorizedEmails.authorizedEmails.findIndex(e => 
+        const existingIndex = emailConfig.authorizedEmails?.findIndex((e: { email: string; name?: string } | string) => 
           typeof e === 'string' ? e === email : e.email === email
-        );
+        ) ?? -1;
         if (existingIndex === -1) {
-          authorizedEmails.authorizedEmails.push({ email, name });
+          if (!emailConfig.authorizedEmails) {
+            emailConfig.authorizedEmails = [];
+          }
+          emailConfig.authorizedEmails.push({ email, name });
         }
       } else if (type === "admin") {
         // Verificar se email já existe
-        const existingIndex = authorizedEmails.adminEmails.findIndex(e => 
+        const existingIndex = emailConfig.adminEmails.findIndex((e: { email: string; name?: string } | string) => 
           typeof e === 'string' ? e === email : e.email === email
         );
         if (existingIndex === -1) {
-          authorizedEmails.adminEmails.push({ email, name });
+          emailConfig.adminEmails.push({ email, name });
         }
       }
 
       // Salvar no arquivo
-      const configPath = path.join(__dirname, "config", "authorized-emails.json");
-      fs.writeFileSync(configPath, JSON.stringify(authorizedEmails, null, 2));
+      await saveEmailConfig(emailConfig);
 
       res.json({ message: "Email adicionado com sucesso" });
     } catch (error) {
+      console.error("Erro ao adicionar email:", error);
       res.status(500).json({ error: "Erro ao adicionar email" });
     }
   });
 
-  app.put("/api/admin/emails", async (req, res) => {
+  app.put("/api/admin/emails", authenticate, requireAdmin, async (req, res) => {
     try {
       const { oldEmail, newEmail, name, type } = req.body;
 
@@ -526,35 +902,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Todos os campos são obrigatórios" });
       }
 
-      const authorizedEmails = loadAuthorizedEmails();
+      const emailConfig = await loadEmailConfig();
 
       if (type === "authorized") {
-        const index = authorizedEmails.authorizedEmails.findIndex(e => 
+        const index = emailConfig.authorizedEmails?.findIndex((e: { email: string; name?: string } | string) => 
           typeof e === 'string' ? e === oldEmail : e.email === oldEmail
-        );
+        ) ?? -1;
         if (index !== -1) {
-          authorizedEmails.authorizedEmails[index] = { email: newEmail, name };
+          if (!emailConfig.authorizedEmails) {
+            emailConfig.authorizedEmails = [];
+          }
+          emailConfig.authorizedEmails[index] = { email: newEmail, name };
         }
       } else if (type === "admin") {
-        const index = authorizedEmails.adminEmails.findIndex(e => 
+        const index = emailConfig.adminEmails.findIndex((e: { email: string; name?: string } | string) => 
           typeof e === 'string' ? e === oldEmail : e.email === oldEmail
         );
         if (index !== -1) {
-          authorizedEmails.adminEmails[index] = { email: newEmail, name };
+          emailConfig.adminEmails[index] = { email: newEmail, name };
         }
       }
 
       // Salvar no arquivo
-      const configPath = path.join(__dirname, "config", "authorized-emails.json");
-      fs.writeFileSync(configPath, JSON.stringify(authorizedEmails, null, 2));
+      await saveEmailConfig(emailConfig);
 
       res.json({ message: "Email editado com sucesso" });
     } catch (error) {
+      console.error("Erro ao editar email:", error);
       res.status(500).json({ error: "Erro ao editar email" });
     }
   });
 
-  app.delete("/api/admin/emails", async (req, res) => {
+  app.delete("/api/admin/emails", authenticate, requireAdmin, async (req, res) => {
     try {
       const { email, type } = req.body;
 
@@ -562,7 +941,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email e tipo são obrigatórios" });
       }
 
-      const authorizedEmails = loadAuthorizedEmails();
+      const emailConfig = await loadEmailConfig();
 
       // Não permitir remoção de admins
       if (type === "admin") {
@@ -570,17 +949,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (type === "authorized") {
-        authorizedEmails.authorizedEmails = authorizedEmails.authorizedEmails.filter(e => 
-          typeof e === 'string' ? e !== email : e.email !== email
-        );
+        if (emailConfig.authorizedEmails) {
+          emailConfig.authorizedEmails = emailConfig.authorizedEmails.filter((e: string | { email: string; name?: string }) => 
+            typeof e === 'string' ? e !== email : e.email !== email
+          );
+        }
+        
+        // Remover todos os alertas do usuário excluído
+        try {
+          alertSystem.removeAllUserAlerts(email);
+          console.log(`✅ Todos os alertas do usuário ${email} foram removidos`);
+        } catch (error) {
+          console.error('Erro ao remover alertas do usuário:', error);
+        }
       }
 
       // Salvar no arquivo
-      const configPath = path.join(__dirname, "config", "authorized-emails.json");
-      fs.writeFileSync(configPath, JSON.stringify(authorizedEmails, null, 2));
+      await saveEmailConfig(emailConfig);
 
       res.json({ message: "Email removido com sucesso" });
     } catch (error) {
+      console.error("Erro ao remover email:", error);
       res.status(500).json({ error: "Erro ao remover email" });
     }
   });
@@ -590,7 +979,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const config = await loadEmailConfig();
       const now = new Date();
-      const twoYearsAgo = new Date(now.getTime() - 2 * 365 * 24 * 60 * 60 * 1000); // 2 anos
+      const oneYearAgo = new Date(now.getTime() - 1 * 365 * 24 * 60 * 60 * 1000); // 1 ano
       const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000); // 6 meses
 
       let removedCount = 0;
@@ -598,7 +987,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Filtrar emails autorizados (não admins)
       const originalCount = config.authorizedEmails.length;
 
-      config.authorizedEmails = config.authorizedEmails.filter(user => {
+      config.authorizedEmails = config.authorizedEmails.filter((user: { email: string; lastAccess?: string; createdAt?: string } | string) => {
         const email = typeof user === 'string' ? user : user.email;
         const lastAccess = typeof user === 'object' && user.lastAccess ? new Date(user.lastAccess) : null;
         const createdAt = typeof user === 'object' && user.createdAt ? new Date(user.createdAt) : null;
@@ -617,9 +1006,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return false;
           }
         } else {
-          // Se acessou há mais de 2 anos, remove
-          if (lastAccess < twoYearsAgo) {
-            console.log(`🗑️ Removendo email inativo há mais de 2 anos: ${email}`);
+          // Se acessou há mais de 1 ano, remove
+          if (lastAccess < oneYearAgo) {
+            console.log(`🗑️ Removendo email inativo há mais de 1 ano: ${email}`);
             return false;
           }
         }
@@ -649,15 +1038,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const config = await loadEmailConfig();
 
       const emails = [
-        ...config.adminEmails.map(email => ({
-          email,
+        ...config.adminEmails.map((email: string | { email: string; name?: string }) => ({
+          email: typeof email === 'string' ? email : email.email,
           isAdmin: true,
-          name: email.includes('capcambio') ? 'Administrador CAP Câmbio' : undefined
+          name: (typeof email === 'string' ? (email.includes('capcambio') ? 'Administrador CAP Câmbio' : undefined) : email.name)
         })),
-        ...config.authorizedEmails.map(email => ({
-          email,
+        ...config.authorizedEmails.map((email: string | { email: string; name?: string }) => ({
+          email: typeof email === 'string' ? email : email.email,
           isAdmin: false,
-          name: undefined
+          name: typeof email === 'object' ? email.name : undefined
         }))
       ];
 
@@ -719,7 +1108,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Remover da lista
-      config.authorizedEmails = config.authorizedEmails.filter(e => e !== emailLower);
+      config.authorizedEmails = config.authorizedEmails.filter((e: string | { email: string; name?: string }) => 
+        typeof e === 'string' ? e !== emailLower : e.email !== emailLower
+      );
       await saveEmailConfig(config);
 
       res.json({ success: true, message: 'Email removido com sucesso' });
@@ -740,28 +1131,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/alerts/register-push', (req, res) => {
     try {
       const { email, subscription } = req.body;
+      console.log('📥 Recebendo requisição de registro push:');
+      console.log(`   Email: ${email}`);
+      console.log(`   Subscription endpoint: ${subscription?.endpoint?.substring(0, 60)}...`);
+      
       alertSystem.registerPushSubscription(email, subscription);
+      
+      console.log(`✅ Push subscription registrada para ${email}`);
       res.json({ success: true, message: 'Push subscription registrada' });
     } catch (error) {
+      console.error('❌ Erro ao registrar push subscription:', error);
       res.status(500).json({ error: 'Erro ao registrar push subscription' });
     }
   });
 
   // Criar alerta
-  app.post("/api/alerts/create", (req, res) => {
+  app.post("/api/alerts/create", async (req, res) => {
     try {
-      const { email, currencyCode, limite, tipo, valor, validade } = req.body;
+      const { 
+        email, 
+        currencyCode, 
+        tipo, 
+        valor, 
+        validade
+      } = req.body;
 
       if (!email || !currencyCode || !tipo) {
-        return res.status(400).json({ error: "Missing required fields" });
+        return res.status(400).json({ error: "Campos obrigatórios não fornecidos" });
       }
 
-      alertSystem.createAlert(email, currencyCode, limite || 0, tipo, valor, validade);
+      // Valida o tipo de alerta
+      if (!['subida', 'descida', 'valor-especifico'].includes(tipo)) {
+        return res.status(400).json({ 
+          error: "Tipo de alerta inválido. Use 'subida', 'descida' ou 'valor-especifico'" 
+        });
+      }
+      
+      // Valida se o valor foi fornecido para o tipo 'valor-especifico'
+      if (tipo === 'valor-especifico' && (valor === undefined || valor === null)) {
+        return res.status(400).json({ 
+          error: "Valor específico é obrigatório para este tipo de alerta" 
+        });
+      }
 
-      res.json({ success: true, message: "Alerta criado com sucesso!" });
+      // Valida a data de validade se fornecida
+      if (validade && typeof validade === 'string') {
+        const dataValidade = new Date(validade);
+        if (isNaN(dataValidade.getTime())) {
+          return res.status(400).json({ error: "Data de validade inválida. Use o formato YYYY-MM-DD" });
+        }
+      }
+
+      // Para alertas do tipo 'valor-especifico', determinar automaticamente se deve monitorar acima ou abaixo
+      let condicaoAutomatica: 'acima' | 'abaixo' = 'acima'; // Valor padrão
+      
+      if (tipo === 'valor-especifico') {
+        try {
+          // Obter a moeda para saber o preço atual
+          const currency = await jsonStorage.getCurrencyByCode(currencyCode);
+          if (!currency) {
+            return res.status(404).json({ error: "Moeda não encontrada" });
+          }
+          
+          // Determinar o preço atual (usando apenas preço de venda)
+          const precoAtual = currency.sellPrice;
+          const valorAlvo = Number(valor);
+          
+          // Determinar automaticamente se deve monitorar acima ou abaixo
+          if (valorAlvo > precoAtual) {
+            condicaoAutomatica = 'acima';    // Alerta quando o preço SUBIR
+            console.log(`📈 Valor alvo (${valorAlvo}) é maior que preço atual (${precoAtual}) - monitorando SUBIDA`);
+          } else if (valorAlvo < precoAtual) {
+            condicaoAutomatica = 'abaixo';   // Alerta quando o preço CAIR
+            console.log(`📉 Valor alvo (${valorAlvo}) é menor que preço atual (${precoAtual}) - monitorando QUEDA`);
+          } else {
+            // Se forem iguais, padrão é acima
+            console.log(`⚖️  Valor alvo é igual ao preço atual - usando padrão ACIMA`);
+          }
+        } catch (error) {
+          console.error('Erro ao determinar condição automática:', error);
+          // Em caso de erro, mantém o valor padrão 'acima'
+        }
+      }
+
+      // Criar o alerta usando o sistema atualizado
+      alertSystem.createAlert(
+        email, 
+        currencyCode, 
+        tipo, 
+        validade || null,
+        tipo === 'subida' || tipo === 'descida' ? valor || 0 : undefined, // limite apenas para subida/descida
+        tipo === 'valor-especifico' ? Number(valor) : undefined, // valor específico
+        tipo === 'valor-especifico' ? condicaoAutomatica : undefined // condição (acima/abaixo)
+      );
+
+      res.json({ 
+        success: true, 
+        message: "Alerta criado com sucesso!",
+        data: {
+          email,
+          currencyCode,
+          tipo,
+          valor: tipo === 'valor-especifico' ? Number(valor) : undefined,
+          validade: validade || null,
+          condicao: tipo === 'valor-especifico' ? condicaoAutomatica : null
+        }
+      });
     } catch (error) {
       console.error("Erro ao criar alerta:", error);
-      res.status(500).json({ error: "Internal server error" });
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      res.status(500).json({ error: `Erro ao criar alerta: ${errorMessage}` });
     }
   });
 
@@ -772,7 +1251,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       alertSystem.removeAlert(email, currencyCode);
       res.json({ success: true, message: 'Alerta removido' });
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao remover alerta' });
+      console.error('Erro ao remover alerta:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      res.status(500).json({ error: `Erro ao remover alerta: ${errorMessage}` });
     }
   });
 
@@ -780,20 +1261,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/alerts/:email', (req, res) => {
     try {
       const { email } = req.params;
+      if (!email) {
+        return res.status(400).json({ error: 'Email é obrigatório' });
+      }
       const alerts = alertSystem.getUserAlerts(email);
       res.json(alerts || { email, alerts: {} });
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao buscar alertas' });
+      console.error('Erro ao buscar alertas:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      res.status(500).json({ error: `Erro ao buscar alertas: ${errorMessage}` });
     }
   });
 
-  // Obter todos os alertas (admin)
-  app.get('/api/alerts/admin/all', (req, res) => {
+  // Rota para obter usuários (apenas admin)
+  app.get('/api/users', async (req, res) => {
     try {
-      const allAlerts = alertSystem.getAllAlerts();
-      res.json(allAlerts);
+      // Implemente a lógica para obter usuários aqui
+      // Exemplo: const users = await jsonStorage.getAllUsers();
+      // Por enquanto, retornando um array vazio
+      res.json([]);
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao buscar alertas' });
+      console.error('Erro ao buscar usuários:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      res.status(500).json({ error: `Erro ao buscar usuários: ${errorMessage}` });
     }
   });
 
@@ -801,35 +1291,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
 }
 
 // Função para atualizar as moedas (usada tanto no endpoint quanto no timer)
-async function refreshCurrencies() {
+export async function refreshCurrencies() {
   try {
     const scrapedData = await scrapeCurrencyData();
-    const currentCurrencies = await storage.getAllCurrencies();
+    const currentCurrencies = await jsonStorage.getAllCurrencies();
     const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
-
     const now = new Date();
     const savedCurrencies: any[] = [];
+    
+    // NOVO: Acumular todos os alertas antes de enviar
+    const allAlertsByEmail = new Map<string, Array<{
+      currencyCode: string;
+      buyPrice: number;
+      sellPrice: number;
+      variacao: number;
+      alertType: string;
+      alert: Alert;
+    }>>();
+
+    // Obter preços anteriores para verificação de alertas
+    const previousPrices = new Map<string, { buyPrice: number, sellPrice: number }>();
+    
+    for (const currency of currentCurrencies) {
+      previousPrices.set(currency.code, {
+        buyPrice: currency.buyPrice,
+        sellPrice: currency.sellPrice
+      });
+    }
 
     for (const currency of updatedCurrencies) {
       // Verifica se houve mudança real na cotação
-      const lastHistory = await storage.getLastCurrencyHistory(currency.code);
+      const lastHistory = await jsonStorage.getLastCurrencyHistory(currency.code);
       let isNewPrice = !lastHistory || 
                       lastHistory.sellPrice !== currency.sellPrice || 
                       lastHistory.buyPrice !== currency.buyPrice;
 
-      // Verifica se já foi registrado hoje (evitar múltiplos registros no mesmo dia)
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      const todayHistory = await storage.getCurrencyHistory(currency.code, today, tomorrow);
-      const hasRecordToday = todayHistory.length > 0;
-      const sortedTodayHistory = todayHistory
-        .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-
+      
       // Calcula variação baseada no último preço do dia anterior
       let change = 0;
+      
+      // Definir datas para cálculo de variação
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       
       // Buscar último preço do dia anterior
       const yesterday = new Date(today);
@@ -837,53 +1340,115 @@ async function refreshCurrencies() {
       const dayBeforeYesterday = new Date(yesterday);
       dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
       
-      const yesterdayHistory = await storage.getCurrencyHistory(currency.code, dayBeforeYesterday, today);
+      const yesterdayHistory = await jsonStorage.getCurrencyHistory(currency.code, dayBeforeYesterday, today);
       const yesterdayRecords = yesterdayHistory
-        .filter(record => {
+        .filter((record: { timestamp: string | Date }) => {
           const recordDate = new Date(record.timestamp);
           return recordDate >= dayBeforeYesterday && recordDate < today;
         })
-        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()); // Mais recente primeiro
+        .sort((a: { timestamp: string | Date }, b: { timestamp: string | Date }) => 
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        ); // Mais recente primeiro
       
       if (yesterdayRecords.length > 0) {
         // Usar o último preço registrado do dia anterior
         const lastPriceYesterday = yesterdayRecords[0].sellPrice;
         change = ((currency.sellPrice - lastPriceYesterday) / lastPriceYesterday) * 100;
         change = Number(change.toFixed(2));
-      } else if (sortedTodayHistory.length > 0) {
-        // Fallback: se não há dados de ontem, usar primeiro preço de hoje (variação = 0)
+      } else {
+        // Fallback: se não há dados de ontem, variação = 0
         change = 0;
       }
 
-      // Verifica alertas antes de salvar (usa preço anterior se disponível)
-      if (lastHistory && isNewPrice) {
-        await alertSystem.checkPriceAlerts(
-          currency.code, 
-          currency.buyPrice, 
-          currency.sellPrice, 
-          lastHistory.buyPrice
-        );
-      }
-
       // Atualiza moeda sempre, mesmo que o preço não tenha mudado, para atualizar a variação
-      const savedCurrency = await storage.upsertCurrency({
+      const savedCurrency = await jsonStorage.upsertCurrency({
         ...currency,
         change,
-        lastUpdate: now
+        lastUpdate: now.toISOString()
       });
 
-      // Adiciona ao histórico se for um novo preço OU se não há registro hoje
-      // Isso garante que sempre haja pelo menos 1 registro por dia
-      if (isNewPrice || !hasRecordToday) {
-        await storage.addCurrencyHistory({
+      // Adiciona ao histórico sempre que o preço mudou (respeitando a verificação por hash)
+      if (isNewPrice && currency.code) {
+        const history: InsertCurrencyHistory = {
           code: currency.code,
           buyPrice: currency.buyPrice,
           sellPrice: currency.sellPrice,
-          timestamp: now
-        });
-      }
+          timestamp: now.toISOString()
+        };
 
-      savedCurrencies.push(savedCurrency);
+        try {
+          await jsonStorage.addCurrencyHistory(history);
+          savedCurrencies.push(currency);
+          
+          // VERIFICAÇÃO DE ALERTAS NO MOMENTO EXATO DA ATUALIZAÇÃO (lógica da versão antiga)
+          if (previousPrices.has(currency.code)) {
+            const previous = previousPrices.get(currency.code)!;
+            // Verifica se o preço de venda mudou
+            if (previous.sellPrice !== currency.sellPrice) {
+              try {
+                console.log(`🔔 Verificando alertas para ${currency.code} (${previous.sellPrice} -> ${currency.sellPrice})`);
+                
+                // Calcular variação para o alerta
+                const variacao = ((currency.sellPrice - previous.sellPrice) / previous.sellPrice) * 100;
+                
+                // Verificar alertas para todos os usuários
+                for (const [email, userData] of Object.entries(alertSystem.getAllAlerts())) {
+                  const userAlerts = userData.alerts || {};
+                  const alert = userAlerts[currency.code];
+                  if (!alert || !alert.ativo) continue;
+
+                  let shouldAlert = false;
+                  
+                  // Verifica se o alerta deve ser disparado baseado no tipo
+                  switch (alert.tipo) {
+                    case 'subida':
+                      shouldAlert = variacao > 0; // Avisa sempre que subir
+                      break;
+                    case 'descida':
+                      shouldAlert = variacao < 0; // Avisa sempre que descer
+                      break;
+                    case 'valor-especifico':
+                      // Verifica se o preço atual atende à condição do valor específico definido
+                      if (alert.valor !== undefined && alert.condicaoValor) {
+                        const targetPrice = currency.sellPrice;
+                        const conditionMet = alert.condicaoValor === 'acima' 
+                          ? targetPrice >= alert.valor
+                          : targetPrice <= alert.valor;
+                        shouldAlert = conditionMet && (previous.sellPrice !== currency.sellPrice);
+                      }
+                      break;
+                  }
+
+                  if (shouldAlert) {
+                    if (!allAlertsByEmail.has(email)) {
+                      allAlertsByEmail.set(email, []);
+                    }
+                    allAlertsByEmail.get(email)!.push({
+                      currencyCode: currency.code,
+                      buyPrice: currency.buyPrice,
+                      sellPrice: currency.sellPrice,
+                      variacao,
+                      alertType: alert.tipo,
+                      alert: { ...alert }
+                    });
+                  }
+                }
+              } catch (error) {
+                console.error(`Erro ao verificar alertas para ${currency.code}:`, error);
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`Erro ao salvar histórico para ${currency.code}:`, error);
+        }
+      }
+    }
+
+    // Envia um único email por usuário com todos os alertas coletados
+    for (const [email, alerts] of Array.from(allAlertsByEmail.entries())) {
+      if (alerts.length > 0) {
+        await alertSystem.sendAlert(email, alerts);
+      }
     }
 
     return savedCurrencies;

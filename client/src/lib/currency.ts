@@ -47,19 +47,21 @@ export const currencyDetails: Record<string, { name: string }> = {
 // Format currency values according to their rules
 // Shows up to 5 decimal places, and remove trailing zeros that don't change the value
 export function formatCurrencyValue(code: string, value: number): string {
-  // Evita arredondamento truncando o número para 5 casas decimais
   const valueStr = value.toString();
   const [intPart, rawDecPart = ''] = valueStr.split('.');
   
-  // Trunca para 5 decimais sem arredondar
+  // Adiciona pontos de milhar na parte inteira
+  const formattedIntPart = parseInt(intPart).toLocaleString('pt-BR');
+  
   const decPart = rawDecPart.length > 5 ? rawDecPart.slice(0, 5) : rawDecPart;
-  
-  // Remove zeros à direita que não alteram o valor, mas mantém pelo menos 2 casas
   const minTwoDecimals = decPart.replace(/0+$/, '').padEnd(2, '0');
-  const stringValue = `${intPart}.${minTwoDecimals}`;
   
-  // Converte para formato brasileiro (vírgula como separador decimal)
-  return stringValue.replace('.', ',');
+  // Oculta ,00 para todas as moedas quando não há centavos
+  if (minTwoDecimals === "00") {
+    return formattedIntPart;
+  }
+  
+  return `${formattedIntPart},${minTwoDecimals}`;
 }
 
 // Format percentage changes

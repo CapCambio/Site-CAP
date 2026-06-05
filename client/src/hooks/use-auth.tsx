@@ -1,5 +1,7 @@
 import { createContext, ReactNode, useContext, useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 
 // Tipo de usuário autenticado
 interface AuthUser {
@@ -19,8 +21,6 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-// Senha padrão de admin (em um ambiente real, seria armazenada de forma segura)
-const ADMIN_PASSWORD = "passo2012";
 
 // Criação do contexto
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -36,28 +36,106 @@ export function useAuth() {
 
 // Provider do contexto de autenticação
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const { toast } = useToast();
 
+  // Função para carregar o idioma salvo do usuário
+  const loadUserLanguage = async () => {
+    try {
+      const response = await fetch('/api/user/language', {
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.language && data.language !== i18n.language) {
+          i18n.changeLanguage(data.language);
+          console.log(`🌐 Idioma carregado: ${data.language}`);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar idioma do usuário:', error);
+    }
+  };
+
   // Tenta restaurar a sessão ao carregar a página
   useEffect(() => {
-    const storedUser = localStorage.getItem("auth_user");
-    if (storedUser) {
+    let cancelled = false;
+
+    const validateSession = async () => {
+      setIsLoading(true);
       try {
-        const parsedUser = JSON.parse(storedUser);
-        // Garantir que os dados do usuário estão completos
-        if (parsedUser.email) {
-          setUser(parsedUser);
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          if (cancelled) return;
+
+          const storedUser = localStorage.getItem("auth_user");
+          if (storedUser) {
+            try {
+              const { email } = JSON.parse(storedUser);
+              if (email) {
+                await fetch('/api/auth/release-stale', {
+                  method: 'POST',
+                  credentials: 'include',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email, orphan: true }),
+                });
+              }
+            } catch {
+              // ignore
+            }
+          }
+
+          setUser(null);
+          localStorage.removeItem("auth_user");
+          return;
+        }
+
+        const data = await response.json();
+        const serverUser = data?.user;
+
+        if (cancelled) return;
+
+        if (serverUser?.email) {
+          const userData: AuthUser = {
+            email: serverUser.email,
+            name: serverUser.name,
+            isAdmin: !!serverUser.isAdmin,
+          };
+          setUser(userData);
+          localStorage.setItem("auth_user", JSON.stringify(userData));
+
+          // Carregar idioma salvo do usuário
+          await loadUserLanguage();
         } else {
+          setUser(null);
           localStorage.removeItem("auth_user");
         }
       } catch (error) {
-        console.error("Erro ao restaurar sessão:", error);
+        console.error("Erro ao validar sessão:", error);
+        if (cancelled) return;
+        setUser(null);
         localStorage.removeItem("auth_user");
+        toast({
+          title: t('toasts.sessionError'),
+          description: t('toasts.sessionErrorDesc'),
+          variant: "destructive"
+        });
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-    }
+    };
+
+    validateSession();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Função de login
@@ -67,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Faz a verificação de autorização no servidor
       const response = await fetch('/api/auth/login', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
@@ -76,6 +155,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!response.ok) {
         if (response.status === 401 && data.error?.includes('Senha incorreta')) {
           throw new Error('Senha incorreta');
+        }
+        if (response.status === 409 && data.error === 'SESSION_ALREADY_ACTIVE') {
+          throw new Error('SESSION_ALREADY_ACTIVE');
         }
         return;
       }
@@ -90,6 +172,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData);
       localStorage.setItem("auth_user", JSON.stringify(userData));
 
+      // Carregar idioma salvo do usuário
+      await loadUserLanguage();
+
     } catch (error) {
       console.error("Erro ao fazer login:", error);
       // Re-throw o erro para que possa ser capturado pelo componente
@@ -103,8 +188,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
-      // Simula uma chamada de API
-      await new Promise(resolve => setTimeout(resolve, 500));
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch (error) {
+        console.error("Erro ao fazer logout no servidor:", error);
+        toast({
+          title: t('toasts.logoutError'),
+          description: t('toasts.logoutErrorDesc'),
+          variant: "destructive"
+        });
+      }
 
       setUser(null);
       localStorage.removeItem("auth_user");

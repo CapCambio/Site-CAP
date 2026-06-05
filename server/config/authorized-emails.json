@@ -3,23 +3,30 @@
     {
       "email": "mateus.m2o@live.com",
       "name": "Mateus Medeiros",
-      "lastAccess": "2025-09-14T02:45:35.779Z"
+      "lastAccess": "2025-10-10T17:45:59.727Z"
     },
     {
-      "email": "japalleiro@hotmail.com",
-      "name": "Elbio Javier",
-      "lastAccess": "2025-06-26T21:28:49.323Z"
+      "email": "jpalleiro@hotmail.com",
+      "name": "Elbio Javier"
     }
   ],
   "adminEmails": [
     {
       "email": "capcambiocx@gmail.com",
-      "name": "CAP Câmbio",
-      "lastAccess": "2025-09-14T02:59:00.918Z"
+      "name": "CAP Câmbio Caxias",
+      "lastAccess": "2025-10-10T17:44:58.049Z"
     },
     {
       "email": "capcambio_caxias@hotmail.com",
-      "name": "CAP Câmbio"
+      "name": "CAP Câmbio Caxias"
+    },
+    {
+      "email": "capcambio.bento@gmail.com",
+      "name": "CAP Câmbio Bento"
+    },
+    {
+      "email": "capcambio_passo@hotmail.com",
+      "name": "CAP Câmbio Passo"
     }
   ]
 }

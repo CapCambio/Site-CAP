@@ -1,14 +1,14 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
+import { ComponentType, Suspense } from "react";
 
-export function ProtectedRoute({
-  path,
-  component: Component,
-}: {
+interface ProtectedRouteProps {
   path: string;
-  component: () => React.JSX.Element;
-}) {
+  component: ComponentType;
+}
+
+export function ProtectedRoute({ path, component: Component }: ProtectedRouteProps) {
   const { isAuthorized, isLoading } = useAuth();
 
   if (isLoading) {
@@ -29,5 +29,15 @@ export function ProtectedRoute({
     );
   }
 
-  return <Route path={path} component={Component} />;
+  return (
+    <Route path={path}>
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-border" />
+        </div>
+      }>
+        <Component />
+      </Suspense>
+    </Route>
+  );
 }
