@@ -78,12 +78,29 @@ function loadAuthorizedEmails() {
 
 async function loadEmailConfig() {
   try {
+    // Primeiro tenta ler da variável de ambiente (para Railway/produção)
+    const authorizedEmailsEnv = process.env.AUTHORIZED_EMAILS;
+    if (authorizedEmailsEnv) {
+      try {
+        const emails = JSON.parse(authorizedEmailsEnv);
+        console.log('✅ Emails autorizados carregados da variável de ambiente:', emails);
+        return {
+          authorizedEmails: emails,
+          adminEmails: emails // Usa a mesma lista para admins por enquanto
+        };
+      } catch (parseError) {
+        console.error('Erro ao fazer parse de AUTHORIZED_EMAILS:', parseError);
+      }
+    }
+
+    // Se não tiver variável de ambiente, tenta ler do arquivo (para desenvolvimento local)
     const configPath = path.join(__dirname, 'config', 'email-config.json');
     // Verifica se o arquivo existe
     try {
       await fs.promises.access(configPath, fs.constants.F_OK);
     } catch (err) {
       // Se o arquivo não existir, retorna um objeto vazio
+      console.log('⚠️ Arquivo email-config.json não encontrado, usando lista vazia');
       return { authorizedEmails: [], adminEmails: [] };
     }
     
