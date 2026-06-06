@@ -96,6 +96,9 @@ async function loadEmailConfig() {
 
     // Se não tiver variável de ambiente, tenta ler do arquivo (para desenvolvimento local)
     const configPath = path.join(__dirname, 'config', 'email-config.json');
+    console.log('📁 Procurando config em:', configPath);
+    console.log('📁 __dirname:', __dirname);
+    console.log('📁 Arquivo existe?', fs.existsSync(configPath));
     // Verifica se o arquivo existe
     try {
       await fs.promises.access(configPath, fs.constants.F_OK);

@@ -24,3 +24,16 @@ files.forEach(file => {
 });
 
 console.log('✅ Arquivos de configuração copiados para dist/config/');
+
+// Verificação adicional
+const destFiles = fs.readdirSync(destDir);
+console.log('📋 Arquivos em dist/config/:', destFiles);
+
+// Verificar conteúdo do email-config.json
+const emailConfigPath = path.join(destDir, 'email-config.json');
+if (fs.existsSync(emailConfigPath)) {
+  const content = JSON.parse(fs.readFileSync(emailConfigPath, 'utf8'));
+  console.log('✅ email-config.json encontrado com', content.authorizedEmails?.length, 'emails autorizados');
+} else {
+  console.error('❌ email-config.json NÃO foi copiado!');
+}
