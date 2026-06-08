@@ -303,10 +303,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  function loadAdminPasswords(): Record<string, string> {
+  async function loadAdminPasswords(): Promise<Record<string, string>> {
     try {
+      // Primeiro tenta ler do email-config.json
+      const emailConfig = await loadEmailConfig();
+      const passwordsFromJson: Record<string, string> = {};
+
+      if (emailConfig.adminEmails && Array.isArray(emailConfig.adminEmails)) {
+        for (const admin of emailConfig.adminEmails) {
+          if (typeof admin === 'object' && admin.email && admin.password) {
+            passwordsFromJson[admin.email.toLowerCase()] = admin.password;
+          }
+        }
+      }
+
+      if (Object.keys(passwordsFromJson).length > 0) {
+        console.log('✅ Senhas de admin carregadas do email-config.json:', Object.keys(passwordsFromJson));
+        return passwordsFromJson;
+      }
+
+      // Se não encontrar no JSON, tenta da variável de ambiente
       const raw = process.env.ADMIN_PASSWORDS_JSON;
-      if (!raw) return {};
+      if (!raw) {
+        console.log('⚠️ Nenhuma senha de admin encontrada (nem no JSON, nem na variável de ambiente)');
+        return {};
+      }
+
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== 'object') return {};
 
@@ -317,9 +339,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      console.log('✅ Senhas de admin carregadas da variável de ambiente:', Object.keys(normalized));
       return normalized;
     } catch (error) {
-      console.error('Erro ao carregar ADMIN_PASSWORDS_JSON:', error);
+      console.error('Erro ao carregar senhas de admin:', error);
       return {};
     }
   }
@@ -356,11 +379,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Verificar senha para admins
       if (isAdminEmail) {
-        const adminPasswords = loadAdminPasswords();
+        const adminPasswords = await loadAdminPasswords();
         const expectedPassword = adminPasswords[emailLower];
 
         if (!expectedPassword) {
-          console.error(`Senha de admin não configurada para ${emailLower} (ADMIN_PASSWORDS_JSON)`);
+          console.error(`Senha de admin não configurada para ${emailLower}`);
           return res.status(500).json({ error: "Senha de administrador não configurada" });
         }
 
