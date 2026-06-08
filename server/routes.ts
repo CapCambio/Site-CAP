@@ -94,11 +94,30 @@ async function loadEmailConfig() {
       }
     }
 
-    // Se não tiver variável de ambiente, tenta ler do arquivo (para desenvolvimento local)
-    const configPath = path.join(__dirname, 'config', 'email-config.json');
-    console.log('📁 Procurando config em:', configPath);
-    console.log('📁 __dirname:', __dirname);
-    console.log('📁 Arquivo existe?', fs.existsSync(configPath));
+    // Se não tiver variável de ambiente, tenta ler do arquivo
+    // Tenta múltiplos caminhos para funcionar tanto em dev quanto em produção
+    const possiblePaths = [
+      path.join(__dirname, 'config', 'email-config.json'), // dist/config/ (produção)
+      path.join(__dirname, '..', 'server', 'config', 'email-config.json'), // server/config/ (dev)
+      path.join(process.cwd(), 'server', 'config', 'email-config.json'), // caminho absoluto
+    ];
+    
+    let configPath = null;
+    for (const testPath of possiblePaths) {
+      console.log('📁 Testando caminho:', testPath);
+      console.log('📁 Arquivo existe?', fs.existsSync(testPath));
+      if (fs.existsSync(testPath)) {
+        configPath = testPath;
+        console.log('✅ Arquivo encontrado em:', configPath);
+        break;
+      }
+    }
+    
+    if (!configPath) {
+      console.log('⚠️ Arquivo email-config.json não encontrado em nenhum caminho, usando lista vazia');
+      return { authorizedEmails: [], adminEmails: [] };
+    }
+    
     // Verifica se o arquivo existe
     try {
       await fs.promises.access(configPath, fs.constants.F_OK);
