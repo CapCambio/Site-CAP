@@ -11,6 +11,7 @@ import { authService } from './auth/AuthService';
 import { authenticate, requireAdmin, optionalAuth } from './auth/AuthMiddleware';
 import { sessionRegistry } from './auth/SessionRegistry';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
+import * as db from './db';
 
 // Interface para tipar os administradores
 interface AdminUser {
@@ -78,66 +79,19 @@ function loadAuthorizedEmails() {
 
 async function loadEmailConfig() {
   try {
-    // Primeiro tenta ler da variável de ambiente (para Railway/produção)
-    const authorizedEmailsEnv = process.env.AUTHORIZED_EMAILS;
-    console.log('🔍 Verificando AUTHORIZED_EMAILS:', authorizedEmailsEnv ? 'EXISTS' : 'NOT FOUND');
-    if (authorizedEmailsEnv) {
-      try {
-        const emails = JSON.parse(authorizedEmailsEnv);
-        console.log('✅ Emails autorizados carregados da variável de ambiente:', emails);
-        return {
-          authorizedEmails: emails,
-          adminEmails: emails // Usa a mesma lista para admins por enquanto
-        };
-      } catch (parseError) {
-        console.error('❌ Erro ao fazer parse de AUTHORIZED_EMAILS:', parseError);
-      }
-    }
+    // Usa banco de dados para carregar configuração
+    const authorizedEmails = await db.getAuthorizedEmails();
+    const adminEmails = await db.getAdminEmails();
 
-    // Se não tiver variável de ambiente, tenta ler do arquivo
-    // Tenta múltiplos caminhos para funcionar tanto em dev quanto em produção
-    const possiblePaths = [
-      path.join(__dirname, 'config', 'email-config.json'), // dist/config/ (produção)
-      path.join(__dirname, '..', 'server', 'config', 'email-config.json'), // server/config/ (dev)
-      path.join(process.cwd(), 'server', 'config', 'email-config.json'), // caminho absoluto
-    ];
-    
-    let configPath = null;
-    for (const testPath of possiblePaths) {
-      console.log('📁 Testando caminho:', testPath);
-      console.log('📁 Arquivo existe?', fs.existsSync(testPath));
-      if (fs.existsSync(testPath)) {
-        configPath = testPath;
-        console.log('✅ Arquivo encontrado em:', configPath);
-        break;
-      }
-    }
-    
-    if (!configPath) {
-      console.log('⚠️ Arquivo email-config.json não encontrado em nenhum caminho, usando lista vazia');
-      return { authorizedEmails: [], adminEmails: [] };
-    }
-    
-    // Verifica se o arquivo existe
-    try {
-      await fs.promises.access(configPath, fs.constants.F_OK);
-    } catch (err) {
-      // Se o arquivo não existir, retorna um objeto vazio
-      console.log('⚠️ Arquivo email-config.json não encontrado, usando lista vazia');
-      return { authorizedEmails: [], adminEmails: [] };
-    }
-    
-    // Se o arquivo existir, lê e retorna o conteúdo
-    const configData = await fs.promises.readFile(configPath, 'utf-8');
-    const config = JSON.parse(configData);
-    
-    // Garante que as propriedades necessárias existam
+    console.log('✅ Emails autorizados carregados do banco de dados:', authorizedEmails.length);
+    console.log('✅ Admins carregados do banco de dados:', adminEmails.length);
+
     return {
-      authorizedEmails: config.authorizedEmails || [],
-      adminEmails: config.adminEmails || []
+      authorizedEmails: authorizedEmails,
+      adminEmails: adminEmails
     };
   } catch (error) {
-    console.error('Erro ao carregar configuração de emails:', error);
+    console.error('Erro ao carregar configuração de emails do banco de dados:', error);
     // Retorna configuração padrão se houver erro
     return {
       authorizedEmails: [],
@@ -146,22 +100,6 @@ async function loadEmailConfig() {
   }
 }
 
-  // Caminho para o arquivo de configuração de e-mails
-  const configPath = path.join(__dirname, 'config', 'email-config.json');
-
-  async function saveEmailConfig(config: any) {
-    try {
-      // Garante que o diretório existe
-      await fs.promises.mkdir(path.dirname(configPath), { recursive: true });
-      
-      // Salva o arquivo de configuração
-      await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2));
-      console.log('Arquivo de configuração salvo em:', configPath);
-    } catch (error) {
-      console.error('Erro ao salvar configuração de e-mails:', error);
-      throw error; // Re-throw para que o chamador saiba que houve um erro
-    }
-  }
   
   /**
  * Atualiza o último acesso do usuário
@@ -170,103 +108,29 @@ async function loadEmailConfig() {
  */
 async function updateLastAccess(email: string, isAdmin: boolean): Promise<void> {
   try {
-    // Garante que o email está em minúsculas
     const emailLower = email.toLowerCase();
-    
-    // Carrega a configuração atual
-    const config = await loadEmailConfig();
     const now = new Date().toISOString();
-
+    
     console.log(`[${new Date().toISOString()}] Atualizando último acesso para: ${emailLower}, isAdmin: ${isAdmin}`);
     
-    let updated = false;
-
-    if (isAdmin) {
-      // Atualizar último acesso do admin
-      for (let i = 0; i < config.adminEmails.length; i++) {
-        const admin = config.adminEmails[i];
-        const adminEmail = typeof admin === 'string' ? admin : admin.email;
-        
-        if (adminEmail && adminEmail.toLowerCase() === emailLower) {
-          // Se for uma string, converte para objeto
-          if (typeof config.adminEmails[i] === 'string') {
-            config.adminEmails[i] = {
-              email: config.adminEmails[i] as string,
-              name: 'CAP Câmbio',
-              lastAccess: now,
-              isAdmin: true
-            };
-          } else {
-            // Atualiza apenas o lastAccess, mantendo outras propriedades
-            config.adminEmails[i] = {
-              ...config.adminEmails[i],
-              lastAccess: now,
-              isAdmin: true
-            };
-          }
-          console.log(`Admin atualizado:`, config.adminEmails[i]);
-          updated = true;
-          break;
-        }
-      }
-    } else {
-      // Atualizar último acesso do usuário comum
-      for (let i = 0; i < config.authorizedEmails.length; i++) {
-        const user = config.authorizedEmails[i];
-        const userEmail = typeof user === 'string' ? user : user.email;
-        
-        if (userEmail && userEmail.toLowerCase() === emailLower) {
-          // Se for uma string, converte para objeto
-          if (typeof config.authorizedEmails[i] === 'string') {
-            config.authorizedEmails[i] = {
-              email: config.authorizedEmails[i] as string,
-              name: emailLower.split('@')[0],
-              lastAccess: now,
-              createdAt: now,
-              isAdmin: false
-            };
-          } else {
-            // Atualiza apenas o lastAccess, mantendo outras propriedades
-            config.authorizedEmails[i] = {
-              ...config.authorizedEmails[i],
-              lastAccess: now,
-              isAdmin: false
-            };
-          }
-          console.log(`Usuário atualizado:`, config.authorizedEmails[i]);
-          updated = true;
-          break;
-        }
-      }
-    }
-
-    if (updated) {
-      // Salva as alterações
-      await saveEmailConfig(config);
+    // Tenta atualizar usuário existente
+    const existingUser = await db.getUserByEmail(emailLower);
+    
+    if (existingUser) {
+      await db.updateUser(emailLower, { last_access: now });
       console.log(`[${new Date().toISOString()}] Último acesso atualizado para ${emailLower}`);
     } else {
+      // Se não encontrou, adiciona novo usuário
       console.warn(`[${new Date().toISOString()}] Usuário não encontrado: ${emailLower}, isAdmin: ${isAdmin}`);
       
-      // Se não encontrou o usuário, tenta adicioná-lo (pode ser um novo usuário)
       try {
-        if (isAdmin) {
-          config.adminEmails.push({
-            email: emailLower,
-            name: 'CAP Câmbio',
-            lastAccess: now,
-            createdAt: now,
-            isAdmin: true
-          });
-        } else {
-          config.authorizedEmails.push({
-            email: emailLower,
-            name: emailLower.split('@')[0],
-            lastAccess: now,
-            createdAt: now,
-            isAdmin: false
-          });
-        }
-        await saveEmailConfig(config);
+        await db.addUser({
+          email: emailLower,
+          name: isAdmin ? 'CAP Câmbio' : emailLower.split('@')[0],
+          is_admin: isAdmin,
+          last_access: now,
+          created_at: now
+        });
         console.log(`[${new Date().toISOString()}] Novo usuário adicionado: ${emailLower}`);
       } catch (addError) {
         console.error(`[${new Date().toISOString()}] Erro ao adicionar novo usuário ${emailLower}:`, addError);
@@ -305,44 +169,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   async function loadAdminPasswords(): Promise<Record<string, string>> {
     try {
-      // Primeiro tenta ler do email-config.json
-      const emailConfig = await loadEmailConfig();
-      const passwordsFromJson: Record<string, string> = {};
+      // Usa banco de dados para carregar senhas de admin
+      const adminEmails = await db.getAdminEmails();
+      const passwords: Record<string, string> = {};
 
-      if (emailConfig.adminEmails && Array.isArray(emailConfig.adminEmails)) {
-        for (const admin of emailConfig.adminEmails) {
-          if (typeof admin === 'object' && admin.email && admin.password) {
-            passwordsFromJson[admin.email.toLowerCase()] = admin.password;
-          }
+      for (const admin of adminEmails) {
+        if (admin.password) {
+          passwords[admin.email.toLowerCase()] = admin.password;
         }
       }
 
-      if (Object.keys(passwordsFromJson).length > 0) {
-        console.log('✅ Senhas de admin carregadas do email-config.json:', Object.keys(passwordsFromJson));
-        return passwordsFromJson;
+      if (Object.keys(passwords).length > 0) {
+        console.log('✅ Senhas de admin carregadas do banco de dados:', Object.keys(passwords));
+        return passwords;
       }
 
-      // Se não encontrar no JSON, tenta da variável de ambiente
-      const raw = process.env.ADMIN_PASSWORDS_JSON;
-      if (!raw) {
-        console.log('⚠️ Nenhuma senha de admin encontrada (nem no JSON, nem na variável de ambiente)');
-        return {};
-      }
-
-      const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object') return {};
-
-      const normalized: Record<string, string> = {};
-      for (const [email, pass] of Object.entries(parsed)) {
-        if (typeof email === 'string' && typeof pass === 'string') {
-          normalized[email.toLowerCase()] = pass;
-        }
-      }
-
-      console.log('✅ Senhas de admin carregadas da variável de ambiente:', Object.keys(normalized));
-      return normalized;
+      console.log('⚠️ Nenhuma senha de admin encontrada no banco de dados');
+      return {};
     } catch (error) {
-      console.error('Erro ao carregar senhas de admin:', error);
+      console.error('Erro ao carregar senhas de admin do banco de dados:', error);
       return {};
     }
   }
@@ -361,13 +206,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Login attempt for:", emailLower);
 
       // Verificar se é admin
-      const adminUser = emailConfig.adminEmails.find((admin: { email: string; name?: string } | string) => 
-        typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
+      const adminUser = emailConfig.adminEmails.find((admin: db.User) => 
+        admin.email === emailLower
       );
 
       // Verificar se é usuário autorizado
-      const regularUser = emailConfig.authorizedEmails.find((user: { email: string; name?: string } | string) => 
-        typeof user === 'string' ? user === emailLower : user.email === emailLower
+      const regularUser = emailConfig.authorizedEmails.find((user: string) => 
+        user === emailLower
       );
 
       const isAdminEmail = !!adminUser;
@@ -396,17 +241,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let userName;
 
       if (isAdminEmail) {
-        if (typeof adminUser === 'object' && adminUser.name) {
-          userName = adminUser.name;
-        } else {
-          userName = 'CAP Câmbio';
-        }
+        userName = adminUser.name || 'CAP Câmbio';
       } else {
-        if (typeof regularUser === 'object' && regularUser.name) {
-          userName = regularUser.name;
-        } else {
-          userName = (typeof emailLower === 'string' ? emailLower : String(emailLower)).split('@')[0];
-        }
+        userName = emailLower.split('@')[0];
       }
 
       console.log("User name resolved to:", userName);
@@ -924,31 +761,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email, nome e tipo são obrigatórios" });
       }
 
-      const emailConfig = await loadEmailConfig();
+      const emailLower = email.toLowerCase();
 
       if (type === "authorized") {
         // Verificar se email já existe
-        const existingIndex = emailConfig.authorizedEmails?.findIndex((e: { email: string; name?: string } | string) => 
-          typeof e === 'string' ? e === email : e.email === email
-        ) ?? -1;
-        if (existingIndex === -1) {
-          if (!emailConfig.authorizedEmails) {
-            emailConfig.authorizedEmails = [];
-          }
-          emailConfig.authorizedEmails.push({ email, name });
+        const existingUser = await db.getUserByEmail(emailLower);
+        if (!existingUser) {
+          await db.addUser({
+            email: emailLower,
+            name,
+            is_admin: false,
+            created_at: new Date().toISOString()
+          });
         }
       } else if (type === "admin") {
         // Verificar se email já existe
-        const existingIndex = emailConfig.adminEmails.findIndex((e: { email: string; name?: string } | string) => 
-          typeof e === 'string' ? e === email : e.email === email
-        );
-        if (existingIndex === -1) {
-          emailConfig.adminEmails.push({ email, name });
+        const existingUser = await db.getUserByEmail(emailLower);
+        if (!existingUser) {
+          await db.addUser({
+            email: emailLower,
+            name,
+            is_admin: true,
+            created_at: new Date().toISOString()
+          });
+        } else {
+          // Se existe, atualiza para admin
+          await db.updateUser(emailLower, { is_admin: true });
         }
       }
-
-      // Salvar no arquivo
-      await saveEmailConfig(emailConfig);
 
       res.json({ message: "Email adicionado com sucesso" });
     } catch (error) {
@@ -965,29 +805,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Todos os campos são obrigatórios" });
       }
 
-      const emailConfig = await loadEmailConfig();
+      const oldEmailLower = oldEmail.toLowerCase();
+      const newEmailLower = newEmail.toLowerCase();
 
-      if (type === "authorized") {
-        const index = emailConfig.authorizedEmails?.findIndex((e: { email: string; name?: string } | string) => 
-          typeof e === 'string' ? e === oldEmail : e.email === oldEmail
-        ) ?? -1;
-        if (index !== -1) {
-          if (!emailConfig.authorizedEmails) {
-            emailConfig.authorizedEmails = [];
-          }
-          emailConfig.authorizedEmails[index] = { email: newEmail, name };
-        }
-      } else if (type === "admin") {
-        const index = emailConfig.adminEmails.findIndex((e: { email: string; name?: string } | string) => 
-          typeof e === 'string' ? e === oldEmail : e.email === oldEmail
-        );
-        if (index !== -1) {
-          emailConfig.adminEmails[index] = { email: newEmail, name };
-        }
-      }
-
-      // Salvar no arquivo
-      await saveEmailConfig(emailConfig);
+      // Atualizar email no banco de dados
+      await db.updateUser(oldEmailLower, { email: newEmailLower, name });
 
       res.json({ message: "Email editado com sucesso" });
     } catch (error) {
@@ -1004,7 +826,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email e tipo são obrigatórios" });
       }
 
-      const emailConfig = await loadEmailConfig();
+      const emailLower = email.toLowerCase();
 
       // Não permitir remoção de admins
       if (type === "admin") {
@@ -1012,23 +834,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (type === "authorized") {
-        if (emailConfig.authorizedEmails) {
-          emailConfig.authorizedEmails = emailConfig.authorizedEmails.filter((e: string | { email: string; name?: string }) => 
-            typeof e === 'string' ? e !== email : e.email !== email
-          );
-        }
+        await db.deleteUser(emailLower);
         
         // Remover todos os alertas do usuário excluído
         try {
-          alertSystem.removeAllUserAlerts(email);
+          await db.deleteAlertsByUser(emailLower);
           console.log(`✅ Todos os alertas do usuário ${email} foram removidos`);
         } catch (error) {
           console.error('Erro ao remover alertas do usuário:', error);
         }
       }
-
-      // Salvar no arquivo
-      await saveEmailConfig(emailConfig);
 
       res.json({ message: "Email removido com sucesso" });
     } catch (error) {
@@ -1040,49 +855,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Função para limpeza automática de emails inativos
   async function cleanupInactiveEmails() {
     try {
-      const config = await loadEmailConfig();
       const now = new Date();
       const oneYearAgo = new Date(now.getTime() - 1 * 365 * 24 * 60 * 60 * 1000); // 1 ano
       const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000); // 6 meses
 
       let removedCount = 0;
 
-      // Filtrar emails autorizados (não admins)
-      const originalCount = config.authorizedEmails.length;
+      // Buscar usuários não admins
+      const users = await db.getUsers();
+      const nonAdminUsers = users.filter(user => !user.is_admin);
 
-      config.authorizedEmails = config.authorizedEmails.filter((user: { email: string; lastAccess?: string; createdAt?: string } | string) => {
-        const email = typeof user === 'string' ? user : user.email;
-        const lastAccess = typeof user === 'object' && user.lastAccess ? new Date(user.lastAccess) : null;
-        const createdAt = typeof user === 'object' && user.createdAt ? new Date(user.createdAt) : null;
+      for (const user of nonAdminUsers) {
+        const lastAccess = user.last_access ? new Date(user.last_access) : null;
+        const createdAt = user.created_at ? new Date(user.created_at) : null;
+
+        let shouldRemove = false;
 
         // Se nunca acessou, verificar data de criação
         if (!lastAccess) {
           if (createdAt) {
             // Se temos data de criação, verificar se passou 6 meses
             if (createdAt < sixMonthsAgo) {
-              console.log(`🗑️ Removendo email sem acesso criado há mais de 6 meses: ${email} (criado em ${createdAt.toLocaleDateString()})`);
-              return false;
+              console.log(`🗑️ Removendo email sem acesso criado há mais de 6 meses: ${user.email} (criado em ${createdAt.toLocaleDateString()})`);
+              shouldRemove = true;
             }
           } else {
             // Para emails antigos sem createdAt, assumir que são antigos e remover
-            console.log(`🗑️ Removendo email antigo sem registro de acesso: ${email}`);
-            return false;
+            console.log(`🗑️ Removendo email antigo sem registro de acesso: ${user.email}`);
+            shouldRemove = true;
           }
         } else {
           // Se acessou há mais de 1 ano, remove
           if (lastAccess < oneYearAgo) {
-            console.log(`🗑️ Removendo email inativo há mais de 1 ano: ${email}`);
-            return false;
+            console.log(`🗑️ Removendo email inativo há mais de 1 ano: ${user.email}`);
+            shouldRemove = true;
           }
         }
 
-        return true;
-      });
-
-      removedCount = originalCount - config.authorizedEmails.length;
+        if (shouldRemove) {
+          await db.deleteUser(user.email);
+          removedCount++;
+        }
+      }
 
       if (removedCount > 0) {
-        await saveEmailConfig(config);
         console.log(`🧹 Limpeza de emails: ${removedCount} emails inativos removidos`);
       }
 
@@ -1129,22 +945,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Email é obrigatório' });
       }
 
-      const config = await loadEmailConfig();
       const emailLower = email.toLowerCase();
+      const userName = name || emailLower.split('@')[0];
 
       // Verificar se já existe
-      if (config.authorizedEmails.includes(emailLower) || config.adminEmails.includes(emailLower)) {
+      const existingUser = await db.getUserByEmail(emailLower);
+      if (existingUser) {
         return res.status(400).json({ error: 'Email já está autorizado' });
       }
 
-      // Adicionar à lista com data de criação
-      const newEmail = {
+      // Adicionar ao banco de dados
+      await db.addUser({
         email: emailLower,
-        name: emailLower.split('@')[0],
-        createdAt: new Date().toISOString()
-      };
-      config.authorizedEmails.push(newEmail);
-      await saveEmailConfig(config);
+        name: userName,
+        is_admin: false,
+        created_at: new Date().toISOString()
+      });
 
       res.json({ success: true, message: 'Email adicionado com sucesso' });
     } catch (error) {
@@ -1162,19 +978,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Email é obrigatório' });
       }
 
-      const config = await loadEmailConfig();
       const emailLower = email.toLowerCase();
 
       // Não permitir remoção de admins
-      if (config.adminEmails.includes(emailLower)) {
+      const existingUser = await db.getUserByEmail(emailLower);
+      if (existingUser && existingUser.is_admin) {
         return res.status(400).json({ error: 'Não é possível remover emails de administrador' });
       }
 
-      // Remover da lista
-      config.authorizedEmails = config.authorizedEmails.filter((e: string | { email: string; name?: string }) => 
-        typeof e === 'string' ? e !== emailLower : e.email !== emailLower
-      );
-      await saveEmailConfig(config);
+      // Remover do banco de dados
+      await db.deleteUser(emailLower);
 
       res.json({ success: true, message: 'Email removido com sucesso' });
     } catch (error) {
@@ -1191,14 +1004,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Registrar push subscription
-  app.post('/api/alerts/register-push', (req, res) => {
+  app.post('/api/alerts/register-push', async (req, res) => {
     try {
       const { email, subscription } = req.body;
       console.log('📥 Recebendo requisição de registro push:');
       console.log(`   Email: ${email}`);
       console.log(`   Subscription endpoint: ${subscription?.endpoint?.substring(0, 60)}...`);
       
-      alertSystem.registerPushSubscription(email, subscription);
+      await db.addPushSubscription({
+        email: email.toLowerCase(),
+        endpoint: subscription.endpoint,
+        p256dh: subscription.keys.p256dh,
+        auth: subscription.keys.auth,
+        timestamp: new Date().toISOString()
+      });
       
       console.log(`✅ Push subscription registrada para ${email}`);
       res.json({ success: true, message: 'Push subscription registrada' });
@@ -1277,16 +1096,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Criar o alerta usando o sistema atualizado
-      alertSystem.createAlert(
-        email, 
-        currencyCode, 
-        tipo, 
-        validade || null,
-        tipo === 'subida' || tipo === 'descida' ? valor || 0 : undefined, // limite apenas para subida/descida
-        tipo === 'valor-especifico' ? Number(valor) : undefined, // valor específico
-        tipo === 'valor-especifico' ? condicaoAutomatica : undefined // condição (acima/abaixo)
-      );
+      // Criar o alerta usando o banco de dados
+      await db.addAlert({
+        user_email: email.toLowerCase(),
+        currency_code: currencyCode,
+        tipo: tipo,
+        ativo: true,
+        valor: tipo === 'valor-especifico' ? Number(valor) : null,
+        condicao_valor: tipo === 'valor-especifico' ? condicaoAutomatica : null
+      });
 
       res.json({ 
         success: true, 
@@ -1308,10 +1126,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Remover alerta
-  app.delete('/api/alerts/:email/:currencyCode', (req, res) => {
+  app.delete('/api/alerts/:email/:currencyCode', async (req, res) => {
     try {
       const { email, currencyCode } = req.params;
-      alertSystem.removeAlert(email, currencyCode);
+      const emailLower = email.toLowerCase();
+      
+      // Buscar alerta do usuário
+      const alerts = await db.getAlertsByUser(emailLower);
+      const alert = alerts.find(a => a.currency_code === currencyCode);
+      
+      if (alert) {
+        await db.deleteAlert(alert.id);
+      }
+      
       res.json({ success: true, message: 'Alerta removido' });
     } catch (error) {
       console.error('Erro ao remover alerta:', error);
@@ -1321,14 +1148,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Obter alertas do usuário
-  app.get('/api/alerts/:email', (req, res) => {
+  app.get('/api/alerts/:email', async (req, res) => {
     try {
       const { email } = req.params;
       if (!email) {
         return res.status(400).json({ error: 'Email é obrigatório' });
       }
-      const alerts = alertSystem.getUserAlerts(email);
-      res.json(alerts || { email, alerts: {} });
+      const alerts = await db.getAlertsByUser(email.toLowerCase());
+      
+      // Converter para o formato esperado pelo frontend
+      const alertsFormatted = alerts.reduce((acc: any, alert) => {
+        if (!acc[alert.currency_code]) {
+          acc[alert.currency_code] = {
+            tipo: alert.tipo,
+            ativo: alert.ativo,
+            valor: alert.valor,
+            condicaoValor: alert.condicao_valor
+          };
+        }
+        return acc;
+      }, {});
+      
+      res.json({ email, alerts: alertsFormatted });
     } catch (error) {
       console.error('Erro ao buscar alertas:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
@@ -1384,10 +1225,10 @@ export async function refreshCurrencies() {
 
     for (const currency of updatedCurrencies) {
       // Verifica se houve mudança real na cotação
-      const lastHistory = await jsonStorage.getLastCurrencyHistory(currency.code);
-      let isNewPrice = !lastHistory || 
-                      lastHistory.sellPrice !== currency.sellPrice || 
-                      lastHistory.buyPrice !== currency.buyPrice;
+      const lastHistory = await db.getCurrencyHistory(currency.code, undefined, undefined, 1);
+      let isNewPrice = !lastHistory || lastHistory.length === 0 ||
+                      lastHistory[0].sell_price !== currency.sellPrice || 
+                      lastHistory[0].buy_price !== currency.buyPrice;
 
       
       // Calcula variação baseada no último preço do dia anterior
@@ -1403,7 +1244,7 @@ export async function refreshCurrencies() {
       const dayBeforeYesterday = new Date(yesterday);
       dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
       
-      const yesterdayHistory = await jsonStorage.getCurrencyHistory(currency.code, dayBeforeYesterday, today);
+      const yesterdayHistory = await db.getCurrencyHistory(currency.code, dayBeforeYesterday, today);
       const yesterdayRecords = yesterdayHistory
         .filter((record: { timestamp: string | Date }) => {
           const recordDate = new Date(record.timestamp);
@@ -1415,7 +1256,7 @@ export async function refreshCurrencies() {
       
       if (yesterdayRecords.length > 0) {
         // Usar o último preço registrado do dia anterior
-        const lastPriceYesterday = yesterdayRecords[0].sellPrice;
+        const lastPriceYesterday = yesterdayRecords[0].sell_price;
         change = ((currency.sellPrice - lastPriceYesterday) / lastPriceYesterday) * 100;
         change = Number(change.toFixed(2));
       } else {
@@ -1440,7 +1281,12 @@ export async function refreshCurrencies() {
         };
 
         try {
-          await jsonStorage.addCurrencyHistory(history);
+          await db.addCurrencyHistory({
+            code: currency.code,
+            buy_price: currency.buyPrice,
+            sell_price: currency.sellPrice,
+            timestamp: now.toISOString()
+          });
           savedCurrencies.push(currency);
           
           // VERIFICAÇÃO DE ALERTAS NO MOMENTO EXATO DA ATUALIZAÇÃO (lógica da versão antiga)
