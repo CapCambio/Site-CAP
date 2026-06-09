@@ -1,7 +1,8 @@
 import pg from 'pg';
 const { Pool } = pg;
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:passofundo2012@db.wzrkasgtryxyiwtrmcqo.supabase.co:5432/postgres';
+// Forçar uso de IPv4 adicionando ?family=4 à connection string
+const connectionString = (process.env.DATABASE_URL || 'postgresql://postgres:passofundo2012@db.wzrkasgtryxyiwtrmcqo.supabase.co:5432/postgres') + '?family=4';
 
 export const pool = new Pool({
   connectionString,
