@@ -1,12 +1,15 @@
 import pg from 'pg';
+
 const { Pool } = pg;
 
-// Forçar uso de IPv4 adicionando ?family=4 à connection string
-const connectionString = (process.env.DATABASE_URL || 'postgresql://postgres:passofundo2012@db.wzrkasgtryxyiwtrmcqo.supabase.co:5432/postgres') + '?family=4';
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:passofundo2012@db.wzrkasgtryxyiwtrmcqo.supabase.co:5432/postgres';
 
 export const pool = new Pool({
   connectionString,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  // Tentar habilitar IPv6
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000
 });
 
 export interface User {
