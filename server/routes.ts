@@ -174,36 +174,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const passwords: Record<string, string> = {};
 
       for (const admin of adminEmails) {
-        if (admin.password && admin.password !== 'sua_senha_aqui') {
+        if (admin.password) {
           passwords[admin.email.toLowerCase()] = admin.password;
         }
       }
 
-      // Se não encontrar senhas válidas no banco, tenta da variável de ambiente
-      if (Object.keys(passwords).length === 0) {
-        console.log('⚠️ Nenhuma senha válida no banco de dados, tentando variável de ambiente');
-        const raw = process.env.ADMIN_PASSWORDS_JSON;
-        if (raw) {
-          try {
-            const parsed = JSON.parse(raw);
-            if (parsed && typeof parsed === 'object') {
-              for (const [email, pass] of Object.entries(parsed)) {
-                if (typeof email === 'string' && typeof pass === 'string') {
-                  passwords[email.toLowerCase()] = pass;
-                }
-              }
-              console.log('✅ Senhas de admin carregadas da variável de ambiente:', Object.keys(passwords));
-              return passwords;
-            }
-          } catch (parseError) {
-            console.error('❌ Erro ao fazer parse de ADMIN_PASSWORDS_JSON:', parseError);
-          }
-        }
-      } else {
+      if (Object.keys(passwords).length > 0) {
         console.log('✅ Senhas de admin carregadas do banco de dados:', Object.keys(passwords));
+        return passwords;
       }
 
-      return passwords;
+      console.log('⚠️ Nenhuma senha de admin encontrada no banco de dados');
+      return {};
     } catch (error) {
       console.error('Erro ao carregar senhas de admin do banco de dados:', error);
       return {};
