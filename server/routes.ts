@@ -152,12 +152,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email é obrigatório" });
       }
 
-      // Mantém a mesma fonte de verdade usada no login: email-config.json
-      const emailConfig = await loadEmailConfig();
+      // Usa banco de dados para verificar admin
+      const adminEmails = await db.getAdminEmails();
       const emailLower = String(email).toLowerCase();
 
-      const isAdmin = emailConfig.adminEmails.some((admin: { email: string; name?: string } | string) =>
-        typeof admin === 'string' ? admin === emailLower : admin.email === emailLower
+      const isAdmin = adminEmails.some((admin: db.User) =>
+        admin.email === emailLower
       );
 
       res.json({ isAdmin });
@@ -200,18 +200,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email é obrigatório" });
       }
 
-      const emailConfig = await loadEmailConfig();
       const emailLower = email.toLowerCase();
 
       console.log("Login attempt for:", emailLower);
 
-      // Verificar se é admin
-      const adminUser = emailConfig.adminEmails.find((admin: db.User) => 
+      // Verificar se é admin usando banco de dados
+      const adminEmails = await db.getAdminEmails();
+      const adminUser = adminEmails.find((admin: db.User) => 
         admin.email === emailLower
       );
 
-      // Verificar se é usuário autorizado
-      const regularUser = emailConfig.authorizedEmails.find((user: string) => 
+      // Verificar se é usuário autorizado usando banco de dados
+      const authorizedEmails = await db.getAuthorizedEmails();
+      const regularUser = authorizedEmails.find((user: string) => 
         user === emailLower
       );
 
@@ -705,26 +706,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = parseInt(req.query.limit as string) || 10;
       const offset = (page - 1) * limit;
 
-      // Usar loadEmailConfig() em vez de loadAuthorizedEmails()
-      const emailConfig = await loadEmailConfig();
+      // Usar banco de dados
+      const authorizedEmails = await db.getAuthorizedEmails();
+      const adminEmails = await db.getAdminEmails();
 
       // Converter para formato uniforme e adicionar informações de último acesso
       const allEmails = [
-        ...emailConfig.authorizedEmails.map((item: any) => {
-          console.log('Processando email autorizado:', item);
+        ...authorizedEmails.map((email: string) => {
           return {
-            email: typeof item === 'string' ? item : item.email,
-            name: typeof item === 'string' ? 'Cliente' : (item.name || 'Cliente'),
-            lastAccess: (typeof item === 'object' && item.lastAccess) ? item.lastAccess : null,
+            email: email,
+            name: 'Cliente',
+            lastAccess: null,
             isAdmin: false
           };
         }),
-        ...emailConfig.adminEmails.map((item: any) => {
-          console.log('Processando email admin:', item);
+        ...adminEmails.map((admin: db.User) => {
           return {
-            email: typeof item === 'string' ? item : item.email,
-            name: typeof item === 'string' ? 'CAP Câmbio' : (item.name || 'CAP Câmbio'),
-            lastAccess: (typeof item === 'object' && item.lastAccess) ? item.lastAccess : null,
+            email: admin.email,
+            name: admin.name || 'CAP Câmbio',
+            lastAccess: admin.last_access,
             isAdmin: true
           };
         })
@@ -919,18 +919,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para listar emails autorizados (apenas admins)
   app.get('/api/auth/authorized-emails', async (req, res) => {
     try {
-      const config = await loadEmailConfig();
+      const adminEmails = await db.getAdminEmails();
+      const authorizedEmails = await db.getAuthorizedEmails();
 
       const emails = [
-        ...config.adminEmails.map((email: string | { email: string; name?: string }) => ({
-          email: typeof email === 'string' ? email : email.email,
+        ...adminEmails.map((admin: db.User) => ({
+          email: admin.email,
           isAdmin: true,
-          name: (typeof email === 'string' ? (email.includes('capcambio') ? 'Administrador CAP Câmbio' : undefined) : email.name)
+          name: admin.name
         })),
-        ...config.authorizedEmails.map((email: string | { email: string; name?: string }) => ({
-          email: typeof email === 'string' ? email : email.email,
+        ...authorizedEmails.map((email: string) => ({
+          email: email,
           isAdmin: false,
-          name: typeof email === 'object' ? email.name : undefined
+          name: undefined
         }))
       ];
 
