@@ -227,6 +227,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const adminPasswords = await loadAdminPasswords();
         const expectedPassword = adminPasswords[emailLower];
 
+        console.log(`🔐 Verificando senha para ${emailLower}:`);
+        console.log(`   Senha esperada: "${expectedPassword}"`);
+        console.log(`   Senha recebida: "${password}"`);
+        console.log(`   Senhas conferem: ${password === expectedPassword}`);
+
         if (!expectedPassword) {
           console.error(`Senha de admin não configurada para ${emailLower}`);
           return res.status(500).json({ error: "Senha de administrador não configurada" });
