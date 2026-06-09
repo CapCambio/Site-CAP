@@ -2,8 +2,7 @@
  * Serviço de autenticação unificado
  * Fonte única da verdade para dados de usuários
  */
-import fs from 'fs/promises';
-import path from 'path';
+import * as db from '../db';
 import { Session } from 'express-session';
 
 export interface User {
@@ -14,13 +13,8 @@ export interface User {
   createdAt?: string;
 }
 
-export interface AuthConfig {
-  users: User[];
-}
-
 export class AuthService {
   private static instance: AuthService;
-  private configPath: string;
   private users: Map<string, User> = new Map();
   private lastLoad: number = 0;
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutos
@@ -29,7 +23,6 @@ export class AuthService {
   private readonly LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutos
 
   private constructor() {
-    this.configPath = path.join(process.cwd(), 'server', 'config', 'users.json');
     this.loadUsers();
   }
 
@@ -52,7 +45,7 @@ export class AuthService {
   }
 
   /**
-   * Carrega usuários do arquivo (com cache)
+   * Carrega usuários do banco de dados (com cache)
    */
   private async loadUsers(): Promise<void> {
     const now = Date.now();
@@ -63,62 +56,23 @@ export class AuthService {
     }
 
     try {
-      const data = await fs.readFile(this.configPath, 'utf-8');
-      const config: AuthConfig = JSON.parse(data);
+      const users = await db.getUsers();
       
       this.users.clear();
-      config.users.forEach(user => {
-        this.users.set(user.email.toLowerCase(), user);
+      users.forEach((user: any) => {
+        this.users.set(user.email.toLowerCase(), {
+          email: user.email,
+          name: user.name,
+          isAdmin: user.is_admin,
+          lastAccess: user.last_access,
+          createdAt: user.created_at
+        });
       });
       
       this.lastLoad = now;
-      console.log(`🔐 ${this.users.size} usuários carregados`);
+      console.log(`🔐 ${this.users.size} usuários carregados do banco de dados`);
     } catch (error) {
-      console.error('Erro ao carregar usuários:', error);
-      // Criar arquivo com usuário admin padrão
-      await this.createDefaultConfig();
-    }
-  }
-
-  /**
-   * Cria configuração padrão
-   */
-  private async createDefaultConfig(): Promise<void> {
-    const defaultConfig: AuthConfig = {
-      users: [
-        {
-          email: 'capcambiocx@gmail.com',
-          name: 'CAP Câmbio Admin',
-          isAdmin: true,
-          createdAt: new Date().toISOString()
-        }
-      ]
-    };
-
-    await fs.writeFile(this.configPath, JSON.stringify(defaultConfig, null, 2));
-    
-    this.users.clear();
-    defaultConfig.users.forEach(user => {
-      this.users.set(user.email.toLowerCase(), user);
-    });
-    
-    console.log('📝 Configuração padrão criada');
-  }
-
-  /**
-   * Salva usuários no arquivo
-   */
-  private async saveUsers(): Promise<void> {
-    try {
-      const config: AuthConfig = {
-        users: Array.from(this.users.values())
-      };
-      
-      await fs.writeFile(this.configPath, JSON.stringify(config, null, 2));
-      console.log(`💾 ${this.users.size} usuários salvos`);
-    } catch (error) {
-      console.error('Erro ao salvar usuários:', error);
-      throw error;
+      console.error('Erro ao carregar usuários do banco de dados:', error);
     }
   }
 
@@ -147,9 +101,13 @@ export class AuthService {
     if (user) {
       // Reset tentativas em sucesso
       this.authAttempts.delete(emailLower);
-      // Atualiza último acesso
-      user.lastAccess = new Date().toISOString();
-      await this.saveUsers();
+      // Atualiza último acesso no banco de dados
+      try {
+        await db.updateUser(emailLower, { last_access: new Date().toISOString() });
+        user.lastAccess = new Date().toISOString();
+      } catch (error) {
+        console.error('Erro ao atualizar último acesso:', error);
+      }
     } else {
       // Incrementar tentativas em falha
       const currentAttempts = this.authAttempts.get(emailLower) || { count: 0, lastAttempt: now };
@@ -189,62 +147,75 @@ export class AuthService {
    * Adiciona usuário
    */
   async addUser(email: string, name: string, isAdmin: boolean = false): Promise<void> {
-    await this.loadUsers();
-    
     const emailLower = email.toLowerCase();
     
-    if (this.users.has(emailLower)) {
-      throw new Error('Usuário já existe');
+    try {
+      await db.addUser({
+        email: emailLower,
+        name,
+        is_admin: isAdmin,
+        created_at: new Date().toISOString()
+      });
+      
+      // Recarrega cache
+      this.lastLoad = 0;
+      await this.loadUsers();
+      
+      console.log(`➕ Usuário adicionado: ${this.maskEmail(emailLower)}`);
+    } catch (error) {
+      console.error('Erro ao adicionar usuário:', error);
+      throw error;
     }
-    
-    const newUser: User = {
-      email: emailLower,
-      name,
-      isAdmin,
-      createdAt: new Date().toISOString()
-    };
-    
-    this.users.set(emailLower, newUser);
-    await this.saveUsers();
-    
-    console.log(`➕ Usuário adicionado: ${this.maskEmail(emailLower)}`);
   }
 
   /**
    * Remove usuário
    */
   async removeUser(email: string): Promise<boolean> {
-    await this.loadUsers();
-    
     const emailLower = email.toLowerCase();
-    const deleted = this.users.delete(emailLower);
     
-    if (deleted) {
-      await this.saveUsers();
-      console.log(`➖ Usuário removido: ${this.maskEmail(emailLower)}`);
+    try {
+      const deleted = await db.deleteUser(emailLower);
+      
+      if (deleted) {
+        // Recarrega cache
+        this.lastLoad = 0;
+        await this.loadUsers();
+        console.log(`➖ Usuário removido: ${this.maskEmail(emailLower)}`);
+      }
+      
+      return deleted;
+    } catch (error) {
+      console.error('Erro ao remover usuário:', error);
+      return false;
     }
-    
-    return deleted;
   }
 
   /**
    * Atualiza usuário
    */
   async updateUser(email: string, updates: Partial<Pick<User, 'name' | 'isAdmin'>>): Promise<boolean> {
-    await this.loadUsers();
-    
     const emailLower = email.toLowerCase();
-    const user = this.users.get(emailLower);
     
-    if (!user) {
+    try {
+      const dbUpdates: any = {};
+      if (updates.name !== undefined) dbUpdates.name = updates.name;
+      if (updates.isAdmin !== undefined) dbUpdates.is_admin = updates.isAdmin;
+      
+      const updated = await db.updateUser(emailLower, dbUpdates);
+      
+      if (updated) {
+        // Recarrega cache
+        this.lastLoad = 0;
+        await this.loadUsers();
+        console.log(`✏️ Usuário atualizado: ${this.maskEmail(emailLower)}`);
+      }
+      
+      return !!updated;
+    } catch (error) {
+      console.error('Erro ao atualizar usuário:', error);
       return false;
     }
-    
-    Object.assign(user, updates);
-    await this.saveUsers();
-    
-    console.log(`✏️ Usuário atualizado: ${this.maskEmail(emailLower)}`);
-    return true;
   }
 
   /**
@@ -258,6 +229,7 @@ export class AuthService {
     const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
     
     const initialCount = this.users.size;
+    const emailsToDelete: string[] = [];
     
     this.users.forEach((user, email) => {
       const lastAccess = user.lastAccess ? new Date(user.lastAccess) : null;
@@ -266,22 +238,31 @@ export class AuthService {
       // Se nunca acessou, verificar data de criação
       if (!lastAccess) {
         if (createdAt && createdAt < sixMonthsAgo) {
-          this.users.delete(email);
+          emailsToDelete.push(email);
           console.log(`🗑️ Usuário sem acesso removido: ${this.maskEmail(email)}`);
         }
       } else {
         // Se acessou há mais de 1 ano, remove
         if (lastAccess < oneYearAgo) {
-          this.users.delete(email);
+          emailsToDelete.push(email);
           console.log(`🗑️ Usuário inativo removido: ${this.maskEmail(email)}`);
         }
       }
     });
     
+    // Remove do banco de dados
+    for (const email of emailsToDelete) {
+      try {
+        await db.deleteUser(email);
+        this.users.delete(email);
+      } catch (error) {
+        console.error(`Erro ao remover usuário ${email}:`, error);
+      }
+    }
+    
     const removedCount = initialCount - this.users.size;
     
     if (removedCount > 0) {
-      await this.saveUsers();
       console.log(`🧹 Limpeza: ${removedCount} usuários inativos removidos`);
     }
     
