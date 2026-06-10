@@ -17,7 +17,7 @@ if (connectionString) {
 
 export const pool = new Pool({
   connectionString,
-  ssl: connectionString ? { rejectUnauthorized: true } : false
+  ssl: connectionString ? { rejectUnauthorized: false } : false
 });
 
 export interface User {
