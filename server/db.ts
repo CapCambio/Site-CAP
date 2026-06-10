@@ -7,14 +7,17 @@ const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
   console.error('❌ DATABASE_URL não está definida nas variáveis de ambiente!');
   console.error('A aplicação não conseguirá conectar ao banco de dados.');
-  throw new Error('DATABASE_URL não está definida');
+  console.error('Por favor, configure DATABASE_URL no Railway.');
+  // Não lançar erro para permitir que o servidor inicie e mostre os logs
 }
 
-console.log('✅ DATABASE_URL carregada:', connectionString.replace(/:[^:@]+@/, ':****@'));
+if (connectionString) {
+  console.log('✅ DATABASE_URL carregada:', connectionString.replace(/:[^:@]+@/, ':****@'));
+}
 
 export const pool = new Pool({
   connectionString,
-  ssl: { rejectUnauthorized: true }
+  ssl: connectionString ? { rejectUnauthorized: true } : false
 });
 
 export interface User {
