@@ -157,15 +157,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Enviar heartbeat a cada 15 segundos
-    const interval = setInterval(sendHeartbeat, 15000);
+    // Aguardar 2 segundos antes de iniciar o heartbeat para garantir que a sessão esteja estabelecida
+    const timeout = setTimeout(() => {
+      sendHeartbeat();
+      const interval = setInterval(sendHeartbeat, 15000);
 
-    // Enviar heartbeat imediatamente ao logar
-    sendHeartbeat();
+      return () => {
+        console.log('Parando heartbeat para:', user.email);
+        clearInterval(interval);
+      };
+    }, 2000);
 
     return () => {
-      console.log('Parando heartbeat para:', user.email);
-      clearInterval(interval);
+      console.log('Limpando heartbeat para:', user.email);
+      clearTimeout(timeout);
     };
   }, [user]);
 
