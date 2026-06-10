@@ -2,14 +2,11 @@ import pg from 'pg';
 
 const { Pool } = pg;
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:passofundo2012@db.wzrkasgtryxyiwtrmcqo.supabase.co:5432/postgres';
+const connectionString = process.env.DATABASE_URL;
 
 export const pool = new Pool({
   connectionString,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  // Tentar habilitar IPv6
-  connectionTimeoutMillis: 10000,
-  idleTimeoutMillis: 30000
+  ssl: { rejectUnauthorized: true }
 });
 
 export interface User {
