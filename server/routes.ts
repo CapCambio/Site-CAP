@@ -314,6 +314,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ user: req.user });
   });
 
+  app.post("/api/auth/heartbeat", authenticate, (req, res) => {
+    try {
+      const email = req.user?.email;
+      if (email) {
+        sessionRegistry.touchHeartbeat(email, req.sessionID);
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erro no heartbeat:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   app.post("/api/auth/release-stale", async (req, res) => {
     try {
       const { email, orphan } = req.body;

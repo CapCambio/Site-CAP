@@ -8,7 +8,11 @@ interface ActiveSession {
   sessionId: string;
   createdAt: number;
   lastActivity: number;
+  lastHeartbeat: number;
 }
+
+/** Sem heartbeat neste intervalo = sessão considerada morta (navegador fechado) */
+const HEARTBEAT_TIMEOUT_MS = 30 * 1000; // 30 segundos
 
 export class SessionRegistry {
   private static instance: SessionRegistry;
@@ -33,6 +37,14 @@ export class SessionRegistry {
     }
   }
 
+  touchHeartbeat(email: string, sessionId: string): void {
+    const key = this.normalizeEmail(email);
+    const active = this.activeByEmail.get(key);
+    if (active && active.sessionId === sessionId) {
+      active.lastHeartbeat = Date.now();
+    }
+  }
+
   /**
    * Libera sessão registrada em outro cookie (ex.: após refresh sem logout).
    */
@@ -53,7 +65,7 @@ export class SessionRegistry {
   }
 
   /**
-   * Libera sessão registrada se estiver expirada, morta no store ou abandonada.
+   * Libera sessão registrada se estiver expirada, morta no store ou sem heartbeat.
    */
   async tryReleaseStale(
     email: string,
@@ -67,6 +79,15 @@ export class SessionRegistry {
     }
 
     if (active.sessionId === currentSessionId) {
+      return true;
+    }
+
+    // Verificar se há heartbeat recente (navegador ainda aberto)
+    const heartbeatAge = Date.now() - active.lastHeartbeat;
+    if (heartbeatAge >= HEARTBEAT_TIMEOUT_MS) {
+      console.log(`SessionRegistry.tryReleaseStale - Sessão sem heartbeat por ${heartbeatAge}ms, liberando: ${active.sessionId}`);
+      await this.destroySession(store, active.sessionId);
+      this.activeByEmail.delete(key);
       return true;
     }
 
@@ -116,6 +137,7 @@ export class SessionRegistry {
       sessionId,
       createdAt: now,
       lastActivity: now,
+      lastHeartbeat: now,
     });
   }
 
