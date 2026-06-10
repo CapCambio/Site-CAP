@@ -55,6 +55,11 @@ interface Alert {
   condicaoValor?: 'acima' | 'abaixo';
 }
 
+// Cache em memória para moedas
+let currenciesCache: any[] = [];
+let currenciesCacheTime = 0;
+const CURRENCIES_CACHE_TTL = 30 * 1000; // 30 segundos
+
 // Get current directory for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -360,15 +365,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // API routes
-  app.get("/api/currencies", async (req, res) => {
-    try {
-      const currencies = await jsonStorage.getAllCurrencies();
-      res.json(currencies);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch currencies" });
+// API routes
+app.get("/api/currencies", async (req, res) => {
+  try {
+    const now = Date.now();
+    
+    // Usar cache se ainda válido
+    if (currenciesCache.length > 0 && (now - currenciesCacheTime) < CURRENCIES_CACHE_TTL) {
+      return res.json(currenciesCache);
     }
-  });
+    
+    // Tentar obter do jsonStorage (fallback)
+    const currencies = await jsonStorage.getAllCurrencies();
+    
+    // Atualizar cache
+    currenciesCache = currencies;
+    currenciesCacheTime = now;
+    
+    res.json(currencies);
+  } catch (error) {
+    // Se houver erro, tentar usar o cache mesmo se expirado
+    if (currenciesCache.length > 0) {
+      console.warn('Usando cache expirado devido a erro:', error);
+      return res.json(currenciesCache);
+    }
+    res.status(500).json({ message: "Failed to fetch currencies" });
+  }
+});
 
   app.get("/api/currencies/:code", async (req, res) => {
     try {
@@ -1208,6 +1231,10 @@ export async function refreshCurrencies() {
     const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
     const now = new Date();
     const savedCurrencies: any[] = [];
+    
+    // Invalidar cache de moedas
+    currenciesCache = [];
+    currenciesCacheTime = 0;
     
     // NOVO: Acumular todos os alertas antes de enviar
     const allAlertsByEmail = new Map<string, Array<{
