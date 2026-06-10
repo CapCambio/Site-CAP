@@ -42,11 +42,6 @@ export class SessionRegistry {
     const active = this.activeByEmail.get(key);
     if (active && active.sessionId === sessionId) {
       active.lastHeartbeat = Date.now();
-      console.log(`SessionRegistry.touchHeartbeat - Heartbeat atualizado para ${email}, sessão: ${sessionId}`);
-    } else if (active) {
-      console.log(`SessionRegistry.touchHeartbeat - Sessão diferente para ${email}. Atual: ${active.sessionId}, Recebido: ${sessionId}`);
-    } else {
-      console.log(`SessionRegistry.touchHeartbeat - Nenhuma sessão ativa para ${email}`);
     }
   }
 
@@ -157,19 +152,7 @@ export class SessionRegistry {
   private isSessionAlive(store: Store, sessionId: string): Promise<boolean> {
     return new Promise((resolve) => {
       store.get(sessionId, (err, session) => {
-        if (err) {
-          console.log('SessionRegistry.isSessionAlive - Erro ao verificar sessão:', err);
-          resolve(false);
-        } else if (!session) {
-          console.log('SessionRegistry.isSessionAlive - Sessão não encontrada:', sessionId);
-          resolve(false);
-        } else if (!session.user) {
-          console.log('SessionRegistry.isSessionAlive - Sessão sem user:', sessionId);
-          resolve(false);
-        } else {
-          console.log('SessionRegistry.isSessionAlive - Sessão viva:', sessionId);
-          resolve(true);
-        }
+        resolve(!err && !!session?.user);
       });
     });
   }
