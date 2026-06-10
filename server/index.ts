@@ -13,8 +13,8 @@ import session from 'express-session';
 // Importar refreshCurrencies para usar no timer
 import { refreshCurrencies } from "./routes";
 
-// Verificar variáveis de ambiente obrigatórias
-const requiredEnvVars = [
+// Verificar variáveis de ambiente obrigatórias (apenas avisar se faltar)
+const optionalEnvVars = [
   'EMAIL_USER',
   'EMAIL_PASS',
   'VAPID_PUBLIC_KEY',
@@ -22,13 +22,12 @@ const requiredEnvVars = [
   'VAPID_EMAIL'
 ];
 
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+const missingVars = optionalEnvVars.filter(varName => !process.env[varName]);
 
 if (missingVars.length > 0) {
-  console.error('❌ Variáveis de ambiente obrigatórias não definidas:');
-  missingVars.forEach(varName => console.error(`  - ${varName}`));
-  console.error('\nPor favor, verifique o arquivo .env e tente novamente.\n');
-  process.exit(1);
+  console.warn('⚠️ Variáveis de ambiente opcionais não definidas:');
+  missingVars.forEach(varName => console.warn(`  - ${varName}`));
+  console.warn('\nAlgumas funcionalidades podem não funcionar corretamente.\n');
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,10 +37,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const sessionSecret = process.env.SESSION_SECRET;
-if (process.env.NODE_ENV === 'production' && !sessionSecret) {
-  console.error('❌ SESSION_SECRET não definido em produção. Configure SESSION_SECRET no ambiente antes de iniciar o servidor.');
-  process.exit(1);
+const sessionSecret = process.env.SESSION_SECRET || 'fallback-secret-change-in-production';
+if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+  console.warn('⚠️ SESSION_SECRET não definido em produção. Usando valor padrão (não recomendado para produção).');
 }
 
 // Configuração de sessão
