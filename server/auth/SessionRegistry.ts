@@ -11,7 +11,7 @@ interface ActiveSession {
 }
 
 /** Sem requisições autenticadas neste intervalo = sessão abandonada (mesmo aparelho). */
-const STALE_SESSION_MS = 45 * 1000;
+const STALE_SESSION_MS = 30 * 1000; // 30 segundos
 
 export class SessionRegistry {
   private static instance: SessionRegistry;
