@@ -138,6 +138,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Heartbeat para manter sessão ativa
+  useEffect(() => {
+    if (!user) return;
+
+    const sendHeartbeat = async () => {
+      try {
+        await fetch('/api/auth/heartbeat', {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch (error) {
+        console.error('Erro ao enviar heartbeat:', error);
+      }
+    };
+
+    // Enviar heartbeat a cada 15 segundos
+    const interval = setInterval(sendHeartbeat, 15000);
+
+    // Enviar heartbeat imediatamente ao logar
+    sendHeartbeat();
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [user]);
+
   // Função de login
   const login = async (email: string, password?: string) => {
     setIsLoading(true);
