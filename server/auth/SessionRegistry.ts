@@ -42,6 +42,11 @@ export class SessionRegistry {
     const active = this.activeByEmail.get(key);
     if (active && active.sessionId === sessionId) {
       active.lastHeartbeat = Date.now();
+      console.log(`SessionRegistry.touchHeartbeat - Heartbeat atualizado para ${email}, sessão: ${sessionId}`);
+    } else if (active) {
+      console.log(`SessionRegistry.touchHeartbeat - Sessão diferente para ${email}. Atual: ${active.sessionId}, Recebido: ${sessionId}`);
+    } else {
+      console.log(`SessionRegistry.touchHeartbeat - Nenhuma sessão ativa para ${email}`);
     }
   }
 
