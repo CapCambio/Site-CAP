@@ -130,7 +130,19 @@ export class SessionRegistry {
   private isSessionAlive(store: Store, sessionId: string): Promise<boolean> {
     return new Promise((resolve) => {
       store.get(sessionId, (err, session) => {
-        resolve(!err && !!session?.user);
+        if (err) {
+          console.log('SessionRegistry.isSessionAlive - Erro ao verificar sessão:', err);
+          resolve(false);
+        } else if (!session) {
+          console.log('SessionRegistry.isSessionAlive - Sessão não encontrada:', sessionId);
+          resolve(false);
+        } else if (!session.user) {
+          console.log('SessionRegistry.isSessionAlive - Sessão sem user:', sessionId);
+          resolve(false);
+        } else {
+          console.log('SessionRegistry.isSessionAlive - Sessão viva:', sessionId);
+          resolve(true);
+        }
       });
     });
   }
