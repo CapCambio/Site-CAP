@@ -317,8 +317,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/heartbeat", authenticate, (req, res) => {
     try {
       const email = req.user?.email;
+      const sessionId = req.sessionID;
+      console.log(`Heartbeat recebido - Email: ${email}, SessionID: ${sessionId}`);
       if (email) {
-        sessionRegistry.touchHeartbeat(email, req.sessionID);
+        sessionRegistry.touchHeartbeat(email, sessionId);
       }
       res.json({ success: true });
     } catch (error) {
