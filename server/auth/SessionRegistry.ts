@@ -10,9 +10,6 @@ interface ActiveSession {
   lastActivity: number;
 }
 
-/** Sem requisições autenticadas neste intervalo = sessão abandonada (mesmo aparelho). */
-const STALE_SESSION_MS = 30 * 1000; // 30 segundos
-
 export class SessionRegistry {
   private static instance: SessionRegistry;
   private readonly activeByEmail = new Map<string, ActiveSession>();
@@ -73,15 +70,9 @@ export class SessionRegistry {
       return true;
     }
 
+    // Verificar apenas se a sessão ainda está viva no store
     const alive = await this.isSessionAlive(store, active.sessionId);
     if (!alive) {
-      this.activeByEmail.delete(key);
-      return true;
-    }
-
-    const idleMs = Date.now() - active.lastActivity;
-    if (idleMs >= STALE_SESSION_MS) {
-      await this.destroySession(store, active.sessionId);
       this.activeByEmail.delete(key);
       return true;
     }
