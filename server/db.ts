@@ -4,6 +4,14 @@ const { Pool } = pg;
 
 const connectionString = process.env.DATABASE_URL;
 
+if (!connectionString) {
+  console.error('❌ DATABASE_URL não está definida nas variáveis de ambiente!');
+  console.error('A aplicação não conseguirá conectar ao banco de dados.');
+  throw new Error('DATABASE_URL não está definida');
+}
+
+console.log('✅ DATABASE_URL carregada:', connectionString.replace(/:[^:@]+@/, ':****@'));
+
 export const pool = new Pool({
   connectionString,
   ssl: { rejectUnauthorized: true }
