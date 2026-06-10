@@ -2,9 +2,9 @@
  * Sistema de Health Checks abrangente
  */
 import { logger, LogLevel } from './Logger';
-import { jsonStorage } from '../json-storage';
 import { authService } from '../auth/AuthService';
 import { alertSystem } from '../alert-system';
+import { pool } from '../db';
 
 export interface HealthCheck {
   name: string;
@@ -88,35 +88,32 @@ export class HealthChecker {
   }
 
   /**
-   * Check do banco de dados (JSON files)
+   * Check do banco de dados (Supabase)
    */
   private async checkDatabase(): Promise<HealthCheck> {
     const start = Date.now();
     
     try {
-      // Testa leitura
-      const currencies = await jsonStorage.getAllCurrencies();
-      
-      // Testa escrita (em um arquivo de teste)
-      const testWrite = await this.testFileWrite();
+      // Testa conexão com o Supabase
+      const result = await pool.query('SELECT 1 as test');
       
       const responseTime = Date.now() - start;
       
-      if (testWrite && currencies.length >= 0) {
+      if (result.rows.length > 0 && result.rows[0].test === 1) {
         return {
           name: 'database',
           status: 'healthy',
           responseTime,
           metadata: {
-            currenciesCount: currencies.length,
-            writeAccess: testWrite
+            type: 'supabase',
+            connected: true
           }
         };
       } else {
         return {
           name: 'database',
           status: 'unhealthy',
-          message: 'Failed to read or write database files',
+          message: 'Database query returned unexpected result',
           responseTime
         };
       }
@@ -365,21 +362,6 @@ export class HealthChecker {
         message: `Cache system error: ${error}`,
         responseTime: Date.now() - start
       };
-    }
-  }
-
-  /**
-   * Testa escrita de arquivo
-   */
-  private async testFileWrite(): Promise<boolean> {
-    try {
-      const fs = require('fs');
-      const testPath = 'data/.health-check-test';
-      fs.writeFileSync(testPath, 'test');
-      fs.unlinkSync(testPath);
-      return true;
-    } catch (error) {
-      return false;
     }
   }
 
