@@ -82,7 +82,6 @@ export class SessionRegistry {
 
   /**
    * Indica se um novo login pode ser criado.
-   * Se houver sessão ativa em outro dispositivo, derruba automaticamente.
    */
   async canLogin(
     email: string,
@@ -107,10 +106,7 @@ export class SessionRegistry {
       return true;
     }
 
-    // Se ainda houver sessão ativa em outro dispositivo, derruba automaticamente
-    await this.destroySession(store, active.sessionId);
-    this.activeByEmail.delete(key);
-    return true;
+    return false;
   }
 
   setActive(email: string, sessionId: string): void {
