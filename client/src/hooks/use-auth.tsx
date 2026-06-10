@@ -142,12 +142,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user) return;
 
+    console.log('Iniciando heartbeat para:', user.email);
+
     const sendHeartbeat = async () => {
       try {
-        await fetch('/api/auth/heartbeat', {
+        console.log('Enviando heartbeat...');
+        const response = await fetch('/api/auth/heartbeat', {
           method: 'POST',
           credentials: 'include',
         });
+        console.log('Heartbeat enviado com sucesso:', response.status);
       } catch (error) {
         console.error('Erro ao enviar heartbeat:', error);
       }
@@ -160,6 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sendHeartbeat();
 
     return () => {
+      console.log('Parando heartbeat para:', user.email);
       clearInterval(interval);
     };
   }, [user]);
