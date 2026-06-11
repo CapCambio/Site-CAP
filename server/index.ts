@@ -9,8 +9,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import session from 'express-session';
-import { createClient } from 'redis';
-import RedisStore from 'connect-redis';
+import pg from 'pg';
+import PgSession from 'connect-pg-simple';
 
 // Importar refreshCurrencies para usar no timer
 import { refreshCurrencies } from "./routes";
@@ -44,20 +44,22 @@ if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
   console.warn('⚠️ SESSION_SECRET não definido em produção. Usando valor padrão (não recomendado para produção).');
 }
 
-// Configurar Redis para sessões
-let redisClient;
+// Configurar PostgreSQL para sessões
 let sessionStore;
 
-if (process.env.REDIS_URL) {
-  redisClient = createClient({ url: process.env.REDIS_URL });
-  redisClient.connect().catch(err => {
-    console.error('Erro ao conectar ao Redis:', err);
+if (process.env.DATABASE_URL) {
+  const pgPool = new pg.Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
   });
   
-  sessionStore = new RedisStore({ client: redisClient });
-  console.log('✅ Redis configurado para sessões');
+  sessionStore = new (PgSession(session))({
+    pool: pgPool,
+    tableName: 'session'
+  });
+  console.log('✅ PostgreSQL configurado para sessões');
 } else {
-  console.warn('⚠️ REDIS_URL não definido. Usando MemoryStore (não recomendado para produção).');
+  console.warn('⚠️ DATABASE_URL não definido. Usando MemoryStore (não recomendado para produção).');
 }
 
 // Configuração de sessão
