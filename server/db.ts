@@ -69,9 +69,9 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   return result.rows[0] || null;
 }
 
-export async function getAuthorizedEmails(): Promise<string[]> {
-  const result = await pool.query('SELECT email FROM users WHERE is_admin = false ORDER BY email');
-  return result.rows.map((row: { email: string }) => row.email);
+export async function getAuthorizedEmails(): Promise<User[]> {
+  const result = await pool.query('SELECT * FROM users WHERE is_admin = false ORDER BY email');
+  return result.rows;
 }
 
 export async function getAdminEmails(): Promise<User[]> {

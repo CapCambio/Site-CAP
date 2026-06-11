@@ -750,11 +750,11 @@ app.get("/api/currencies", async (req, res) => {
 
       // Converter para formato uniforme e adicionar informações de último acesso
       const allEmails = [
-        ...authorizedEmails.map((email: string) => {
+        ...authorizedEmails.map((user: db.User) => {
           return {
-            email: email,
-            name: 'Cliente',
-            lastAccess: null,
+            email: user.email,
+            name: user.name || 'Cliente',
+            lastAccess: user.last_access,
             isAdmin: false
           };
         }),
