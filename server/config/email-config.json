@@ -13,27 +13,27 @@
       "name": "CAP Câmbio Caxias",
       "lastAccess": "2026-06-08T17:14:56.614Z",
       "isAdmin": true,
-      "password": "capcambio2024"
+      "password": "sua_senha_aqui"
     },
     {
       "email": "capcambio_caxias@hotmail.com",
       "name": "CAP Câmbio Caxias",
       "isAdmin": true,
-      "password": "capcambio2024"
+      "password": "sua_senha_aqui"
     },
     {
       "email": "capcambio.bento@gmail.com",
       "name": "CAP Câmbio Bento",
       "lastAccess": "2026-05-06T16:40:13.065Z",
       "isAdmin": true,
-      "password": "capcambio2024"
+      "password": "sua_senha_aqui"
     },
     {
       "email": "capcambio_passo@hotmail.com",
       "name": "CAP Câmbio Passo",
       "lastAccess": "2026-05-06T16:45:52.800Z",
       "isAdmin": true,
-      "password": "capcambio2024"
+      "password": "sua_senha_aqui"
     }
   ]
 }

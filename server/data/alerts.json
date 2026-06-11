@@ -1,0 +1,169 @@
+{
+  "capcambiocx@gmail.com": {
+    "email": "capcambiocx@gmail.com",
+    "alerts": {},
+    "pushSubscription": {
+      "endpoint": "https://fcm.googleapis.com/fcm/send/cx8Aec6TAe4:APA91bE2AMF4e-VoahyM-A-zR0qz90W2kmeQV029uIyRK8LdYQueqgUrxiupXRMQaUpXxG0fMPnvQDAx5uxCpJgeHQcYf4H_h7P6FKLNou70q_Dg_mtTBu_AkM3vzmtDAZCA9q4dJba2",
+      "expirationTime": null,
+      "keys": {
+        "p256dh": "BAv8UozP8WlzHX4H-9jOI0-bGqXag89_ioyE1ksdE6ms_KJrbAu6UeAG2fHJjRseNqCFvKjbyUuG3H-4_aJjtE8",
+        "auth": "dl4yKVfpBUIDpPLpEEXGLg"
+      }
+    },
+    "lastNotificationSent": null,
+    "cardOrder": [
+      "USD",
+      "EUR",
+      "GBP",
+      "AUD",
+      "ARS",
+      "NZD",
+      "CAD",
+      "CHF",
+      "UYU",
+      "CLP",
+      "MXN",
+      "COP",
+      "CNY",
+      "JPY",
+      "PEN",
+      "ZAR"
+    ],
+    "pushSubscriptions": [
+      {
+        "endpoint": "https://fcm.googleapis.com/fcm/send/eTQcgt6raUQ:APA91bE2pnNWFnG-vEiZKzZZMibuH5QNYDjA0pkPrWbOwkidK-TwA362PkFuQTrZ0uNk-j42DhP9HH1x9kvMABJh83LIfyav7SN_87K5B8HHPbjZWY5vAlDL6JRSy6LPeC2X75Lxk-vg",
+        "expirationTime": null,
+        "keys": {
+          "p256dh": "BL2jZpezad3mipvTP9piacBsho9VRiGiGszqTvlA6M3_e0B6Z5bPHIXJz1edRX53w26bIAr1zpQlLsegzjjTV8o",
+          "auth": "aSf7hhdkpLZDM5GWUHuHNw"
+        }
+      },
+      {
+        "endpoint": "https://fcm.googleapis.com/fcm/send/dOWAZLw3LLs:APA91bG_fY_HOGSOwUbfuQVD1fettSqtOEUJ7h1Il9sVDuHm5r5GkBlJRy7S7peEitQxGbicy5OeHdqLrbZdR-6i8fYLdmIToMUYLJ9mZMETR69c0mY4XCxrbGAUAk-1BErxXIgWRg0Y",
+        "expirationTime": null,
+        "keys": {
+          "p256dh": "BPlBv3mQfWUtr0orCXsEGUU2ngABPOX1PtsGj7BlOHiEARYA3lWzlBfQ7b1XqTXZXsFhqADb_ShXIuO4NQKFsWM",
+          "auth": "MTq0dqsJFSp0SVRU0XXzHw"
+        }
+      }
+    ]
+  },
+  "usuario@exemplo.com": {
+    "email": "usuario@exemplo.com",
+    "alerts": {},
+    "pushSubscription": {
+      "endpoint": "https://fcm.googleapis.com/fcm/send/dWiIA_rnsfo:APA91bF82u0MbepP56kxrDhhT_Q2IwoDRnIgp8PiH3vJtJD7x9pMyn6UUuAjdh3d8bOt492bUozyaoZGQlzFnRINH2PCKxAGFpIQhGJm7hkbkA7Ss6icx3h-hBHK6oaHVI3Q6m_B5pFT",
+      "expirationTime": null,
+      "keys": {
+        "p256dh": "BIGaB0duTJAbpJ53sMFnEEUcpzUSNj4h5oSso2ZfcyH7PpALiLqDS0gnT9uvbpkcG1P4vVS6Dnf3_H5ZSbliTxc",
+        "auth": "rsykPIserzip4IYS973A-w"
+      }
+    },
+    "lastNotificationSent": null
+  },
+  "capcambio_passo@hotmail.com": {
+    "email": "capcambio_passo@hotmail.com",
+    "alerts": {},
+    "pushSubscriptions": [],
+    "cardOrder": [
+      "USD",
+      "EUR",
+      "GBP",
+      "AUD",
+      "ARS",
+      "NZD",
+      "CAD",
+      "CHF",
+      "UYU",
+      "CLP",
+      "MXN",
+      "COP",
+      "CNY",
+      "JPY",
+      "PEN",
+      "ZAR"
+    ],
+    "lastNotificationSent": null
+  },
+  "capcambio.bento@gmail.com": {
+    "email": "capcambio.bento@gmail.com",
+    "alerts": {},
+    "pushSubscriptions": [],
+    "cardOrder": [
+      "USD",
+      "EUR",
+      "GBP",
+      "AUD",
+      "ARS",
+      "NZD",
+      "CAD",
+      "CHF",
+      "UYU",
+      "CLP",
+      "MXN",
+      "COP",
+      "CNY",
+      "JPY",
+      "PEN",
+      "ZAR"
+    ],
+    "lastNotificationSent": null
+  },
+  "mateus.m2o@live.com": {
+    "email": "mateus.m2o@live.com",
+    "alerts": {
+      "USD": {
+        "tipo": "subida",
+        "ativo": true,
+        "validade": "2026-06-19",
+        "limite": 0
+      }
+    },
+    "pushSubscriptions": [
+      {
+        "endpoint": "https://fcm.googleapis.com/fcm/send/d0twsQ2I7-I:APA91bG0BCLU-c_eYSmqzCMw2U2TPHeRTE_fQMKVlXMYpSP3QqCg-kA7MzE9TpzrEDFFz_ORodwaVXVpHZZ6up6hD4P1xTf-HecbZNG2yP5qOCZr7atp902PAPnn17TrzPA2tXVKOmRn",
+        "expirationTime": null,
+        "keys": {
+          "p256dh": "BJ19V19KvXrJHIGdfMX9RUOs6tcnBbqYsBsCIgcSuX_-44wjl8Tn4bQlf4bMGQKTYRb0Dqji_nvZjrtd8sJHzko",
+          "auth": "lnGNyqTTVMY0r-ocTRROaA"
+        }
+      },
+      {
+        "endpoint": "https://updates.push.services.mozilla.com/wpush/v2/gAAAAABqDOMn3AVeefocTTKu62kvI8M9s252ue03rNpOUJf1sgnoTAsvjuOXYoGx3ZwmsHSjI-ZNH8vh7ASNraT2wztCz6ZxDxMBxmiKBDi-WosB4NpjmJwDcEOsoPWaUAE2cv9Gf4yaGiG95Z-8WrD9ZwCpYzdM6QvOcqTZJcfQ8QQNPt0kqZU",
+        "expirationTime": null,
+        "keys": {
+          "auth": "zop8OLg6EpY4Gpxw1xrPHw",
+          "p256dh": "BO9EIca07ZEx_Y02WMMTfMuVlpFADjITaHiO070BsX1nTcmgso16wyQ2aDn2wYhmXjl6iU1g6iq5fDczTJ77Hqw"
+        }
+      },
+      {
+        "endpoint": "https://fcm.googleapis.com/fcm/send/dOWAZLw3LLs:APA91bG_fY_HOGSOwUbfuQVD1fettSqtOEUJ7h1Il9sVDuHm5r5GkBlJRy7S7peEitQxGbicy5OeHdqLrbZdR-6i8fYLdmIToMUYLJ9mZMETR69c0mY4XCxrbGAUAk-1BErxXIgWRg0Y",
+        "expirationTime": null,
+        "keys": {
+          "p256dh": "BIK9CH6yCIbyw4_ALOkhv8ZFSWZ7VleRsH1GtpD23KrerK3fLdIhnSpzr9rlR4mhT3rUeMrMmEuegvgnLupD0nU",
+          "auth": "ypte4AHSY27Vd5RtQCEdmA"
+        }
+      }
+    ],
+    "cardOrder": [
+      "USD",
+      "EUR",
+      "GBP",
+      "AUD",
+      "ARS",
+      "NZD",
+      "CAD",
+      "CHF",
+      "UYU",
+      "CLP",
+      "MXN",
+      "COP",
+      "CNY",
+      "JPY",
+      "PEN",
+      "ZAR"
+    ],
+    "lastNotificationSent": null,
+    "language": "pt"
+  }
+}

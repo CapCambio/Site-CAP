@@ -1,29 +1,29 @@
 {
-  "lastUpdate": "2026-06-05T19:27:25.008Z",
+  "lastUpdate": "2026-06-08T22:47:27.177Z",
   "currencies": [
     {
       "name": "Dólar Americano",
       "code": "USD",
-      "buyPrice": 5,
-      "sellPrice": 5.52
+      "buyPrice": 5.1,
+      "sellPrice": 5.58
     },
     {
       "name": "Euro",
       "code": "EUR",
-      "buyPrice": 5.85,
-      "sellPrice": 6.39
+      "buyPrice": 5.95,
+      "sellPrice": 6.44
     },
     {
       "name": "Libra Esterlina",
       "code": "GBP",
-      "buyPrice": 6.7,
-      "sellPrice": 7.56
+      "buyPrice": 6.8,
+      "sellPrice": 7.62
     },
     {
       "name": "Dólar Australiano",
       "code": "AUD",
-      "buyPrice": 3.55,
-      "sellPrice": 4.02
+      "buyPrice": 3.6,
+      "sellPrice": 4.05
     },
     {
       "name": "Peso Argentino",
@@ -35,25 +35,25 @@
       "name": "Dólar Neozelandês",
       "code": "NZD",
       "buyPrice": 2.8,
-      "sellPrice": 3.28
+      "sellPrice": 3.3
     },
     {
       "name": "Dólar Canadense",
       "code": "CAD",
-      "buyPrice": 3.6,
-      "sellPrice": 4.08
+      "buyPrice": 3.65,
+      "sellPrice": 4.12
     },
     {
       "name": "Franco Suíço",
       "code": "CHF",
-      "buyPrice": 6.3,
-      "sellPrice": 7.1
+      "buyPrice": 6.4,
+      "sellPrice": 7.15
     },
     {
       "name": "Peso Uruguaio",
       "code": "UYU",
       "buyPrice": 0.12,
-      "sellPrice": 0.165
+      "sellPrice": 0.167
     },
     {
       "name": "Peso Chileno",
@@ -83,7 +83,7 @@
       "name": "Iene Japonês",
       "code": "JPY",
       "buyPrice": 0.03,
-      "sellPrice": 0.037
+      "sellPrice": 0.0373
     },
     {
       "name": "Novo Sol Peruano",
@@ -95,7 +95,7 @@
       "name": "Rand Africano",
       "code": "ZAR",
       "buyPrice": 0.25,
-      "sellPrice": 0.38
+      "sellPrice": 0.383
     }
   ]
 }
