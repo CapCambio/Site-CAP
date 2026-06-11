@@ -1,6 +1,6 @@
 // Service Worker para Push Notifications e Cache
 
-const CACHE_NAME = 'cap-cotacoes-v2';
+const CACHE_NAME = 'cap-cotacoes-v3';
 const OFFLINE_PAGE = '/offline.html';
 const ASSETS_TO_CACHE = [
   '/',
@@ -88,24 +88,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Para requisições de API, usar estratégia Network First com fallback para cache
+  // Para requisições de API, usar estratégia Network First sem cache
   if (event.request.url.includes('/api/')) {
     event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          // Se a resposta é válida, armazena em cache
-          if (response && response.status === 200) {
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-          }
-          return response;
-        })
+      fetch(event.request, { credentials: 'include' })
         .catch(() => {
-          // Se a rede falhar, tenta buscar do cache
-          return caches.match(event.request);
+          return new Response(JSON.stringify({ error: 'Offline' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json' }
+          });
         })
     );
     return;
@@ -146,9 +137,6 @@ self.addEventListener('fetch', (event) => {
 
 // Gerenciamento de notificações push
 self.addEventListener('push', (event) => {
-  // #region agent log
-  fetch('http://127.0.0.1:7755/ingest/d33e14d9-8b7f-451e-8c44-954461d3c7f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'aff3bf'},body:JSON.stringify({sessionId:'aff3bf',location:'sw.js:push',message:'push_event_received',data:{hasData:!!event.data},timestamp:Date.now(),hypothesisId:'H4-H5'})}).catch(()=>{});
-  // #endregion
   if (!event.data) return;
 
   let data;
@@ -156,9 +144,6 @@ self.addEventListener('push', (event) => {
     data = event.data.json();
   } catch (e) {
     console.error('Erro ao processar notificação push:', e);
-    // #region agent log
-    fetch('http://127.0.0.1:7755/ingest/d33e14d9-8b7f-451e-8c44-954461d3c7f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'aff3bf'},body:JSON.stringify({sessionId:'aff3bf',location:'sw.js:push',message:'push_parse_error',data:{error:String(e)},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
-    // #endregion
     return;
   }
 
@@ -194,15 +179,7 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification(notificationTitle, showOptions).then(() => {
-      // #region agent log
-      fetch('http://127.0.0.1:7755/ingest/d33e14d9-8b7f-451e-8c44-954461d3c7f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'aff3bf'},body:JSON.stringify({sessionId:'aff3bf',location:'sw.js:push',message:'notification_shown',data:{title:notificationTitle},timestamp:Date.now(),hypothesisId:'H5',runId:'post-fix'})}).catch(()=>{});
-      // #endregion
-    }).catch((err) => {
-      // #region agent log
-      fetch('http://127.0.0.1:7755/ingest/d33e14d9-8b7f-451e-8c44-954461d3c7f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'aff3bf'},body:JSON.stringify({sessionId:'aff3bf',location:'sw.js:push',message:'notification_show_failed',data:{error:String(err)},timestamp:Date.now(),hypothesisId:'H5',runId:'post-fix'})}).catch(()=>{});
-      // #endregion
-    })
+    self.registration.showNotification(notificationTitle, showOptions)
   );
 });
 
