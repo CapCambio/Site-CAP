@@ -9,6 +9,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import session from 'express-session';
+import { createClient } from 'redis';
+import RedisStore from 'connect-redis';
 
 // Importar refreshCurrencies para usar no timer
 import { refreshCurrencies } from "./routes";
@@ -42,13 +44,32 @@ if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
   console.warn('⚠️ SESSION_SECRET não definido em produção. Usando valor padrão (não recomendado para produção).');
 }
 
+// Configurar Redis para sessões
+let redisClient;
+let sessionStore;
+
+if (process.env.REDIS_URL) {
+  redisClient = createClient({ url: process.env.REDIS_URL });
+  redisClient.connect().catch(err => {
+    console.error('Erro ao conectar ao Redis:', err);
+  });
+  
+  sessionStore = new RedisStore({ client: redisClient });
+  console.log('✅ Redis configurado para sessões');
+} else {
+  console.warn('⚠️ REDIS_URL não definido. Usando MemoryStore (não recomendado para produção).');
+}
+
 // Configuração de sessão
 app.use(session({
+  store: sessionStore,
   secret: sessionSecret || 'fallback-secret-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24 horas
   }
 }));
