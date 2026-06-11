@@ -217,8 +217,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Verificar se é usuário autorizado usando banco de dados
       const authorizedEmails = await db.getAuthorizedEmails();
-      const regularUser = authorizedEmails.find((user: string) => 
-        user === emailLower
+      const regularUser = authorizedEmails.find((user: db.User) => 
+        user.email === emailLower
       );
 
       const isAdminEmail = !!adminUser;
@@ -966,10 +966,10 @@ app.get("/api/currencies", async (req, res) => {
           isAdmin: true,
           name: admin.name
         })),
-        ...authorizedEmails.map((email: string) => ({
-          email: email,
+        ...authorizedEmails.map((user: db.User) => ({
+          email: user.email,
           isAdmin: false,
-          name: undefined
+          name: user.name
         }))
       ];
 
