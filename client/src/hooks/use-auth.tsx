@@ -51,9 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        if (data.language && data.language !== i18n.language) {
+        if (data.language) {
+          // Sempre atualizar o idioma com o valor do servidor
           i18n.changeLanguage(data.language);
-          console.log(`🌐 Idioma carregado: ${data.language}`);
+          localStorage.setItem('preferred_language', data.language);
+          console.log(`🌐 Idioma carregado do servidor: ${data.language}`);
         }
       }
     } catch (error) {

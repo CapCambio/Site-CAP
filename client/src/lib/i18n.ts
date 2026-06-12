@@ -14,14 +14,6 @@ const resources = {
   fr: { translation: fr },
 };
 
-// Debug: log resources
-console.log('i18n resources loaded:', {
-  en: en.header?.alerts,
-  pt: pt.header?.alerts,
-  es: es.header?.alerts,
-  fr: fr.header?.alerts
-});
-
 // Tentar recuperar idioma salvo no localStorage
 const savedLanguage = localStorage.getItem('preferred_language');
 
