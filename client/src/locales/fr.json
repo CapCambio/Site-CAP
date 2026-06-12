@@ -45,7 +45,7 @@
   "header": {
     "title": "CAP Cotations",
     "settings": "Paramètres",
-    "alerts": "Alertes",
+    "alerts": "Mes Alertes",
     "adminPanel": "Gestion",
     "logout": "Déconnexion",
     "welcome": "Bienvenue, {{name}}",

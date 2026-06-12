@@ -45,7 +45,7 @@
   "header": {
     "title": "CAP Quotes",
     "settings": "Settings",
-    "alerts": "Alerts",
+    "alerts": "My Alerts",
     "adminPanel": "Management",
     "logout": "Logout",
     "welcome": "Welcome, {{name}}",

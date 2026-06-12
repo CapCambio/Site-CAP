@@ -45,7 +45,7 @@
   "header": {
     "title": "CAP Cotizaciones",
     "settings": "Configuración",
-    "alerts": "Alertas",
+    "alerts": "Mis Alertas",
     "adminPanel": "Gestión",
     "logout": "Cerrar sesión",
     "welcome": "Bienvenido, {{name}}",
