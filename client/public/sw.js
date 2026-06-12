@@ -1,55 +1,165 @@
-// Service Worker integrado com Workbox
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
+// Service Worker simplificado para cache e push notifications
 
-// Configuração do Workbox
-workbox.routing.registerRoute(
-  ({ request }) => request.destination === 'image',
-  new workbox.strategies.CacheFirst({
-    cacheName: 'images',
-    plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 60,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 dias
-      }),
-    ],
-  })
-);
+const CACHE_NAME = 'cap-cotacoes-v4';
+const OFFLINE_PAGE = '/offline.html';
 
-workbox.routing.registerRoute(
-  ({ request }) => request.destination === 'script' || request.destination === 'style',
-  new workbox.strategies.StaleWhileRevalidate({
-    cacheName: 'static-resources',
-  })
-);
+// Adiciona uma mensagem para debug
+console.log('[Service Worker] Iniciando...');
 
-// Notificações push — delegar para o mesmo comportamento do SW principal (public/sw.js via /sw.js)
-self.addEventListener('push', function(event) {
+// Instalação do Service Worker
+self.addEventListener('install', (event) => {
+  console.log('[Service Worker] Instalando...');
+  
+  // Pular a fase de espera para ativação imediata
+  self.skipWaiting();
+  
+  // Pré-cache de recursos essenciais apenas
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('[Service Worker] Cache aberto');
+        // Não fazer cache.addAll para evitar problemas de tela preta
+        // O cache será preenchido dinamicamente conforme os recursos forem acessados
+      })
+  );
+});
+
+// Ativação do Service Worker
+self.addEventListener('activate', (event) => {
+  console.log('[Service Worker] Ativado');
+  
+  // Limpar caches antigos
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      console.log('[Service Worker] Caches encontrados:', cacheNames);
+      return Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => {
+            console.log('[Service Worker] Removendo cache antigo:', name);
+            return caches.delete(name);
+          })
+      );
+    }).then(() => {
+      console.log('[Service Worker] Ativado e pronto para controlar clientes');
+      return self.clients.claim();
+    })
+  );
+});
+
+// Estratégia de cache: Network First, fallback para cache
+self.addEventListener('fetch', (event) => {
+  // Ignorar requisições que não são GET
+  if (event.request.method !== 'GET') return;
+  
+  // Ignorar requisições de extensões do navegador
+  if (event.request.url.startsWith('chrome-extension://') || 
+      event.request.url.includes('extension') || 
+      !(event.request.url.startsWith('http'))) {
+    return;
+  }
+  
+  // Ignorar requisições de analytics
+  if (event.request.url.includes('google-analytics') || 
+      event.request.url.includes('analytics')) {
+    return;
+  }
+  
+  // Para requisições de API, usar estratégia Network First sem cache
+  if (event.request.url.includes('/api/')) {
+    event.respondWith(
+      fetch(event.request, { credentials: 'include' })
+        .catch(() => {
+          return new Response(JSON.stringify({ error: 'Offline' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        })
+    );
+    return;
+  }
+  
+  // Para recursos estáticos, usar Network First com fallback para cache
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        // Se a resposta é válida, armazena em cache
+        if (response && response.status === 200) {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+        }
+        return response;
+      })
+      .catch(() => {
+        // Se falhar, tenta buscar no cache
+        return caches.match(event.request)
+          .then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            // Se for uma navegação, retorna a página offline
+            if (event.request.mode === 'navigate') {
+              return caches.match(OFFLINE_PAGE);
+            }
+            return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+          });
+      })
+  );
+});
+
+// Gerenciamento de notificações push
+self.addEventListener('push', (event) => {
   if (!event.data) return;
+
   let data;
   try {
     data = event.data.json();
   } catch (e) {
-    console.error('[SW client/public] Erro ao processar push:', e);
+    console.error('Erro ao processar notificação push:', e);
     return;
   }
-  const title = data.title || '💰 Alerta de cotações';
+
+  // Formata o título e corpo da notificação
+  const notificationTitle = data.title || '💰 Atualização de Cotações';
+  const notificationBody = data.body || 'Confira as melhores taxas de câmbio disponíveis agora mesmo!';
+
   const options = {
-    body: data.body || '',
+    body: notificationBody,
     icon: data.icon || '/optimized/favicon-32x32.webp',
     badge: data.badge || '/optimized/favicon-32x32.webp',
+    image: data.image,
+    vibrate: [100, 50, 100],
+    requireInteraction: false,
     data: {
       url: data.data?.url || '/',
-      actionUrl: data.data?.actionUrl || 'https://capcambio.com.br/cotacoes',
+      actionUrl: data.data?.actionUrl || 'https://capcambio.com.br/cotacoes'
     },
+    actions: data.actions || [
+      {
+        action: 'view-quotes',
+        title: 'Ver Cotações',
+        icon: '/optimized/favicon-32x32.webp'
+      }
+    ]
+  };
+
+  const showOptions = {
+    ...options,
     tag: 'cap-cotacao-alert',
     renotify: true,
     requireInteraction: true,
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+
+  event.waitUntil(
+    self.registration.showNotification(notificationTitle, showOptions)
+  );
 });
 
-// Lidar com cliques nas notificações
-self.addEventListener('notificationclick', function(event) {
+// Manipulação de cliques nas notificações
+self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
   // Sempre redireciona para a página de cotações, independentemente de onde clicou
@@ -73,17 +183,28 @@ self.addEventListener('notificationclick', function(event) {
   );
 });
 
-// Workbox: precache dos assets essenciais
-workbox.precaching.precacheAndRoute([
-  { url: '/', revision: '1' },
-  { url: '/offline.html', revision: '1' },
-  { url: '/favicon.ico', revision: '1' }
-]);
-
-// Workbox: offline fallback
-workbox.routing.setCatchHandler(({ event }) => {
-  if (event.request.destination === 'document') {
-    return workbox.precaching.match('/offline.html');
+// Atualização em segundo plano
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'update-rates') {
+    console.log('[Service Worker] Sincronização de cotações em segundo plano');
+    // Aqui você pode adicionar lógica para sincronização em segundo plano
   }
-  return Response.error();
+});
+
+// Limpar cache quando solicitado
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.action === 'clear-cache') {
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          return caches.delete(cacheName);
+        })
+      );
+    }).then(() => {
+      // Recarregar a página após limpar o cache
+      self.clients.matchAll().then(clients => {
+        clients.forEach(client => client.postMessage({ action: 'reload' }));
+      });
+    });
+  }
 });
