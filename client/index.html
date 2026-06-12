@@ -65,6 +65,8 @@
     <!-- Preload de recursos críticos -->
     
     <!-- Configuração para instalação do PWA -->
+    <!-- Service Worker desativado temporariamente para debug -->
+    <!--
     <script>
       // Função para registrar o service worker
       const registerServiceWorker = async () => {
@@ -137,6 +139,7 @@
         }
       });
     </script>
+    -->
     
     <!-- Pré-carregar recursos críticos -->
     <link rel="preload" href="/optimized/favicon-32x32.webp" as="image" type="image/webp" fetchpriority="high">
@@ -145,6 +148,7 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script src="/sw-register.js"></script>
+    <!-- Service Worker desativado temporariamente para debug -->
+    <!-- <script src="/sw-register.js"></script> -->
   </body>
 </html>
