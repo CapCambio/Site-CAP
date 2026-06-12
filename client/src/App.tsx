@@ -8,6 +8,7 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { lazyWithRetry, LazyLoad } from "@/components/lazy-load";
 import { useServiceWorker } from "@/hooks/useServiceWorker";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import './lib/i18n';
 
 // Lazy load pages com tratamento de erro e retry
@@ -48,6 +49,7 @@ function AppContent() {
         </Switch>
       </LazyLoad>
       <Toaster />
+      <PWAInstallPrompt />
     </div>
   );
 }
