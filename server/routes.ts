@@ -253,6 +253,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (isAdminEmail) {
         userName = adminUser.name || 'CAP Câmbio';
+      } else if (regularUser) {
+        userName = regularUser.name || emailLower.split('@')[0];
       } else {
         userName = emailLower.split('@')[0];
       }

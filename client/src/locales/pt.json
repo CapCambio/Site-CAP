@@ -45,7 +45,7 @@
   "header": {
     "title": "CAP Cotações",
     "settings": "Configurações",
-    "alerts": "Alertas",
+    "alerts": "Meus Alertas",
     "adminPanel": "Gerenciamento",
     "logout": "Sair",
     "welcome": "Bem-vindo, {{name}}",
