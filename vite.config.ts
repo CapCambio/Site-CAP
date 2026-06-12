@@ -11,7 +11,19 @@ export default defineConfig({
     // Configuração do PWA e Service Worker
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: [
+        'favicon.ico',
+        'apple-touch-icon.png',
+        'masked-icon.svg',
+        'optimized/android-chrome-192x192.webp',
+        'optimized/android-chrome-512x512.webp',
+        'optimized/apple-touch-icon.webp',
+        'optimized/favicon-16x16.webp',
+        'optimized/favicon-32x32.webp',
+        'optimized/favicon-64x64.webp',
+        'optimized/favicon.webp',
+        'optimized/cap-logo-fundo-optimized.webp'
+      ],
       manifest: {
         name: 'CAP Cotações',
         short_name: 'CAP Cotações',
@@ -20,6 +32,7 @@ export default defineConfig({
         background_color: '#000000',
         display: 'standalone',
         start_url: '/',
+        orientation: 'portrait',
         icons: [
           {
             src: '/optimized/android-chrome-192x192.webp',
