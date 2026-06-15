@@ -9,9 +9,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { authService } from './auth/AuthService';
 import { authenticate, requireAdmin, optionalAuth } from './auth/AuthMiddleware';
-import { sessionRegistry } from './auth/SessionRegistry';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
 import * as db from './db';
+
+// Map em memória para controle de sessões ativas (email -> sessionId)
+const activeSessions = new Map<string, string>();
+
+// Exportar para uso no AuthMiddleware
+(global as any).activeSessions = activeSessions;
 
 // Interface para tipar os administradores
 interface AdminUser {
@@ -261,18 +266,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("User name resolved to:", userName);
 
-      // Usuários comuns: primeira sessão prevalece — bloqueia novo login se já houver sessão ativa
+      // Usuários comuns: verificar se já existe sessão ativa em outro dispositivo
       if (!isAdminEmail) {
-        const canLogin = await sessionRegistry.canLogin(
-          emailLower,
-          req.sessionStore,
-          req.sessionID
-        );
-        if (!canLogin) {
+        const activeSessionId = activeSessions.get(emailLower);
+        if (activeSessionId && activeSessionId !== req.sessionID) {
           return res.status(409).json({
-            error: 'SESSION_ALREADY_ACTIVE',
-            message:
-              'Não foi possível entrar. Já existe uma sessão ativa com este usuário no momento.',
+            error: 'Já existe uma sessão ativa em outro dispositivo'
           });
         }
       }
@@ -295,8 +294,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.session.save((err) => (err ? reject(err) : resolve()));
       });
 
+      // Registrar nova sessão no Map (apenas para usuários regulares)
       if (!isAdminEmail) {
-        sessionRegistry.setActive(emailLower, req.sessionID);
+        activeSessions.set(emailLower, req.sessionID);
       }
 
       return res.json({
@@ -316,66 +316,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ user: req.user });
   });
 
-  app.post("/api/auth/heartbeat", authenticate, (req, res) => {
-    try {
-      const email = req.user?.email;
-      const sessionId = req.sessionID;
-      console.log(`Heartbeat recebido - Email: ${email}, SessionID: ${sessionId}`);
-      if (email) {
-        sessionRegistry.touchHeartbeat(email, sessionId);
-      }
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Erro no heartbeat:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
-    }
-  });
-
-  app.post("/api/auth/release-stale", async (req, res) => {
-    try {
-      const { email, orphan } = req.body;
-      if (!email || typeof email !== 'string') {
-        return res.status(400).json({ error: 'Email é obrigatório' });
-      }
-
-      const emailLower = email.toLowerCase();
-      const released = orphan === true
-        ? await sessionRegistry.releaseOrphan(
-            emailLower,
-            req.sessionStore,
-            req.sessionID
-          )
-        : await sessionRegistry.tryReleaseStale(
-            emailLower,
-            req.sessionStore,
-            req.sessionID
-          );
-
-      res.json({
-        released,
-        message: released
-          ? 'Sessão anterior liberada'
-          : 'Ainda existe uma sessão ativa em outro dispositivo',
-      });
-    } catch (error) {
-      console.error('Erro ao liberar sessão:', error);
-      res.status(500).json({ error: 'Erro interno do servidor' });
-    }
-  });
-
   app.post("/api/auth/logout", (req, res) => {
     const email = req.session?.user?.email;
     const isAdmin = req.session?.user?.isAdmin;
     const sessionId = req.sessionID;
 
+    // Remover sessão do Map (apenas para usuários regulares)
+    if (email && !isAdmin) {
+      activeSessions.delete(email);
+    }
+
     req.session.destroy((err) => {
       if (err) {
         console.error('Erro ao destruir sessão:', err);
         return res.status(500).json({ error: 'Erro ao fazer logout' });
-      }
-
-      if (email && !isAdmin) {
-        sessionRegistry.release(email, sessionId);
       }
 
       res.json({ message: 'Logout realizado com sucesso' });

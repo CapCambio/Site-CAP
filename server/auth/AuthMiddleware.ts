@@ -3,7 +3,6 @@
  */
 import { Request, Response, NextFunction } from 'express';
 import { authService, User } from './AuthService';
-import { sessionRegistry } from './SessionRegistry';
 
 // Interface para estender Request
 declare global {
@@ -13,6 +12,10 @@ declare global {
     }
   }
 }
+
+// Map em memória para controle de sessões ativas (email -> sessionId)
+// Importado do routes.ts para evitar dependência circular
+declare const activeSessions: Map<string, string>;
 
 /**
  * Middleware de autenticação
@@ -26,8 +29,13 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
       return;
     }
 
+    // Verificar se a sessão ainda é válida (apenas para usuários regulares)
     if (!sessionUser.isAdmin) {
-      sessionRegistry.touchActivity(sessionUser.email, req.sessionID);
+      const activeSessionId = (global as any).activeSessions?.get(sessionUser.email);
+      if (activeSessionId && activeSessionId !== req.sessionID) {
+        res.status(401).json({ error: 'Sessão encerrada em outro dispositivo' });
+        return;
+      }
     }
 
     req.user = sessionUser;

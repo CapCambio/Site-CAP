@@ -140,42 +140,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Heartbeat desativado para reduzir egress
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   console.log('Iniciando heartbeat para:', user.email);
-
-  //   const sendHeartbeat = async () => {
-  //     try {
-  //       console.log('Enviando heartbeat...');
-  //       const response = await fetch('/api/auth/heartbeat', {
-  //         method: 'POST',
-  //         credentials: 'include',
-  //       });
-  //       console.log('Heartbeat enviado com sucesso:', response.status);
-  //     } catch (error) {
-  //       console.error('Erro ao enviar heartbeat:', error);
-  //     }
-  //   };
-
-  //   // Aguardar 2 segundos antes de iniciar o heartbeat para garantir que a sessão esteja estabelecida
-  //   const timeout = setTimeout(() => {
-  //     sendHeartbeat();
-  //     const interval = setInterval(sendHeartbeat, 300000); // 5 minutos para reduzir egress
-
-  //     return () => {
-  //       console.log('Parando heartbeat para:', user.email);
-  //       clearInterval(interval);
-  //     };
-  //   }, 2000);
-
-  //   return () => {
-  //     console.log('Limpando heartbeat para:', user.email);
-  //     clearTimeout(timeout);
-  //   };
-  // }, [user]);
-
   // Função de login
   const login = async (email: string, password?: string) => {
     setIsLoading(true);
