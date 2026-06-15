@@ -45,5 +45,16 @@
   "prefer_related_applications": false,
   "related_applications": [],
   "scope": "/",
-  "splash_pages": null
+  "splash_screen": {
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "icons": [
+      {
+        "src": "/optimized/android-chrome-512x512.webp",
+        "sizes": "512x512",
+        "type": "image/webp",
+        "purpose": "any maskable"
+      }
+    ]
+  }
 }
