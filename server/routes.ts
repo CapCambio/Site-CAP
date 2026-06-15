@@ -633,29 +633,26 @@ app.get("/api/currencies", async (req, res) => {
   // Configuração de atualização automática a cada minuto
   const server = createServer(app);
 
-  // Limpeza inicial do histórico antigo
+  // Limpeza inicial do histórico antigo (manter apenas 30 dias)
   try {
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const deletedCount = await jsonStorage.cleanupOldHistory(oneYearAgo);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const deletedCount = await db.deleteCurrencyHistoryOlderThan(thirtyDaysAgo);
     if (deletedCount > 0) {
-      console.log(`🗑️ Limpeza inicial: ${deletedCount} registros antigos removidos.`);
+      console.log(`🗑️ Limpeza inicial: ${deletedCount} registros antigos removidos (mais de 30 dias).`);
     }
   } catch (error) {
     console.error("Erro na limpeza inicial do histórico:", error);
   }
 
-  // Configurar limpeza automática do histórico a cada 24 horas
+  // Configurar limpeza automática do histórico a cada 24 horas (manter apenas 30 dias)
   setInterval(async () => {
-    console.log('🧹 Executando limpeza automática do histórico...');
     try {
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-      const deletedCount = await jsonStorage.cleanupOldHistory(oneYearAgo);
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const deletedCount = await db.deleteCurrencyHistoryOlderThan(thirtyDaysAgo);
       if (deletedCount > 0) {
-        console.log(`🗑️ Limpeza automática: ${deletedCount} registros antigos removidos.`);
-      } else {
-        console.log('✅ Nenhum registro antigo encontrado para remoção.');
+        console.log(`🗑️ Limpeza automática: ${deletedCount} registros antigos removidos (mais de 30 dias).`);
       }
     } catch (error) {
       console.error("Erro na limpeza automática do histórico:", error);
@@ -1274,11 +1271,11 @@ export async function refreshCurrencies() {
     }
 
     for (const currency of updatedCurrencies) {
-      // Verifica se houve mudança real na cotação
-      const lastHistory = await db.getCurrencyHistory(currency.code, undefined, undefined, 1);
-      let isNewPrice = !lastHistory || lastHistory.length === 0 ||
-                      lastHistory[0].sell_price !== currency.sellPrice || 
-                      lastHistory[0].buy_price !== currency.buyPrice;
+      // Verifica se houve mudança real na cotação comparando com a última moeda salva
+      const existingCurrency = currentCurrencies.find(c => c.code === currency.code);
+      let isNewPrice = !existingCurrency || 
+                      existingCurrency.sellPrice !== currency.sellPrice || 
+                      existingCurrency.buyPrice !== currency.buyPrice;
 
       
       // Calcula variação baseada no último preço do dia anterior
@@ -1321,7 +1318,7 @@ export async function refreshCurrencies() {
         lastUpdate: now.toISOString()
       });
 
-      // Adiciona ao histórico sempre que o preço mudou (respeitando a verificação por hash)
+      // Adiciona ao histórico sempre que o preço mudou
       if (isNewPrice && currency.code) {
         const history: InsertCurrencyHistory = {
           code: currency.code,
