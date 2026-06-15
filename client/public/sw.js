@@ -1,6 +1,6 @@
 // Service Worker simplificado para cache e push notifications
 
-const CACHE_NAME = 'cap-cotacoes-v4';
+const CACHE_NAME = 'cap-cotacoes-v5';
 const OFFLINE_PAGE = '/offline.html';
 
 // Adiciona uma mensagem para debug
@@ -13,13 +13,20 @@ self.addEventListener('install', (event) => {
   // Pular a fase de espera para ativação imediata
   self.skipWaiting();
   
-  // Pré-cache de recursos essenciais apenas
+  // Pré-cache de recursos essenciais
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('[Service Worker] Cache aberto');
-        // Não fazer cache.addAll para evitar problemas de tela preta
-        // O cache será preenchido dinamicamente conforme os recursos forem acessados
+        // Pré-cache do splash screen e vídeo
+        return cache.addAll([
+          '/splash-video.html',
+          '/splash.mp4'
+        ]).then(() => {
+          console.log('[Service Worker] Splash screen e vídeo cacheados');
+        }).catch(err => {
+          console.log('[Service Worker] Erro ao cachear splash:', err);
+        });
       })
   );
 });
