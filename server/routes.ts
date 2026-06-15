@@ -266,6 +266,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("User name resolved to:", userName);
 
+      // Definir dados da sessão
+      req.session.user = {
+        email: emailLower,
+        name: userName,
+        isAdmin: isAdminEmail
+      };
+
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => (err ? reject(err) : resolve()));
+      });
+
       // Usuários comuns: verificar se já existe sessão ativa em outro dispositivo
       if (!isAdminEmail) {
         const activeSessionId = activeSessions.get(emailLower);
@@ -282,17 +293,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         console.error("Erro ao atualizar último acesso:", error);
       }
-
-      // Definir dados da sessão
-      req.session.user = {
-        email: emailLower,
-        name: userName,
-        isAdmin: isAdminEmail
-      };
-
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => (err ? reject(err) : resolve()));
-      });
 
       // Registrar nova sessão no Map (apenas para usuários regulares)
       if (!isAdminEmail) {
