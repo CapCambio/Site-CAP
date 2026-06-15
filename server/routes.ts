@@ -633,26 +633,26 @@ app.get("/api/currencies", async (req, res) => {
   // Configuração de atualização automática a cada minuto
   const server = createServer(app);
 
-  // Limpeza inicial do histórico antigo (manter apenas 30 dias)
+  // Limpeza inicial do histórico antigo (manter apenas 1 ano)
   try {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const deletedCount = await db.deleteCurrencyHistoryOlderThan(thirtyDaysAgo);
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const deletedCount = await db.deleteCurrencyHistoryOlderThan(oneYearAgo);
     if (deletedCount > 0) {
-      console.log(`🗑️ Limpeza inicial: ${deletedCount} registros antigos removidos (mais de 30 dias).`);
+      console.log(`🗑️ Limpeza inicial: ${deletedCount} registros antigos removidos (mais de 1 ano).`);
     }
   } catch (error) {
     console.error("Erro na limpeza inicial do histórico:", error);
   }
 
-  // Configurar limpeza automática do histórico a cada 24 horas (manter apenas 30 dias)
+  // Configurar limpeza automática do histórico a cada 24 horas (manter apenas 1 ano)
   setInterval(async () => {
     try {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const deletedCount = await db.deleteCurrencyHistoryOlderThan(thirtyDaysAgo);
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const deletedCount = await db.deleteCurrencyHistoryOlderThan(oneYearAgo);
       if (deletedCount > 0) {
-        console.log(`🗑️ Limpeza automática: ${deletedCount} registros antigos removidos (mais de 30 dias).`);
+        console.log(`🗑️ Limpeza automática: ${deletedCount} registros antigos removidos (mais de 1 ano).`);
       }
     } catch (error) {
       console.error("Erro na limpeza automática do histórico:", error);
