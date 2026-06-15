@@ -162,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Aguardar 2 segundos antes de iniciar o heartbeat para garantir que a sessão esteja estabelecida
     const timeout = setTimeout(() => {
       sendHeartbeat();
-      const interval = setInterval(sendHeartbeat, 15000);
+      const interval = setInterval(sendHeartbeat, 300000); // 5 minutos para reduzir egress
 
       return () => {
         console.log('Parando heartbeat para:', user.email);

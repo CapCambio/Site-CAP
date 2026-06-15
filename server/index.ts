@@ -148,7 +148,7 @@ app.use((req, res, next) => {
   log("✅ Sistema de alertas ativado (verificação no momento da atualização)");
   
   // Timer para verificar cotações periodicamente (independente de acesso à página)
-  const CHECK_INTERVAL_MINUTES = 1; // Verificar a cada 1 minuto
+  const CHECK_INTERVAL_MINUTES = 5; // Verificar a cada 5 minutos para reduzir egress
   log(`⏰ Iniciando verificação automática de cotações a cada ${CHECK_INTERVAL_MINUTES} minutos`);
   
   // Verificação inicial
