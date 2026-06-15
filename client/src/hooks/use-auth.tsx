@@ -158,10 +158,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (response.status === 401 && data.error?.includes('Senha incorreta')) {
           throw new Error('Senha incorreta');
         }
-        if (response.status === 409 && data.error === 'SESSION_ALREADY_ACTIVE') {
+        if (response.status === 409) {
           throw new Error('SESSION_ALREADY_ACTIVE');
         }
-        return;
+        throw new Error(data.error || 'Erro ao fazer login');
       }
 
       // Login bem-sucedido
