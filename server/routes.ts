@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { scrapeCurrencyData, updateCurrenciesWithScrapedData } from "./scraper";
+import { scrapeCurrencyData, updateCurrenciesWithScrapedData, hasContentChanged } from "./scraper";
 import { InsertCurrencyHistory } from "../shared/schema";
 import { jsonStorage } from "./json-storage";
 import { alertSystem } from "./init-alert-system";
@@ -64,6 +64,13 @@ interface Alert {
 let currenciesCache: any[] = [];
 let currenciesCacheTime = 0;
 const CURRENCIES_CACHE_TTL = 30 * 1000; // 30 segundos
+
+// Cache em memória para histórico do dia anterior (reduz queries ao banco)
+let yesterdayCache = new Map<string, number>(); // code -> lastSellPrice
+let yesterdayCacheDate = '';
+
+// Cache em memória para hash do conteúdo (evita scraping quando conteúdo não mudou)
+let lastContentHash = '';
 
 // Get current directory for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -1194,6 +1201,13 @@ app.get("/api/currencies", async (req, res) => {
 // Função para atualizar as moedas (usada tanto no endpoint quanto no timer)
 export async function refreshCurrencies() {
   try {
+    // OTIMIZAÇÃO 3: Verificar hash do conteúdo antes de fazer scraping
+    const { changed } = await hasContentChanged();
+    if (!changed) {
+      console.log('✅ Conteúdo não mudou, encerrando refreshCurrencies() sem operações no banco');
+      return [];
+    }
+    
     const scrapedData = await scrapeCurrencyData();
     const currentCurrencies = await jsonStorage.getAllCurrencies();
     const updatedCurrencies = updateCurrenciesWithScrapedData(currentCurrencies, scrapedData);
@@ -1203,6 +1217,52 @@ export async function refreshCurrencies() {
     // Invalidar cache de moedas
     currenciesCache = [];
     currenciesCacheTime = 0;
+    
+    // OTIMIZAÇÃO 2: Cachear histórico do dia anterior em memória
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (yesterdayCacheDate !== todayStr) {
+      console.log('🔄 Atualizando cache de histórico do dia anterior...');
+      yesterdayCache = new Map();
+      yesterdayCacheDate = todayStr;
+      
+      // Buscar histórico do dia anterior para todas as moedas
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const dayBeforeYesterday = new Date(yesterday);
+      dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
+      
+      // Buscar histórico para todas as moedas de uma vez
+      const allHistory = await db.getCurrencyHistory(undefined, dayBeforeYesterday, today);
+      
+      // Processar e cachear o último preço de cada moeda do dia anterior
+      const historyByCode = new Map<string, any[]>();
+      allHistory.forEach((record: any) => {
+        if (!historyByCode.has(record.code)) {
+          historyByCode.set(record.code, []);
+        }
+        historyByCode.get(record.code)!.push(record);
+      });
+      
+      // Para cada moeda, pegar o último preço do dia anterior
+      for (const [code, records] of Array.from(historyByCode.entries())) {
+        const sortedRecords = records
+          .filter((record: { timestamp: string | Date }) => {
+            const recordDate = new Date(record.timestamp);
+            return recordDate >= dayBeforeYesterday && recordDate < today;
+          })
+          .sort((a: { timestamp: string | Date }, b: { timestamp: string | Date }) => 
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          );
+        
+        if (sortedRecords.length > 0) {
+          yesterdayCache.set(code, sortedRecords[0].sell_price);
+        }
+      }
+      
+      console.log(`✅ Cache de histórico atualizado com ${yesterdayCache.size} moedas`);
+    }
     
     // NOVO: Acumular todos os alertas antes de enviar
     const allAlertsByEmail = new Map<string, Array<{
@@ -1232,45 +1292,27 @@ export async function refreshCurrencies() {
                       existingCurrency.buyPrice !== currency.buyPrice;
 
       
-      // Calcula variação baseada no último preço do dia anterior
+      // Calcula variação baseada no último preço do dia anterior (usando cache em memória)
       let change = 0;
       
-      // Definir datas para cálculo de variação
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      // Buscar último preço do dia anterior
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      const dayBeforeYesterday = new Date(yesterday);
-      dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
-      
-      const yesterdayHistory = await db.getCurrencyHistory(currency.code, dayBeforeYesterday, today);
-      const yesterdayRecords = yesterdayHistory
-        .filter((record: { timestamp: string | Date }) => {
-          const recordDate = new Date(record.timestamp);
-          return recordDate >= dayBeforeYesterday && recordDate < today;
-        })
-        .sort((a: { timestamp: string | Date }, b: { timestamp: string | Date }) => 
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        ); // Mais recente primeiro
-      
-      if (yesterdayRecords.length > 0) {
-        // Usar o último preço registrado do dia anterior
-        const lastPriceYesterday = yesterdayRecords[0].sell_price;
+      // OTIMIZAÇÃO 2: Usa cache em memória em vez de query ao banco
+      const lastPriceYesterday = yesterdayCache.get(currency.code);
+      if (lastPriceYesterday) {
         change = ((currency.sellPrice - lastPriceYesterday) / lastPriceYesterday) * 100;
         change = Number(change.toFixed(2));
       } else {
-        // Fallback: se não há dados de ontem, variação = 0
+        // Fallback: se não há dados no cache, variação = 0
         change = 0;
       }
 
-      // Atualiza moeda sempre, mesmo que o preço não tenha mudado, para atualizar a variação
-      const savedCurrency = await jsonStorage.upsertCurrency({
-        ...currency,
-        change,
-        lastUpdate: now.toISOString()
-      });
+      // OTIMIZAÇÃO 1: Só faz upsert quando o preço mudou
+      if (isNewPrice) {
+        const savedCurrency = await jsonStorage.upsertCurrency({
+          ...currency,
+          change,
+          lastUpdate: now.toISOString()
+        });
+      }
 
       // Adiciona ao histórico sempre que o preço mudou
       if (isNewPrice && currency.code) {

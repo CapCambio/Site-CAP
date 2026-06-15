@@ -145,7 +145,7 @@ async function saveCachedData(currencies: ScrapedCurrency[]): Promise<void> {
 /**
  * Verifica se houve mudança no conteúdo da página
  */
-async function hasContentChanged(): Promise<{ changed: boolean; tableContent?: string }> {
+export async function hasContentChanged(): Promise<{ changed: boolean; tableContent?: string }> {
   console.log('Verificando mudanças no conteúdo da página...');
 
   try {
