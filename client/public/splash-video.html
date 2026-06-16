@@ -19,6 +19,23 @@
       height: 100%;
       object-fit: cover;
     }
+    .skip-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+      z-index: 1000;
+    }
+    .skip-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
   </style>
 </head>
 <body>
@@ -30,19 +47,42 @@
     playsinline
     preload="auto"
   ></video>
+  <button class="skip-button" id="skipButton">Pular</button>
 
   <script>
     const video = document.getElementById('splash');
+    const skipButton = document.getElementById('skipButton');
     const redirect = () => window.location.replace('/');
 
-    // Redireciona quando o vídeo terminar
-    video.addEventListener('ended', redirect);
+    // Verifica se o usuário já viu o splash screen
+    const hasSeenSplash = localStorage.getItem('hasSeenSplash');
 
-    // Redireciona se ocorrer erro
-    video.addEventListener('error', redirect);
+    if (hasSeenSplash) {
+      // Se já viu, redireciona imediatamente
+      redirect();
+    } else {
+      // Se não viu, mostra o splash
+      // Redireciona quando o vídeo terminar
+      video.addEventListener('ended', () => {
+        localStorage.setItem('hasSeenSplash', 'true');
+        redirect();
+      });
 
-    // Timeout de segurança: 5 segundos
-    setTimeout(redirect, 5000);
+      // Redireciona se ocorrer erro
+      video.addEventListener('error', redirect);
+
+      // Timeout de segurança: 5 segundos
+      setTimeout(() => {
+        localStorage.setItem('hasSeenSplash', 'true');
+        redirect();
+      }, 5000);
+
+      // Botão de pular
+      skipButton.addEventListener('click', () => {
+        localStorage.setItem('hasSeenSplash', 'true');
+        redirect();
+      });
+    }
   </script>
 </body>
 </html>
