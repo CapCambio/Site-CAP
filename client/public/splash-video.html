@@ -50,39 +50,29 @@
   <button class="skip-button" id="skipButton">Pular</button>
 
   <script>
+    // Verifica se já exibiu a splash nessa sessão
+    if (sessionStorage.getItem('splashShown')) {
+      window.location.replace('/');
+    }
+
     const video = document.getElementById('splash');
     const skipButton = document.getElementById('skipButton');
-    const redirect = () => window.location.replace('/');
+    const redirect = () => {
+      sessionStorage.setItem('splashShown', 'true');
+      window.location.replace('/');
+    };
 
-    // Verifica se o usuário já viu o splash screen
-    const hasSeenSplash = localStorage.getItem('hasSeenSplash');
+    // Redireciona quando o vídeo terminar
+    video.addEventListener('ended', redirect);
 
-    if (hasSeenSplash) {
-      // Se já viu, redireciona imediatamente
-      redirect();
-    } else {
-      // Se não viu, mostra o splash
-      // Redireciona quando o vídeo terminar
-      video.addEventListener('ended', () => {
-        localStorage.setItem('hasSeenSplash', 'true');
-        redirect();
-      });
+    // Redireciona se ocorrer erro
+    video.addEventListener('error', redirect);
 
-      // Redireciona se ocorrer erro
-      video.addEventListener('error', redirect);
+    // Timeout de segurança: 5 segundos
+    setTimeout(redirect, 5000);
 
-      // Timeout de segurança: 5 segundos
-      setTimeout(() => {
-        localStorage.setItem('hasSeenSplash', 'true');
-        redirect();
-      }, 5000);
-
-      // Botão de pular
-      skipButton.addEventListener('click', () => {
-        localStorage.setItem('hasSeenSplash', 'true');
-        redirect();
-      });
-    }
+    // Botão de pular
+    skipButton.addEventListener('click', redirect);
   </script>
 </body>
 </html>
