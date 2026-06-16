@@ -56,7 +56,8 @@ if (process.env.DATABASE_URL) {
   
   sessionStore = new (PgSession(session))({
     pool: pgPool,
-    tableName: 'session'
+    tableName: 'session',
+    disableTouch: true
   });
   console.log('✅ PostgreSQL configurado para sessões');
 } else {
