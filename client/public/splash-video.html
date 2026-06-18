@@ -20,12 +20,16 @@
       object-fit: cover;
     }
     @media (min-width: 768px) {
+      body {
+        background: #000000;
+      }
       video {
-        width: 800px;
-        height: 450px;
-        max-width: 90vw;
-        max-height: 90vh;
+        width: auto;
+        height: auto;
+        max-width: 60vw;
+        max-height: 60vh;
         object-fit: contain;
+        border-radius: 12px;
       }
     }
     .skip-button {
