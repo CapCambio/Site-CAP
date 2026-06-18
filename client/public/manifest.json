@@ -39,6 +39,19 @@
       "purpose": "any"
     }
   ],
+  "screenshots": [
+    {
+      "src": "/screenshots/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png"
+    },
+    {
+      "src": "/screenshots/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
   "categories": ["finance", "utilities"],
   "shortcuts": [
     {
