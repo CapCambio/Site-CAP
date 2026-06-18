@@ -12,13 +12,25 @@
       "src": "/optimized/android-chrome-192x192.webp",
       "sizes": "192x192",
       "type": "image/webp",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/optimized/android-chrome-192x192.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "maskable"
     },
     {
       "src": "/optimized/android-chrome-512x512.webp",
       "sizes": "512x512",
       "type": "image/webp",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/optimized/android-chrome-512x512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "maskable"
     },
     {
       "src": "/optimized/apple-touch-icon.webp",
