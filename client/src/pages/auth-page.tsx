@@ -35,6 +35,8 @@ export default function LoginPage() {
   const [showSessionActiveError, setShowSessionActiveError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [submittedWithValidEmail, setSubmittedWithValidEmail] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,6 +96,27 @@ export default function LoginPage() {
       setSubmittedWithValidEmail(false);
     }
   }, [watchEmail]);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e as any);
+      setShowInstallButton(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const result = await installPrompt.userChoice;
+    if (result.outcome === 'accepted') {
+      setShowInstallButton(false);
+    }
+    setInstallPrompt(null);
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // Resetar estado de submissão
@@ -244,6 +267,16 @@ export default function LoginPage() {
                   t('auth.loginButton')
                 )}
               </Button>
+
+              {showInstallButton && (
+                <Button 
+                  type="button"
+                  onClick={handleInstall}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium mt-2"
+                >
+                  Instalar App
+                </Button>
+              )}
 
               
               {showSessionActiveError && !isAdmin && (
