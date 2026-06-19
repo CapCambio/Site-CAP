@@ -18,14 +18,20 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('[Service Worker] Cache aberto');
-        // Pré-cache do splash screen e vídeo
+        // Pré-cache do manifest, ícones, splash screen e vídeo
         return cache.addAll([
+          '/manifest.json',
+          '/optimized/android-chrome-96x96.png',
+          '/optimized/android-chrome-144x144.png',
+          '/optimized/android-chrome-192x192.png',
+          '/optimized/android-chrome-512x512.png',
+          '/optimized/apple-touch-icon.png',
           '/splash-video.html',
           '/splash.mp4'
         ]).then(() => {
-          console.log('[Service Worker] Splash screen e vídeo cacheados');
+          console.log('[Service Worker] Recursos essenciais cacheados');
         }).catch(err => {
-          console.log('[Service Worker] Erro ao cachear splash:', err);
+          console.log('[Service Worker] Erro ao cachear recursos:', err);
         });
       })
   );
@@ -135,8 +141,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: notificationBody,
-    icon: data.icon || '/optimized/favicon-32x32.webp',
-    badge: data.badge || '/optimized/favicon-32x32.webp',
+    icon: data.icon || '/optimized/android-chrome-192x192.png',
+    badge: data.badge || '/optimized/android-chrome-96x96.png',
     image: data.image,
     vibrate: [100, 50, 100],
     requireInteraction: false,
@@ -148,7 +154,7 @@ self.addEventListener('push', (event) => {
       {
         action: 'view-quotes',
         title: 'Ver Cotações',
-        icon: '/optimized/favicon-32x32.webp'
+        icon: '/optimized/android-chrome-96x96.png'
       }
     ]
   };
