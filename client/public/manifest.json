@@ -2,12 +2,24 @@
   "name": "CAP Cotações",
   "short_name": "CAP Cotações",
   "description": "Acompanhe as cotações de moedas em tempo real",
-  "start_url": "/splash-video.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
+    {
+      "src": "/optimized/android-chrome-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/optimized/android-chrome-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/optimized/android-chrome-192x192.webp",
       "sizes": "192x192",
@@ -78,7 +90,13 @@
         "src": "/optimized/android-chrome-512x512.webp",
         "sizes": "512x512",
         "type": "image/webp",
-        "purpose": "any maskable"
+        "purpose": "any"
+      },
+      {
+        "src": "/optimized/android-chrome-512x512.webp",
+        "sizes": "512x512",
+        "type": "image/webp",
+        "purpose": "maskable"
       }
     ]
   }
