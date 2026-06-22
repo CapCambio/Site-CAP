@@ -8,10 +8,22 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Globe } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { useState, useEffect } from 'react';
 
 export function LanguageSelector() {
   const { i18n } = useTranslation();
   const { user } = useAuth();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const changeLanguage = async (lng: string) => {
     i18n.changeLanguage(lng);
@@ -43,12 +55,21 @@ export function LanguageSelector() {
     fr: 'Français',
   };
 
+  const languageAbbreviations: Record<string, string> = {
+    pt: 'PT',
+    en: 'EN',
+    es: 'ES',
+    fr: 'FR',
+  };
+
+  const displayLanguage = isMobile ? languageAbbreviations[currentLanguage] : languageNames[currentLanguage];
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative text-yellow-400 hover:text-yellow-300 hover:bg-zinc-800 gap-2">
           <Globe className="h-5 w-5" />
-          <span className="text-sm font-medium">{languageNames[currentLanguage] || currentLanguage}</span>
+          <span className="text-sm font-medium">{displayLanguage || currentLanguage}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-700 text-white">
@@ -56,25 +77,25 @@ export function LanguageSelector() {
           onClick={() => changeLanguage('pt')}
           className={currentLanguage === 'pt' ? 'bg-accent hover:bg-accent text-black' : 'hover:bg-zinc-800'}
         >
-          Português
+          {isMobile ? 'PT' : 'Português'}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => changeLanguage('en')}
           className={currentLanguage === 'en' ? 'bg-accent hover:bg-accent text-black' : 'hover:bg-zinc-800'}
         >
-          English
+          {isMobile ? 'EN' : 'English'}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => changeLanguage('es')}
           className={currentLanguage === 'es' ? 'bg-accent hover:bg-accent text-black' : 'hover:bg-zinc-800'}
         >
-          Español
+          {isMobile ? 'ES' : 'Español'}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => changeLanguage('fr')}
           className={currentLanguage === 'fr' ? 'bg-accent hover:bg-accent text-black' : 'hover:bg-zinc-800'}
         >
-          Français
+          {isMobile ? 'FR' : 'Français'}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
