@@ -105,15 +105,8 @@
       
       // Registrar o service worker após o carregamento da página
       window.addEventListener('load', () => {
-        // Verificar se estamos em um contexto seguro (HTTPS ou localhost)
-        const isLocalhost = window.location.hostname === 'localhost' || 
-                          window.location.hostname === '127.0.0.1';
-                          
-        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || isLocalhost)) {
-          registerServiceWorker().catch(console.error);
-        } else {
-          console.log('Service Worker não suportado neste ambiente');
-        }
+        // Service worker desativado temporariamente para corrigir tela preta
+        console.log('Service Worker desativado temporariamente');
       });
       
       // Detecta quando o PWA é instalado
