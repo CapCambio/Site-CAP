@@ -13,7 +13,7 @@ export interface ScrapedCurrency {
 }
 
 // URL da fonte de dados - site real da CTR Câmbio
-const SOURCE_URL = 'http://ctrcambio.com.br/tvcaxias/';
+const SOURCE_URL = 'https://ctrcambio.com.br/tvcaxias/';
 
 // Arquivo para armazenar o último hash
 const HASH_FILE_PATH = path.join(process.cwd(), 'server', 'config', 'last-hash.json');
