@@ -1,6 +1,6 @@
 // Service Worker simplificado para cache e push notifications
 
-const CACHE_NAME = 'cap-cotacoes-v5';
+const CACHE_NAME = 'cap-cotacoes-v6';
 const OFFLINE_PAGE = '/offline.html';
 
 // Adiciona uma mensagem para debug
