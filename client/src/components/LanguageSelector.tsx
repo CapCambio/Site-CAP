@@ -8,10 +8,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Globe } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function LanguageSelector() {
   const { i18n } = useTranslation();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   const changeLanguage = async (lng: string) => {
     i18n.changeLanguage(lng);
@@ -43,12 +45,21 @@ export function LanguageSelector() {
     fr: 'Français',
   };
 
+  const languageShortNames: Record<string, string> = {
+    pt: 'PT',
+    en: 'EN',
+    es: 'ES',
+    fr: 'FR',
+  };
+
+  const displayNames = isMobile ? languageShortNames : languageNames;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative text-yellow-400 hover:text-yellow-300 hover:bg-zinc-800 gap-2">
           <Globe className="h-5 w-5" />
-          <span className="text-sm font-medium">{languageNames[currentLanguage] || currentLanguage}</span>
+          <span className="text-sm font-medium">{displayNames[currentLanguage] || currentLanguage}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-700 text-white">
@@ -56,25 +67,25 @@ export function LanguageSelector() {
           onClick={() => changeLanguage('pt')}
           className={currentLanguage === 'pt' ? 'bg-accent hover:bg-accent text-black' : 'hover:bg-zinc-800'}
         >
-          Português
+          {displayNames.pt}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => changeLanguage('en')}
           className={currentLanguage === 'en' ? 'bg-accent hover:bg-accent text-black' : 'hover:bg-zinc-800'}
         >
-          English
+          {displayNames.en}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => changeLanguage('es')}
           className={currentLanguage === 'es' ? 'bg-accent hover:bg-accent text-black' : 'hover:bg-zinc-800'}
         >
-          Español
+          {displayNames.es}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => changeLanguage('fr')}
           className={currentLanguage === 'fr' ? 'bg-accent hover:bg-accent text-black' : 'hover:bg-zinc-800'}
         >
-          Français
+          {displayNames.fr}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
