@@ -52,6 +52,7 @@ export function LanguageSelector() {
     fr: 'FR',
   };
 
+  // Usar abreviações em telas menores (mobile e tablets)
   const displayNames = isMobile ? languageShortNames : languageNames;
 
   return (
