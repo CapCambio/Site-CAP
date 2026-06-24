@@ -12,8 +12,12 @@ import { authenticate, requireAdmin, optionalAuth } from './auth/AuthMiddleware'
 import monitoringRoutes from './monitoring/MonitoringRoutes';
 import * as db from './db';
 
-// Map em memória para controle de sessões ativas (email -> sessionId)
-const activeSessions = new Map<string, string>();
+// Map em memória para controle de sessões ativas (email -> { sessionId, lastActivity })
+interface ActiveSession {
+  sessionId: string;
+  lastActivity: number;
+}
+const activeSessions = new Map<string, ActiveSession>();
 
 // Exportar para uso no AuthMiddleware
 (global as any).activeSessions = activeSessions;
@@ -286,8 +290,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Usuários comuns: verificar se já existe sessão ativa em outro dispositivo
       if (!isAdminEmail) {
-        const activeSessionId = activeSessions.get(emailLower);
-        if (activeSessionId && activeSessionId !== req.sessionID) {
+        const activeSession = activeSessions.get(emailLower);
+        // Limpar sessões inativas (mais de 30 minutos sem atividade)
+        const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutos
+        const now = Date.now();
+        if (activeSession && (now - activeSession.lastActivity) > SESSION_TIMEOUT) {
+          console.log(`🔓 Sessão inativa removida para ${emailLower}`);
+          activeSessions.delete(emailLower);
+        } else if (activeSession && activeSession.sessionId !== req.sessionID) {
           return res.status(409).json({
             error: 'Já existe uma sessão ativa em outro dispositivo'
           });
@@ -303,7 +313,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Registrar nova sessão no Map (apenas para usuários regulares)
       if (!isAdminEmail) {
-        activeSessions.set(emailLower, req.sessionID);
+        activeSessions.set(emailLower, {
+          sessionId: req.sessionID,
+          lastActivity: Date.now()
+        });
       }
 
       return res.json({
@@ -341,29 +354,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: 'Logout realizado com sucesso' });
     });
-  });
-
-  // Endpoint para liberar sessão presa (sem autenticação)
-  app.post("/api/auth/release-stale", async (req, res) => {
-    try {
-      const { email } = req.body;
-
-      if (!email) {
-        return res.status(400).json({ error: "Email é obrigatório" });
-      }
-
-      const emailLower = email.toLowerCase();
-
-      // Remover sessão do Map
-      activeSessions.delete(emailLower);
-
-      console.log(`🔓 Sessão liberada para ${emailLower}`);
-
-      res.json({ message: 'Sessão liberada com sucesso' });
-    } catch (error) {
-      console.error("Erro ao liberar sessão:", error);
-      res.status(500).json({ error: "Erro ao liberar sessão" });
-    }
   });
 
 // API routes

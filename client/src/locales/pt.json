@@ -34,7 +34,6 @@
     "passwordRequired": "Senha é obrigatória",
     "passwordIncorrect": "Senha incorreta",
     "sessionAlreadyActive": "Já existe alguém logado no sistema utilizando esse email nesse momento. Finalize a outra sessão e tente novamente.",
-    "releaseSession": "Liberar sessão e tentar novamente",
     "loginError": "Você não está autorizado a acessar esta plataforma.",
     "contactAdmin": "Fale com o administrador",
     "emailInvalid": "Informe um endereço de email válido.",

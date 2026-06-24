@@ -34,7 +34,6 @@
     "passwordRequired": "Password is required",
     "passwordIncorrect": "Incorrect password",
     "sessionAlreadyActive": "Sign-in failed. This account already has an active session. Sign out on the other device or wait for the session to expire.",
-    "releaseSession": "Release session and try again",
     "loginError": "You are not authorized to access this platform.",
     "contactAdmin": "Contact the administrator",
     "emailInvalid": "Please enter a valid email address.",

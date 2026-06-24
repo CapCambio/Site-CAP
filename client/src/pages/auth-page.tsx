@@ -246,30 +246,8 @@ export default function LoginPage() {
               </Button>
 
               {showSessionActiveError && !isAdmin && (
-                <div className="mt-4 space-y-2">
-                  <div className="text-red-500 text-sm">
-                    {t('auth.sessionAlreadyActive')}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        await fetch('/api/auth/release-stale', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ email: watchEmail })
-                        });
-                        setShowSessionActiveError(false);
-                        // Tentar login novamente automaticamente
-                        await form.handleSubmit(onSubmit)();
-                      } catch (error) {
-                        console.error('Erro ao liberar sessão:', error);
-                      }
-                    }}
-                    className="w-full text-sm text-yellow-500 underline hover:text-yellow-400"
-                  >
-                    {t('auth.releaseSession')}
-                  </button>
+                <div className="mt-4 text-red-500 text-sm">
+                  {t('auth.sessionAlreadyActive')}
                 </div>
               )}
 

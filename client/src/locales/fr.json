@@ -34,7 +34,6 @@
     "passwordRequired": "Mot de passe est requis",
     "passwordIncorrect": "Mot de passe incorrect",
     "sessionAlreadyActive": "Connexion impossible. Une session est déjà active avec ce compte. Déconnectez-vous sur l'autre appareil ou attendez l'expiration de la session.",
-    "releaseSession": "Libérer la session et réessayer",
     "loginError": "Vous n'êtes pas autorisé à accéder à cette plateforme.",
     "contactAdmin": "Contactez l'administrateur",
     "emailInvalid": "Veuillez entrer une adresse email valide.",
