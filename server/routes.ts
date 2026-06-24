@@ -343,6 +343,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Endpoint para liberar sessão presa (sem autenticação)
+  app.post("/api/auth/release-stale", async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ error: "Email é obrigatório" });
+      }
+
+      const emailLower = email.toLowerCase();
+
+      // Remover sessão do Map
+      activeSessions.delete(emailLower);
+
+      console.log(`🔓 Sessão liberada para ${emailLower}`);
+
+      res.json({ message: 'Sessão liberada com sucesso' });
+    } catch (error) {
+      console.error("Erro ao liberar sessão:", error);
+      res.status(500).json({ error: "Erro ao liberar sessão" });
+    }
+  });
+
 // API routes
 app.get("/api/currencies", async (req, res) => {
   try {
