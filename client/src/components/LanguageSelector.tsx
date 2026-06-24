@@ -63,7 +63,7 @@ export function LanguageSelector() {
           <span className="text-sm font-medium">{displayNames[currentLanguage] || currentLanguage}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-700 text-white">
+      <DropdownMenuContent side="bottom" align="end" className="bg-zinc-900 border-zinc-700 text-white">
         <DropdownMenuItem
           onClick={() => changeLanguage('pt')}
           className={currentLanguage === 'pt' ? 'bg-accent hover:bg-accent text-black' : 'hover:bg-zinc-800'}
