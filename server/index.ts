@@ -9,8 +9,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import session from 'express-session';
-// import pg from 'pg';
-// import PgSession from 'connect-pg-simple';
+import pg from 'pg';
+import PgSession from 'connect-pg-simple';
 
 // Importar refreshCurrencies para usar no timer
 import { refreshCurrencies } from "./routes";
@@ -45,30 +45,31 @@ if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
   console.warn('⚠️ SESSION_SECRET não definido em produção. Usando valor padrão (não recomendado para produção).');
 }
 
-// Configurar PostgreSQL para sessões (TEMPORARIAMENTE DESATIVADO - usando MemoryStore)
-// let sessionStore;
+// Configurar PostgreSQL para sessões
+let sessionStore;
 
-// if (process.env.DATABASE_URL) {
-//   const pgPool = new pg.Pool({
-//     connectionString: process.env.DATABASE_URL,
-//     ssl: { rejectUnauthorized: false }
-//   });
-  
-//   sessionStore = new (PgSession(session))({
-//     pool: pgPool,
-//     tableName: 'session',
-//     disableTouch: true
-//   });
-//   console.log('✅ PostgreSQL configurado para sessões');
-// } else {
-//   console.warn('⚠️ DATABASE_URL não definido. Usando MemoryStore (não recomendado para produção).');
-// }
+if (process.env.DATABASE_URL) {
+  const pgPool = new pg.Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
 
-// Configuração de sessão (MemoryStore temporário)
+  sessionStore = new (PgSession(session))({
+    pool: pgPool,
+    tableName: 'session',
+    disableTouch: true
+  });
+  console.log('✅ PostgreSQL configurado para sessões');
+} else {
+  console.warn('⚠️ DATABASE_URL não definido. Usando MemoryStore (não recomendado para produção).');
+}
+
+// Configuração de sessão
 app.use(session({
   secret: sessionSecret || 'fallback-secret-change-in-production',
   resave: false,
   saveUninitialized: false,
+  store: sessionStore,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
