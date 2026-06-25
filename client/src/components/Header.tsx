@@ -103,7 +103,7 @@ export function Header() {
         <div className="container mx-auto">
           <div className="flex flex-col items-center relative">
             {/* LanguageSelector no canto direito superior */}
-            <div className="absolute top-0 right-3 md:right-6">
+            <div className="absolute top-4 right-3 md:right-6 z-10">
               <LanguageSelector />
             </div>
             <img 
