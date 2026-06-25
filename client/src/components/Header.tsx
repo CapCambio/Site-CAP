@@ -99,9 +99,9 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-[#000000] text-white px-4 py-2 shadow-md mb-2">
+      <header className="bg-[#000000] text-white px-4 shadow-md mb-2">
         <div className="container mx-auto">
-          <div className="flex flex-col items-center relative">
+          <div className="flex flex-col items-center relative pt-4 pb-2">
             {/* LanguageSelector no canto direito superior */}
             <div className="absolute top-4 right-3 md:right-6 z-10">
               <LanguageSelector />
