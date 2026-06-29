@@ -194,6 +194,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await fetch('/api/auth/logout', {
           method: 'POST',
           credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user?.email })
         });
       } catch (error) {
         console.error("Erro ao fazer logout no servidor:", error);

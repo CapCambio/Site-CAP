@@ -291,8 +291,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Usuários comuns: verificar se já existe sessão ativa em outro dispositivo
       if (!isAdminEmail) {
         const activeSession = activeSessions.get(emailLower);
-        // Limpar sessões inativas (mais de 30 minutos sem atividade)
-        const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutos
+        // Limpar sessões inativas (mais de 2 horas sem atividade)
+        const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 horas
         const now = Date.now();
         if (activeSession && (now - activeSession.lastActivity) > SESSION_TIMEOUT) {
           console.log(`🔓 Sessão inativa removida para ${emailLower}`);
@@ -337,13 +337,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/auth/logout", (req, res) => {
-    const email = req.session?.user?.email;
+    const email = req.session?.user?.email || req.body?.email;
     const isAdmin = req.session?.user?.isAdmin;
     const sessionId = req.sessionID;
 
     // Remover sessão do Map (apenas para usuários regulares)
     if (email && !isAdmin) {
       activeSessions.delete(email);
+      console.log(`🔓 Sessão removida do Map para ${email}`);
     }
 
     req.session.destroy((err) => {
