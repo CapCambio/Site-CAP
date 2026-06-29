@@ -290,17 +290,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Usuários comuns: verificar se já existe sessão ativa em outro dispositivo
       if (!isAdminEmail) {
+        const HEARTBEAT_TIMEOUT = 30 * 1000; // 30 segundos
         const activeSession = activeSessions.get(emailLower);
-        // Limpar sessões inativas (mais de 2 horas sem atividade)
-        const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 horas
         const now = Date.now();
-        if (activeSession && (now - activeSession.lastActivity) > SESSION_TIMEOUT) {
-          console.log(`🔓 Sessão inativa removida para ${emailLower}`);
-          activeSessions.delete(emailLower);
-        } else if (activeSession && activeSession.sessionId !== req.sessionID) {
-          return res.status(409).json({
-            error: 'Já existe uma sessão ativa em outro dispositivo'
-          });
+
+        if (activeSession && activeSession.sessionId !== req.sessionID) {
+          const timeSinceLastActivity = now - activeSession.lastActivity;
+          if (timeSinceLastActivity < HEARTBEAT_TIMEOUT) {
+            // Sessão ativa com heartbeat recente — bloqueia login
+            return res.status(409).json({
+              error: 'Já existe uma sessão ativa em outro dispositivo'
+            });
+          } else {
+            // Sem heartbeat por mais de 30 segundos — derruba sessão anterior
+            console.log(`🔓 Sessão inativa derrubada para ${emailLower} (${Math.round(timeSinceLastActivity / 1000)}s sem heartbeat)`);
+            activeSessions.delete(emailLower);
+          }
         }
       }
 
@@ -355,6 +360,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: 'Logout realizado com sucesso' });
     });
+  });
+
+  app.post("/api/auth/heartbeat", (req, res) => {
+    const email = req.session?.user?.email;
+    const isAdmin = req.session?.user?.isAdmin;
+
+    if (!email || isAdmin) {
+      return res.json({ success: false });
+    }
+
+    const activeSession = activeSessions.get(email);
+    if (activeSession && activeSession.sessionId === req.sessionID) {
+      activeSession.lastActivity = Date.now();
+      console.log(`💓 Heartbeat recebido para ${email}`);
+    }
+
+    res.json({ success: true });
   });
 
 // API routes

@@ -215,6 +215,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Heartbeat para detectar sessões ativas (apenas para usuários regulares)
+  useEffect(() => {
+    if (!user || user.isAdmin) return;
+
+    const sendHeartbeat = async () => {
+      try {
+        await fetch('/api/auth/heartbeat', {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch (error) {
+        // Ignora erros silenciosamente
+      }
+    };
+
+    // Envia heartbeat imediatamente
+    sendHeartbeat();
+
+    // Depois a cada 15 segundos
+    const interval = setInterval(sendHeartbeat, 15000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
