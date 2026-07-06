@@ -8,7 +8,8 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { authService } from './auth/AuthService';
-import { authenticate, requireAdmin, optionalAuth } from './auth/AuthMiddleware';
+import { authenticate, requireAdmin, optionalAuth } from './auth/JwtMiddleware';
+import { JwtService } from './auth/JwtService';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
 import * as db from './db';
 
@@ -277,24 +278,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("User name resolved to:", userName);
 
-      // Definir dados da sessão
-      req.session.user = {
-        email: emailLower,
-        name: userName,
-        isAdmin: isAdminEmail
-      };
-
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => (err ? reject(err) : resolve()));
-      });
-
       // Usuários comuns: verificar se já existe sessão ativa em outro dispositivo
       if (!isAdminEmail) {
         const HEARTBEAT_TIMEOUT = 30 * 1000; // 30 segundos
         const activeSession = activeSessions.get(emailLower);
         const now = Date.now();
 
-        if (activeSession && activeSession.sessionId !== req.sessionID) {
+        if (activeSession) {
           const timeSinceLastActivity = now - activeSession.lastActivity;
           if (timeSinceLastActivity < HEARTBEAT_TIMEOUT) {
             // Sessão ativa com heartbeat recente — bloqueia login
@@ -316,21 +306,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Erro ao atualizar último acesso:", error);
       }
 
+      // Gerar JWT
+      const user = {
+        email: emailLower,
+        name: userName,
+        isAdmin: isAdminEmail
+      };
+      const token = JwtService.generateToken(user);
+
+      // Definir cookie JWT
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 dias
+      });
+
       // Registrar nova sessão no Map (apenas para usuários regulares)
       if (!isAdminEmail) {
         activeSessions.set(emailLower, {
-          sessionId: req.sessionID,
+          sessionId: Date.now().toString(), // Usar timestamp como ID único
           lastActivity: Date.now()
         });
       }
 
-      return res.json({
-        user: {
-          email: emailLower,
-          name: userName,
-          isAdmin: isAdminEmail
-        }
-      });
+      return res.json({ user });
     } catch (error) {
       console.error("Erro no login:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
@@ -342,9 +342,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/auth/logout", (req, res) => {
-    const email = req.session?.user?.email || req.body?.email;
-    const isAdmin = req.session?.user?.isAdmin;
-    const sessionId = req.sessionID;
+    const user = (req as any).user;
+    const email = user?.email || req.body?.email;
+    const isAdmin = user?.isAdmin;
 
     // Remover sessão do Map (apenas para usuários regulares)
     if (email && !isAdmin) {
@@ -352,26 +352,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`🔓 Sessão removida do Map para ${email}`);
     }
 
-    req.session.destroy((err) => {
-      if (err) {
-        console.error('Erro ao destruir sessão:', err);
-        return res.status(500).json({ error: 'Erro ao fazer logout' });
-      }
-
-      res.json({ message: 'Logout realizado com sucesso' });
+    // Limpar cookie JWT
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
+
+    res.json({ message: 'Logout realizado com sucesso' });
   });
 
   app.post("/api/auth/heartbeat", (req, res) => {
-    const email = req.session?.user?.email;
-    const isAdmin = req.session?.user?.isAdmin;
+    const user = (req as any).user;
+    const email = user?.email;
+    const isAdmin = user?.isAdmin;
 
     if (!email || isAdmin) {
       return res.json({ success: false });
     }
 
     const activeSession = activeSessions.get(email);
-    if (activeSession && activeSession.sessionId === req.sessionID) {
+    if (activeSession) {
       activeSession.lastActivity = Date.now();
       console.log(`💓 Heartbeat recebido para ${email}`);
     }

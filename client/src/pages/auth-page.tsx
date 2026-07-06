@@ -120,7 +120,7 @@ export default function LoginPage() {
     try {
       await login(values.email, values.password);
     } catch (error) {
-      if (error instanceof Error && error.message === 'SESSION_ALREADY_ACTIVE') {
+      if (error instanceof Error && error.message.includes('sessão ativa')) {
         setShowSessionActiveError(true);
         setSubmittedWithValidEmail(false);
         return;

@@ -8,7 +8,9 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import session from 'express-session';
+import { jwtMiddleware } from './auth/JwtMiddleware';
+import { jwtRenewalMiddleware } from './auth/JwtRenewalMiddleware';
+import { UserValidationCache } from './auth/UserValidationCache';
 // import pg from 'pg';
 // import PgSession from 'connect-pg-simple';
 
@@ -40,42 +42,14 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const sessionSecret = process.env.SESSION_SECRET || 'fallback-secret-change-in-production';
-if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
-  console.warn('⚠️ SESSION_SECRET não definido em produção. Usando valor padrão (não recomendado para produção).');
-}
+// Adicionar middlewares JWT
+app.use(jwtMiddleware);
+app.use(jwtRenewalMiddleware);
 
-// Configurar PostgreSQL para sessões (TEMPORARIAMENTE DESATIVADO - usando MemoryStore)
-// let sessionStore;
-
-// if (process.env.DATABASE_URL) {
-//   const pgPool = new pg.Pool({
-//     connectionString: process.env.DATABASE_URL,
-//     ssl: { rejectUnauthorized: false }
-//   });
-  
-//   sessionStore = new (PgSession(session))({
-//     pool: pgPool,
-//     tableName: 'session',
-//     disableTouch: true
-//   });
-//   console.log('✅ PostgreSQL configurado para sessões');
-// } else {
-//   console.warn('⚠️ DATABASE_URL não definido. Usando MemoryStore (não recomendado para produção).');
-// }
-
-// Configuração de sessão (MemoryStore temporário)
-app.use(session({
-  secret: sessionSecret || 'fallback-secret-change-in-production',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 horas
-  }
-}));
+// Limpeza periódica do cache de validação de usuários (a cada hora)
+setInterval(() => {
+  UserValidationCache.cleanupExpiredEntries();
+}, 60 * 60 * 1000);
 
 // Configuração do Service Worker
 app.get('/sw.js', (req, res) => {

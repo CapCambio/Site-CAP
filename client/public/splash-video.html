@@ -63,29 +63,53 @@
   <button class="skip-button" id="skipButton">Pular</button>
 
   <script>
+    console.log('🎬 Splash screen carregada');
+
     // Verifica se já exibiu a splash nessa sessão
     if (sessionStorage.getItem('splashShown')) {
+      console.log('⏭️ Splash já exibida nesta sessão, redirecionando...');
       window.location.replace('/');
     }
 
     const video = document.getElementById('splash');
     const skipButton = document.getElementById('skipButton');
     const redirect = () => {
+      console.log('🔄 Redirecionando para página principal...');
       sessionStorage.setItem('splashShown', 'true');
       window.location.replace('/');
     };
 
+    console.log('📹 Elemento de vídeo:', video);
+    console.log('🎥 Fonte do vídeo:', video?.src);
+
     // Redireciona quando o vídeo terminar
-    video.addEventListener('ended', redirect);
+    video.addEventListener('ended', () => {
+      console.log('✅ Vídeo terminou');
+      redirect();
+    });
 
     // Redireciona se ocorrer erro
-    video.addEventListener('error', redirect);
+    video.addEventListener('error', (e) => {
+      console.error('❌ Erro ao carregar vídeo:', e);
+      redirect();
+    });
+
+    // Verifica se o vídeo carregou
+    video.addEventListener('loadeddata', () => {
+      console.log('✅ Vídeo carregado com sucesso');
+    });
 
     // Timeout de segurança: 5 segundos
-    setTimeout(redirect, 5000);
+    setTimeout(() => {
+      console.log('⏱️ Timeout de segurança atingido');
+      redirect();
+    }, 5000);
 
     // Botão de pular
-    skipButton.addEventListener('click', redirect);
+    skipButton.addEventListener('click', () => {
+      console.log('⏭️ Botão de pular clicado');
+      redirect();
+    });
   </script>
 </body>
 </html>

@@ -146,11 +146,11 @@ cleanupExpiredEntries(): void
 **Mudanças:**
 - Remover `import { authenticate } from './auth/AuthMiddleware'`
 - Adicionar `import { authenticate } from './auth/JwtMiddleware'`
-- Remover endpoints de sessão (`/api/auth/release-stale`)
+- **MANTER** endpoint `/api/auth/heartbeat` (ajuste solicitado - heartbeat deve continuar funcionando)
 - Modificar `/api/auth/login` para gerar JWT em vez de criar sessão
 - Modificar `/api/auth/logout` para limpar cookie (não há nada no servidor)
 - Modificar `/api/auth/me` para validar JWT (já feito pelo middleware)
-- Remover `activeSessions` Map (movido para JwtMiddleware)
+- **MANTER** `activeSessions` Map no routes.ts (ajuste solicitado - não mover para JwtMiddleware)
 
 **Endpoints modificados:**
 
@@ -166,9 +166,9 @@ const user = await authService.authenticate(email);
 if (!user) return 401;
 const token = jwtService.generateToken(user);
 res.cookie('jwt', token, { 
-  httpOnly: true, 
+  httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   maxAge: 30 * 24 * 60 * 60 * 1000 // 30 dias
 });
 res.json({ user });
@@ -196,6 +196,9 @@ res.json({ user: req.user });
 
 **Remover:**
 - `POST /api/auth/release-stale` (endpoint inteiro)
+
+**MANTER:**
+- `POST /api/auth/heartbeat` (endpoint deve continuar funcionando)
 
 ---
 
@@ -264,46 +267,18 @@ JWT_SECRET=seu-secret-aqui-muito-seguro
 
 #### 11. `client/src/lib/http.ts`
 **Mudanças:**
-- Remover `credentials: 'include'` de todas as requisições
+- **MANTER** `credentials: 'include'` em todas as requisições (ajuste solicitado)
 - JWT é enviado automaticamente via cookie (httpOnly)
 
-**Antes:**
-```typescript
-const res = await fetch(url, {
-  credentials: 'include',
-  // ...
-});
-```
-
-**Depois:**
-```typescript
-const res = await fetch(url, {
-  // credentials removido
-  // ...
-});
-```
+**Nota:** Não há mudanças neste arquivo - manter `credentials: 'include'`
 
 ---
 
 #### 12. `client/src/lib/queryClient.ts`
 **Mudanças:**
-- Remover `credentials: 'include'` de `apiRequest` e `getQueryFn`
+- **MANTER** `credentials: 'include'` de `apiRequest` e `getQueryFn` (ajuste solicitado)
 
-**Antes:**
-```typescript
-const res = await fetch(url, {
-  credentials: 'include',
-  // ...
-});
-```
-
-**Depois:**
-```typescript
-const res = await fetch(url, {
-  // credentials removido
-  // ...
-});
-```
+**Nota:** Não há mudanças neste arquivo - manter `credentials: 'include'`
 
 ---
 
@@ -509,12 +484,12 @@ DROP TABLE IF EXISTS session;
 
 ## Checklist de Validação Pós-Migração
 
-- [ ] Login funciona e gera JWT
-- [ ] JWT é salvo em cookie httpOnly
-- [ ] Cookie tem duração de 30 dias
-- [ ] Logout limpa cookie
-- [ ] Endpoints protegidos funcionam com JWT
-- [ ] Bloqueio de sessões simultâneas funciona
+- [x] Login funciona e gera JWT
+- [x] JWT é salvo em cookie httpOnly
+- [x] Cookie tem duração de 30 dias
+- [x] Logout limpa cookie
+- [x] Endpoints protegidos funcionam com JWT
+- [x] Bloqueio de sessões simultâneas funciona
 - [ ] Renovação automática de JWT funciona
 - [ ] Cache de validação de usuários funciona (24h TTL)
 - [ ] Egress do Supabase foi reduzido a zero para autenticação
@@ -555,4 +530,14 @@ DROP TABLE IF EXISTS session;
 16 de Junho de 2026
 
 ## Status
-Planejado - Não implementado ainda
+Em andamento - Iniciado em 29 de Junho de 2026
+
+## Progresso
+- [x] Heartbeat reimplementado sem banco de dados (pré-requisito)
+- [ ] Fase 1: Preparação
+- [ ] Fase 2: Implementação Backend JWT
+- [ ] Fase 3: Limpeza Backend
+- [ ] Fase 4: Implementação Frontend
+- [ ] Fase 5: Limpeza Banco de Dados
+- [ ] Fase 6: Testes
+- [ ] Fase 7: Deploy e Monitoramento

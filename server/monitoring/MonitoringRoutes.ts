@@ -5,7 +5,7 @@ import { Router, Request, Response } from 'express';
 import { healthChecker, SystemHealth } from './HealthChecker';
 import { logger, LogLevel } from './Logger';
 import { authService } from '../auth/AuthService';
-import { authenticate, requireAdmin } from '../auth/AuthMiddleware';
+import { authenticate, requireAdmin } from '../auth/JwtMiddleware';
 
 const router = Router();
 
@@ -150,7 +150,7 @@ router.delete('/logs', authenticate, requireAdmin, async (req: Request, res: Res
   try {
     logger.clearLogs();
     logger.info('Logs cleared by admin', 'monitoring', { 
-      userId: req.user?.email 
+      userId: (req as any).user?.email 
     });
     
     res.json({ message: 'Logs cleared successfully' });
@@ -166,7 +166,7 @@ router.delete('/logs', authenticate, requireAdmin, async (req: Request, res: Res
 router.post('/health/check', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
     logger.info('Manual health check triggered', 'monitoring', { 
-      userId: req.user?.email 
+      userId: (req as any).user?.email 
     });
     
     const health = await healthChecker.runHealthChecks();

@@ -159,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           throw new Error('Senha incorreta');
         }
         if (response.status === 409) {
-          throw new Error('SESSION_ALREADY_ACTIVE');
+          throw new Error(data.error || 'Já existe uma sessão ativa em outro dispositivo');
         }
         throw new Error(data.error || 'Erro ao fazer login');
       }
