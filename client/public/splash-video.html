@@ -17,18 +17,16 @@
     video {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      max-width: 100vw;
+      max-height: 100vh;
     }
     @media (min-width: 768px) {
-      body {
-        background: #000000;
-      }
       video {
         width: auto;
         height: auto;
         max-width: 60vw;
         max-height: 60vh;
-        object-fit: contain;
         border-radius: 12px;
       }
     }
