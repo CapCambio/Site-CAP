@@ -32,23 +32,6 @@
         border-radius: 12px;
       }
     }
-    .skip-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s;
-      z-index: 1000;
-    }
-    .skip-button:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
   </style>
 </head>
 <body>
@@ -60,7 +43,6 @@
     playsinline
     preload="auto"
   ></video>
-  <button class="skip-button" id="skipButton">Pular</button>
 
   <script>
     console.log('🎬 Splash screen carregada');
@@ -72,7 +54,6 @@
     }
 
     const video = document.getElementById('splash');
-    const skipButton = document.getElementById('skipButton');
     const redirect = () => {
       console.log('🔄 Redirecionando para página principal...');
       sessionStorage.setItem('splashShown', 'true');
@@ -104,12 +85,6 @@
       console.log('⏱️ Timeout de segurança atingido');
       redirect();
     }, 5000);
-
-    // Botão de pular
-    skipButton.addEventListener('click', () => {
-      console.log('⏭️ Botão de pular clicado');
-      redirect();
-    });
   </script>
 </body>
 </html>
