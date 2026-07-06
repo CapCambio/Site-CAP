@@ -45,6 +45,18 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-touch-fullscreen" content="yes">
+
+    <!-- Splash screen para PWA -->
+    <script>
+      // Verifica se é PWA e se splash já foi exibida nesta sessão
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                    window.navigator.standalone === true || 
+                    document.referrer.includes('android-app://');
+
+      if (isPWA && !sessionStorage.getItem('splashShown')) {
+        window.location.replace('/splash-video.html');
+      }
+    </script>
     
     <!-- Configurações para iOS -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
