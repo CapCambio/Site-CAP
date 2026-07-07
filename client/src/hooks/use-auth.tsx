@@ -77,23 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!response.ok) {
           if (cancelled) return;
 
-          const storedUser = localStorage.getItem("auth_user");
-          if (storedUser) {
-            try {
-              const { email } = JSON.parse(storedUser);
-              if (email) {
-                await fetch('/api/auth/release-stale', {
-                  method: 'POST',
-                  credentials: 'include',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email, orphan: true }),
-                });
-              }
-            } catch {
-              // ignore
-            }
-          }
-
           setUser(null);
           localStorage.removeItem("auth_user");
           return;

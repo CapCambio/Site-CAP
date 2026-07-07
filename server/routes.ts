@@ -318,7 +318,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.cookie('jwt', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 dias
       });
 
@@ -356,7 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.clearCookie('jwt', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: 'lax',
     });
 
     res.json({ message: 'Logout realizado com sucesso' });
