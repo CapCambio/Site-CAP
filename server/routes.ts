@@ -540,24 +540,24 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Endpoint para salvar ordem dos cards do usuário
-  app.post("/api/user/card-order", authenticate, async (req: Request, res: Response) => {
+  app.post("/api/user/card-order", async (req: Request, res: Response) => {
     try {
       const { order } = req.body;
-      
+
       if (!Array.isArray(order)) {
         return res.status(400).json({ error: 'Ordem inválida' });
       }
-      
-      // Salvar ordem usando o alertSystem
-      const userEmail = req.user?.email;
+
+      // Verificar autenticação manualmente
+      const userEmail = (req as any).user?.email;
       if (!userEmail) {
         return res.status(401).json({ error: 'Usuário não autenticado' });
       }
-      
+
       alertSystem.saveCardOrder(userEmail, order);
-      
+
       console.log(`✅ Ordem dos cards salva para ${userEmail}:`, order);
-      
+
       res.json({ success: true, order });
     } catch (error) {
       console.error('Erro ao salvar ordem dos cards:', error);
@@ -566,9 +566,10 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Endpoint para carregar ordem dos cards do usuário
-  app.get("/api/user/card-order", authenticate, async (req: Request, res: Response) => {
+  app.get("/api/user/card-order", async (req: Request, res: Response) => {
     try {
-      const userEmail = req.user?.email;
+      // Verificar autenticação manualmente
+      const userEmail = (req as any).user?.email;
       if (!userEmail) {
         return res.status(401).json({ error: 'Usuário não autenticado' });
       }
@@ -585,10 +586,11 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Endpoint para salvar idioma preferido do usuário
-  app.post("/api/user/language", authenticate, async (req: Request, res: Response) => {
+  app.post("/api/user/language", async (req: Request, res: Response) => {
     try {
       const { language } = req.body;
-      const userEmail = req.user?.email;
+      // Verificar autenticação manualmente
+      const userEmail = (req as any).user?.email;
 
       if (!userEmail) {
         return res.status(401).json({ error: 'Usuário não autenticado' });
@@ -610,9 +612,10 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Endpoint para carregar idioma preferido do usuário
-  app.get("/api/user/language", authenticate, async (req: Request, res: Response) => {
+  app.get("/api/user/language", async (req: Request, res: Response) => {
     try {
-      const userEmail = req.user?.email;
+      // Verificar autenticação manualmente
+      const userEmail = (req as any).user?.email;
       if (!userEmail) {
         return res.status(401).json({ error: 'Usuário não autenticado' });
       }
