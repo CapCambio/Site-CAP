@@ -10,6 +10,9 @@ export const jwtMiddleware = async (req: Request, res: Response, next: NextFunct
   // Extrair token do cookie
   const token = req.cookies?.jwt;
 
+  // Log para debug
+  console.log(`[JWT Middleware] Path: ${req.path}, Token existe: ${!!token}`);
+
   // Se não houver token, continuar sem usuário (para endpoints públicos)
   if (!token) {
     return next();
@@ -18,20 +21,28 @@ export const jwtMiddleware = async (req: Request, res: Response, next: NextFunct
   // Verificar e decodificar o token
   const user = JwtService.verifyToken(token);
 
+  console.log(`[JWT Middleware] User verificado: ${!!user}, Email: ${user?.email}`);
+
   if (!user) {
     // Token inválido ou expirado
+    console.log(`[JWT Middleware] Token inválido ou expirado`);
     return res.status(401).json({ error: 'Token inválido ou expirado' });
   }
 
   // Verificar se o usuário ainda está autorizado (cache de 24h)
   const isAuthorized = await UserValidationCache.isUserAuthorized(user.email);
 
+  console.log(`[JWT Middleware] Usuário autorizado: ${isAuthorized}`);
+
   if (!isAuthorized) {
+    console.log(`[JWT Middleware] Usuário não autorizado no cache`);
     return res.status(401).json({ error: 'Usuário não autorizado' });
   }
 
   // Adicionar usuário ao request
   (req as any).user = user;
+
+  console.log(`[JWT Middleware] Usuário adicionado ao request: ${user.email}`);
 
   next();
 };
