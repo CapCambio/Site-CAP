@@ -1,6 +1,6 @@
 {
   "name": "CAP Cotações",
-  "short_name": "CAP",
+  "short_name": "CAP Câmbio",
   "description": "Acompanhe as cotações de moedas em tempo real",
   "start_url": "/splash-video.html",
   "display": "standalone",
