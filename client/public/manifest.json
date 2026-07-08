@@ -2,7 +2,7 @@
   "name": "CAP Cotações",
   "short_name": "CAP Cotações",
   "description": "Acompanhe as cotações de moedas em tempo real",
-  "start_url": "/splash-video.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
