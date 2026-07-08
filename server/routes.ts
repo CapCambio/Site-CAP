@@ -320,11 +320,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Definir cookie JWT
       res.cookie('jwt', token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 dias
-        path: '/',
-        domain: undefined // Deixar undefined para usar o domínio atual
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        path: '/'
       });
 
       console.log(`[Login] Cookie JWT definido para ${emailLower}`);
@@ -363,8 +362,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Limpar cookie JWT
     res.clearCookie('jwt', {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
 
     res.json({ message: 'Logout realizado com sucesso' });
