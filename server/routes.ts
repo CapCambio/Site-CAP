@@ -317,7 +317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Definir cookie JWT
       res.cookie('jwt', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 dias
       });
@@ -355,7 +355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Limpar cookie JWT
     res.clearCookie('jwt', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
     });
 
