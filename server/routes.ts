@@ -314,6 +314,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       const token = JwtService.generateToken(user);
 
+      console.log(`[Login] Gerando token para ${emailLower}`);
+      console.log(`[Login] Token gerado: ${token.substring(0, 20)}...`);
+
       // Definir cookie JWT
       res.cookie('jwt', token, {
         httpOnly: true,
@@ -321,6 +324,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 dias
       });
+
+      console.log(`[Login] Cookie JWT definido para ${emailLower}`);
 
       // Registrar nova sessão no Map (apenas para usuários regulares)
       if (!isAdminEmail) {
