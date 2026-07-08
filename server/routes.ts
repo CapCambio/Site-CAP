@@ -322,10 +322,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         httpOnly: true,
         secure: false,
         sameSite: 'lax',
-        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 dias
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 dias
+        path: '/',
+        domain: undefined // Deixar undefined para usar o domínio atual
       });
 
       console.log(`[Login] Cookie JWT definido para ${emailLower}`);
+      console.log(`[Login] Headers de resposta:`, res.getHeaders());
 
       // Registrar nova sessão no Map (apenas para usuários regulares)
       if (!isAdminEmail) {
