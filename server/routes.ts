@@ -315,6 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const token = JwtService.generateToken(user);
 
       console.log(`[Login] Gerando token para ${emailLower}`);
+      console.log(`[Login] NODE_ENV: ${process.env.NODE_ENV}`);
       console.log(`[Login] Token gerado: ${token.substring(0, 20)}...`);
 
       // Definir cookie JWT
