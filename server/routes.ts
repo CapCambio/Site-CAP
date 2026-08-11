@@ -346,7 +346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/auth/me", authenticate, (req, res) => {
-    res.json({ user: req.user });
+    res.json({ user: (req as any).user });
   });
 
   app.post("/api/auth/logout", (req, res) => {
