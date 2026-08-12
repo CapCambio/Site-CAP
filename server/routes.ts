@@ -284,10 +284,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const activeSession = activeSessions.get(emailLower);
         const now = Date.now();
 
+        console.log(`[Login] Verificando sessão ativa para ${emailLower}`);
+        console.log(`[Login] Sessão existe: ${!!activeSession}`);
+
         if (activeSession) {
           const timeSinceLastActivity = now - activeSession.lastActivity;
+          console.log(`[Login] Tempo desde última atividade: ${Math.round(timeSinceLastActivity / 1000)}s`);
+          console.log(`[Login] Timeout: ${HEARTBEAT_TIMEOUT / 1000}s`);
+
           if (timeSinceLastActivity < HEARTBEAT_TIMEOUT) {
             // Sessão ativa com heartbeat recente — bloqueia login
+            console.log(`[Login] Bloqueando login - sessão ativa em outro dispositivo`);
             return res.status(409).json({
               error: 'Já existe uma sessão ativa em outro dispositivo'
             });
@@ -385,14 +392,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const email = user?.email;
     const isAdmin = user?.isAdmin;
 
+    console.log(`[Heartbeat] Recebido - Email: ${email}, IsAdmin: ${isAdmin}`);
+
     if (!email || isAdmin) {
+      console.log(`[Heartbeat] Rejeitado - Sem email ou é admin`);
       return res.json({ success: false });
     }
 
     const activeSession = activeSessions.get(email);
     if (activeSession) {
       activeSession.lastActivity = Date.now();
-      console.log(`💓 Heartbeat recebido para ${email}`);
+      console.log(`💓 Heartbeat recebido para ${email} - Sessão atualizada`);
+    } else {
+      console.log(`[Heartbeat] Sessão não encontrada para ${email}`);
     }
 
     res.json({ success: true });
