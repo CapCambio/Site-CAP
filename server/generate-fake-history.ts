@@ -81,5 +81,10 @@ async function generateFakeHistory() {
   console.log(`💰 Total de entradas: ${CURRENCIES.length * daysToGenerate * entriesPerDay}`);
 }
 
-// Executar
-generateFakeHistory().catch(console.error);
+// Exportar a função para uso em outros módulos
+export { generateFakeHistory };
+
+// Executar apenas se for chamado diretamente
+if (import.meta.url === `file://${process.argv[1]}`) {
+  generateFakeHistory().catch(console.error);
+}
