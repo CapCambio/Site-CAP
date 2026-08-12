@@ -348,7 +348,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      return res.json({ user });
+      // Retornar informações de debug sobre o cookie
+      return res.json({
+        user,
+        debug: {
+          cookieConfig: {
+            httpOnly: cookieConfig.httpOnly,
+            secure: cookieConfig.secure,
+            sameSite: cookieConfig.sameSite,
+            maxAge: cookieConfig.maxAge,
+            path: cookieConfig.path
+          },
+          tokenPreview: token.substring(0, 20) + '...',
+          NODE_ENV: process.env.NODE_ENV
+        }
+      });
     } catch (error) {
       console.error("Erro no login:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
