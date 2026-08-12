@@ -12,9 +12,12 @@ export const jwtMiddleware = async (req: Request, res: Response, next: NextFunct
 
   // Log para debug
   console.log(`[JWT Middleware] Path: ${req.path}, Token existe: ${!!token}`);
+  console.log(`[JWT Middleware] Cookies:`, Object.keys(req.cookies || {}));
+  console.log(`[JWT Middleware] NODE_ENV: ${process.env.NODE_ENV}`);
 
   // Se não houver token, continuar sem usuário (para endpoints públicos)
   if (!token) {
+    console.log(`[JWT Middleware] Nenhum token encontrado, continuando sem usuário`);
     return next();
   }
 

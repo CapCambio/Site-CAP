@@ -319,13 +319,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[Login] Token gerado: ${token.substring(0, 20)}...`);
 
       // Definir cookie JWT
-      res.cookie('jwt', token, {
+      const isProduction = process.env.NODE_ENV === 'production';
+      const cookieConfig = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
         maxAge: 30 * 24 * 60 * 60 * 1000,
         path: '/'
+      };
+
+      console.log(`[Login] Configuração de cookie:`, {
+        NODE_ENV: process.env.NODE_ENV,
+        isProduction,
+        secure: cookieConfig.secure,
+        sameSite: cookieConfig.sameSite
       });
+
+      res.cookie('jwt', token, cookieConfig);
 
       console.log(`[Login] Cookie JWT definido para ${emailLower}`);
       console.log(`[Login] Headers de resposta:`, res.getHeaders());
