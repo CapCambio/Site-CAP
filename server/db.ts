@@ -20,6 +20,31 @@ export const pool = new Pool({
   ssl: connectionString ? { rejectUnauthorized: false } : false
 });
 
+// Inicializar tabela de histórico de moedas
+export async function initializeCurrencyHistoryTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS currency_history (
+        id SERIAL PRIMARY KEY,
+        code VARCHAR(10) NOT NULL,
+        buy_price DECIMAL(10, 6) NOT NULL,
+        sell_price DECIMAL(10, 6) NOT NULL,
+        timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      )
+    `);
+
+    // Criar índice para melhorar performance
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_currency_history_code_timestamp
+      ON currency_history (code, timestamp DESC)
+    `);
+
+    console.log('✅ Tabela currency_history inicializada');
+  } catch (error) {
+    console.error('❌ Erro ao inicializar tabela currency_history:', error);
+  }
+}
+
 export interface User {
   id: number;
   email: string;

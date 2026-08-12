@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 import { jwtMiddleware } from './auth/JwtMiddleware';
 import { jwtRenewalMiddleware } from './auth/JwtRenewalMiddleware';
 import { UserValidationCache } from './auth/UserValidationCache';
+import { initializeCurrencyHistoryTable } from './db';
 // import pg from 'pg';
 // import PgSession from 'connect-pg-simple';
 
@@ -81,6 +82,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Inicializar tabela de histórico de moedas no PostgreSQL
+  await initializeCurrencyHistoryTable();
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

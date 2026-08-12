@@ -1,4 +1,4 @@
-import { jsonStorage } from './json-storage';
+import { addCurrencyHistory } from './db';
 import type { InsertCurrencyHistory } from '../shared/schema';
 
 // Moedas para gerar histórico (baseado nas moedas do sistema)
@@ -65,7 +65,7 @@ async function generateFakeHistory() {
         };
 
         try {
-          await jsonStorage.addCurrencyHistory(historyEntry);
+          await addCurrencyHistory(historyEntry);
         } catch (error) {
           console.error(`Erro ao adicionar histórico para ${currency.code}:`, error);
         }
