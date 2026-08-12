@@ -44,7 +44,8 @@
     "check": "tsc",
     "optimize:images": "node scripts/optimize-images.js",
     "update:favicon": "node scripts/update-favicon.js",
-    "test:push": "node scripts/test-push-notification.js"
+    "test:push": "node scripts/test-push-notification.js",
+    "generate:fake-history": "tsx server/generate-fake-history.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
