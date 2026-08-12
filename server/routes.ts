@@ -398,49 +398,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true });
   });
 
-  // Endpoint administrativo para gerar dados históricos falsos
-  app.post("/api/admin/generate-fake-history", authenticate, async (req, res) => {
-    const user = (req as any).user;
-
-    // Verificar se é admin
-    if (!user?.isAdmin) {
-      return res.status(403).json({ error: 'Acesso negado' });
-    }
-
-    try {
-      // Importar a função de geração
-      const { generateFakeHistory } = await import('./generate-fake-history.js');
-      await generateFakeHistory();
-      res.json({ success: true, message: 'Dados históricos falsos gerados com sucesso' });
-    } catch (error) {
-      console.error('Erro ao gerar dados históricos falsos:', error);
-      res.status(500).json({ error: 'Erro ao gerar dados históricos falsos' });
-    }
-  });
-
-  // Endpoint para verificar histórico de uma moeda (debug)
-  app.get("/api/admin/history-check/:code", authenticate, async (req, res) => {
-    const user = (req as any).user;
-    const code = req.params.code;
-
-    // Verificar se é admin
-    if (!user?.isAdmin) {
-      return res.status(403).json({ error: 'Acesso negado' });
-    }
-
-    try {
-      const history = await getCurrencyHistoryFromDB(code);
-      res.json({
-        code,
-        count: history.length,
-        sample: history.slice(0, 5)
-      });
-    } catch (error) {
-      console.error('Erro ao verificar histórico:', error);
-      res.status(500).json({ error: 'Erro ao verificar histórico' });
-    }
-  });
-
 // API routes
 app.get("/api/currencies", async (req, res) => {
   try {
