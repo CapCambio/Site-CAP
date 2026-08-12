@@ -410,6 +410,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true });
   });
 
+  // Endpoint para verificar status da sessão (debug)
+  app.get("/api/auth/session-status", (req, res) => {
+    const user = (req as any).user;
+    const email = user?.email;
+
+    if (!email) {
+      return res.json({
+        authenticated: false,
+        session: null
+      });
+    }
+
+    const activeSession = activeSessions.get(email.toLowerCase());
+    const now = Date.now();
+
+    res.json({
+      authenticated: true,
+      email,
+      session: activeSession ? {
+        exists: true,
+        lastActivity: activeSession.lastActivity,
+        timeSinceLastActivity: now - activeSession.lastActivity,
+        isActive: (now - activeSession.lastActivity) < 30000 // 30 segundos
+      } : {
+        exists: false
+      }
+    });
+  });
+
 // API routes
 app.get("/api/currencies", async (req, res) => {
   try {
