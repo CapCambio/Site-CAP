@@ -348,21 +348,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Retornar informações de debug sobre o cookie
-      return res.json({
-        user,
-        debug: {
-          cookieConfig: {
-            httpOnly: cookieConfig.httpOnly,
-            secure: cookieConfig.secure,
-            sameSite: cookieConfig.sameSite,
-            maxAge: cookieConfig.maxAge,
-            path: cookieConfig.path
-          },
-          tokenPreview: token.substring(0, 20) + '...',
-          NODE_ENV: process.env.NODE_ENV
-        }
-      });
+      return res.json({ user });
     } catch (error) {
       console.error("Erro no login:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
@@ -392,20 +378,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
 
     res.json({ message: 'Logout realizado com sucesso' });
-  });
-
-  // Endpoint de debug para verificar cookie
-  app.get("/api/debug/cookie", (req, res) => {
-    res.json({
-      hasJwt: !!req.cookies?.jwt,
-      cookies: Object.keys(req.cookies || {}),
-      protocol: req.protocol,
-      secure: req.secure,
-      hostname: req.hostname,
-      origin: req.headers.origin || null,
-      referer: req.headers.referer || null,
-      NODE_ENV: process.env.NODE_ENV
-    });
   });
 
   app.post("/api/auth/heartbeat", (req, res) => {
