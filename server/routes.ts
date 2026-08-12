@@ -417,6 +417,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para verificar histórico de uma moeda (debug)
+  app.get("/api/admin/history-check/:code", authenticate, async (req, res) => {
+    const user = (req as any).user;
+    const code = req.params.code;
+
+    // Verificar se é admin
+    if (!user?.isAdmin) {
+      return res.status(403).json({ error: 'Acesso negado' });
+    }
+
+    try {
+      const history = await jsonStorage.getCurrencyHistory(code);
+      res.json({
+        code,
+        count: history.length,
+        sample: history.slice(0, 5)
+      });
+    } catch (error) {
+      console.error('Erro ao verificar histórico:', error);
+      res.status(500).json({ error: 'Erro ao verificar histórico' });
+    }
+  });
+
 // API routes
 app.get("/api/currencies", async (req, res) => {
   try {
