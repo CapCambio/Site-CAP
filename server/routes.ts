@@ -6,12 +6,13 @@ import { jsonStorage } from "./json-storage";
 import { alertSystem } from "./init-alert-system";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'url';
 import { authService } from './auth/AuthService';
 import { authenticate, requireAdmin, optionalAuth } from './auth/JwtMiddleware';
 import { JwtService } from './auth/JwtService';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
 import * as db from './db';
+import { getCurrencyHistory as getCurrencyHistoryFromDB } from './db';
 
 // Map em memória para controle de sessões ativas (email -> { sessionId, lastActivity })
 interface ActiveSession {
@@ -428,7 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const history = await jsonStorage.getCurrencyHistory(code);
+      const history = await getCurrencyHistoryFromDB(code);
       res.json({
         code,
         count: history.length,
@@ -505,9 +506,9 @@ app.get("/api/currencies", async (req, res) => {
         startDate = oneYearAgo;
       }
 
-      const history = await jsonStorage.getCurrencyHistory(
-        req.params.code, 
-        startDate, 
+      const history = await getCurrencyHistoryFromDB(
+        req.params.code,
+        startDate,
         endDate
       );
 
