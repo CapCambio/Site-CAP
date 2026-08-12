@@ -380,6 +380,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ message: 'Logout realizado com sucesso' });
   });
 
+  // Endpoint de debug para verificar cookie
+  app.get("/api/debug/cookie", (req, res) => {
+    res.json({
+      hasJwt: !!req.cookies?.jwt,
+      cookies: Object.keys(req.cookies || {}),
+      protocol: req.protocol,
+      secure: req.secure,
+      hostname: req.hostname,
+      origin: req.headers.origin || null,
+      referer: req.headers.referer || null,
+      NODE_ENV: process.env.NODE_ENV
+    });
+  });
+
   app.post("/api/auth/heartbeat", (req, res) => {
     const user = (req as any).user;
     const email = user?.email;
