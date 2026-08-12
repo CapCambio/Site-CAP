@@ -362,6 +362,18 @@ class AlertSystem {
       const alert = userData.alerts[currencyCode];
       if (!alert || !alert.ativo) continue;
 
+      // Verificar validade do alerta
+      if (alert.validade) {
+        const validadeDate = new Date(alert.validade);
+        const now = new Date();
+        if (now > validadeDate) {
+          console.log(`⏰ Alerta expirado: ${email} - ${currencyCode} (validade: ${alert.validade})`);
+          delete this.data[email].alerts[currencyCode];
+          this.saveAlerts();
+          continue;
+        }
+      }
+
       let shouldAlert = false;
       
       // Verifica se o alerta deve ser disparado baseado no tipo
