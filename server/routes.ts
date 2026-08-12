@@ -323,7 +323,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const cookieConfig = {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax',
+        sameSite: 'lax' as const, // Usar 'lax' mesmo em produção pois frontend/backend estão no mesmo domínio
         maxAge: 30 * 24 * 60 * 60 * 1000,
         path: '/'
       };
@@ -388,7 +388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.clearCookie('jwt', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: 'lax' as const, // Usar 'lax' mesmo em produção pois frontend/backend estão no mesmo domínio
     });
 
     res.json({ message: 'Logout realizado com sucesso' });
