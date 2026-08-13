@@ -69,7 +69,7 @@ interface Alert {
 // Cache em memória para moedas
 let currenciesCache: any[] = [];
 let currenciesCacheTime = 0;
-const CURRENCIES_CACHE_TTL = 30 * 1000; // 30 segundos
+const CURRENCIES_CACHE_TTL = 5 * 60 * 1000; // 5 minutos
 
 // Cache em memória para histórico do dia anterior (reduz queries ao banco)
 let yesterdayCache = new Map<string, number>(); // code -> lastSellPrice
