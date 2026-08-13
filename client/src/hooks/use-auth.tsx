@@ -127,6 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password?: string) => {
     setIsLoading(true);
     try {
+      console.log('🔍 Tentando login com email:', email);
       // Faz a verificação de autorização no servidor
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -135,7 +136,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ email, password })
       });
 
+      console.log('🔍 Response status:', response.status);
       const data = await response.json();
+      console.log('🔍 Response data:', data);
 
       if (!response.ok) {
         if (response.status === 401 && data.error?.includes('Senha incorreta')) {
@@ -162,8 +165,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
+      console.error("Tipo do erro:", error instanceof TypeError ? 'TypeError' : typeof error);
+      console.error("Mensagem do erro:", error instanceof Error ? error.message : error);
       // Detectar erro de rede (sem conexão)
       if (error instanceof TypeError) {
+        console.log('🔍 Detectado erro de rede (TypeError)');
         throw new Error('NETWORK_ERROR');
       }
       // Re-throw o erro para que possa ser capturado pelo componente

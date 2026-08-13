@@ -51,7 +51,7 @@ export default function LoginPage() {
   // Fazer verificação no backend sem expor emails no frontend
   const checkIfAdmin = async (email: string) => {
     console.log('Verificando email:', email);
-    
+
     if (!email || !email.match(/^[^@]+@[^@]+$/)) {
       console.log('Email inválido ou vazio');
       setIsAdmin(false);
@@ -68,7 +68,7 @@ export default function LoginPage() {
         },
         body: JSON.stringify({ email })
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setIsAdmin(data.isAdmin);
@@ -77,9 +77,10 @@ export default function LoginPage() {
       }
     } catch (error) {
       console.error('Erro ao verificar admin:', error);
+      // Em caso de erro de rede, assumir que não é admin
       setIsAdmin(false);
     }
-    
+
     setEmailVerified(true);
   };
 
