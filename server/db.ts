@@ -246,7 +246,12 @@ export async function getCurrencyHistory(code?: string, startDate?: Date, endDat
   }
 
   const result = await pool.query(query, values);
-  return result.rows;
+  return result.rows.map(row => ({
+    ...row,
+    buy_price: parseFloat(row.buy_price),
+    sell_price: parseFloat(row.sell_price),
+    timestamp: new Date(row.timestamp)
+  }));
 }
 
 export async function addCurrencyHistory(entry: Partial<CurrencyHistory>): Promise<CurrencyHistory> {
