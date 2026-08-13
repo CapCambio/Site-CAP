@@ -23,8 +23,8 @@ export async function apiRequest(
     await throwIfResNotOk(res);
     return res;
   } catch (error) {
-    // Detectar erro de rede (sem conexão)
-    if (error instanceof TypeError && error.message.includes('fetch')) {
+    // Detectar erro de rede (sem conexão) - TypeError indica falha de rede
+    if (error instanceof TypeError) {
       throw new Error('NETWORK_ERROR');
     }
     throw error;

@@ -35,6 +35,7 @@ export default function LoginPage() {
   const [showSessionActiveError, setShowSessionActiveError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [submittedWithValidEmail, setSubmittedWithValidEmail] = useState(false);
+  const [showNetworkError, setShowNetworkError] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -98,28 +99,34 @@ export default function LoginPage() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // Resetar estado de submissão
     setSubmittedWithValidEmail(false);
-    
+    setShowNetworkError(false);
+
     // Verificar se o email é válido antes de prosseguir
     const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
     if (!emailRegex.test(values.email)) {
       // Email inválido - não mostrar mensagem de "não autorizado"
       return;
     }
-    
+
     // Email válido - marcar como submetido com email válido
     setSubmittedWithValidEmail(true);
-    
+
     if (isAdmin && (!values.password || values.password.trim() === '')) {
       setShowValidationErrors(true);
       return;
     }
-    
+
     // Resetar erros antes de tentar login
     setShowPasswordError(false);
     setShowSessionActiveError(false);
     try {
       await login(values.email, values.password);
     } catch (error) {
+      if (error instanceof Error && error.message === 'NETWORK_ERROR') {
+        setShowNetworkError(true);
+        setSubmittedWithValidEmail(false);
+        return;
+      }
       if (error instanceof Error && error.message.includes('sessão ativa')) {
         setShowSessionActiveError(true);
         setSubmittedWithValidEmail(false);
@@ -251,10 +258,16 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {submittedWithValidEmail && !isAuthorized && !isLoading && !isAdmin && !showSessionActiveError && (
+              {showNetworkError && (
+                <div className="mt-4 text-red-500 text-sm">
+                  {t('network.message')}
+                </div>
+              )}
+
+              {submittedWithValidEmail && !isAuthorized && !isLoading && !isAdmin && !showSessionActiveError && !showNetworkError && (
                 <div className="mt-4 text-red-500 text-sm">
                   {t('auth.loginError')} {" "}
-                  <button 
+                  <button
                     onClick={() => setShowBranchDialog(true)}
                     className="text-white underline hover:text-white/80"
                   >

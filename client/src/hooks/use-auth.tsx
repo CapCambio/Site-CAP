@@ -162,6 +162,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
+      // Detectar erro de rede (sem conexão)
+      if (error instanceof TypeError) {
+        throw new Error('NETWORK_ERROR');
+      }
       // Re-throw o erro para que possa ser capturado pelo componente
       throw error;
     } finally {
