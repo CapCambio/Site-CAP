@@ -580,5 +580,10 @@
     "COP": "Colombian Peso",
     "NZD": "New Zealand Dollar",
     "ZAR": "South African Rand"
+  },
+  "network": {
+    "title": "No Internet Connection",
+    "message": "Unable to connect to the server. Please check your internet connection and try again.",
+    "retry": "Try Again"
   }
 }

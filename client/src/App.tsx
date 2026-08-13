@@ -9,6 +9,8 @@ import { lazyWithRetry, LazyLoad } from "@/components/lazy-load";
 import { useServiceWorker } from "@/hooks/useServiceWorker";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { NetworkError } from "@/components/NetworkError";
+import { useState, useEffect } from 'react';
 import './lib/i18n';
 
 // Lazy load pages com tratamento de erro e retry
@@ -38,7 +40,36 @@ const queryClient = new QueryClient({
 function AppContent() {
   // Configurar notificações push
   const { isSupported, isSubscribed, isLoading } = usePushNotifications();
-  
+  const [networkError, setNetworkError] = useState(false);
+
+  // Detectar erros de rede globalmente
+  const handleNetworkError = (error: Error) => {
+    if (error.message === 'NETWORK_ERROR') {
+      setNetworkError(true);
+    }
+  };
+
+  const handleRetry = () => {
+    setNetworkError(false);
+    window.location.reload();
+  };
+
+  // Adicionar listener de erros globais
+  useEffect(() => {
+    const handleUncaughtError = (event: ErrorEvent) => {
+      if (event.error?.message === 'NETWORK_ERROR') {
+        setNetworkError(true);
+      }
+    };
+
+    window.addEventListener('error', handleUncaughtError);
+    return () => window.removeEventListener('error', handleUncaughtError);
+  }, []);
+
+  if (networkError) {
+    return <NetworkError />;
+  }
+
   return (
     <div className="min-h-screen bg-black">
       <LazyLoad>

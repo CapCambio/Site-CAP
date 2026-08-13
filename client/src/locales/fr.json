@@ -580,5 +580,10 @@
   "notFound": {
     "title": "Page Non Trouvée",
     "message": "Avez-vous oublié d'ajouter la page au routeur?"
+  },
+  "network": {
+    "title": "Pas de Connexion Internet",
+    "message": "Impossible de se connecter au serveur. Vérifiez votre connexion internet et réessayez.",
+    "retry": "Réessayer"
   }
 }

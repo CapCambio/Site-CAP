@@ -580,5 +580,10 @@
     "COP": "Peso Colombiano",
     "NZD": "Dólar Neozelandês",
     "ZAR": "Rand Sul-Africano"
+  },
+  "network": {
+    "title": "Sem Conexão com a Internet",
+    "message": "Não foi possível conectar ao servidor. Verifique sua conexão com a internet e tente novamente.",
+    "retry": "Tentar Novamente"
   }
 }
