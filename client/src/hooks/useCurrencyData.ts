@@ -17,28 +17,24 @@ export function useCurrencyData() {
   const { toast } = useToast();
 
   // Get currency data from API
-  const { 
-    data: currencies, 
-    isLoading, 
-    isError, 
-    error, 
-    refetch 
+  const {
+    data: currencies,
+    isLoading,
+    isError,
+    error,
+    refetch
   } = useQuery({
     queryKey: ['/api/currencies'],
     refetchOnWindowFocus: false,
-    staleTime: 60 * 1000, // 1 minuto (atualização automática a cada minuto)
+    staleTime: 5 * 60 * 1000, // 5 minutos (reduz requisições desnecessárias)
     queryFn: async () => {
-      const [currenciesResponse, historyResponse] = await Promise.all([
-        fetch('/api/currencies'),
-        fetch('/api/history/USD?startDate=' + new Date(Date.now() - 96 * 60 * 60 * 1000).toISOString().split('T')[0] + '&endDate=' + new Date().toISOString().split('T')[0])
-      ]);
+      const currenciesResponse = await fetch('/api/currencies');
 
       if (!currenciesResponse.ok) {
         throw new Error('Failed to fetch currencies');
       }
 
       const currencies = await currenciesResponse.json();
-      const history = historyResponse.ok ? await historyResponse.json() : [];
 
       // Não sobrescrevemos a variação que vem do backend, pois ela já é calculada lá
       // As variações são calculadas corretamente para todas as moedas no servidor
@@ -92,20 +88,16 @@ export function useCurrencyData() {
     }
   }, [currencies]);
 
-  // Configura a atualização automática a cada minuto
+  // Configura a atualização automática a cada 5 minutos
   useEffect(() => {
-    // Atualiza imediatamente na primeira carga
-    refreshData().catch(err => {
-      console.error('Erro na atualização inicial:', err);
-    });
-
-    // Configura o timer para atualizar a cada minuto
+    // Não atualiza imediatamente na primeira carga - usa cache do React Query
+    // Configura o timer para atualizar a cada 5 minutos
     const timer = setInterval(() => {
       console.log('Executando atualização automática...');
       refreshData().catch(err => {
         console.error('Erro na atualização automática:', err);
       });
-    }, 60000); // 1 minuto
+    }, 5 * 60 * 1000); // 5 minutos
 
     // Limpa o timer quando o componente é desmontado
     return () => clearInterval(timer);
