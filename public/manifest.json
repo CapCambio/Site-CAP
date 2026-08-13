@@ -3,9 +3,16 @@
   "short_name": "CAP Cotações",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
   "background_color": "#000000",
   "theme_color": "#000000",
   "description": "Acompanhe as cotações de moedas em tempo real",
+  "orientation": "portrait",
+  "scope": "/",
+  "categories": ["finance", "business"],
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "splash_screen": {
     "src": "/splash-video.html",
     "sizes": "any"
@@ -20,7 +27,32 @@
     {
       "src": "/optimized/android-chrome-512x512.webp",
       "sizes": "512x512",
-      "type": "image/webp"
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/optimized/apple-touch-icon.webp",
+      "sizes": "180x180",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/optimized/favicon-64x64.webp",
+      "sizes": "64x64",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/optimized/favicon-32x32.webp",
+      "sizes": "32x32",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/optimized/favicon-16x16.webp",
+      "sizes": "16x16",
+      "type": "image/webp",
+      "purpose": "any"
     }
   ]
 }
