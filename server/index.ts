@@ -123,19 +123,20 @@ app.use((req, res, next) => {
 
   // Usando a porta definida nas variáveis de ambiente ou 8080 como padrão
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
-  
-  // Sistema de alertas agora verifica apenas no momento da atualização (como a versão antiga)
-  log("✅ Sistema de alertas ativado (verificação no momento da atualização)");
-  
+
+  // Iniciar sistema de alertas (verifica a cada 2 minutos)
+  log("✅ Iniciando sistema de alertas...");
+  alertSystem.startChecking(2);
+
   // Timer para verificar cotações periodicamente (independente de acesso à página)
-  const CHECK_INTERVAL_MINUTES = 1; // Verificar a cada 1 minuto
+  const CHECK_INTERVAL_MINUTES = 5; // Verificar a cada 5 minutos (mais seguro para evitar bloqueios)
   log(`⏰ Iniciando verificação automática de cotações a cada ${CHECK_INTERVAL_MINUTES} minutos`);
-  
+
   // Verificação inicial
   refreshCurrencies().catch(error => {
     console.error('Erro na verificação inicial de cotações:', error);
   });
-  
+
   // Configura verificação periódica
   setInterval(() => {
     refreshCurrencies().catch(error => {
