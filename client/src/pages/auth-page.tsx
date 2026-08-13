@@ -102,6 +102,13 @@ export default function LoginPage() {
     setSubmittedWithValidEmail(false);
     setShowNetworkError(false);
 
+    // Verificar conectividade antes de tentar login
+    if (!navigator.onLine) {
+      setShowNetworkError(true);
+      setSubmittedWithValidEmail(false);
+      return;
+    }
+
     // Verificar se o email é válido antes de prosseguir
     const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
     if (!emailRegex.test(values.email)) {
