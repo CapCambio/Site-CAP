@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import * as cheerio from 'cheerio';
 import { Currency } from '../shared/schema';
+import { getLatestCurrencyHistory } from './db';
 
 // Interface para os dados extraídos do scraping
 export interface ScrapedCurrency {
@@ -558,8 +559,58 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       return cachedData;
     }
     
-    // Se não houver cache, usa os valores hardcoded como último recurso
-    console.log('Nenhum dado em cache encontrado. Usando valores de fallback hardcoded.');
+    // Se não houver cache, tenta usar o histórico do PostgreSQL como fallback
+    console.log('Nenhum dado em cache encontrado. Tentando usar histórico do PostgreSQL como fallback...');
+    
+    try {
+      const latestHistory = await getLatestCurrencyHistory();
+      
+      if (latestHistory.size > 0) {
+        console.log(`✅ Usando ${latestHistory.size} moedas do histórico PostgreSQL como fallback`);
+        
+        // Mapeamento de códigos para nomes
+        const codeToName: Record<string, string> = {
+          'USD': 'Dólar Americano',
+          'EUR': 'Euro',
+          'GBP': 'Libra Esterlina',
+          'CAD': 'Dólar Canadense',
+          'AUD': 'Dólar Australiano',
+          'ARS': 'Peso Argentino',
+          'CLP': 'Peso Chileno',
+          'UYU': 'Peso Uruguaio',
+          'CHF': 'Franco Suíço',
+          'JPY': 'Iene Japonês',
+          'CNY': 'Yuan Chinês',
+          'MXN': 'Peso Mexicano',
+          'PYG': 'Guarani Paraguaio',
+          'PEN': 'Novo Sol Peruano',
+          'BOB': 'Boliviano',
+          'COP': 'Peso Colombiano',
+          'NZD': 'Dólar Neozelandês',
+          'ZAR': 'Rand Sul-Africano'
+        };
+        
+        const currencies: ScrapedCurrency[] = [];
+        latestHistory.forEach((history, code) => {
+          currencies.push({
+            name: codeToName[code] || code,
+            code: history.code,
+            buyPrice: history.buy_price,
+            sellPrice: history.sell_price
+          });
+        });
+        
+        // Salva no cache para uso futuro
+        await saveCachedData(currencies);
+        
+        return currencies;
+      }
+    } catch (dbError) {
+      console.error('Erro ao acessar histórico do PostgreSQL:', dbError);
+    }
+    
+    // Se não houver dados no histórico, usa os valores hardcoded como último recurso
+    console.log('Nenhum dado no histórico PostgreSQL. Usando valores de fallback hardcoded.');
     
     // Lista de moedas na ordem exata da página fonte (valores hardcoded como último recurso)
     const currencies: ScrapedCurrency[] = [
@@ -602,8 +653,62 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       console.error('Erro ao acessar cache:', cacheError);
     }
 
-    // Se não houver cache, usa os valores hardcoded como último recurso
-    console.log('Usando valores de fallback hardcoded.');
+    // Se não houver cache, tenta usar o histórico do PostgreSQL como fallback
+    console.log('Nenhum dado em cache disponível. Tentando usar histórico do PostgreSQL como fallback...');
+    
+    try {
+      const latestHistory = await getLatestCurrencyHistory();
+      
+      if (latestHistory.size > 0) {
+        console.log(`✅ Usando ${latestHistory.size} moedas do histórico PostgreSQL como fallback`);
+        
+        // Mapeamento de códigos para nomes
+        const codeToName: Record<string, string> = {
+          'USD': 'Dólar Americano',
+          'EUR': 'Euro',
+          'GBP': 'Libra Esterlina',
+          'CAD': 'Dólar Canadense',
+          'AUD': 'Dólar Australiano',
+          'ARS': 'Peso Argentino',
+          'CLP': 'Peso Chileno',
+          'UYU': 'Peso Uruguaio',
+          'CHF': 'Franco Suíço',
+          'JPY': 'Iene Japonês',
+          'CNY': 'Yuan Chinês',
+          'MXN': 'Peso Mexicano',
+          'PYG': 'Guarani Paraguaio',
+          'PEN': 'Novo Sol Peruano',
+          'BOB': 'Boliviano',
+          'COP': 'Peso Colombiano',
+          'NZD': 'Dólar Neozelandês',
+          'ZAR': 'Rand Sul-Africano'
+        };
+        
+        const currencies: ScrapedCurrency[] = [];
+        latestHistory.forEach((history, code) => {
+          currencies.push({
+            name: codeToName[code] || code,
+            code: history.code,
+            buyPrice: history.buy_price,
+            sellPrice: history.sell_price
+          });
+        });
+        
+        // Salva no cache para uso futuro
+        try {
+          await saveCachedData(currencies);
+        } catch (saveError) {
+          console.error('Não foi possível salvar no cache:', saveError);
+        }
+        
+        return currencies;
+      }
+    } catch (dbError) {
+      console.error('Erro ao acessar histórico do PostgreSQL:', dbError);
+    }
+    
+    // Se não houver dados no histórico, usa os valores hardcoded como último recurso
+    console.log('Nenhum dado no histórico PostgreSQL. Usando valores de fallback hardcoded.');
     
     // Lista de moedas na ordem exata da página fonte (valores hardcoded como último recurso)
     const currencies: ScrapedCurrency[] = [

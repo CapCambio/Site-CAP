@@ -269,6 +269,29 @@ export async function deleteCurrencyHistoryOlderThan(date: Date): Promise<number
   return result.rowCount || 0;
 }
 
+// Função para obter o último registro de cada moeda do histórico
+export async function getLatestCurrencyHistory(): Promise<Map<string, Omit<CurrencyHistory, 'id'>>> {
+  const query = `
+    SELECT DISTINCT ON (code) code, buy_price, sell_price, timestamp
+    FROM currency_history
+    ORDER BY code, timestamp DESC
+  `;
+  
+  const result = await pool.query(query);
+  const latestMap = new Map<string, Omit<CurrencyHistory, 'id'>>();
+  
+  result.rows.forEach(row => {
+    latestMap.set(row.code, {
+      code: row.code,
+      buy_price: parseFloat(row.buy_price),
+      sell_price: parseFloat(row.sell_price),
+      timestamp: new Date(row.timestamp).toISOString()
+    });
+  });
+  
+  return latestMap;
+}
+
 // Funções para push subscriptions
 export async function getPushSubscriptions(): Promise<PushSubscription[]> {
   const result = await pool.query('SELECT * FROM push_subscriptions ORDER BY timestamp DESC');
