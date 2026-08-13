@@ -1,6 +1,8 @@
 // Service Worker para Push Notifications e Cache
 
-const CACHE_NAME = 'cap-cotacoes-v3';
+// Versionamento dinâmico do cache para invalidação automática
+const CACHE_VERSION = '1.0.0'; // Atualizar este número em cada release
+const CACHE_NAME = `cap-cotacoes-v${CACHE_VERSION}`;
 const OFFLINE_PAGE = '/offline.html';
 const ASSETS_TO_CACHE = [
   '/',
@@ -232,23 +234,4 @@ self.addEventListener('message', (event) => {
       });
     });
   }
-});
-
-// Atualizar automaticamente quando nova versão estiver disponível
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
-  );
 });
