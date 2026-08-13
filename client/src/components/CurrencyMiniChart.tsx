@@ -189,9 +189,12 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     }
 
     // Procurar se há dados históricos para este dia
-    const historyEntry = historicalData?.find((entry: CurrencyHistory) => 
-      isSameDay(entry.timestamp, dayDate)
-    );
+    const historyEntry = historicalData?.find((entry: CurrencyHistory) => {
+      const entryDate = new Date(entry.timestamp);
+      return entryDate.getDate() === dayDate.getDate() &&
+             entryDate.getMonth() === dayDate.getMonth() &&
+             entryDate.getFullYear() === dayDate.getFullYear();
+    });
 
     return {
       date: formattedDay,
