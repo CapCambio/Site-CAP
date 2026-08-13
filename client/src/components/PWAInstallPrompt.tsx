@@ -106,7 +106,7 @@ export function PWAInstallPrompt() {
             <p className="text-gray-400 text-xs mt-1">
               {isIOS 
                 ? 'Toque em Compartilhar e depois em "Adicionar à Tela Inicial"'
-                : 'Instale o app para acesso rápido e offline'}
+                : 'Instale o app para acesso rápido'}
             </p>
           </div>
           <button
