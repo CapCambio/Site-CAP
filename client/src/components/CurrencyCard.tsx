@@ -86,8 +86,6 @@ export function CurrencyCard({
     }
   };
 
-  console.log('CurrencyCard renderizado:', code, 'isExpanded:', isExpanded);
-
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

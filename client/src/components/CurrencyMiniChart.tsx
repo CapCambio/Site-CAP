@@ -16,7 +16,6 @@ interface CurrencyMiniChartProps {
 }
 
 export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
-  console.log(' CurrencyMiniChart renderizado para:', currencyCode);
   const { t, i18n } = useTranslation();
   const [selectedMonth, setSelectedMonth] = useState<Date>(selectedDate ? startOfMonth(selectedDate) : startOfMonth(new Date()));
   const [chartType, setChartType] = useState<'day' | 'month'>('month');
@@ -159,25 +158,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const daysInMonth = Array.from({ length: daysInFullMonth }, (_, i) => i + 1);
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-  // Debug - verificar dados recebidos
-  console.log('🔍 CurrencyMiniChart Debug:');
-  console.log('Currency:', currencyCode);
-  console.log('Selected Month:', selectedMonth);
-  console.log('Historical Data:', historicalData);
-  console.log('Historical Data length:', historicalData?.length);
-
-  if (historicalData && historicalData.length > 0) {
-    const dates = historicalData.map((d: any) => ({
-      raw: d.timestamp,
-      parsed: new Date(d.timestamp),
-      day: new Date(d.timestamp).getDate(),
-      month: new Date(d.timestamp).getMonth(),
-      year: new Date(d.timestamp).getFullYear(),
-      sellPrice: d.sell_price
-    }));
-    console.log('Dates in history:', dates);
-  }
-
   // Mapear dados históricos para cada dia do mês
   const allChartData = daysInMonth.map(day => {
     // Formatar o dia no formato "dd/MM"
@@ -228,11 +208,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
   // Usar todos os dados no gráfico
   const chartData = allChartData;
-
-  // Debug - verificar dados finais do gráfico
-  console.log('🔍 Chart Data Final:');
-  console.log('Chart Data length:', chartData.length);
-  console.log('Chart Data with valid prices:', chartData.filter(d => d.sellPrice !== null));
 
   // Para mobile portrait: filtrar ticks para mostrar apenas ímpares + último dia
   const getCustomTicks = () => {
