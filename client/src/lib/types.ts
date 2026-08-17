@@ -11,9 +11,9 @@ export interface Currency {
 export interface CurrencyHistory {
   id?: number;
   code: string;
-  buyPrice: number;
-  sellPrice: number;
-  timestamp: Date;
+  buy_price: number;
+  sell_price: number;
+  timestamp: string;
 }
 
 export type TabType = "current" | "history";

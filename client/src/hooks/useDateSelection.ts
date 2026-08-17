@@ -63,8 +63,8 @@ export function useDateSelection() {
           if (historyData && historyData.length > 0) {
             // Usamos o primeiro registro do dia (normalmente terá apenas um)
             result[currency.code] = {
-              buyPrice: historyData[0].buyPrice,
-              sellPrice: historyData[0].sellPrice,
+              buyPrice: historyData[0].buy_price,
+              sellPrice: historyData[0].sell_price,
               timestamp: new Date(historyData[0].timestamp)
             };
           } else {
