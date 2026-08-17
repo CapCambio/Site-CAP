@@ -16,12 +16,11 @@ interface CurrencyMiniChartProps {
 }
 
 export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
+  console.log(' CurrencyMiniChart renderizado para:', currencyCode);
   const { t, i18n } = useTranslation();
+  const [selectedMonth, setSelectedMonth] = useState<Date>(selectedDate ? startOfMonth(selectedDate) : startOfMonth(new Date()));
+  const [chartType, setChartType] = useState<'day' | 'month'>('month');
   const today = new Date();
-  // Usar selectedDate se fornecida, senão usar hoje - mas sempre começar com o mês atual
-  const initialMonth = selectedDate ? startOfMonth(selectedDate) : startOfMonth(today);
-  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
-  const [chartType, setChartType] = useState<'month' | 'day'>('month');
   const [isMobileLandscape, setIsMobileLandscape] = useState(false);
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
 
