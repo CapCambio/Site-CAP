@@ -78,13 +78,15 @@ export function CurrencyCard({
 
   const handleTooltipClose = () => {
     setShowTooltip(false);
-    
+
     // Limpa o timer
     if (tooltipTimerRef.current) {
       clearTimeout(tooltipTimerRef.current);
       tooltipTimerRef.current = null;
     }
   };
+
+  console.log('CurrencyCard renderizado:', code, 'isExpanded:', isExpanded);
 
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
