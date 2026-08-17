@@ -37,7 +37,9 @@ export function useHistoricalData() {
       const data = await response.json();
       return data.map((item: any) => ({
         ...item,
-        timestamp: item.timestamp
+        buyPrice: item.buy_price,
+        sellPrice: item.sell_price,
+        timestamp: new Date(item.timestamp)
       }));
     },
     refetchOnWindowFocus: false,
@@ -82,20 +84,20 @@ export function useHistoricalData() {
 
   // Prepare chart data
   const chartData = historicalData ? historicalData
-    .sort((a: CurrencyHistory, b: CurrencyHistory) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+    .sort((a: CurrencyHistory, b: CurrencyHistory) => a.timestamp.getTime() - b.timestamp.getTime())
     .map((entry: CurrencyHistory) => ({
-      date: formatDate(new Date(entry.timestamp)),
-      compra: entry.buy_price,
-      venda: entry.sell_price
+      date: formatDate(entry.timestamp),
+      compra: entry.buyPrice,
+      venda: entry.sellPrice
     })) : [];
 
   // Calculate average prices
   const averageBuy = historicalData && historicalData.length > 0
-    ? historicalData.reduce((sum: number, item: CurrencyHistory) => sum + item.buy_price, 0) / historicalData.length
+    ? historicalData.reduce((sum: number, item: CurrencyHistory) => sum + item.buyPrice, 0) / historicalData.length
     : 0;
 
   const averageSell = historicalData && historicalData.length > 0
-    ? historicalData.reduce((sum: number, item: CurrencyHistory) => sum + item.sell_price, 0) / historicalData.length
+    ? historicalData.reduce((sum: number, item: CurrencyHistory) => sum + item.sellPrice, 0) / historicalData.length
     : 0;
 
   return {

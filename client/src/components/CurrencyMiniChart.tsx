@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { format, getDate, startOfMonth, endOfMonth, isBefore, isSameDay, getMonth, getYear, parseISO } from 'date-fns';
+import { format, getDate, startOfMonth, endOfMonth, isBefore, isSameDay, getMonth, getYear } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { CurrencyHistory } from '../lib/types';
@@ -209,15 +209,14 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
     // Procurar se há dados históricos para este dia
     const historyEntry = historicalData?.find((entry: CurrencyHistory) => {
-      const entryDate = parseISO(entry.timestamp);
-      return isSameDay(entryDate, dayDate);
+      return isSameDay(entry.timestamp, dayDate);
     });
 
     return {
       date: formattedDay,
       day: day.toString(),
-      sellPrice: historyEntry?.sell_price ?? null,
-      buyPrice: historyEntry?.buy_price ?? null,
+      sellPrice: historyEntry?.sellPrice ?? null,
+      buyPrice: historyEntry?.buyPrice ?? null,
       hasRealData: !!historyEntry
     };
   });
