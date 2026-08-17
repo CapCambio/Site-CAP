@@ -47,6 +47,9 @@ export const currencyDetails: Record<string, { name: string }> = {
 // Format currency values according to their rules
 // Shows up to 5 decimal places, and remove trailing zeros that don't change the value
 export function formatCurrencyValue(code: string, value: number): string {
+  if (typeof value !== 'number' || isNaN(value)) {
+    return '0,00';
+  }
   const valueStr = value.toString();
   const [intPart, rawDecPart = ''] = valueStr.split('.');
   
@@ -67,7 +70,8 @@ export function formatCurrencyValue(code: string, value: number): string {
 // Format percentage changes
 export function formatPercentage(value: number | null): string {
   if (value === null || value === 0) return '0,00%';
-  
+  if (typeof value !== 'number' || isNaN(value)) return '0,00%';
+
   // Converte para string e trunca para 2 casas sem arredondar
   const valueStr = value.toString();
   const [intPart, rawDecPart = ''] = valueStr.split('.');
