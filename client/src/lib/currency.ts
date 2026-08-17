@@ -79,8 +79,9 @@ export function formatPercentage(value: number | null): string {
 }
 
 // Format dates to Brazilian format
-export function formatDate(date: Date): string {
-  return date.toLocaleDateString('pt-BR');
+export function formatDate(date: Date | string): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return dateObj.toLocaleDateString('pt-BR');
 }
 
 // Format time to Brazilian format
