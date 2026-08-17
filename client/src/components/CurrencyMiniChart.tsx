@@ -158,7 +158,10 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const daysInMonth = Array.from({ length: daysInFullMonth }, (_, i) => i + 1);
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-  // Mapear dados históricos para cada dia do mês
+  // Mapear dados históricos para cada dia do mês com forward fill
+  let lastKnownSellPrice: number | null = null;
+  let lastKnownBuyPrice: number | null = null;
+
   const allChartData = daysInMonth.map(day => {
     // Formatar o dia no formato "dd/MM"
     const dayDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day);
@@ -179,9 +182,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     if (isSameDay(dayDate, today)) {
       // Priorizar: currentPrice > currentCurrencyData > dados históricos
       const todaysSellPrice = currentPrice || currentCurrencyData?.sellPrice;
-      const todaysBuyPrice = currentCurrencyData?.buyPrice;
-      
+      const todaysBuyPrice = currentCurrencyData?.buyPrice ?? null;
+
       if (todaysSellPrice) {
+        lastKnownSellPrice = todaysSellPrice;
+        lastKnownBuyPrice = todaysBuyPrice;
         return {
           date: formattedDay,
           day: day.toString(),
@@ -197,11 +202,18 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       return isSameDay(entry.timestamp, dayDate);
     });
 
+    // Se houver dados para este dia, atualiza o último preço conhecido
+    if (historyEntry) {
+      lastKnownSellPrice = historyEntry.sellPrice;
+      lastKnownBuyPrice = historyEntry.buyPrice;
+    }
+
+    // Forward fill: usar último preço conhecido se não houver dados para este dia
     return {
       date: formattedDay,
       day: day.toString(),
-      sellPrice: historyEntry?.sellPrice ?? null,
-      buyPrice: historyEntry?.buyPrice ?? null,
+      sellPrice: historyEntry?.sellPrice ?? lastKnownSellPrice,
+      buyPrice: historyEntry?.buyPrice ?? lastKnownBuyPrice,
       hasRealData: !!historyEntry
     };
   });
