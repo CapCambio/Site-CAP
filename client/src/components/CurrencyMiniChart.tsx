@@ -96,10 +96,16 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
       const monthStartStr = monthStart.toISOString().split('T')[0];
       const monthEndStr = adjustedMonthEnd.toISOString().split('T')[0];
 
-      const data = await api.history.getForCurrency(currencyCode, monthStartStr, monthEndStr);
+      const data = await api.history.getForCurrency(
+        currencyCode,
+        monthStartStr,
+        monthEndStr
+      );
+
       return data.map((item: any) => ({
-        ...item,
-        timestamp: new Date(item.timestamp)
+        timestamp: new Date(item.timestamp),
+        sellPrice: Number(item.sell_price),
+        buyPrice: Number(item.buy_price),
       }));
     },
     refetchOnWindowFocus: false,
