@@ -16,6 +16,9 @@ interface CurrencyMiniChartProps {
 }
 
 export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
+  // MODO MOCKUP: Ative para gerar dados falsos para prints (apenas USD e EUR)
+  const MOCK_MODE = false;
+
   const { t, i18n } = useTranslation();
   const [selectedMonth, setSelectedMonth] = useState<Date>(selectedDate ? startOfMonth(selectedDate) : startOfMonth(new Date()));
   const [chartType, setChartType] = useState<'day' | 'month'>('month');
@@ -158,6 +161,39 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const daysInMonth = Array.from({ length: daysInFullMonth }, (_, i) => i + 1);
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+  // Gerar dados falsos para mockups (apenas USD e EUR)
+  const mockHistoricalData = (() => {
+    if (!MOCK_MODE || (currencyCode !== 'USD' && currencyCode !== 'EUR')) {
+      return historicalData;
+    }
+
+    const basePrice = currentPrice || currentCurrencyData?.sellPrice || 5.5;
+    const mockData: CurrencyHistory[] = [];
+
+    for (let day = 1; day <= daysInFullMonth; day++) {
+      const dayDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day);
+
+      // Não gerar dados para dias futuros
+      if (dayDate > today) continue;
+
+      // Variação aleatória de até 0.08 para cima ou para baixo
+      const variation = (Math.random() - 0.5) * 0.16; // -0.08 a +0.08
+      const sellPrice = basePrice + variation;
+      const buyPrice = sellPrice - 0.1; // buyPrice geralmente menor que sellPrice
+
+      mockData.push({
+        timestamp: dayDate,
+        sellPrice,
+        buyPrice,
+        code: currencyCode
+      });
+    }
+
+    return mockData;
+  })();
+
+  const effectiveHistoricalData = mockHistoricalData;
+
   // Mapear dados históricos para cada dia do mês com forward fill
   let lastKnownSellPrice: number | null = null;
   let lastKnownBuyPrice: number | null = null;
@@ -198,7 +234,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     }
 
     // Procurar se há dados históricos para este dia
-    const historyEntry = historicalData?.find((entry: CurrencyHistory) => {
+    const historyEntry = effectiveHistoricalData?.find((entry: CurrencyHistory) => {
       return isSameDay(entry.timestamp, dayDate);
     });
 
