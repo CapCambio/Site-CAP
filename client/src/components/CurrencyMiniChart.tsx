@@ -17,7 +17,7 @@ interface CurrencyMiniChartProps {
 
 export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
   // MODO MOCKUP: Ative para gerar dados falsos para prints (apenas USD e EUR)
-  const MOCK_MODE = false;
+  const MOCK_MODE = true;
 
   const { t, i18n } = useTranslation();
   const [selectedMonth, setSelectedMonth] = useState<Date>(selectedDate ? startOfMonth(selectedDate) : startOfMonth(new Date()));
