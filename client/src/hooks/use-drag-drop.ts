@@ -205,21 +205,44 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null)
   };
 
   const handleTouchStart = (e: React.TouchEvent, index: number) => {
+    // Guardar posição inicial do toque para detectar scroll
+    const touch = e.touches[0];
+    const startY = touch.clientY;
+    const startX = touch.clientX;
+
     // Iniciar long press timer para touch
     longPressTimer.current = setTimeout(() => {
       setIsLongPressActive(true);
       setSelectedForDrag(index);
-      
+
       // Iniciar drag visual
       const draggedItem: DragItem = {
         index,
         id: items[index].code,
         type: 'currency'
       };
-      
+
       setDraggedItem(draggedItem);
       setDraggedIndex(index);
     }, 1000); // 1 segundo
+
+    // Adicionar listener de touchmove para detectar scroll
+    const handleTouchMove = (moveEvent: TouchEvent) => {
+      const moveTouch = moveEvent.touches[0];
+      const deltaY = Math.abs(moveTouch.clientY - startY);
+      const deltaX = Math.abs(moveTouch.clientX - startX);
+
+      // Se moveu mais de 10px, cancelar long press (é scroll)
+      if (deltaY > 10 || deltaX > 10) {
+        if (longPressTimer.current) {
+          clearTimeout(longPressTimer.current);
+          longPressTimer.current = null;
+        }
+        document.removeEventListener('touchmove', handleTouchMove);
+      }
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: true });
   };
 
   const handleTouchEnd = () => {
