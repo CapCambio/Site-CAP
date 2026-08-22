@@ -9,10 +9,29 @@ export function WhatsAppFloatingButton() {
 
   return (
     <>
+      <style>{`
+        @media (prefers-reduced-motion: no-preference) {
+          .whatsapp-pulse::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border: 2px solid #25D366;
+            border-radius: 9999px;
+            animation: whatsapp-pulse 2.8s cubic-bezier(.23, 1, .32, 1) infinite;
+            pointer-events: none;
+          }
+
+          @keyframes whatsapp-pulse {
+            0%, 18% { opacity: .65; transform: scale(.9); }
+            62%, 100% { opacity: 0; transform: scale(1.55); }
+          }
+        }
+      `}</style>
+
       {/* Botão flutuante */}
       <button
         onClick={() => setShowBranchDialog(true)}
-        className="fixed bottom-20 md:bottom-12 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-black"
+        className="whatsapp-pulse fixed bottom-20 md:bottom-12 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-black"
         aria-label={t('whatsapp.contact')}
       >
         <FaWhatsapp className="text-2xl" />
