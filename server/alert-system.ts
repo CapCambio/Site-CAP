@@ -5,6 +5,7 @@ import webpush from 'web-push';
 import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
 import { jsonStorage } from './json-storage';
+import { logger } from './logger';
 
 // Registrar helpers Handlebars
 Handlebars.registerHelper('gt', (a: number, b: number) => a > b);
@@ -249,8 +250,9 @@ class AlertSystem {
    */
   private async checkAllCurrencies(): Promise<void> {
     try {
+      logger.info('Iniciando verificação de cotações para alertas');
       console.log('🔍 Verificando cotações para alertas...');
-      
+
       // Obter todas as moedas do sistema
       const currencies = await jsonStorage.getAllCurrencies();
       
@@ -284,14 +286,18 @@ class AlertSystem {
             // Pegar o mais antigo e o mais recente
             const previous = sortedHistory[0];
             const current = sortedHistory[sortedHistory.length - 1];
-            
+
+            // Calcular variação
+            const variacao = ((current.sellPrice - previous.sellPrice) / previous.sellPrice) * 100;
+
             console.log(`- Primeiro registro: ${new Date(previous.timestamp).toISOString()} - Venda: R$ ${previous.sellPrice}`);
             console.log(`- Último registro:   ${new Date(current.timestamp).toISOString()} - Venda: R$ ${current.sellPrice}`);
-            
+
             // Verificar se os preços são diferentes
             if (previous.sellPrice !== current.sellPrice) {
               console.log(`✅ Alteração de preço detectada para ${currency.code}`);
-              
+              logger.priceCheck(currency.code, previous.sellPrice, current.sellPrice, variacao);
+
               // Coletar alertas para esta moeda e adicionar ao mapa do usuário
               await this.collectAlertsForCurrency(
                 currency.code,
@@ -443,6 +449,9 @@ class AlertSystem {
           alertType: alert.tipo,
           alert: { ...alert } // Inclui o objeto de alerta completo
         });
+
+        // Log específico para alerta disparado
+        logger.alertTriggered(email, currencyCode, alert.tipo, newSellPrice, variacao);
 
         // Se for alerta de valor-especifico, remove-o após o disparo
         if (alert.tipo === 'valor-especifico') {
@@ -1008,11 +1017,13 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
         console.log(`   → Enviando para endpoint: ${subscription.endpoint.substring(0, 60)}...`);
         await webpush.sendNotification(subscription, payload);
         console.log(`   ✅ PUSH ENVIADO COM SUCESSO para ${email}`);
+        logger.pushSent(email, subscription.endpoint, true);
         successCount++;
       } catch (error: unknown) {
         if (error && typeof error === 'object' && 'statusCode' in error && error.statusCode === 410) {
           // Assinatura expirada, remover do array
           console.log(`   ❌ Assinatura push expirada (410) para ${email}, removendo...`);
+          logger.pushSent(email, subscription.endpoint, false, 'Subscription expired (410)');
           const index = subscriptions.indexOf(subscription);
           if (index > -1) {
             subscriptions.splice(index, 1);
@@ -1024,6 +1035,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
           console.error(`   ❌ Erro ao enviar notificação push para ${email}:`);
           console.error(`      Status: ${statusCode}`);
           console.error(`      Mensagem: ${errorMessage}`);
+          logger.pushSent(email, subscription.endpoint, false, `${statusCode}: ${errorMessage}`);
         }
       }
     }
@@ -1112,7 +1124,9 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
 
       // Envia o e-mail com todos os alertas
       await this.sendEmailNotification(email, emailAlerts);
-      
+
+      logger.emailSent(email, `Alertas de cotações (${alerts.length} moedas)`, alerts.length);
+
       console.log(`✅ Notificações agrupadas enviadas para ${email} com ${alerts.length} alerta(s)`);
     } catch (error) {
       console.error(`❌ Erro ao enviar notificações para ${email}:`, error);
