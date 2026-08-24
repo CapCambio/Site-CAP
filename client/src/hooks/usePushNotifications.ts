@@ -187,10 +187,9 @@ export function usePushNotifications() {
       }
       
       setIsSubscribed(true);
-      
+
       toast({
         title: t('toasts.notificationsEnabled'),
-        description: t('toasts.notificationsEnabledDesc'),
       });
       return true;
     } catch (error) {
