@@ -94,8 +94,12 @@ const UserAlerts: React.FC<{ email: string }> = ({ email }) => {
       case 'descida':
         return t('admin.alwaysFall');
       case 'valor-especifico':
-        const valor = typeof alert?.valor === 'number' ? alert.valor.toFixed(2) : '0,00';
-        return `${t('admin.whenReach')}: R$ ${valor}`;
+        // Verificar tanto 'valor' quanto 'valorEspecifico' para compatibilidade
+        const valor = typeof alert?.valor === 'number' ? alert.valor :
+                      typeof alert?.valorEspecifico === 'number' ? alert.valorEspecifico :
+                      '0,00';
+        const valorFormatado = typeof valor === 'number' ? valor.toFixed(2) : valor;
+        return `${t('admin.whenReach')}: R$ ${valorFormatado}`;
       default:
         return t('admin.alertBothCases');
     }
@@ -105,7 +109,7 @@ const UserAlerts: React.FC<{ email: string }> = ({ email }) => {
     if (alert.tipo === 'valor-especifico') {
       return '';
     }
-    
+
     if (!alert.validade) {
       return t('admin.indefiniteTime');
     }
@@ -318,8 +322,12 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
       case 'descida':
         return t('admin.alwaysFall');
       case 'valor-especifico':
-        const valor = typeof alert?.valor === 'number' ? alert.valor.toFixed(2) : '0,00';
-        return `${t('admin.whenReach')}: R$ ${valor}`;
+        // Verificar tanto 'valor' quanto 'valorEspecifico' para compatibilidade
+        const valor = typeof alert?.valor === 'number' ? alert.valor :
+                      typeof alert?.valorEspecifico === 'number' ? alert.valorEspecifico :
+                      '0,00';
+        const valorFormatado = typeof valor === 'number' ? valor.toFixed(2) : valor;
+        return `${t('admin.whenReach')}: R$ ${valorFormatado}`;
       default:
         return t('admin.alertBothCases');
     }
@@ -330,7 +338,7 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
     if (alert.tipo === 'valor-especifico') {
       return '';
     }
-    
+
     if (!alert.validade) {
       return t('admin.indefiniteTime');
     }
