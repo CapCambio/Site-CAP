@@ -358,73 +358,62 @@
     "hoursLabel": "Horas"
   },
   "privacy": {
-    "title": "Política de Privacidade",
+    "title": "Política de Privacidade – CAP Câmbio",
     "close": "Fechar",
     "back": "Voltar",
     "disclaimer": "Esta é uma tradução informativa. A versão em português é a única legalmente válida.",
     "section1": {
-      "title": "1. Introdução",
-      "content": "A CAP Câmbio valoriza a privacidade e a proteção dos dados pessoais de seus usuários. Esta Política de Privacidade explica como coletamos, utilizamos, protegemos, armazenamos e, quando necessário, compartilhamos suas informações, em conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018)."
+      "title": "1. Informações Coletadas",
+      "content": "A CAP Câmbio valoriza a privacidade e a proteção dos dados pessoais de seus clientes e visitantes. Esta Política de Privacidade explica como coletamos, utilizamos, protegemos e armazenamos suas informações em nosso site institucional e na plataforma CAP Cotações, em total conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018). Coletamos informações em diferentes níveis de interação com nossos serviços digitais:"
     },
     "section2": {
-      "title": "2. Informações Coletadas",
-      "intro": "Coletamos informações pessoais que você fornece diretamente ou que são geradas automaticamente durante o uso da plataforma, incluindo:",
-      "item1": "Endereço de e-mail;",
-      "item2": "Nome;",
-      "item3": "Preferências de alertas e notificações;",
-      "item4": "Informações de uso da plataforma e dados de navegação (como cookies, endereço IP, tipo de dispositivo, dados de sessão)."
+      "title": "2. Níveis de Coleta",
+      "intro": "Coletamos informações em diferentes níveis de interação com nossos serviços digitais:",
+      "item1": "Navegação Geral: Dados técnicos como endereço IP, tipo de dispositivo, cookies e padrões de navegação para melhorar a performance do site.",
+      "item2": "Contato e Reservas: Informações fornecidas voluntariamente por você ao entrar em contato via WhatsApp ou e-mail (nome, telefone e detalhes da operação desejada).",
+      "item3": "Plataforma CAP Cotações: Dados necessários para o funcionamento do sistema restrito, incluindo endereço de e-mail cadastrado, nome e preferências de alertas personalizados."
     },
     "section3": {
-      "title": "3. Finalidade do Uso dos Dados",
-      "intro": "Utilizamos suas informações para:",
-      "item1": "Fornecer e gerenciar o acesso à plataforma de cotações;",
-      "item2": "Personalizar sua experiência e enviar alertas de preços configurados por você;",
-      "item3": "Melhorar e otimizar nossos serviços;",
-      "item4": "Garantir a segurança da plataforma;",
-      "item5": "Enviar comunicações importantes sobre o serviço (como atualizações, manutenções e mudanças nos termos)."
+      "title": "3. Finalidade do Tratamento de Dados",
+      "intro": "Seus dados são utilizados exclusivamente para:",
+      "item1": "Gerenciar e autenticar o acesso à plataforma exclusiva de cotações.",
+      "item2": "Processar pedidos de reserva de moeda e responder a consultas de taxas.",
+      "item3": "Enviar alertas de preços e notificações configuradas pelo usuário na plataforma.",
+      "item4": "Garantir a segurança cibernética de nossos ambientes digitais.",
+      "item5": "Cumprir obrigações legais e regulatórias inerentes ao mercado de câmbio."
     },
     "section4": {
-      "title": "4. Compartilhamento de Informações",
-      "intro": "Não vendemos nem alugamos seus dados pessoais. Somente compartilhamos suas informações quando estritamente necessário para:",
-      "item1": "Cumprir obrigações legais ou regulatórias;",
-      "item2": "Proteger os direitos, a segurança e a integridade da CAP Câmbio e de seus usuários;",
-      "item3": "Executar serviços técnicos essenciais, como hospedagem e infraestrutura, sempre com parceiros que também respeitam a LGPD."
+      "title": "4. Compartilhamento e Segurança",
+      "intro": "A CAP Câmbio não comercializa seus dados pessoais. O compartilhamento ocorre apenas quando estritamente necessário para:",
+      "item1": "Cumprimento de normas do Banco Central do Brasil e demais órgãos reguladores.",
+      "item2": "Serviços técnicos essenciais (como hospedagem e infraestrutura de TI), sempre com parceiros que garantam conformidade com a LGPD.",
+      "item3": "Adotamos medidas técnicas e organizacionais para proteger seus dados contra acessos não autorizados ou incidentes de segurança. Recomendamos que você também proteja suas credenciais de acesso à plataforma."
     },
     "section5": {
-      "title": "5. Segurança dos Dados",
-      "content": "Adotamos medidas técnicas e organizacionais apropriadas para proteger seus dados contra acessos não autorizados, perda, uso indevido, alteração ou divulgação indevida. No entanto, nenhum sistema é completamente imune, e recomendamos que você também proteja suas credenciais."
+      "title": "5. Cookies e Tecnologias de Rastreio",
+      "content": "Utilizamos cookies para manter sua sessão ativa na plataforma e lembrar suas preferências de visualização. Você pode gerenciar ou desativar os cookies nas configurações do seu navegador, embora isso possa afetar algumas funcionalidades do site."
     },
     "section6": {
-      "title": "6. Retenção de Dados",
-      "content": "Seus dados serão armazenados apenas pelo tempo necessário para cumprir as finalidades descritas nesta política, exceto quando exigido por obrigações legais ou regulatórias que exijam retenção por prazo superior."
+      "title": "6. Seus Direitos (LGPD)",
+      "intro": "Como titular dos dados, você possui direitos garantidos por lei, incluindo:",
+      "item1": "Confirmação da existência de tratamento e acesso aos dados.",
+      "item2": "Correção de dados incompletos, inexatos ou desatualizados.",
+      "item3": "Solicitação de exclusão de dados, quando a base legal permitir.",
+      "item4": "Revogação de consentimento para comunicações opcionais."
     },
     "section7": {
-      "title": "7. Cookies e Tecnologias Similares",
-      "intro": "Utilizamos cookies e tecnologias semelhantes para:",
-      "item1": "Melhorar o desempenho da plataforma;",
-      "item2": "Analisar padrões de uso;",
-      "item3": "Manter sua sessão ativa e lembrar suas preferências.",
-      "note": "Você pode desativar os cookies nas configurações do seu navegador, mas isso pode afetar a experiência de uso."
+      "title": "7. Retenção de Dados",
+      "content": "Seus dados serão armazenados pelo período necessário para cumprir as finalidades descritas ou conforme exigido por prazos legais de guarda de documentos e registros cambiais."
     },
     "section8": {
-      "title": "8. Seus Direitos como Titular de Dados",
-      "intro": "Você tem os seguintes direitos garantidos pela LGPD:",
-      "item1": "Confirmar se tratamos seus dados e acessá-los;",
-      "item2": "Corrigir dados pessoais incompletos, inexatos ou desatualizados;",
-      "item3": "Solicitar a exclusão dos seus dados, quando aplicável;",
-      "item4": "Retirar seu consentimento, quando o tratamento for baseado nele;",
-      "item5": "Portabilidade de dados, mediante requisição expressa;",
-      "item6": "Solicitar informações sobre compartilhamentos realizados.",
-      "note": "Para exercer qualquer desses direitos, entre em contato pelos nossos canais oficiais."
+      "title": "8. Alterações nesta Política",
+      "content": "Esta Política de Privacidade pode ser atualizada periodicamente para refletir melhorias em nossos processos ou mudanças legislativas. A versão atualizada estará sempre disponível em nosso site."
     },
     "section9": {
-      "title": "9. Alterações nesta Política",
-      "content": "Esta Política de Privacidade pode ser atualizada periodicamente. Notificaremos você sobre mudanças relevantes por meio da plataforma ou pelo seu e-mail cadastrado. A versão mais recente sempre estará disponível nesta página."
-    },
-    "section10": {
-      "title": "10. Contato",
-      "intro": "Em caso de dúvidas, solicitações ou para exercer seus direitos como titular de dados, entre em contato conosco pelo e-mail:",
-      "email": "📧 capcambio_caxias@hotmail.com"
+      "title": "9. Contato e Encarregado de Dados",
+      "content": "Para exercer seus direitos ou tirar dúvidas sobre como tratamos suas informações, entre em contato conosco:",
+      "email": "📧 capcambio_caxias@hotmail.com",
+      "lastUpdate": "Última atualização: Agosto de 2026."
     }
   },
   "footer": {

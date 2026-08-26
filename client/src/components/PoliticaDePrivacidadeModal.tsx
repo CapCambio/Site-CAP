@@ -51,7 +51,6 @@ export function PoliticaDePrivacidadeModal({ isOpen, onClose }: PoliticaDePrivac
                 <li>{t('privacy.section2.item1')}</li>
                 <li>{t('privacy.section2.item2')}</li>
                 <li>{t('privacy.section2.item3')}</li>
-                <li>{t('privacy.section2.item4')}</li>
               </ul>
             </section>
 
@@ -91,40 +90,27 @@ export function PoliticaDePrivacidadeModal({ isOpen, onClose }: PoliticaDePrivac
             <section>
               <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('privacy.section6.title')}</h3>
               <p className="text-zinc-300 mb-4">
-                {t('privacy.section6.content')}
+                {t('privacy.section6.intro')}
               </p>
+              <ul className="list-disc list-inside text-zinc-300 mb-4 space-y-2">
+                <li>{t('privacy.section6.item1')}</li>
+                <li>{t('privacy.section6.item2')}</li>
+                <li>{t('privacy.section6.item3')}</li>
+                <li>{t('privacy.section6.item4')}</li>
+              </ul>
             </section>
 
             <section>
               <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('privacy.section7.title')}</h3>
               <p className="text-zinc-300 mb-4">
-                {t('privacy.section7.intro')}
-              </p>
-              <ul className="list-disc list-inside text-zinc-300 mb-4 space-y-2">
-                <li>{t('privacy.section7.item1')}</li>
-                <li>{t('privacy.section7.item2')}</li>
-                <li>{t('privacy.section7.item3')}</li>
-              </ul>
-              <p className="text-zinc-300 mb-4">
-                {t('privacy.section7.note')}
+                {t('privacy.section7.content')}
               </p>
             </section>
 
             <section>
               <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('privacy.section8.title')}</h3>
               <p className="text-zinc-300 mb-4">
-                {t('privacy.section8.intro')}
-              </p>
-              <ul className="list-disc list-inside text-zinc-300 mb-4 space-y-2">
-                <li>{t('privacy.section8.item1')}</li>
-                <li>{t('privacy.section8.item2')}</li>
-                <li>{t('privacy.section8.item3')}</li>
-                <li>{t('privacy.section8.item4')}</li>
-                <li>{t('privacy.section8.item5')}</li>
-                <li>{t('privacy.section8.item6')}</li>
-              </ul>
-              <p className="text-zinc-300 mb-4">
-                {t('privacy.section8.note')}
+                {t('privacy.section8.content')}
               </p>
             </section>
 
@@ -133,20 +119,16 @@ export function PoliticaDePrivacidadeModal({ isOpen, onClose }: PoliticaDePrivac
               <p className="text-zinc-300 mb-4">
                 {t('privacy.section9.content')}
               </p>
+              <p className="text-zinc-300 mt-2">
+                {t('privacy.section9.email')}
+              </p>
+              <p className="text-zinc-400 text-sm mt-2">
+                {t('privacy.section9.lastUpdate')}
+              </p>
             </section>
 
-            <section>
-              <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('privacy.section10.title')}</h3>
-              <p className="text-zinc-300">
-                {t('privacy.section10.intro')}
-              </p>
-              <p className="text-zinc-300 mt-2">
-                {t('privacy.section10.email')}
-              </p>
-            </section>
-            
             <div className="mt-8 pt-6 border-t border-zinc-800 flex justify-center">
-              <Button 
+              <Button
                 onClick={onClose}
                 className="flex items-center gap-2 bg-yellow-500 !bg-yellow-500 text-black hover:bg-yellow-600 border-none transition-colors duration-200"
               >
