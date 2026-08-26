@@ -45,8 +45,15 @@ export function TermosDeUsoModal({ isOpen, onClose }: TermosDeUsoModalProps) {
             <section>
               <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('terms.section2.title')}</h3>
               <p className="text-zinc-300 mb-4">
-                {t('terms.section2.content')}
+                {t('terms.section2.intro')}
               </p>
+              <ul className="list-disc list-inside text-zinc-300 mb-4 space-y-2">
+                <li>{t('terms.section2.item1')}</li>
+                <li>{t('terms.section2.item2')}</li>
+                <li>{t('terms.section2.item3')}</li>
+                <li>{t('terms.section2.item4')}</li>
+                <li>{t('terms.section2.item5')}</li>
+              </ul>
             </section>
 
             <section>
@@ -58,50 +65,32 @@ export function TermosDeUsoModal({ isOpen, onClose }: TermosDeUsoModalProps) {
                 <li>{t('terms.section3.item1')}</li>
                 <li>{t('terms.section3.item2')}</li>
                 <li>{t('terms.section3.item3')}</li>
-                <li>{t('terms.section3.item4')}</li>
-                <li>{t('terms.section3.item5')}</li>
-                <li>{t('terms.section3.item6')}</li>
-                <li>{t('terms.section3.item7')}</li>
               </ul>
-              <p className="text-zinc-300 mb-4">
-                {t('terms.section3.note')}
-              </p>
             </section>
 
             <section>
               <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('terms.section4.title')}</h3>
               <p className="text-zinc-300 mb-4">
-                {t('terms.section4.intro')}
+                {t('terms.section4.content')}
               </p>
-              <ul className="list-disc list-inside text-zinc-300 mb-4 space-y-2">
-                <li>{t('terms.section4.item1')}</li>
-                <li>{t('terms.section4.item2')}</li>
-                <li>{t('terms.section4.item3')}</li>
-                <li>{t('terms.section4.item4')}</li>
-                <li>{t('terms.section4.item5')}</li>
-              </ul>
             </section>
 
             <section>
               <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('terms.section5.title')}</h3>
               <p className="text-zinc-300 mb-4">
-                {t('terms.section5.content')}
+                {t('terms.section5.intro')}
               </p>
+              <ul className="list-disc list-inside text-zinc-300 mb-4 space-y-2">
+                <li>{t('terms.section5.item1')}</li>
+                <li>{t('terms.section5.item2')}</li>
+                <li>{t('terms.section5.item3')}</li>
+              </ul>
             </section>
 
             <section>
               <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('terms.section6.title')}</h3>
               <p className="text-zinc-300 mb-4">
-                {t('terms.section6.intro')}
-              </p>
-              <ul className="list-disc list-inside text-zinc-300 mb-4 space-y-2">
-                <li>{t('terms.section6.item1')}</li>
-                <li>{t('terms.section6.item2')}</li>
-                <li>{t('terms.section6.item3')}</li>
-                <li>{t('terms.section6.item4')}</li>
-              </ul>
-              <p className="text-zinc-300 mb-4">
-                {t('terms.section6.note')}
+                {t('terms.section6.content')}
               </p>
             </section>
 
@@ -120,30 +109,20 @@ export function TermosDeUsoModal({ isOpen, onClose }: TermosDeUsoModalProps) {
               <p className="text-zinc-300 mb-4">
                 {t('terms.section8.content2')}
               </p>
-              <p className="text-zinc-300 mb-4">
-                {t('terms.section8.content3')}
-              </p>
             </section>
 
             <section>
               <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('terms.section9.title')}</h3>
               <p className="text-zinc-300 mb-4">
-                {t('terms.section9.content1')}
+                {t('terms.section9.content')}
               </p>
-              <p className="text-zinc-300 mb-4">
-                {t('terms.section9.content2')}
+              <p className="text-zinc-400 text-sm mt-2">
+                {t('terms.section9.lastUpdate')}
               </p>
             </section>
 
-            <section>
-              <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('terms.section10.title')}</h3>
-              <p className="text-zinc-300">
-                {t('terms.section10.content')}
-              </p>
-            </section>
-            
             <div className="mt-8 pt-6 border-t border-zinc-800 flex justify-center">
-              <Button 
+              <Button
                 onClick={onClose}
                 className="flex items-center gap-2 bg-yellow-500 !bg-yellow-500 text-black hover:bg-yellow-600 border-none transition-colors duration-200"
               >

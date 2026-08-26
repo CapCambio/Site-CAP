@@ -433,70 +433,58 @@
     "privacyPolicy": "Política de Privacidade"
   },
   "terms": {
-    "title": "Termos de Uso",
+    "title": "Termos de Uso – CAP Câmbio",
     "close": "Fechar",
     "back": "Voltar",
     "disclaimer": "Esta é uma tradução informativa. A versão em português é a única legalmente válida.",
     "section1": {
-      "title": "1. Aceitação dos Termos",
-      "content": "Ao acessar e utilizar a plataforma CAP Câmbio, você declara ter lido, compreendido e concordado integralmente com estes Termos de Uso. Caso não concorde com qualquer disposição, recomendamos que não utilize nossos serviços."
+      "title": "1. Descrição dos Serviços Digitais",
+      "content": "Estes Termos de Uso regem o acesso e a utilização dos serviços digitais da CAP Câmbio, incluindo seu site institucional e a plataforma exclusiva CAP Cotações. Ao navegar em nossas páginas ou utilizar nossos sistemas, você declara ter lido, compreendido e concordado integralmente com as disposições aqui estabelecidas."
     },
     "section2": {
-      "title": "2. Vigência",
-      "content": "Estes Termos de Uso entram em vigor a partir da data de sua publicação e permanecerão válidos enquanto a plataforma estiver ativa ou até que uma nova versão os substitua."
+      "title": "2. Acesso e Uso da Plataforma CAP Cotações",
+      "intro": "A CAP Câmbio disponibiliza dois ambientes digitais principais com finalidades distintas:",
+      "item1": "Site Institucional: Destinado à apresentação da empresa, localização das lojas físicas (Caxias do Sul, Bento Gonçalves e Passo Fundo), descrição de serviços (Papel Moeda, Transferências Internacionais e DHL) e facilitação de contato via WhatsApp.",
+      "item2": "Plataforma CAP Cotações: Ambiente restrito a clientes autorizados, oferecendo consulta de moedas em tempo real, alertas personalizáveis, histórico de cotações com gráficos e conversor de moedas baseado nos preços praticados pela empresa.",
+      "item3": "Autorização: O acesso é concedido mediante cadastro prévio e autorização discricionária da equipe da CAP.",
+      "item4": "Responsabilidade: O usuário é o único responsável pela guarda e sigilo de suas credenciais de acesso, sendo vedado o compartilhamento com terceiros.",
+      "item5": "Funcionalidades: A plataforma permite a configuração de notificações via e-mail e push, bem como o acesso offline parcial via tecnologia PWA."
     },
     "section3": {
-      "title": "3. Descrição do Serviço",
-      "intro": "A CAP Câmbio oferece uma plataforma online para consulta de cotações de moedas estrangeiras e serviços relacionados ao câmbio. As funcionalidades incluem:",
-      "item1": "Consulta de cotações em tempo real de 16 moedas estrangeiras;",
-      "item2": "Sistema de alertas personalizáveis (subida, descida e valor específico);",
-      "item3": "Histórico de cotações com gráficos e tabelas detalhadas;",
-      "item4": "Conversor de moedas em tempo real;",
-      "item5": "Notificações via email e push notifications;",
-      "item6": "Painel administrativo para gestão de usuários e alertas;",
-      "item7": "Aplicativo instalável (PWA) para acesso offline parcial.",
-      "note": "As informações são disponibilizadas \"como estão\" e \"conforme disponíveis\", com atualizações regulares e finalidade exclusivamente informativa."
+      "title": "3. Informações e Cotações",
+      "intro": "As cotações exibidas tanto no site quanto na plataforma possuem finalidade informativa e refletem os preços finais praticados pela CAP Câmbio (incluindo o Valor Efetivo Total - VET) no momento da consulta.",
+      "item1": "Validade: As condições finais de qualquer operação dependem da confirmação direta com nossa equipe e do cumprimento dos requisitos regulatórios vigentes.",
+      "item2": "Variação: As cotações podem variar ao longo do dia de acordo com as condições do mercado de câmbio.",
+      "item3": "Limitação: A CAP Câmbio não se responsabiliza por decisões tomadas exclusivamente com base nas informações digitais sem a devida validação humana."
     },
     "section4": {
-      "title": "4. Uso Adequado e Responsabilidades do Usuário",
-      "intro": "Você concorda em utilizar a plataforma de forma ética, legal e responsável. É vedado:",
-      "item1": "Fornecer informações falsas ou desatualizadas;",
-      "item2": "Compartilhar suas informações de acesso com terceiros ou não protegê-las adequadamente;",
-      "item3": "Utilizar o serviço para fins ilegais, fraudulentos ou prejudiciais;",
-      "item4": "Tentar acessar áreas restritas do sistema ou interferir em seu funcionamento;",
-      "item5": "Reproduzir, distribuir, modificar ou explorar comercialmente qualquer conteúdo sem autorização expressa."
+      "title": "4. Propriedade Intelectual",
+      "content": "Todo o conteúdo digital da CAP Câmbio, incluindo marcas, logotipos, textos, imagens, gráficos e códigos-fonte, é de propriedade exclusiva da empresa ou de seus licenciantes. É terminantemente proibida a reprodução, modificação ou exploração comercial de qualquer elemento sem autorização prévia por escrito."
     },
     "section5": {
-      "title": "5. Informações e Cotações",
-      "content": "As cotações exibidas são meramente informativas e podem não refletir os valores exatos praticados no momento da consulta. Para transações oficiais, recomendamos contato direto com nossa equipe."
+      "title": "5. Responsabilidades e Conduta do Usuário",
+      "intro": "Ao utilizar nossos serviços, você se compromete a:",
+      "item1": "Fornecer informações verdadeiras e atualizadas.",
+      "item2": "Não utilizar o sistema para fins fraudulentos ou ilegais.",
+      "item3": "Não interferir na infraestrutura técnica ou tentar acessar áreas restritas sem autorização."
     },
     "section6": {
       "title": "6. Limitação de Responsabilidade",
-      "intro": "Na extensão máxima permitida pela legislação aplicável, a CAP Câmbio não se responsabiliza por:",
-      "item1": "Quaisquer erros, omissões ou imprecisões nas informações apresentadas;",
-      "item2": "Interrupções, falhas técnicas ou indisponibilidades temporárias da plataforma;",
-      "item3": "Decisões tomadas com base nas informações disponibilizadas;",
-      "item4": "Danos diretos, indiretos, incidentais, especiais, consequentes ou punitivos resultantes do uso (ou da impossibilidade de uso) da plataforma.",
-      "note": "Esta cláusula não exclui ou limita direitos garantidos por lei ao consumidor."
+      "content": "A CAP Câmbio emprega seus melhores esforços para manter a disponibilidade e a precisão de seus sistemas. No entanto, não nos responsabilizamos por interrupções técnicas temporárias, falhas de conexão ou imprecisões decorrentes de atrasos na transmissão de dados de mercado."
     },
     "section7": {
-      "title": "7. Propriedade Intelectual",
-      "content": "Todo o conteúdo, incluindo marcas, logotipos, textos, imagens e códigos fonte, pertence à CAP Câmbio ou a seus licenciantes. É proibido o uso indevido sem prévia autorização por escrito."
+      "title": "7. Modificações e Vigência",
+      "content": "Estes termos entram em vigor na data de sua publicação e podem ser alterados a qualquer momento. A continuidade do uso dos serviços após a publicação de uma nova versão será interpretada como aceitação das alterações."
     },
     "section8": {
-      "title": "8. Modificações nos Termos e no Serviço",
-      "content1": "Podemos alterar estes Termos de Uso a qualquer momento. As modificações entrarão em vigor a partir da publicação nesta página, com indicação da data de atualização.",
-      "content2": "Caso você não concorde com os novos termos, deverá descontinuar o uso da plataforma. A continuidade no uso será interpretada como aceitação tácita das alterações.",
-      "content3": "Também nos reservamos o direito de modificar, suspender ou encerrar o serviço, total ou parcialmente, sem aviso prévio."
+      "title": "8. Lei Aplicável e Foro",
+      "content1": "Estes Termos são regidos pelas leis da República Federativa do Brasil.",
+      "content2": "Fica eleito o foro da comarca de Caxias do Sul - RS para dirimir quaisquer controvérsias decorrentes deste documento."
     },
     "section9": {
-      "title": "9. Lei Aplicável e Foro",
-      "content1": "Estes Termos serão regidos e interpretados de acordo com as leis da República Federativa do Brasil.",
-      "content2": "Fica eleito o foro da comarca de Caxias do Sul-RS, com renúncia a qualquer outro, por mais privilegiado que seja, para dirimir eventuais controvérsias decorrentes destes Termos."
-    },
-    "section10": {
-      "title": "10. Contato",
-      "content": "Para dúvidas, sugestões ou solicitações relacionadas a estes Termos de Uso, entre em contato por meio do e-mail: capcambio_caxias@hotmail.com."
+      "title": "9. Contato",
+      "content": "Para dúvidas ou solicitações, entre em contato pelo e-mail: capcambio_caxias@hotmail.com.",
+      "lastUpdate": "Última atualização: Agosto de 2026."
     }
   },
   "alertsPanel": {
