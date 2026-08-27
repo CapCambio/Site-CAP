@@ -12,10 +12,9 @@ export interface ScrapedCurrency {
   sellPrice: number;
 }
 
-// URL da fonte de dados - Google Sheets
+// URL da fonte de dados - Google Sheets (Google Visualization API)
 const SPREADSHEET_ID = '1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk';
-// URL alternativa usando /pub para acesso público
-const SOURCE_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/pub?output=csv&gid=0`;
+const SOURCE_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
 
 // Arquivo para armazenar o último hash
 const HASH_FILE_PATH = path.join(process.cwd(), 'server', 'config', 'last-hash.json');
@@ -147,27 +146,21 @@ async function saveCachedData(currencies: ScrapedCurrency[]): Promise<void> {
 /**
  * Verifica se houve mudança no conteúdo do Google Sheets
  */
-export async function hasContentChanged(): Promise<{ changed: boolean; csvContent?: string }> {
+export async function hasContentChanged(): Promise<{ changed: boolean; jsonContent?: string }> {
   console.log('Verificando mudanças no conteúdo do Google Sheets...');
 
   try {
-    // Busca conteúdo do Google Sheets como CSV
-    console.log(`🌐 Buscando CSV: ${SOURCE_URL}`);
-    const response = await fetch(SOURCE_URL, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'text/csv,application/csv',
-      },
-      redirect: 'follow'
-    });
+    // Busca conteúdo do Google Sheets como JSON (Google Visualization API)
+    console.log(`🌐 Buscando JSON: ${SOURCE_URL}`);
+    const response = await fetch(SOURCE_URL);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const csvContent = await response.text();
-    console.log(`📄 CSV recebido com ${csvContent.length} caracteres`);
+    const rawContent = await response.text();
+    console.log(`📄 JSON recebido com ${rawContent.length} caracteres`);
 
     // Gera o hash do conteúdo
-    const currentHash = generateContentHash(csvContent);
+    const currentHash = generateContentHash(rawContent);
     console.log(`Hash atual: ${currentHash}`);
 
     // Compara com o último hash salvo
@@ -179,7 +172,7 @@ export async function hasContentChanged(): Promise<{ changed: boolean; csvConten
     if (changed) {
       console.log('🔄 Conteúdo do Google Sheets mudou! Iniciando parsing...');
       await saveHash(currentHash);
-      return { changed: true, csvContent };
+      return { changed: true, jsonContent: rawContent };
     } else {
       console.log('✅ Nenhuma mudança detectada no conteúdo.');
       return { changed: false };
@@ -193,11 +186,11 @@ export async function hasContentChanged(): Promise<{ changed: boolean; csvConten
 }
 
 /**
- * Função para extrair dados de câmbio do Google Sheets CSV
+ * Função para extrair dados de câmbio do Google Sheets JSON (Google Visualization API)
  */
 export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
   // Primeiro verifica se houve mudança no conteúdo
-  const { changed, csvContent } = await hasContentChanged();
+  const { changed, jsonContent } = await hasContentChanged();
 
   if (!changed) {
     console.log('📋 Sem mudanças detectadas. Tentando carregar do cache...');
@@ -211,81 +204,56 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
     console.log('Cache vazio, fazendo scraping completo...');
   }
 
-  console.log('🔄 Mudanças detectadas ou cache vazio. Iniciando parsing do CSV...');
+  console.log('🔄 Mudanças detectadas ou cache vazio. Iniciando parsing do JSON...');
 
   try {
-    // Se não recebeu o CSV, busca novamente
-    let csv = csvContent;
-    if (!csv) {
-      console.log(`🌐 Buscando CSV: ${SOURCE_URL}`);
-      const response = await fetch(SOURCE_URL, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-          'Accept': 'text/csv,application/csv',
-        },
-        redirect: 'follow'
-      });
+    // Se não recebeu o JSON, busca novamente
+    let rawJson = jsonContent;
+    if (!rawJson) {
+      console.log(`🌐 Buscando JSON: ${SOURCE_URL}`);
+      const response = await fetch(SOURCE_URL);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      csv = await response.text();
+      rawJson = await response.text();
     }
 
-    console.log(`📄 CSV recebido com ${csv.length} caracteres`);
+    console.log(`📄 JSON recebido com ${rawJson.length} caracteres`);
 
-    // Parse do CSV
+    // Remove o wrapper do Google Visualization API
+    const jsonString = rawJson
+      .replace('/*O_o*/google.visualization.Query.setResponse(', '')
+      .slice(0, -2);
+
+    // Parse do JSON
+    const data = JSON.parse(jsonString);
+    console.log('JSON parseado com sucesso');
+
+    // Extrai as linhas da tabela
     const results: ScrapedCurrency[] = [];
-    const lines = csv.split('\n');
 
-    // Pula cabeçalho (primeira linha)
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
+    if (data.table && data.table.rows) {
+      for (const row of data.table.rows) {
+        // Estrutura esperada: row.c[0] = código, row.c[1] = nome, row.c[2] = compra, row.c[3] = venda
+        // Ajuste conforme a estrutura real da sua planilha
+        if (row.c && row.c.length >= 4) {
+          const code = row.c[0]?.v || '';
+          const name = row.c[1]?.v || '';
+          const buyPrice = row.c[2]?.v || 0;
+          const sellPrice = row.c[3]?.v || 0;
 
-      // Parse da linha CSV (considerando vírgulas dentro de aspas)
-      const parseCSVLine = (text: string): string[] => {
-        const result: string[] = [];
-        let current = '';
-        let inQuotes = false;
-
-        for (let char of text) {
-          if (char === '"') {
-            inQuotes = !inQuotes;
-          } else if (char === ',' && !inQuotes) {
-            result.push(current.trim());
-            current = '';
+          // Validação
+          if (code && name && buyPrice > 0 && sellPrice > 0) {
+            console.log(`Extraído: ${name} (${code}), Compra: ${buyPrice}, Venda: ${sellPrice}`);
+            results.push({
+              name,
+              code,
+              buyPrice,
+              sellPrice
+            });
           } else {
-            current += char;
+            console.log(`Linha inválida:`, row);
           }
-        }
-        result.push(current.trim());
-        return result;
-      };
-
-      const columns = parseCSVLine(line);
-
-      // Espera: Código, Nome, Compra, Venda (ajuste conforme estrutura do seu Google Sheets)
-      if (columns.length >= 4) {
-        const code = columns[0].trim();
-        const name = columns[1].trim();
-        const buyText = columns[2].trim().replace('R$', '').replace(',', '.').replace(/\s/g, '');
-        const sellText = columns[3].trim().replace('R$', '').replace(',', '.').replace(/\s/g, '');
-
-        // Converte para números
-        const buyPrice = parseFloat(buyText);
-        const sellPrice = parseFloat(sellText);
-
-        // Validação
-        if (code && name && !isNaN(buyPrice) && !isNaN(sellPrice) && buyPrice > 0 && sellPrice > 0) {
-          console.log(`Extraído: ${name} (${code}), Compra: ${buyPrice}, Venda: ${sellPrice}`);
-          results.push({
-            name,
-            code,
-            buyPrice,
-            sellPrice
-          });
-        } else {
-          console.log(`Linha inválida: ${line}`);
         }
       }
     }
@@ -295,7 +263,7 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
       await saveCachedData(results);
       return results;
     } else {
-      console.log('Nenhuma moeda extraída do CSV.');
+      console.log('Nenhuma moeda extraída do JSON.');
     }
 
   } catch (error) {
