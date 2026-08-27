@@ -4,7 +4,7 @@ import fs from 'fs/promises';
 import { Currency } from '../shared/schema';
 import { getLatestCurrencyHistory } from './db';
 
-// Interface para os dados extraídos do scraping
+// Interface para os dados extraídos
 export interface ScrapedCurrency {
   name: string;
   code: string;
@@ -12,15 +12,26 @@ export interface ScrapedCurrency {
   sellPrice: number;
 }
 
-// URL da fonte de dados - Google Sheets (Google Visualization API)
+// Google Sheets
 const SPREADSHEET_ID = '1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk';
-const SOURCE_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
 
-// Arquivo para armazenar o último hash
-const HASH_FILE_PATH = path.join(process.cwd(), 'server', 'config', 'last-hash.json');
+const SOURCE_URL =
+  `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
 
-// Arquivo para cache dos dados de moedas
-const CACHE_FILE_PATH = path.join(process.cwd(), 'server', 'config', 'currency-cache.json');
+// Arquivos locais
+const HASH_FILE_PATH = path.join(
+  process.cwd(),
+  'server',
+  'config',
+  'last-hash.json'
+);
+
+const CACHE_FILE_PATH = path.join(
+  process.cwd(),
+  'server',
+  'config',
+  'currency-cache.json'
+);
 
 interface HashData {
   lastHash: string;
@@ -32,367 +43,923 @@ interface CacheData {
   currencies: ScrapedCurrency[];
 }
 
+// Cache em memória
+let memoryCache: {
+  data: ScrapedCurrency[];
+  timestamp: number;
+} | null = null;
+
+const CACHE_TTL = 5 * 60 * 1000;
+
 /**
- * Gera um hash MD5 do conteúdo da tabela de preços
+ * Gera hash do conteúdo recebido
  */
-function generateContentHash(tableContent: string): string {
-  return createHash('md5').update(tableContent).digest('hex');
+function generateContentHash(content: string): string {
+  return createHash('md5')
+    .update(content)
+    .digest('hex');
 }
 
 /**
- * Carrega o último hash salvo
+ * Converte valores da planilha em número.
+ *
+ * Aceita:
+ * 5.45
+ * "5.45"
+ * "5,45"
+ * "5.450,25"
+ * "5,450.25"
+ */
+function parsePrice(value: unknown): number {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value !== 'string') {
+    return 0;
+  }
+
+  let normalized = value
+    .trim()
+    .replace(/[R$\s]/g, '');
+
+  if (!normalized) {
+    return 0;
+  }
+
+  const hasComma = normalized.includes(',');
+  const hasDot = normalized.includes('.');
+
+  // Exemplo: 5.450,25
+  if (hasComma && hasDot) {
+    if (normalized.lastIndexOf(',') > normalized.lastIndexOf('.')) {
+      normalized = normalized
+        .replace(/\./g, '')
+        .replace(',', '.');
+    } else {
+      normalized = normalized.replace(/,/g, '');
+    }
+  }
+
+  // Exemplo: 5,45
+  else if (hasComma) {
+    normalized = normalized.replace(',', '.');
+  }
+
+  const parsed = Number(normalized);
+
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+/**
+ * Normaliza texto para comparação de cabeçalhos
+ */
+function normalizeHeader(value: unknown): string {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+/**
+ * Lê o último hash salvo
  */
 async function getLastHash(): Promise<string | null> {
   try {
-    const data = await fs.readFile(HASH_FILE_PATH, 'utf-8');
+    const data = await fs.readFile(
+      HASH_FILE_PATH,
+      'utf-8'
+    );
+
     const hashData: HashData = JSON.parse(data);
+
     return hashData.lastHash;
-  } catch (error) {
-    console.log('Arquivo de hash não encontrado, será criado na primeira execução.');
+  } catch {
+    console.log(
+      'ℹ️ Arquivo de hash não encontrado. Será criado após a primeira atualização válida.'
+    );
+
     return null;
   }
 }
 
 /**
- * Salva o hash atual
+ * Salva o hash somente após sucesso completo
  */
 async function saveHash(hash: string): Promise<void> {
   try {
+    const dir = path.dirname(HASH_FILE_PATH);
+
+    await fs.mkdir(dir, {
+      recursive: true
+    });
+
     const hashData: HashData = {
       lastHash: hash,
       lastUpdate: new Date().toISOString()
     };
-    
-    // Garante que o diretório existe
-    const dir = path.dirname(HASH_FILE_PATH);
-    await fs.mkdir(dir, { recursive: true });
-    
-    await fs.writeFile(HASH_FILE_PATH, JSON.stringify(hashData, null, 2));
-    console.log('Hash salvo com sucesso.');
+
+    await fs.writeFile(
+      HASH_FILE_PATH,
+      JSON.stringify(hashData, null, 2),
+      'utf-8'
+    );
+
+    console.log('💾 Hash salvo com sucesso.');
   } catch (error) {
-    console.error('Erro ao salvar hash:', error);
+    console.error(
+      '❌ Erro ao salvar hash:',
+      error
+    );
   }
 }
 
-// Cache em memória para performance
-let memoryCache: { data: ScrapedCurrency[]; timestamp: number } | null = null;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
-
 /**
- * Carrega dados do cache (memória primeiro, depois arquivo)
+ * Busca cache atual
  */
 async function getCachedData(): Promise<ScrapedCurrency[]> {
   const now = Date.now();
-  
-  // Verifica cache em memória primeiro
-  if (memoryCache && (now - memoryCache.timestamp) < CACHE_TTL) {
-    console.log(`⚡ Cache memória: ${memoryCache.data.length} moedas (idade: ${Math.round((now - memoryCache.timestamp) / 1000)}s)`);
+
+  if (
+    memoryCache &&
+    now - memoryCache.timestamp < CACHE_TTL
+  ) {
+    console.log(
+      `⚡ Usando cache em memória: ${memoryCache.data.length} moedas` 
+    );
+
     return memoryCache.data;
   }
-  
+
   try {
-    const data = await fs.readFile(CACHE_FILE_PATH, 'utf-8');
+    const data = await fs.readFile(
+      CACHE_FILE_PATH,
+      'utf-8'
+    );
+
     const cacheData: CacheData = JSON.parse(data);
-    
-    if (cacheData.currencies && cacheData.currencies.length > 0) {
-      // Atualiza cache em memória
+
+    if (
+      Array.isArray(cacheData.currencies) &&
+      cacheData.currencies.length > 0
+    ) {
       memoryCache = {
         data: cacheData.currencies,
         timestamp: now
       };
-      
-      console.log(`📦 Cache arquivo: ${cacheData.currencies.length} moedas (última atualização: ${cacheData.lastUpdate})`);
+
+      console.log(
+        `📦 Usando cache em arquivo: ${cacheData.currencies.length} moedas` 
+      );
+
+      console.log(
+        `📅 Última atualização do cache: ${cacheData.lastUpdate}` 
+      );
+
       return cacheData.currencies;
     }
-  } catch (error) {
-    console.log('Cache não encontrado ou inválido.');
+  } catch {
+    console.log(
+      'ℹ️ Nenhum cache válido encontrado.'
+    );
   }
-  
+
   return [];
 }
 
 /**
- * Salva dados no cache (memória + arquivo)
+ * Salva dados válidos no cache
  */
-async function saveCachedData(currencies: ScrapedCurrency[]): Promise<void> {
+async function saveCachedData(
+  currencies: ScrapedCurrency[]
+): Promise<void> {
   try {
     const now = Date.now();
-    
-    // Atualiza cache em memória primeiro
+
     memoryCache = {
       data: currencies,
       timestamp: now
     };
-    
+
     const cacheData: CacheData = {
       lastUpdate: new Date().toISOString(),
       currencies
     };
-    
-    // Garante que o diretório existe
+
     const dir = path.dirname(CACHE_FILE_PATH);
-    await fs.mkdir(dir, { recursive: true });
-    
-    // Salva em arquivo de forma assíncrona (não bloqueia)
-    fs.writeFile(CACHE_FILE_PATH, JSON.stringify(cacheData, null, 2))
-      .then(() => console.log(`💾 Cache atualizado com ${currencies.length} moedas.`))
-      .catch(error => console.error('Erro ao salvar cache:', error));
-      
+
+    await fs.mkdir(dir, {
+      recursive: true
+    });
+
+    await fs.writeFile(
+      CACHE_FILE_PATH,
+      JSON.stringify(cacheData, null, 2),
+      'utf-8'
+    );
+
+    console.log(
+      `💾 Cache atualizado com ${currencies.length} moedas.` 
+    );
   } catch (error) {
-    console.error('Erro ao salvar cache:', error);
+    console.error(
+      '❌ Erro ao salvar cache:',
+      error
+    );
   }
 }
 
 /**
- * Verifica se houve mudança no conteúdo do Google Sheets
+ * Busca conteúdo do Google Sheets
  */
-export async function hasContentChanged(): Promise<{ changed: boolean; jsonContent?: string }> {
-  console.log('Verificando mudanças no conteúdo do Google Sheets...');
+async function fetchGoogleSheet(): Promise<string> {
+  console.log(
+    '🌐 Buscando dados do Google Sheets...'
+  );
+
+  console.log(
+    `🔗 URL: ${SOURCE_URL}` 
+  );
+
+  const response = await fetch(SOURCE_URL, {
+    headers: {
+      'User-Agent':
+        'Mozilla/5.0 (compatible; CurrencyBot/1.0)',
+      'Accept':
+        'application/json,text/plain,*/*'
+    },
+    redirect: 'follow'
+  });
+
+  console.log(
+    `📡 Status HTTP: ${response.status} ${response.statusText}` 
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Google Sheets retornou HTTP ${response.status}` 
+    );
+  }
+
+  const rawContent = await response.text();
+
+  if (!rawContent || rawContent.trim().length === 0) {
+    throw new Error(
+      'Google Sheets retornou uma resposta vazia.'
+    );
+  }
+
+  console.log(
+    `📄 Resposta recebida: ${rawContent.length} caracteres` 
+  );
+
+  return rawContent;
+}
+
+/**
+ * Extrai o JSON da resposta do Google Visualization API.
+ *
+ * A resposta normalmente vem assim:
+ *
+ * google.visualization.Query.setResponse({...});
+ */
+function parseGoogleVisualizationResponse(
+  rawContent: string
+): any {
+  const start = rawContent.indexOf('{');
+  const end = rawContent.lastIndexOf('}');
+
+  if (
+    start === -1 ||
+    end === -1 ||
+    end <= start
+  ) {
+    console.error(
+      '❌ Resposta inesperada do Google Sheets:'
+    );
+
+    console.error(
+      rawContent.substring(0, 500)
+    );
+
+    throw new Error(
+      'Não foi possível localizar JSON na resposta do Google Sheets.'
+    );
+  }
+
+  const jsonString = rawContent.substring(
+    start,
+    end + 1
+  );
 
   try {
-    // Busca conteúdo do Google Sheets como JSON (Google Visualization API)
-    console.log(`🌐 Buscando JSON: ${SOURCE_URL}`);
-    const response = await fetch(SOURCE_URL);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const rawContent = await response.text();
-    console.log(`📄 JSON recebido com ${rawContent.length} caracteres`);
-
-    // Gera o hash do conteúdo
-    const currentHash = generateContentHash(rawContent);
-    console.log(`Hash atual: ${currentHash}`);
-
-    // Compara com o último hash salvo
-    const lastHash = await getLastHash();
-    console.log(`Último hash: ${lastHash || 'N/A'}`);
-
-    const changed = currentHash !== lastHash;
-
-    if (changed) {
-      console.log('🔄 Conteúdo do Google Sheets mudou! Iniciando parsing...');
-      await saveHash(currentHash);
-      return { changed: true, jsonContent: rawContent };
-    } else {
-      console.log('✅ Nenhuma mudança detectada no conteúdo.');
-      return { changed: false };
-    }
-
+    return JSON.parse(jsonString);
   } catch (error) {
-    console.error('Erro ao verificar mudanças:', error);
-    // Em caso de erro, assume que houve mudança para tentar fazer o scraping
-    return { changed: true };
+    console.error(
+      '❌ Erro ao converter resposta em JSON.'
+    );
+
+    console.error(
+      'Início da resposta:',
+      rawContent.substring(0, 500)
+    );
+
+    throw error;
   }
 }
 
 /**
- * Função para extrair dados de câmbio do Google Sheets JSON (Google Visualization API)
+ * Procura automaticamente as colunas.
  */
-export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
-  // Primeiro verifica se houve mudança no conteúdo
-  const { changed, jsonContent } = await hasContentChanged();
+function detectColumns(
+  rows: any[]
+): {
+  codeIndex: number;
+  nameIndex: number;
+  buyIndex: number;
+  sellIndex: number;
+  dataStartIndex: number;
+} {
+  if (!rows.length) {
+    throw new Error(
+      'Google Sheets não possui linhas.'
+    );
+  }
 
+  const firstRow = rows[0];
+
+  const headers = firstRow.c?.map(
+    (cell: any) => normalizeHeader(cell?.v)
+  ) ?? [];
+
+  console.log(
+    '📋 Cabeçalhos detectados:',
+    headers
+  );
+
+  let codeIndex = headers.findIndex(header =>
+    [
+      'codigo',
+      'code',
+      'sigla',
+      'moeda'
+    ].includes(header)
+  );
+
+  let nameIndex = headers.findIndex(header =>
+    [
+      'nome',
+      'name',
+      'descricao',
+      'currency'
+    ].includes(header)
+  );
+
+  let buyIndex = headers.findIndex(header =>
+    [
+      'compra',
+      'buy',
+      'buyprice',
+      'precodecompra'
+    ].includes(header)
+  );
+
+  let sellIndex = headers.findIndex(header =>
+    [
+      'venda',
+      'sell',
+      'sellprice',
+      'precodevenda'
+    ].includes(header)
+  );
+
+  const hasDetectedHeaders =
+    codeIndex !== -1 &&
+    nameIndex !== -1 &&
+    buyIndex !== -1 &&
+    sellIndex !== -1;
+
+  // Se não houver cabeçalho reconhecível,
+  // mantém a estrutura original esperada.
+  if (!hasDetectedHeaders) {
+    console.log(
+      '⚠️ Cabeçalhos não reconhecidos. Usando estrutura padrão: Código, Nome, Compra, Venda.'
+    );
+
+    codeIndex = 0;
+    nameIndex = 1;
+    buyIndex = 2;
+    sellIndex = 3;
+
+    return {
+      codeIndex,
+      nameIndex,
+      buyIndex,
+      sellIndex,
+      dataStartIndex: 0
+    };
+  }
+
+  console.log(
+    '✅ Estrutura identificada automaticamente.'
+  );
+
+  return {
+    codeIndex,
+    nameIndex,
+    buyIndex,
+    sellIndex,
+    dataStartIndex: 1
+  };
+}
+
+/**
+ * Converte resposta do Google Sheets
+ * para o formato interno do sistema.
+ */
+function extractCurrenciesFromGoogleSheet(
+  data: any
+): ScrapedCurrency[] {
+  if (
+    !data?.table ||
+    !Array.isArray(data.table.rows)
+  ) {
+    throw new Error(
+      'Resposta do Google Sheets não contém table.rows.'
+    );
+  }
+
+  const rows = data.table.rows;
+
+  console.log(
+    `📊 Total de linhas recebidas: ${rows.length}` 
+  );
+
+  if (rows.length === 0) {
+    return [];
+  }
+
+  const {
+    codeIndex,
+    nameIndex,
+    buyIndex,
+    sellIndex,
+    dataStartIndex
+  } = detectColumns(rows);
+
+  const results: ScrapedCurrency[] = [];
+
+  for (
+    let index = dataStartIndex;
+    index < rows.length;
+    index++
+  ) {
+    const row = rows[index];
+
+    if (!row?.c) {
+      continue;
+    }
+
+    const code = String(
+      row.c[codeIndex]?.v ?? ''
+    )
+      .trim()
+      .toUpperCase();
+
+    const name = String(
+      row.c[nameIndex]?.v ?? ''
+    ).trim();
+
+    const buyPrice = parsePrice(
+      row.c[buyIndex]?.v
+    );
+
+    const sellPrice = parsePrice(
+      row.c[sellIndex]?.v
+    );
+
+    if (
+      !code ||
+      !name ||
+      buyPrice <= 0 ||
+      sellPrice <= 0
+    ) {
+      console.log(
+        `⚠️ Linha ${index + 1} ignorada:`,
+        {
+          code,
+          name,
+          buyPrice,
+          sellPrice,
+          raw: row.c?.map(
+            (cell: any) => cell?.v
+          )
+        }
+      );
+
+      continue;
+    }
+
+    const currency: ScrapedCurrency = {
+      code,
+      name,
+      buyPrice,
+      sellPrice
+    };
+
+    console.log(
+      `💱 ${currency.code} | ${currency.name} | Compra: ${currency.buyPrice} | Venda: ${currency.sellPrice}` 
+    );
+
+    results.push(currency);
+  }
+
+  return results;
+}
+
+/**
+ * Verifica se o conteúdo mudou.
+ *
+ * IMPORTANTE:
+ * Não salva o hash aqui.
+ * O hash só será salvo depois que o
+ * conteúdo for parseado e validado.
+ */
+export async function hasContentChanged(): Promise<{
+  changed: boolean;
+  rawContent?: string;
+  hash?: string;
+}> {
+  console.log(
+    '🔍 Verificando alterações no Google Sheets...'
+  );
+
+  try {
+    const rawContent = await fetchGoogleSheet();
+
+    const currentHash =
+      generateContentHash(rawContent);
+
+    const lastHash =
+      await getLastHash();
+
+    console.log(
+      `🔐 Hash atual: ${currentHash}` 
+    );
+
+    console.log(
+      `🔐 Último hash: ${lastHash ?? 'N/A'}` 
+    );
+
+    const changed =
+      currentHash !== lastHash;
+
+    if (changed) {
+      console.log(
+        '🔄 Alteração detectada no Google Sheets.'
+      );
+    } else {
+      console.log(
+        '✅ Nenhuma alteração detectada.'
+      );
+    }
+
+    return {
+      changed,
+      rawContent,
+      hash: currentHash
+    };
+  } catch (error) {
+    console.error(
+      '❌ Erro ao verificar Google Sheets:',
+      error
+    );
+
+    // Retorna changed=true para permitir
+    // nova tentativa no scraping.
+    return {
+      changed: true
+    };
+  }
+}
+
+/**
+ * Função principal de scraping.
+ */
+export async function scrapeCurrencyData(): Promise<
+  ScrapedCurrency[]
+> {
+  const {
+    changed,
+    rawContent,
+    hash
+  } = await hasContentChanged();
+
+  // Se nada mudou, utiliza cache.
   if (!changed) {
-    console.log('📋 Sem mudanças detectadas. Tentando carregar do cache...');
+    console.log(
+      '📋 Nenhuma alteração. Verificando cache...'
+    );
 
-    // Tenta carregar do cache
-    const cachedData = await getCachedData();
+    const cachedData =
+      await getCachedData();
+
     if (cachedData.length > 0) {
       return cachedData;
     }
 
-    console.log('Cache vazio, fazendo scraping completo...');
+    console.log(
+      '⚠️ Hash indica que não houve mudança, mas o cache está vazio. Fazendo nova leitura.'
+    );
   }
-
-  console.log('🔄 Mudanças detectadas ou cache vazio. Iniciando parsing do JSON...');
 
   try {
-    // Se não recebeu o JSON, busca novamente
-    let rawJson = jsonContent;
-    if (!rawJson) {
-      console.log(`🌐 Buscando JSON: ${SOURCE_URL}`);
-      const response = await fetch(SOURCE_URL);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      rawJson = await response.text();
+    console.log(
+      '🔄 Iniciando processamento dos dados do Google Sheets...'
+    );
+
+    // Usa resposta já buscada.
+    // Se houve erro na primeira busca,
+    // tenta novamente.
+    const content =
+      rawContent ??
+      await fetchGoogleSheet();
+
+    // Parse da resposta.
+    const data =
+      parseGoogleVisualizationResponse(
+        content
+      );
+
+    console.log(
+      '✅ JSON do Google Sheets parseado com sucesso.'
+    );
+
+    // Extrai moedas.
+    const currencies =
+      extractCurrenciesFromGoogleSheet(
+        data
+      );
+
+    if (currencies.length === 0) {
+      throw new Error(
+        'Nenhuma moeda válida foi extraída do Google Sheets.'
+      );
     }
 
-    console.log(`📄 JSON recebido com ${rawJson.length} caracteres`);
-    console.log(`📄 Primeiros 200 caracteres do conteúdo bruto: ${rawJson.substring(0, 200)}`);
+    console.log(
+      `✅ Extração concluída: ${currencies.length} moedas válidas.` 
+    );
 
-    // Remove o wrapper do Google Visualization API de forma defensiva
-    let jsonString = rawJson;
+    // Salva cache SOMENTE com dados válidos.
+    await saveCachedData(currencies);
 
-    // Tenta diferentes padrões de prefixo
-    const patterns = [
-      '/*O_o*/google.visualization.Query.setResponse(',
-      'google.visualization.Query.setResponse(',
-      'google.visualization.Query.setResponse'
-    ];
+    // Salva hash somente após sucesso completo.
+    const finalHash =
+      hash ??
+      generateContentHash(content);
 
-    for (const pattern of patterns) {
-      if (jsonString.includes(pattern)) {
-        console.log(`✅ Encontrado padrão: ${pattern}`);
-        jsonString = jsonString.replace(pattern, '');
-        break;
-      }
-    }
+    await saveHash(finalHash);
 
-    // Remove os últimos 2 caracteres (geralmente ");")
-    jsonString = jsonString.slice(0, -2);
-    console.log(`📄 JSON após remover wrapper: ${jsonString.substring(0, 200)}`);
+    console.log(
+      '🎉 Google Sheets processado com sucesso.'
+    );
 
-    // Parse do JSON
-    const data = JSON.parse(jsonString);
-    console.log('✅ JSON parseado com sucesso');
-    console.log(`📊 Estrutura da resposta:`, Object.keys(data));
-
-    if (data.table) {
-      console.log(`📊 Tabela encontrada com ${data.table.rows?.length || 0} linhas`);
-      if (data.table.rows && data.table.rows.length > 0) {
-        console.log(`📊 Primeira linha:`, JSON.stringify(data.table.rows[0]));
-      }
-    }
-
-    // Extrai as linhas da tabela
-    const results: ScrapedCurrency[] = [];
-
-    if (data.table && data.table.rows) {
-      console.log(`🔄 Processando ${data.table.rows.length} linhas...`);
-      for (const row of data.table.rows) {
-        // Estrutura esperada: row.c[0] = código, row.c[1] = nome, row.c[2] = compra, row.c[3] = venda
-        // Ajuste conforme a estrutura real da sua planilha
-        if (row.c && row.c.length >= 4) {
-          const code = String(row.c[0]?.v ?? '').trim();
-          const name = String(row.c[1]?.v ?? '').trim();
-          const buyPrice = Number(row.c[2]?.v);
-          const sellPrice = Number(row.c[3]?.v);
-
-          // Validação mais robusta
-          if (code && name && Number.isFinite(buyPrice) && Number.isFinite(sellPrice) && buyPrice > 0 && sellPrice > 0) {
-            console.log(`✅ Extraído: ${name} (${code}), Compra: ${buyPrice}, Venda: ${sellPrice}`);
-            results.push({
-              name,
-              code,
-              buyPrice,
-              sellPrice
-            });
-          } else {
-            console.log(`❌ Linha inválida - code: ${code}, name: ${name}, buyPrice: ${buyPrice}, sellPrice: ${sellPrice}`);
-          }
-        } else {
-          console.log(`❌ Linha sem estrutura adequada:`, row);
-        }
-      }
-    } else {
-      console.log('❌ Nenhuma tabela ou linhas encontradas na resposta');
-    }
-
-    if (results.length > 0) {
-      console.log(`Extração concluída. Encontradas ${results.length} moedas.`);
-      await saveCachedData(results);
-      return results;
-    } else {
-      console.log('Nenhuma moeda extraída do JSON.');
-    }
+    return currencies;
 
   } catch (error) {
-    console.error('Erro ao fazer scraping dos dados de moedas:', error);
+    console.error(
+      '❌ Falha no processamento do Google Sheets:',
+      error
+    );
   }
 
-  // Fallback para cache
-  console.log('Tentando usar cache como fallback...');
-  const cachedData = await getCachedData();
+  /*
+   * FALLBACK 1
+   * Cache
+   */
+  console.log(
+    '📦 Tentando fallback do cache...'
+  );
+
+  const cachedData =
+    await getCachedData();
+
   if (cachedData.length > 0) {
-    console.log('Usando dados do cache como fallback.');
+    console.warn(
+      `⚠️ Usando ${cachedData.length} moedas do cache como fallback.` 
+    );
+
     return cachedData;
   }
 
-  // Fallback para histórico PostgreSQL
-  console.log('Tentando usar histórico PostgreSQL como fallback...');
+  /*
+   * FALLBACK 2
+   * PostgreSQL
+   */
+  console.log(
+    '🗄️ Tentando fallback do histórico PostgreSQL...'
+  );
+
   try {
-    const latestHistory = await getLatestCurrencyHistory();
+    const latestHistory =
+      await getLatestCurrencyHistory();
 
     if (latestHistory.size > 0) {
-      console.log(`✅ Usando ${latestHistory.size} moedas do histórico PostgreSQL como fallback`);
+      console.warn(
+        `⚠️ Usando ${latestHistory.size} moedas do histórico PostgreSQL.` 
+      );
 
-      const codeToName: Record<string, string> = {
-        'USD': 'Dólar Americano',
-        'EUR': 'Euro',
-        'GBP': 'Libra Esterlina',
-        'CAD': 'Dólar Canadense',
-        'AUD': 'Dólar Australiano',
-        'ARS': 'Peso Argentino',
-        'CLP': 'Peso Chileno',
-        'UYU': 'Peso Uruguaio',
-        'CHF': 'Franco Suíço',
-        'JPY': 'Iene Japonês',
-        'CNY': 'Yuan Chinês',
-        'MXN': 'Peso Mexicano',
-        'PYG': 'Guarani Paraguaio',
-        'PEN': 'Novo Sol Peruano',
-        'BOB': 'Boliviano',
-        'COP': 'Peso Colombiano',
-        'NZD': 'Dólar Neozelandês',
-        'ZAR': 'Rand Sul-Africano'
+      const codeToName: Record<
+        string,
+        string
+      > = {
+        USD: 'Dólar Americano',
+        EUR: 'Euro',
+        GBP: 'Libra Esterlina',
+        CAD: 'Dólar Canadense',
+        AUD: 'Dólar Australiano',
+        ARS: 'Peso Argentino',
+        CLP: 'Peso Chileno',
+        UYU: 'Peso Uruguaio',
+        CHF: 'Franco Suíço',
+        JPY: 'Iene Japonês',
+        CNY: 'Yuan Chinês',
+        MXN: 'Peso Mexicano',
+        PYG: 'Guarani Paraguaio',
+        PEN: 'Novo Sol Peruano',
+        BOB: 'Boliviano',
+        COP: 'Peso Colombiano',
+        NZD: 'Dólar Neozelandês',
+        ZAR: 'Rand Sul-Africano'
       };
 
-      const currencies: ScrapedCurrency[] = [];
-      latestHistory.forEach((history, code) => {
-        currencies.push({
-          name: codeToName[code] || code,
-          code: history.code,
-          buyPrice: history.buy_price,
-          sellPrice: history.sell_price
-        });
-      });
+      const currencies: ScrapedCurrency[] =
+        [];
+
+      latestHistory.forEach(
+        (history, code) => {
+          currencies.push({
+            name:
+              codeToName[code] ?? code,
+            code: history.code,
+            buyPrice:
+              history.buy_price,
+            sellPrice:
+              history.sell_price
+          });
+        }
+      );
 
       await saveCachedData(currencies);
+
       return currencies;
     }
   } catch (dbError) {
-    console.error('Erro ao acessar histórico do PostgreSQL:', dbError);
+    console.error(
+      '❌ Erro ao acessar histórico PostgreSQL:',
+      dbError
+    );
   }
 
-  // Fallback hardcoded
-  console.log('Usando valores de fallback hardcoded.');
+  /*
+   * FALLBACK 3
+   * Valores hardcoded
+   */
+  console.error(
+    '🚨 Todos os sistemas falharam. Usando fallback hardcoded.'
+  );
+
   const currencies: ScrapedCurrency[] = [
-    { name: "Dólar Americano", code: "USD", buyPrice: 5.55, sellPrice: 5.92 },
-    { name: "Euro", code: "EUR", buyPrice: 6.40, sellPrice: 6.81 },
-    { name: "Libra Esterlina", code: "GBP", buyPrice: 7.45, sellPrice: 8.19 },
-    { name: "Dólar Australiano", code: "AUD", buyPrice: 3.52, sellPrice: 3.96 },
-    { name: "Peso Argentino", code: "ARS", buyPrice: 0.004, sellPrice: 0.006 },
-    { name: "Dólar Neozelandês", code: "NZD", buyPrice: 3.25, sellPrice: 3.64 },
-    { name: "Dólar Canadense", code: "CAD", buyPrice: 4.00, sellPrice: 4.46 },
-    { name: "Franco Suíço", code: "CHF", buyPrice: 6.60, sellPrice: 7.40 },
-    { name: "Peso Uruguaio", code: "UYU", buyPrice: 0.135, sellPrice: 0.17 },
-    { name: "Peso Chileno", code: "CLP", buyPrice: 0.0059, sellPrice: 0.0071 },
-    { name: "Peso Mexicano", code: "MXN", buyPrice: 0.28, sellPrice: 0.35 },
-    { name: "Peso Colombiano", code: "COP", buyPrice: 0.0014, sellPrice: 0.00185 },
-    { name: "Yuan Chinês", code: "CNY", buyPrice: 0.75, sellPrice: 0.90 },
-    { name: "Iene Japonês", code: "JPY", buyPrice: 0.032, sellPrice: 0.0453 },
-    { name: "Sol Peruano", code: "PEN", buyPrice: 1.63, sellPrice: 1.74 },
-    { name: "Rand Africano", code: "ZAR", buyPrice: 0.28, sellPrice: 0.356 }
+    {
+      name: 'Dólar Americano',
+      code: 'USD',
+      buyPrice: 5.55,
+      sellPrice: 5.92
+    },
+    {
+      name: 'Euro',
+      code: 'EUR',
+      buyPrice: 6.40,
+      sellPrice: 6.81
+    },
+    {
+      name: 'Libra Esterlina',
+      code: 'GBP',
+      buyPrice: 7.45,
+      sellPrice: 8.19
+    },
+    {
+      name: 'Dólar Australiano',
+      code: 'AUD',
+      buyPrice: 3.52,
+      sellPrice: 3.96
+    },
+    {
+      name: 'Peso Argentino',
+      code: 'ARS',
+      buyPrice: 0.004,
+      sellPrice: 0.006
+    },
+    {
+      name: 'Dólar Neozelandês',
+      code: 'NZD',
+      buyPrice: 3.25,
+      sellPrice: 3.64
+    },
+    {
+      name: 'Dólar Canadense',
+      code: 'CAD',
+      buyPrice: 4.00,
+      sellPrice: 4.46
+    },
+    {
+      name: 'Franco Suíço',
+      code: 'CHF',
+      buyPrice: 6.60,
+      sellPrice: 7.40
+    },
+    {
+      name: 'Peso Uruguaio',
+      code: 'UYU',
+      buyPrice: 0.135,
+      sellPrice: 0.17
+    },
+    {
+      name: 'Peso Chileno',
+      code: 'CLP',
+      buyPrice: 0.0059,
+      sellPrice: 0.0071
+    },
+    {
+      name: 'Peso Mexicano',
+      code: 'MXN',
+      buyPrice: 0.28,
+      sellPrice: 0.35
+    },
+    {
+      name: 'Peso Colombiano',
+      code: 'COP',
+      buyPrice: 0.0014,
+      sellPrice: 0.00185
+    },
+    {
+      name: 'Yuan Chinês',
+      code: 'CNY',
+      buyPrice: 0.75,
+      sellPrice: 0.90
+    },
+    {
+      name: 'Iene Japonês',
+      code: 'JPY',
+      buyPrice: 0.032,
+      sellPrice: 0.0453
+    },
+    {
+      name: 'Sol Peruano',
+      code: 'PEN',
+      buyPrice: 1.63,
+      sellPrice: 1.74
+    },
+    {
+      name: 'Rand Africano',
+      code: 'ZAR',
+      buyPrice: 0.28,
+      sellPrice: 0.356
+    }
   ];
 
   await saveCachedData(currencies);
+
   return currencies;
 }
 
 /**
- * Função auxiliar para calcular a variação percentual entre valores
+ * Calcula variação percentual.
  */
-export function calculateChange(currentValue: number, previousValue: number): number | undefined {
-  if (previousValue === 0 || isNaN(previousValue) || !isFinite(previousValue)) {
+export function calculateChange(
+  currentValue: number,
+  previousValue: number
+): number | undefined {
+  if (
+    previousValue === 0 ||
+    !Number.isFinite(previousValue)
+  ) {
     return undefined;
   }
-  const change = ((currentValue / previousValue) - 1) * 100;
-  return isFinite(change) ? change : undefined;
+
+  const change =
+    ((currentValue / previousValue) - 1) * 100;
+
+  return Number.isFinite(change)
+    ? change
+    : undefined;
 }
 
 /**
- * Função para atualizar moedas com base nos dados extraídos
+ * Atualiza moedas com base nos dados extraídos.
  */
 export function updateCurrenciesWithScrapedData(
   currentCurrencies: Currency[],
@@ -400,44 +967,52 @@ export function updateCurrenciesWithScrapedData(
 ): Omit<Currency, 'id'>[] {
   const now = new Date();
 
-  // Mapeia as moedas existentes pelo código para acesso rápido
-  const currencyMap = new Map<string, Currency>();
+  const currencyMap =
+    new Map<string, Currency>();
+
   currentCurrencies.forEach(currency => {
-    currencyMap.set(currency.code, currency);
+    currencyMap.set(
+      currency.code,
+      currency
+    );
   });
 
-  // Atualiza ou cria cada moeda com base nos dados extraídos
-  return scrapedData.map((scraped, index) => {
-    const existing = currencyMap.get(scraped.code);
-    // Atribui a ordem de exibição baseada na ordem da lista que vem da página fonte
-    const displayOrder = index + 1;
+  return scrapedData.map(
+    (scraped, index) => {
+      const existing =
+        currencyMap.get(scraped.code);
 
-    // Se a moeda existir, calcula a variação em relação à cotação anterior
-    if (existing) {
-      const change = calculateChange(scraped.buyPrice, existing.buyPrice);
+      const displayOrder =
+        index + 1;
+
+      if (existing) {
+        const change =
+          calculateChange(
+            scraped.buyPrice,
+            existing.buyPrice
+          );
+
+        return {
+          name: scraped.name,
+          code: existing.code,
+          buyPrice: scraped.buyPrice,
+          sellPrice: scraped.sellPrice,
+          change,
+          lastUpdate:
+            now.toISOString(),
+          displayOrder
+        };
+      }
 
       return {
-        // id será gerenciado pelo storage
         name: scraped.name,
-        code: existing.code,
+        code: scraped.code,
         buyPrice: scraped.buyPrice,
         sellPrice: scraped.sellPrice,
-        change,
-        lastUpdate: now.toISOString(),
-        displayOrder // Mantém a ordem da página fonte
+        lastUpdate:
+          now.toISOString(),
+        displayOrder
       };
     }
-
-    // Se for uma nova moeda, cria sem variação (será undefined)
-    return {
-      // id será gerenciado pelo storage
-      name: scraped.name,
-      code: scraped.code,
-      buyPrice: scraped.buyPrice,
-      sellPrice: scraped.sellPrice,
-      // Não definimos change para novas moedas (será undefined por padrão)
-      lastUpdate: now.toISOString(),
-      displayOrder // Mantém a ordem da página fonte
-    };
-  });
+  );
 }
