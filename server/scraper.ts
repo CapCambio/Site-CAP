@@ -219,32 +219,59 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
     }
 
     console.log(`📄 JSON recebido com ${rawJson.length} caracteres`);
+    console.log(`📄 Primeiros 200 caracteres do conteúdo bruto: ${rawJson.substring(0, 200)}`);
 
-    // Remove o wrapper do Google Visualization API
-    const jsonString = rawJson
-      .replace('/*O_o*/google.visualization.Query.setResponse(', '')
-      .slice(0, -2);
+    // Remove o wrapper do Google Visualization API de forma defensiva
+    let jsonString = rawJson;
+
+    // Tenta diferentes padrões de prefixo
+    const patterns = [
+      '/*O_o*/google.visualization.Query.setResponse(',
+      'google.visualization.Query.setResponse(',
+      'google.visualization.Query.setResponse'
+    ];
+
+    for (const pattern of patterns) {
+      if (jsonString.includes(pattern)) {
+        console.log(`✅ Encontrado padrão: ${pattern}`);
+        jsonString = jsonString.replace(pattern, '');
+        break;
+      }
+    }
+
+    // Remove os últimos 2 caracteres (geralmente ");")
+    jsonString = jsonString.slice(0, -2);
+    console.log(`📄 JSON após remover wrapper: ${jsonString.substring(0, 200)}`);
 
     // Parse do JSON
     const data = JSON.parse(jsonString);
-    console.log('JSON parseado com sucesso');
+    console.log('✅ JSON parseado com sucesso');
+    console.log(`📊 Estrutura da resposta:`, Object.keys(data));
+
+    if (data.table) {
+      console.log(`📊 Tabela encontrada com ${data.table.rows?.length || 0} linhas`);
+      if (data.table.rows && data.table.rows.length > 0) {
+        console.log(`📊 Primeira linha:`, JSON.stringify(data.table.rows[0]));
+      }
+    }
 
     // Extrai as linhas da tabela
     const results: ScrapedCurrency[] = [];
 
     if (data.table && data.table.rows) {
+      console.log(`🔄 Processando ${data.table.rows.length} linhas...`);
       for (const row of data.table.rows) {
         // Estrutura esperada: row.c[0] = código, row.c[1] = nome, row.c[2] = compra, row.c[3] = venda
         // Ajuste conforme a estrutura real da sua planilha
         if (row.c && row.c.length >= 4) {
-          const code = row.c[0]?.v || '';
-          const name = row.c[1]?.v || '';
-          const buyPrice = row.c[2]?.v || 0;
-          const sellPrice = row.c[3]?.v || 0;
+          const code = String(row.c[0]?.v ?? '').trim();
+          const name = String(row.c[1]?.v ?? '').trim();
+          const buyPrice = Number(row.c[2]?.v);
+          const sellPrice = Number(row.c[3]?.v);
 
-          // Validação
-          if (code && name && buyPrice > 0 && sellPrice > 0) {
-            console.log(`Extraído: ${name} (${code}), Compra: ${buyPrice}, Venda: ${sellPrice}`);
+          // Validação mais robusta
+          if (code && name && Number.isFinite(buyPrice) && Number.isFinite(sellPrice) && buyPrice > 0 && sellPrice > 0) {
+            console.log(`✅ Extraído: ${name} (${code}), Compra: ${buyPrice}, Venda: ${sellPrice}`);
             results.push({
               name,
               code,
@@ -252,10 +279,14 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
               sellPrice
             });
           } else {
-            console.log(`Linha inválida:`, row);
+            console.log(`❌ Linha inválida - code: ${code}, name: ${name}, buyPrice: ${buyPrice}, sellPrice: ${sellPrice}`);
           }
+        } else {
+          console.log(`❌ Linha sem estrutura adequada:`, row);
         }
       }
+    } else {
+      console.log('❌ Nenhuma tabela ou linhas encontradas na resposta');
     }
 
     if (results.length > 0) {
