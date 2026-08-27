@@ -1,7 +1,7 @@
 // Service Worker para Push Notifications e Cache
 
 // Versionamento dinâmico do cache para invalidação automática
-const CACHE_VERSION = '1.0.0'; // Atualizar este número em cada release
+const CACHE_VERSION = '1.0.1'; // Atualizar este número em cada release
 const CACHE_NAME = `cap-cotacoes-v${CACHE_VERSION}`;
 const OFFLINE_PAGE = '/offline.html';
 const ASSETS_TO_CACHE = [
@@ -104,29 +104,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Para recursos estáticos, usar Cache First com fallback para rede
+  // Para recursos estáticos, usar Network First com fallback para cache
   event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        // Se encontrou no cache, retorna
-        if (cachedResponse) {
-          return cachedResponse;
+    fetch(event.request)
+      .then((response) => {
+        // Se a resposta é válida, armazena em cache e retorna
+        if (response && response.status === 200) {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
         }
-        
-        // Se não encontrou, busca na rede
-        return fetch(event.request)
-          .then((response) => {
-            // Se a resposta é válida, armazena em cache
-            if (response && response.status === 200) {
-              const responseToCache = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(event.request, responseToCache);
-                });
+        return response;
+      })
+      .catch(() => {
+        // Se falhar na rede, tenta o cache
+        return caches.match(event.request)
+          .then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
             }
-            return response;
-          })
-          .catch(() => {
             // Se for uma navegação, retorna a página offline
             if (event.request.mode === 'navigate') {
               return caches.match(OFFLINE_PAGE);

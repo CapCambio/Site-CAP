@@ -399,7 +399,7 @@ function detectColumns(
     headers
   );
 
-  let codeIndex = headers.findIndex(header =>
+  let codeIndex = headers.findIndex((header: string) =>
     [
       'codigo',
       'code',
@@ -408,7 +408,7 @@ function detectColumns(
     ].includes(header)
   );
 
-  let nameIndex = headers.findIndex(header =>
+  let nameIndex = headers.findIndex((header: string) =>
     [
       'nome',
       'name',
@@ -417,7 +417,7 @@ function detectColumns(
     ].includes(header)
   );
 
-  let buyIndex = headers.findIndex(header =>
+  let buyIndex = headers.findIndex((header: string) =>
     [
       'compra',
       'buy',
@@ -426,7 +426,7 @@ function detectColumns(
     ].includes(header)
   );
 
-  let sellIndex = headers.findIndex(header =>
+  let sellIndex = headers.findIndex((header: string) =>
     [
       'venda',
       'sell',
