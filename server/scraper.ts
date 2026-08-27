@@ -371,111 +371,6 @@ function parseGoogleVisualizationResponse(
 }
 
 /**
- * Procura automaticamente as colunas.
- */
-function detectColumns(
-  rows: any[]
-): {
-  codeIndex: number;
-  nameIndex: number;
-  buyIndex: number;
-  sellIndex: number;
-  dataStartIndex: number;
-} {
-  if (!rows.length) {
-    throw new Error(
-      'Google Sheets não possui linhas.'
-    );
-  }
-
-  const firstRow = rows[0];
-
-  const headers = firstRow.c?.map(
-    (cell: any) => normalizeHeader(cell?.v)
-  ) ?? [];
-
-  console.log(
-    '📋 Cabeçalhos detectados:',
-    headers
-  );
-
-  let codeIndex = headers.findIndex((header: string) =>
-    [
-      'codigo',
-      'code',
-      'sigla',
-      'moeda'
-    ].includes(header)
-  );
-
-  let nameIndex = headers.findIndex((header: string) =>
-    [
-      'nome',
-      'name',
-      'descricao',
-      'currency'
-    ].includes(header)
-  );
-
-  let buyIndex = headers.findIndex((header: string) =>
-    [
-      'compra',
-      'buy',
-      'buyprice',
-      'precodecompra'
-    ].includes(header)
-  );
-
-  let sellIndex = headers.findIndex((header: string) =>
-    [
-      'venda',
-      'sell',
-      'sellprice',
-      'precodevenda'
-    ].includes(header)
-  );
-
-  const hasDetectedHeaders =
-    codeIndex !== -1 &&
-    nameIndex !== -1 &&
-    buyIndex !== -1 &&
-    sellIndex !== -1;
-
-  // Se não houver cabeçalho reconhecível,
-  // mantém a estrutura original esperada.
-  if (!hasDetectedHeaders) {
-    console.log(
-      '⚠️ Cabeçalhos não reconhecidos. Usando estrutura padrão: Código, Nome, Compra, Venda.'
-    );
-
-    codeIndex = 0;
-    nameIndex = 1;
-    buyIndex = 2;
-    sellIndex = 3;
-
-    return {
-      codeIndex,
-      nameIndex,
-      buyIndex,
-      sellIndex,
-      dataStartIndex: 0
-    };
-  }
-
-  console.log(
-    '✅ Estrutura identificada automaticamente.'
-  );
-
-  return {
-    codeIndex,
-    nameIndex,
-    buyIndex,
-    sellIndex,
-    dataStartIndex: 1
-  };
-}
-
-/**
  * Converte resposta do Google Sheets
  * para o formato interno do sistema.
  */
@@ -494,66 +389,82 @@ function extractCurrenciesFromGoogleSheet(
   const rows = data.table.rows;
 
   console.log(
-    `📊 Total de linhas recebidas: ${rows.length}` 
+    `📊 Total de linhas recebidas: ${rows.length}`
   );
 
-  if (rows.length === 0) {
-    return [];
-  }
-
-  const {
-    codeIndex,
-    nameIndex,
-    buyIndex,
-    sellIndex,
-    dataStartIndex
-  } = detectColumns(rows);
+  const CURRENCY_CODES: Record<string, string> = {
+    dolaramericano: 'USD',
+    euro: 'EUR',
+    libraesterlina: 'GBP',
+    dolaraustraliano: 'AUD',
+    pesoargentino: 'ARS',
+    dolarneozelandes: 'NZD',
+    dolarcanadense: 'CAD',
+    francosuico: 'CHF',
+    pesouruguaio: 'UYU',
+    pesochileno: 'CLP',
+    pesomexicano: 'MXN',
+    pesocolombiano: 'COP',
+    yuanchines: 'CNY',
+    ienejapones: 'JPY',
+    novosolperuano: 'PEN',
+    randafricano: 'ZAR'
+  };
 
   const results: ScrapedCurrency[] = [];
 
-  for (
-    let index = dataStartIndex;
-    index < rows.length;
-    index++
-  ) {
+  for (let index = 0; index < rows.length; index++) {
     const row = rows[index];
 
     if (!row?.c) {
       continue;
     }
 
-    const code = String(
-      row.c[codeIndex]?.v ?? ''
-    )
-      .trim()
-      .toUpperCase();
-
-    const name = String(
-      row.c[nameIndex]?.v ?? ''
+    const rawName = String(
+      row.c[0]?.v ?? ''
     ).trim();
 
+    const normalizedName = normalizeHeader(rawName);
+
+    // Pula linha vazia ou cabeçalho
+    if (
+      !rawName ||
+      ['moeda', 'nome', 'currency'].includes(normalizedName)
+    ) {
+      continue;
+    }
+
+    const code =
+      CURRENCY_CODES[normalizedName];
+
     const buyPrice = parsePrice(
-      row.c[buyIndex]?.v
+      row.c[1]?.v
     );
 
     const sellPrice = parsePrice(
-      row.c[sellIndex]?.v
+      row.c[2]?.v
     );
 
+    if (!code) {
+      console.warn(
+        `⚠️ Moeda sem código mapeado: "${rawName}"`
+      );
+
+      continue;
+    }
+
     if (
-      !code ||
-      !name ||
       buyPrice <= 0 ||
       sellPrice <= 0
     ) {
-      console.log(
+      console.warn(
         `⚠️ Linha ${index + 1} ignorada:`,
         {
           code,
-          name,
+          name: rawName,
           buyPrice,
           sellPrice,
-          raw: row.c?.map(
+          raw: row.c.map(
             (cell: any) => cell?.v
           )
         }
@@ -564,13 +475,13 @@ function extractCurrenciesFromGoogleSheet(
 
     const currency: ScrapedCurrency = {
       code,
-      name,
+      name: rawName,
       buyPrice,
       sellPrice
     };
 
     console.log(
-      `💱 ${currency.code} | ${currency.name} | Compra: ${currency.buyPrice} | Venda: ${currency.sellPrice}` 
+      `💱 ${currency.code} | ${currency.name} | Compra: ${currency.buyPrice} | Venda: ${currency.sellPrice}`
     );
 
     results.push(currency);
