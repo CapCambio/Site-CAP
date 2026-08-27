@@ -14,7 +14,8 @@ export interface ScrapedCurrency {
 
 // URL da fonte de dados - Google Sheets
 const SPREADSHEET_ID = '1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk';
-const SOURCE_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=0`;
+// URL alternativa usando /pub para acesso público
+const SOURCE_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/pub?output=csv&gid=0`;
 
 // Arquivo para armazenar o último hash
 const HASH_FILE_PATH = path.join(process.cwd(), 'server', 'config', 'last-hash.json');
