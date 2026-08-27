@@ -152,7 +152,13 @@ export async function hasContentChanged(): Promise<{ changed: boolean; csvConten
   try {
     // Busca conteúdo do Google Sheets como CSV
     console.log(`🌐 Buscando CSV: ${SOURCE_URL}`);
-    const response = await fetch(SOURCE_URL);
+    const response = await fetch(SOURCE_URL, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/csv,application/csv',
+      },
+      redirect: 'follow'
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -211,7 +217,13 @@ export async function scrapeCurrencyData(): Promise<ScrapedCurrency[]> {
     let csv = csvContent;
     if (!csv) {
       console.log(`🌐 Buscando CSV: ${SOURCE_URL}`);
-      const response = await fetch(SOURCE_URL);
+      const response = await fetch(SOURCE_URL, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          'Accept': 'text/csv,application/csv',
+        },
+        redirect: 'follow'
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
