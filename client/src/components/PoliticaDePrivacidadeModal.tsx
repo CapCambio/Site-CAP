@@ -90,14 +90,8 @@ export function PoliticaDePrivacidadeModal({ isOpen, onClose }: PoliticaDePrivac
             <section>
               <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('privacy.section6.title')}</h3>
               <p className="text-zinc-300 mb-4">
-                {t('privacy.section6.intro')}
+                {t('privacy.section6.content')}
               </p>
-              <ul className="list-disc list-inside text-zinc-300 mb-4 space-y-2">
-                <li>{t('privacy.section6.item1')}</li>
-                <li>{t('privacy.section6.item2')}</li>
-                <li>{t('privacy.section6.item3')}</li>
-                <li>{t('privacy.section6.item4')}</li>
-              </ul>
             </section>
 
             <section>
@@ -112,18 +106,11 @@ export function PoliticaDePrivacidadeModal({ isOpen, onClose }: PoliticaDePrivac
               <p className="text-zinc-300 mb-4">
                 {t('privacy.section8.content')}
               </p>
-            </section>
-
-            <section>
-              <h3 className="text-lg font-semibold text-yellow-400 mb-3">{t('privacy.section9.title')}</h3>
-              <p className="text-zinc-300 mb-4">
-                {t('privacy.section9.content')}
-              </p>
               <p className="text-zinc-300 mt-2">
-                {t('privacy.section9.email')}
+                {t('privacy.section8.email')}
               </p>
               <p className="text-zinc-400 text-sm mt-2">
-                {t('privacy.section9.lastUpdate')}
+                {t('privacy.section8.lastUpdate')}
               </p>
             </section>
 

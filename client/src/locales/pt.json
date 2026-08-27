@@ -369,49 +369,41 @@
     "section2": {
       "title": "2. Níveis de Coleta",
       "intro": "Coletamos informações em diferentes níveis de interação com nossos serviços digitais:",
-      "item1": "Navegação Geral: Dados técnicos como endereço IP, tipo de dispositivo, cookies e padrões de navegação para melhorar a performance do site.",
+      "item1": "Navegação e Análise Estatística: Utilizamos ferramentas de terceiros, como Google Analytics e Microsoft Clarity, para coletar dados técnicos e comportamentais. Isso inclui endereço IP (anonimizado), tipo de dispositivo, navegador, páginas visitadas, tempo de permanência e interações visuais (mapas de calor e gravações de sessão). Esses dados são processados de forma agregada e desidentificada.",
       "item2": "Contato e Reservas: Informações fornecidas voluntariamente por você ao entrar em contato via WhatsApp ou e-mail (nome, telefone e detalhes da operação desejada).",
       "item3": "Plataforma CAP Cotações: Dados necessários para o funcionamento do sistema restrito, incluindo endereço de e-mail cadastrado, nome e preferências de alertas personalizados."
     },
     "section3": {
       "title": "3. Finalidade do Tratamento de Dados",
       "intro": "Seus dados são utilizados exclusivamente para:",
-      "item1": "Gerenciar e autenticar o acesso à plataforma exclusiva de cotações.",
-      "item2": "Processar pedidos de reserva de moeda e responder a consultas de taxas.",
-      "item3": "Enviar alertas de preços e notificações configuradas pelo usuário na plataforma.",
-      "item4": "Garantir a segurança cibernética de nossos ambientes digitais.",
-      "item5": "Cumprir obrigações legais e regulatórias inerentes ao mercado de câmbio."
+      "item1": "Melhoria da Experiência: Analisar o comportamento do usuário no site para identificar falhas técnicas e otimizar a navegação.",
+      "item2": "Gestão de Acesso: Autenticar o acesso à plataforma exclusiva de cotações.",
+      "item3": "Atendimento Comercial: Processar pedidos de reserva de moeda e responder a consultas de taxas.",
+      "item4": "Comunicações Personalizadas: Enviar alertas de preços e notificações configuradas pelo usuário na plataforma.",
+      "item5": "Segurança e Conformidade: Garantir a segurança cibernética e cumprir obrigações legais e regulatórias do mercado de câmbio."
     },
     "section4": {
-      "title": "4. Compartilhamento e Segurança",
+      "title": "4. Compartilhamento de Dados com Terceiros",
       "intro": "A CAP Câmbio não comercializa seus dados pessoais. O compartilhamento ocorre apenas quando estritamente necessário para:",
-      "item1": "Cumprimento de normas do Banco Central do Brasil e demais órgãos reguladores.",
-      "item2": "Serviços técnicos essenciais (como hospedagem e infraestrutura de TI), sempre com parceiros que garantam conformidade com a LGPD.",
-      "item3": "Adotamos medidas técnicas e organizacionais para proteger seus dados contra acessos não autorizados ou incidentes de segurança. Recomendamos que você também proteja suas credenciais de acesso à plataforma."
+      "item1": "Serviços de Análise: O Google e a Microsoft processam dados de navegação para nos fornecer relatórios estatísticos e insights de negócio. Esses dados são anonimizados antes de serem utilizados para benchmarking ou melhorias de produtos dos provedores.",
+      "item2": "Conformidade Legal: Cumprimento de normas do Banco Central do Brasil e demais órgãos reguladores.",
+      "item3": "Infraestrutura: Parceiros técnicos de hospedagem e TI que garantam conformidade com a LGPD."
     },
     "section5": {
       "title": "5. Cookies e Tecnologias de Rastreio",
-      "content": "Utilizamos cookies para manter sua sessão ativa na plataforma e lembrar suas preferências de visualização. Você pode gerenciar ou desativar os cookies nas configurações do seu navegador, embora isso possa afetar algumas funcionalidades do site."
+      "content": "Utilizamos cookies para: 1. Manter sua sessão ativa na plataforma CAP Cotações. 2. Armazenar suas preferências de visualização. 3. Coletar dados de análise via Google e Microsoft. Você pode gerenciar ou desativar os cookies nas configurações do seu navegador ou através do nosso banner de consentimento. Note que a desativação pode afetar algumas funcionalidades do site."
     },
     "section6": {
       "title": "6. Seus Direitos (LGPD)",
-      "intro": "Como titular dos dados, você possui direitos garantidos por lei, incluindo:",
-      "item1": "Confirmação da existência de tratamento e acesso aos dados.",
-      "item2": "Correção de dados incompletos, inexatos ou desatualizados.",
-      "item3": "Solicitação de exclusão de dados, quando a base legal permitir.",
-      "item4": "Revogação de consentimento para comunicações opcionais."
+      "content": "Como titular dos dados, você possui direitos garantidos por lei, incluindo a confirmação da existência de tratamento, acesso, correção de dados incompletos ou inexatos, e a solicitação de exclusão de dados quando aplicável."
     },
     "section7": {
-      "title": "7. Retenção de Dados",
-      "content": "Seus dados serão armazenados pelo período necessário para cumprir as finalidades descritas ou conforme exigido por prazos legais de guarda de documentos e registros cambiais."
+      "title": "7. Alterações nesta Política",
+      "content": "Esta Política de Privacidade pode ser atualizada periodicamente. A versão mais recente estará sempre disponível em nosso site."
     },
     "section8": {
-      "title": "8. Alterações nesta Política",
-      "content": "Esta Política de Privacidade pode ser atualizada periodicamente para refletir melhorias em nossos processos ou mudanças legislativas. A versão atualizada estará sempre disponível em nosso site."
-    },
-    "section9": {
-      "title": "9. Contato e Encarregado de Dados",
-      "content": "Para exercer seus direitos ou tirar dúvidas sobre como tratamos suas informações, entre em contato conosco:",
+      "title": "8. Contato e Encarregado de Dados",
+      "content": "Para exercer seus direitos ou tirar dúvidas, entre em contato conosco:",
       "email": "📧 capcambio_caxias@hotmail.com",
       "lastUpdate": "Última atualização: Agosto de 2026."
     }
