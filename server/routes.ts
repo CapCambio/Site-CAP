@@ -1277,50 +1277,49 @@ export async function refreshCurrencies() {
     currenciesCacheTime = 0;
     
     // OTIMIZAÇÃO 2: Cachear histórico do dia anterior em memória
+    // Sempre atualiza o cache para garantir dados atualizados
+    console.log('🔄 Atualizando cache de histórico do dia anterior...');
+    yesterdayCache = new Map();
     const todayStr = new Date().toISOString().split('T')[0];
-    if (yesterdayCacheDate !== todayStr) {
-      console.log('🔄 Atualizando cache de histórico do dia anterior...');
-      yesterdayCache = new Map();
-      yesterdayCacheDate = todayStr;
-      
-      // Buscar histórico do dia anterior para todas as moedas
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      const dayBeforeYesterday = new Date(yesterday);
-      dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
-      
-      // Buscar histórico para todas as moedas de uma vez
-      const allHistory = await db.getCurrencyHistory(undefined, dayBeforeYesterday, today);
-      
-      // Processar e cachear o último preço de cada moeda do dia anterior
-      const historyByCode = new Map<string, any[]>();
-      allHistory.forEach((record: any) => {
-        if (!historyByCode.has(record.code)) {
-          historyByCode.set(record.code, []);
-        }
-        historyByCode.get(record.code)!.push(record);
-      });
-      
-      // Para cada moeda, pegar o último preço do dia anterior
-      for (const [code, records] of Array.from(historyByCode.entries())) {
-        const sortedRecords = records
-          .filter((record: { timestamp: string | Date }) => {
-            const recordDate = new Date(record.timestamp);
-            return recordDate >= dayBeforeYesterday && recordDate < today;
-          })
-          .sort((a: { timestamp: string | Date }, b: { timestamp: string | Date }) => 
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-          );
-        
-        if (sortedRecords.length > 0) {
-          yesterdayCache.set(code, sortedRecords[0].sell_price);
-        }
+    yesterdayCacheDate = todayStr;
+
+    // Buscar histórico do dia anterior para todas as moedas
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const dayBeforeYesterday = new Date(yesterday);
+    dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
+
+    // Buscar histórico para todas as moedas de uma vez
+    const allHistory = await db.getCurrencyHistory(undefined, dayBeforeYesterday, today);
+
+    // Processar e cachear o último preço de cada moeda do dia anterior
+    const historyByCode = new Map<string, any[]>();
+    allHistory.forEach((record: any) => {
+      if (!historyByCode.has(record.code)) {
+        historyByCode.set(record.code, []);
       }
-      
-      console.log(`✅ Cache de histórico atualizado com ${yesterdayCache.size} moedas`);
+      historyByCode.get(record.code)!.push(record);
+    });
+
+    // Para cada moeda, pegar o último preço do dia anterior
+    for (const [code, records] of Array.from(historyByCode.entries())) {
+      const sortedRecords = records
+        .filter((record: { timestamp: string | Date }) => {
+          const recordDate = new Date(record.timestamp);
+          return recordDate >= dayBeforeYesterday && recordDate < today;
+        })
+        .sort((a: { timestamp: string | Date }, b: { timestamp: string | Date }) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+
+      if (sortedRecords.length > 0) {
+        yesterdayCache.set(code, sortedRecords[0].sell_price);
+      }
     }
+
+    console.log(`✅ Cache de histórico atualizado com ${yesterdayCache.size} moedas`);
     
     // NOVO: Acumular todos os alertas antes de enviar
     const allAlertsByEmail = new Map<string, Array<{
