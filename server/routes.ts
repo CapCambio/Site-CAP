@@ -1348,17 +1348,20 @@ export async function refreshCurrencies() {
                       existingCurrency.sellPrice !== currency.sellPrice || 
                       existingCurrency.buyPrice !== currency.buyPrice;
 
-      
+
       // Calcula variação baseada no último preço do dia anterior (usando cache em memória)
       let change = 0;
-      
+
       // OTIMIZAÇÃO 2: Usa cache em memória em vez de query ao banco
       const lastPriceYesterday = yesterdayCache.get(currency.code);
       if (lastPriceYesterday) {
+        console.log(`📊 ${currency.code}: Preço atual=${currency.sellPrice}, Preço ontem=${lastPriceYesterday}`);
         change = ((currency.sellPrice - lastPriceYesterday) / lastPriceYesterday) * 100;
         change = Number(change.toFixed(2));
+        console.log(`📊 ${currency.code}: Variação calculada=${change}%`);
       } else {
         // Fallback: se não há dados no cache, variação = 0
+        console.log(`⚠️ ${currency.code}: Sem dados no cache de ontem, variação=0`);
         change = 0;
       }
 
