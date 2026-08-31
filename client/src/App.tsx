@@ -84,7 +84,7 @@ function AppContent() {
         <Switch>
           <Route path="/" component={LandingPage} />
           <Route path="/precos" component={PrecosPage} />
-          <Route path="/tv-caxias" component={TvCaxiasPage} />
+          <Route path="/tv" component={TvCaxiasPage} />
           <Route path="/auth" component={LoginPage} />
           <Route component={NotFound} />
         </Switch>

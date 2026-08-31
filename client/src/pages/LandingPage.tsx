@@ -16,7 +16,7 @@ export default function LandingPage() {
             Ver Cotações
           </Link>
           <Link
-            href="/tv-caxias"
+            href="/tv"
             className="px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors"
           >
             TV Caxias
