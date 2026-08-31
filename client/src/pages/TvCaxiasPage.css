@@ -1,0 +1,729 @@
+/*
+ * STYLE NOTE — Painel Editorial de Cotações:
+ * amarelo-sinal + preto-tinta, logotipo CAP em área própria acima do status,
+ * tipografia de transmissão e tabela para leitura à distância; no Natal, uma
+ * guirlanda exclusiva recebe luzes coloridas fixas e sinos laterais, sem deslocar a composição.
+ */
+
+* { box-sizing: border-box; }
+
+html { background: #0b0b0b; }
+
+.tv-caxias-page body {
+  margin: 0;
+  min-width: 320px;
+  background: #f7f7f4;
+  color: #222220;
+  font-family: "DM Sans", Arial, sans-serif;
+}
+
+button, input { font: inherit; }
+button { cursor: pointer; }
+
+button:focus-visible, input:focus-visible {
+  outline: 3px solid #ffce00;
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.broadcast-shell {
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(250px, 28vw) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  overflow: hidden;
+  background: #f7f7f4;
+}
+
+.brand-rail {
+  --ticker-height: clamp(36px, 5vh, 40px);
+  --cap-bottom: 0.4rem;
+  --halloween-top-offset: clamp(0.25rem, 0.6vh, 0.45rem);
+  position: relative;
+  display: flex;
+  grid-row: 1;
+  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+  padding: clamp(2rem, 7vh, 4rem) 2rem 2rem;
+  background: #ffd300;
+  color: #151515;
+}
+
+/* Página original: logo e título têm coordenadas próprias; Halloween e Natal
+   mantêm a composição sazonal independente, sem herdar estes posicionamentos. */
+.broadcast-shell--original .brand-rail {
+  padding-top: clamp(4.9rem, 12vh, 6.25rem);
+}
+
+.brand-logo {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  top: clamp(0.75rem, 1.8vh, 1rem);
+  width: clamp(112px, 10.3vw, 136px);
+  height: auto;
+  margin: 0;
+}
+
+.brand-status {
+  position: relative;
+  z-index: 2;
+  max-width: 9ch;
+  margin: 0;
+  color: #171717;
+  font-family: "Archivo Black", Impact, sans-serif;
+  font-size: clamp(2rem, 3.4vw, 4rem);
+  letter-spacing: -0.06em;
+  line-height: 0.94;
+}
+
+.brand-status span { display: block; }
+.brand-status__first-line { transform: translateX(1.12rem); }
+
+/* STYLE NOTE — Janela editorial de viagens: imagens intensas em um recorte
+   reto e discreto, mantendo a lateral amarela como campo principal da marca. */
+.travel-carousel {
+  position: absolute;
+  z-index: 1;
+  top: 43.5%;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(240px, 35vh, 280px);
+  overflow: hidden;
+  border-top: 1px solid rgb(23 23 23 / 28%);
+  border-bottom: 1px solid rgb(23 23 23 / 28%);
+  background: #171717;
+  transform: translateY(-50%);
+}
+
+.travel-carousel::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(0 0 0 / 4%), rgb(0 0 0 / 22%));
+}
+
+.travel-carousel__slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  object-fit: cover;
+  transition: opacity 900ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.travel-carousel__slide.is-active { opacity: 1; }
+
+.broadcast-shell--original .travel-carousel {
+  top: 48.5%;
+}
+
+.cap-mark {
+  position: absolute;
+  z-index: 1;
+  right: 0.8rem;
+  bottom: var(--cap-bottom);
+  margin: 0;
+  color: rgb(0 0 0 / 22%);
+  font-family: "Archivo Black", Impact, sans-serif;
+  font-size: 12rem;
+  font-weight: 900;
+  letter-spacing: -0.15em;
+  line-height: 1;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.side-ticker {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 4;
+  display: flex;
+  height: var(--ticker-height);
+  align-items: center;
+  overflow: hidden;
+  border-top: 1px solid rgb(255 255 255 / 13%);
+  background: #10100f;
+  color: #fff;
+}
+
+.side-ticker__track {
+  display: flex;
+  width: max-content;
+  animation: sidebar-ticker 25s linear infinite;
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: clamp(1.08rem, 1.4vw, 1.35rem);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.side-ticker__cycle {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.side-ticker__copy { flex: 0 0 auto; }
+.side-ticker__separator { flex: 0 0 auto; color: #fff; }
+.side-ticker__separator--rate { margin: 0 0.45rem; }
+.side-ticker__separator--currency { margin: 0 1.4rem 0 1.25rem; }
+
+/* STYLE NOTE — Halloween no ticker: a abóbora separa Compra e Venda em cada moeda,
+   quase em contato com os valores; o fantasma cria uma pausa ampla entre moedas e ciclos. */
+.side-ticker__pumpkin {
+  display: block;
+  width: clamp(46px, 4.3vw, 56px);
+  height: auto;
+  flex: 0 0 clamp(46px, 4.3vw, 56px);
+  margin: 0 -0.42rem;
+  object-fit: contain;
+}
+
+.side-ticker__ghost {
+  display: block;
+  width: clamp(40px, 3.6vw, 48px);
+  height: auto;
+  flex: 0 0 clamp(40px, 3.6vw, 48px);
+  margin: 0 1.4rem 0 1.25rem;
+  object-fit: contain;
+  transform: translateY(-2px);
+}
+
+/* STYLE NOTE — Natal no ticker mantém a lógica do Halloween sem tocar nela: árvore
+   espaçada entre Compra/Venda e presentes com pausa maior entre as moedas. */
+.side-ticker__christmas-tree {
+  display: block;
+  width: clamp(31px, 2.8vw, 38px);
+  height: auto;
+  flex: 0 0 clamp(31px, 2.8vw, 38px);
+  margin: 0 0.05rem;
+  object-fit: contain;
+}
+
+.side-ticker__christmas-gifts {
+  display: block;
+  width: clamp(38px, 3.5vw, 46px);
+  height: auto;
+  flex: 0 0 clamp(38px, 3.5vw, 46px);
+  margin: 0 1.4rem 0 1.25rem;
+  object-fit: contain;
+  transform: translateY(0);
+}
+
+/* STYLE NOTE — Halloween: ativos transparentes sobre a lateral, sem deslocar título,
+   carrossel, CAP, ticker ou tabela. */
+.broadcast-shell--halloween-preview .brand-rail { padding-top: clamp(2rem, 7vh, 4rem); }
+
+.halloween-top-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.halloween-corner-web,
+.halloween-web-connector,
+.halloween-bat,
+.halloween-witch-hat,
+.halloween-cap cat,
+.halloween-cap-web {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.halloween-corner-web {
+  width: clamp(76px, 8.5vw, 110px);
+  top: calc(-1 * var(--halloween-top-offset) - 0.15rem);
+}
+
+.halloween-corner-web--left { left: -0.25rem; }
+.halloween-corner-web--right { right: -0.25rem; transform: scaleX(-1); }
+
+.halloween-web-connector {
+  width: 68%;
+  top: calc(-1 * var(--halloween-top-offset) - 0.85rem);
+  left: 16%;
+}
+
+.halloween-bat {
+  width: clamp(36px, 3.9vw, 50px);
+  z-index: 1;
+}
+
+.halloween-bat--one { top: 4.1rem; left: calc(1.1rem - 5px); transform: rotate(-8deg); }
+.halloween-bat--two { top: 0.8rem; left: calc(43.5% - 5px); transform: rotate(5deg); }
+.halloween-bat--three { top: 3.3rem; right: calc(6% - 5px); transform: rotate(8deg); }
+
+.halloween-witch-hat {
+  z-index: 3;
+  bottom: calc(var(--ticker-height) + 5.76rem);
+  left: calc(48% - 1.3rem);
+  width: clamp(88px, 8vw, 106px);
+  transform: rotate(1deg) scale(1.2);
+}
+
+.halloween-cap-cat {
+  z-index: 0;
+  bottom: calc(var(--ticker-height) + 1.92rem);
+  left: 3.77rem;
+  width: clamp(41px, 3.5vw, 47px);
+}
+
+.halloween-cap-web {
+  z-index: 0;
+  right: 1.6rem;
+  bottom: var(--ticker-height);
+  width: clamp(32px, 3.2vw, 41px);
+  transform: rotate(360deg);
+  transform-origin: 50% 50%;
+}
+
+/* STYLE NOTE — Natal usa enfeites próprios: a guirlanda de topo horizontal ampliada,
+   luzes de pisca-pisca e sinos laterais enquadram o título; chapéu no A e rena diagonal no C preservam a
+   composição oficial, Halloween e o ticker-base. */
+.broadcast-shell--christmas-preview .brand-rail {
+  padding-top: clamp(3.75rem, 9vh, 5rem);
+}
+
+.christmas-title-garland,
+.christmas-santa-hat,
+.christmas-cap-reindeer {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.christmas-title-garland {
+  z-index: 3;
+  top: -0.5rem;
+  left: -2rem;
+  width: calc(100% + 4rem);
+  height: auto;
+  transform: scaleX(1.14);
+  transform-origin: top left;
+}
+
+.christmas-title-twinkle {
+  position: absolute;
+  z-index: 4;
+  top: -0.1rem;
+  left: 0;
+  width: 100%;
+  height: clamp(54px, 10vh, 76px);
+  pointer-events: none;
+  mix-blend-mode: normal;
+  transform: none;
+}
+
+.christmas-title-bell {
+  position: absolute;
+  z-index: 5;
+  top: clamp(2.85rem, 7vh, 3.5rem);
+  display: block;
+  width: clamp(50px, 5vw, 64px);
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgb(92 55 5 / 25%));
+}
+
+.christmas-title-bell--left { top: clamp(2.35rem, 6vh, 3rem); left: 0.6rem; }
+.christmas-title-bell--right { top: clamp(2.66rem, 6.6vh, 3.31rem); right: 0.7rem; transform: scaleX(-1); }
+
+.christmas-title-twinkle--one {
+  background:
+    radial-gradient(circle at 15% 18%, rgb(255 252 194 / 95%) 0 1px, rgb(255 205 68 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 8% 28%, rgb(255 250 174 / 96%) 0 1.2px, rgb(255 207 75 / 64%) 2px, transparent 5px),
+    radial-gradient(circle at 23% 48%, rgb(255 252 194 / 95%) 0 1.1px, rgb(255 205 68 / 60%) 2px, transparent 5px),
+    radial-gradient(circle at 31% 16%, rgb(255 252 194 / 95%) 0 1px, rgb(255 205 68 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 39% 24%, rgb(255 250 174 / 96%) 0 1.2px, rgb(255 207 75 / 64%) 2px, transparent 5px),
+    radial-gradient(circle at 48% 18%, rgb(255 252 194 / 95%) 0 1px, rgb(255 205 68 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 58% 42%, rgb(255 252 194 / 95%) 0 1.1px, rgb(255 205 68 / 60%) 2px, transparent 5px),
+    radial-gradient(circle at 67% 18%, rgb(255 252 194 / 95%) 0 1px, rgb(255 205 68 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 76% 23%, rgb(255 250 174 / 96%) 0 1.2px, rgb(255 207 75 / 64%) 2px, transparent 5px),
+    radial-gradient(circle at 85% 18%, rgb(255 252 194 / 95%) 0 1px, rgb(255 205 68 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 92% 43%, rgb(255 252 194 / 95%) 0 1.1px, rgb(255 205 68 / 60%) 2px, transparent 5px);
+  animation: christmas-garland-twinkle-a 2.8s ease-in-out infinite;
+}
+
+.christmas-title-twinkle--two {
+  background:
+    radial-gradient(circle at 5% 42%, rgb(255 250 174 / 95%) 0 1px, rgb(255 207 75 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 15% 40%, rgb(255 252 194 / 96%) 0 1.1px, rgb(255 207 75 / 62%) 2px, transparent 5px),
+    radial-gradient(circle at 24% 20%, rgb(255 250 174 / 95%) 0 1px, rgb(255 207 75 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 32% 20%, rgb(255 250 174 / 95%) 0 1.2px, rgb(255 207 75 / 60%) 2px, transparent 5px),
+    radial-gradient(circle at 42% 39%, rgb(255 250 174 / 95%) 0 1px, rgb(255 207 75 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 49% 47%, rgb(255 252 194 / 96%) 0 1.1px, rgb(255 207 75 / 62%) 2px, transparent 5px),
+    radial-gradient(circle at 58% 19%, rgb(255 252 194 / 95%) 0 1px, rgb(255 207 75 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 67% 21%, rgb(255 250 174 / 95%) 0 1.2px, rgb(255 207 75 / 60%) 2px, transparent 5px),
+    radial-gradient(circle at 75% 44%, rgb(255 250 174 / 95%) 0 1px, rgb(255 207 75 / 58%) 1.8px, transparent 4.5px),
+    radial-gradient(circle at 84% 46%, rgb(255 250 174 / 96%) 0 1.1px, rgb(255 207 75 / 62%) 2px, transparent 5px);
+  animation: christmas-garland-twinkle-b 3.35s ease-in-out infinite;
+}
+
+@keyframes christmas-garland-twinkle-a {
+  0%, 100% { opacity: 0.22; transform: scale(0.985); }
+  48% { opacity: 0.9; transform: scale(1); }
+}
+
+@keyframes christmas-garland-twinkle-b {
+  0%, 100% { opacity: 0.78; transform: scale(1); }
+  48% { opacity: 0.16; transform: scale(0.985); }
+}
+
+/* Grupos coloridos, com durações, atrasos e picos próprios para um pisca-pisca orgânico. */
+.christmas-title-twinkle--one {
+  background:
+    radial-gradient(circle at 8% 28%, rgb(255 119 96 / 98%) 0 1.4px, rgb(255 62 46 / 72%) 2.2px, transparent 5px),
+    radial-gradient(circle at 19% 44%, rgb(255 128 102 / 98%) 0 1.2px, rgb(255 62 46 / 68%) 2px, transparent 4.8px),
+    radial-gradient(circle at 31% 16%, rgb(255 119 96 / 98%) 0 1.4px, rgb(255 62 46 / 72%) 2.2px, transparent 5px),
+    radial-gradient(circle at 45% 39%, rgb(255 128 102 / 98%) 0 1.2px, rgb(255 62 46 / 68%) 2px, transparent 4.8px),
+    radial-gradient(circle at 58% 42%, rgb(255 121 96 / 98%) 0 1.4px, rgb(255 62 46 / 72%) 2.2px, transparent 5px),
+    radial-gradient(circle at 70% 18%, rgb(255 128 102 / 98%) 0 1.2px, rgb(255 62 46 / 68%) 2px, transparent 4.8px),
+    radial-gradient(circle at 85% 18%, rgb(255 119 96 / 98%) 0 1.4px, rgb(255 62 46 / 72%) 2.2px, transparent 5px),
+    radial-gradient(circle at 95% 42%, rgb(255 128 102 / 98%) 0 1.2px, rgb(255 62 46 / 68%) 2px, transparent 4.8px);
+  animation: christmas-garland-twinkle-red 3.1s ease-in-out -1.25s infinite;
+  filter: drop-shadow(0 0 3px rgb(255 54 38 / 92%));
+}
+
+.christmas-title-twinkle--two {
+  background:
+    radial-gradient(circle at 15% 40%, rgb(148 255 174 / 98%) 0 1.35px, rgb(54 202 95 / 70%) 2.2px, transparent 5px),
+    radial-gradient(circle at 42% 39%, rgb(152 255 180 / 98%) 0 1.15px, rgb(54 202 95 / 66%) 2px, transparent 4.8px),
+    radial-gradient(circle at 67% 21%, rgb(145 255 172 / 98%) 0 1.35px, rgb(54 202 95 / 70%) 2.2px, transparent 5px),
+    radial-gradient(circle at 93% 22%, rgb(152 255 180 / 98%) 0 1.15px, rgb(54 202 95 / 66%) 2px, transparent 4.8px);
+  animation: christmas-garland-twinkle-green 4.35s ease-in-out -2.8s infinite;
+  filter: drop-shadow(0 0 3px rgb(46 205 92 / 88%));
+}
+
+.christmas-title-twinkle--three {
+  background:
+    radial-gradient(circle at 5% 42%, rgb(140 205 255 / 98%) 0 1.25px, rgb(43 134 255 / 70%) 2.1px, transparent 4.9px),
+    radial-gradient(circle at 24% 20%, rgb(155 213 255 / 98%) 0 1.05px, rgb(43 134 255 / 66%) 1.9px, transparent 4.7px),
+    radial-gradient(circle at 49% 47%, rgb(140 205 255 / 98%) 0 1.25px, rgb(43 134 255 / 70%) 2.1px, transparent 4.9px),
+    radial-gradient(circle at 75% 44%, rgb(155 213 255 / 98%) 0 1.05px, rgb(43 134 255 / 66%) 1.9px, transparent 4.7px);
+  animation: christmas-garland-twinkle-blue 3.75s ease-in-out -0.55s infinite;
+  filter: drop-shadow(0 0 3px rgb(45 136 255 / 88%));
+}
+
+.christmas-title-twinkle--four {
+  background:
+    radial-gradient(circle at 15% 18%, rgb(255 232 142 / 98%) 0 1.2px, rgb(255 167 35 / 68%) 2px, transparent 4.8px),
+    radial-gradient(circle at 39% 24%, rgb(255 219 131 / 98%) 0 1.35px, rgb(255 167 35 / 72%) 2.2px, transparent 5px),
+    radial-gradient(circle at 67% 18%, rgb(255 232 142 / 98%) 0 1.2px, rgb(255 167 35 / 68%) 2px, transparent 4.8px),
+    radial-gradient(circle at 92% 43%, rgb(255 219 131 / 98%) 0 1.35px, rgb(255 167 35 / 72%) 2.2px, transparent 5px);
+  animation: christmas-garland-twinkle-amber 5.05s ease-in-out -3.2s infinite;
+  filter: drop-shadow(0 0 3px rgb(255 176 38 / 90%));
+}
+
+@keyframes christmas-garland-twinkle-red {
+  0%, 14%, 100% { opacity: 0.43; }
+  33% { opacity: 1; }
+  53% { opacity: 0.58; }
+  76% { opacity: 0.9; }
+}
+
+@keyframes christmas-garland-twinkle-green {
+  0%, 22%, 100% { opacity: 0.38; }
+  40% { opacity: 0.96; }
+  61% { opacity: 0.53; }
+  82% { opacity: 0.85; }
+}
+
+@keyframes christmas-garland-twinkle-blue {
+  0%, 10%, 100% { opacity: 0.35; }
+  28% { opacity: 0.94; }
+  47% { opacity: 0.5; }
+  69% { opacity: 1; }
+}
+
+@keyframes christmas-garland-twinkle-amber {
+  0%, 18%, 100% { opacity: 0.4; }
+  36% { opacity: 0.98; }
+  57% { opacity: 0.55; }
+  79% { opacity: 0.87; }
+}
+
+.christmas-santa-hat {
+  z-index: 3;
+  bottom: calc(var(--ticker-height) + 3.55rem);
+  left: calc(47% - 1.2rem);
+  width: clamp(105px, 9.4vw, 128px);
+  height: auto;
+  transform: rotate(-5deg);
+}
+
+.christmas-cap-reindeer {
+  z-index: 2;
+  bottom: calc(var(--ticker-height) - 0.41rem);
+  left: -0.65rem;
+  width: clamp(84px, 7.8vw, 100px);
+  height: auto;
+}
+
+.christmas-cap-reindeer--bust {
+  bottom: calc(var(--ticker-height) + 2.1rem);
+  left: 2.55rem;
+  width: clamp(54px, 4.9vw, 64px);
+}
+
+@keyframes sidebar-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .travel-carousel__slide { transition: none; }
+}
+
+.quote-stage {
+  display: flex;
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fafaf8;
+}
+
+.quote-stage--table-only { height: 100%; }
+
+.quote-table-wrap {
+  --currency-flag-inset: clamp(1.4rem, 4.2vw, 5rem);
+  --rate-value-width: clamp(6.5rem, 9.4vw, 7.5rem);
+  --quote-table-header-height: clamp(31px, 4.6vh, 39px);
+  --table-body-row-height: calc((100% - var(--quote-table-header-height)) / 17);
+  --table-spider-size: clamp(39px, 3.75vw, 49px);
+  --table-spider-half-size: clamp(19.5px, 1.875vw, 24.5px);
+  --table-spider-side-gap: calc((var(--currency-flag-inset) - var(--table-spider-size)) / 2);
+  --table-spider-nudge-x: -2px;
+  --table-spider-thread-nudge-x: 2px;
+  --table-spider-bottom-stop: calc(100% - var(--table-body-row-height) - var(--table-spider-half-size));
+  --table-spider-thread-length: calc(var(--table-spider-bottom-stop) + 1rem);
+  position: relative;
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.quote-table {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-columns: 48% 26% 26%;
+  grid-template-rows: var(--quote-table-header-height) repeat(17, minmax(0, 1fr));
+  background: #f8f8f6;
+  overflow: hidden;
+}
+
+.quote-table thead, .quote-table tbody, .quote-table tr { display: contents; }
+.quote-table th, .quote-table td { text-align: left; }
+
+.quote-table thead th {
+  display: flex;
+  position: relative;
+  z-index: 4;
+  align-items: center;
+  padding: 0 clamp(0.8rem, 2.2vw, 2.2rem);
+  border-bottom: 2px solid #d4a019;
+  background: #15191c;
+  color: #fff;
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: clamp(0.78rem, 1.1vw, 1.05rem);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+}
+
+.quote-table thead th > span { transform: translateY(2px); }
+
+.quote-table .currency-head {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding-left: var(--currency-flag-inset);
+}
+
+.quote-table thead th:nth-child(2), .quote-table thead th:nth-child(3) {
+  justify-content: flex-start;
+  padding-left: var(--currency-flag-inset);
+  text-align: left;
+}
+
+.quote-table thead th:nth-child(2) span, .quote-table thead th:nth-child(3) span {
+  width: auto;
+  text-align: left;
+}
+
+.quote-table thead th + th { border-left: 1px solid rgb(255 255 255 / 14%); }
+
+.quote-table tbody tr > * {
+  animation: row-in 420ms cubic-bezier(.23, 1, .32, 1) both;
+  animation-delay: calc(var(--row-index) * 28ms);
+  background: #fff;
+}
+
+.quote-table tbody tr:nth-child(even) > * { background: #f0f1f0; }
+.quote-table tbody tr:hover > * { background: inherit; }
+
+.quote-table tbody th, .quote-table tbody td {
+  min-height: 0;
+  padding: 0 clamp(0.8rem, 2.2vw, 2.2rem);
+  border-bottom: 1px solid #dfe1df;
+}
+
+.quote-table tbody td {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: var(--currency-flag-inset);
+  text-align: left;
+  border-left: 1px solid #e3e4e2;
+}
+
+.quote-table .currency-cell {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.6rem, 1vw, 0.9rem);
+  padding-left: var(--currency-flag-inset);
+  color: #272a2a;
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: clamp(0.8rem, 1.2vw, 1.08rem);
+  font-weight: 550;
+  letter-spacing: -0.015em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.flag-image {
+  width: clamp(22px, 2.1vw, 30px);
+  height: auto;
+  flex: 0 0 auto;
+  border: 0;
+  box-shadow: none;
+  object-fit: cover;
+}
+
+/* STYLE NOTE — Natal na tabela: uma guirlanda vertical realista de fio preto, lâmpadas quentes
+   e bolas vermelhas/douradas usa o respiro antes das bandeiras sem deslocar moedas ou valores. */
+.christmas-table-ornament {
+  position: absolute;
+  z-index: 3;
+  top: var(--quote-table-header-height);
+  bottom: 0.15rem;
+  left: calc(var(--currency-flag-inset) / 2);
+  width: clamp(18px, 1.7vw, 24px);
+  overflow: visible;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.christmas-table-ornament__image {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: auto;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  mix-blend-mode: normal;
+  transform: translateX(-50%);
+}
+
+/* STYLE NOTE — Halloween na tabela: a aranha e sua teia percorrem a margem anterior
+   às bandeiras como camadas absolutas, sem deslocar colunas, moedas ou valores. */
+.halloween-table-spider-thread {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: calc(var(--table-spider-side-gap) + var(--table-spider-half-size) + var(--table-spider-nudge-x) + var(--table-spider-thread-nudge-x));
+  width: 2px;
+  height: 0;
+  background: #0b0d0f;
+  pointer-events: none;
+  animation: halloween-table-spider-thread-route 32s linear infinite;
+}
+
+@keyframes halloween-table-spider-thread-route {
+  0%, 8.026% { height: 0; }
+  45.313% { height: var(--table-spider-thread-length); }
+  60.938% { height: var(--table-spider-thread-length); }
+  98.223%, 100% { height: 0; }
+}
+
+.halloween-table-spider {
+  position: absolute;
+  z-index: 3;
+  top: calc(-1 * var(--table-spider-size));
+  left: calc(var(--table-spider-side-gap) + var(--table-spider-nudge-x));
+  width: var(--table-spider-size);
+  height: auto;
+  pointer-events: none;
+  animation: halloween-table-spider-route 32s linear infinite;
+}
+
+@keyframes halloween-table-spider-route {
+  0%, 6.25% { top: calc(-1 * var(--table-spider-size)); }
+  45.313% { top: var(--table-spider-bottom-stop); }
+  60.938% { top: var(--table-spider-bottom-stop); }
+  100% { top: calc(-1 * var(--table-spider-size)); }
+}
+
+/* STYLE NOTE — Valores monetários: uma caixa interna fixa mantém cada conjunto
+   centralizado na coluna enquanto todos os prefixos R$ partem da mesma margem. */
+.rate-value {
+  width: var(--rate-value-width);
+  color: #151719;
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: clamp(0.92rem, 1.3vw, 1.18rem);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+@keyframes row-in { from { opacity: 0; transform: translateX(9px); } to { opacity: 1; transform: translateX(0); } }
+
+@media (max-width: 760px) {
+  .broadcast-shell { display: block; height: auto; overflow: visible; }
+  .brand-rail { min-height: 118px; align-items: flex-start; padding: 1.35rem 1.25rem; }
+  .broadcast-shell--original .brand-rail { padding-top: 4.75rem; }
+  .brand-logo { top: 0.8rem; width: 84px; }
+  .brand-status { max-width: none; font-size: 1.7rem; }
+  .cap-mark { right: -0.3rem; bottom: -1rem; font-size: 6rem; }
+  .quote-stage { min-height: 0; }
+  .quote-table-wrap { display: block; overflow: auto; }
+  .quote-table { display: table; height: auto; overflow: visible; }
+  .quote-table thead { display: table-header-group; position: sticky; top: 0; z-index: 2; background: #fafaf8; }
+  .quote-table tbody { display: table-row-group; }
+  .quote-table tr { display: table-row; }
+  .quote-table .currency-head { width: 47%; padding-left: 1.25rem; }
+  .quote-table thead th { height: 43px; padding: 0 0.55rem; font-size: 0.7rem; }
+  .quote-table tbody th, .quote-table tbody td { height: 49px; padding: 0 0.55rem; }
+  .quote-table .currency-cell { gap: 0.42rem; padding-left: 1.25rem; font-size: 0.83rem; white-space: normal; }
+  .flag-image { width: 21px; }
+  .rate-value { font-size: 0.88rem; }
+}

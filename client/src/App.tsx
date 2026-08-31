@@ -14,7 +14,15 @@ import { useState, useEffect } from 'react';
 import './lib/i18n';
 
 // Lazy load pages com tratamento de erro e retry
-const Home = lazyWithRetry(() => import("@/pages/Home"), {
+const LandingPage = lazyWithRetry(() => import("@/pages/LandingPage"), {
+  fallback: <LoadingOverlay isVisible={true} />
+});
+
+const PrecosPage = lazyWithRetry(() => import("@/pages/Home"), {
+  fallback: <LoadingOverlay isVisible={true} />
+});
+
+const TvCaxiasPage = lazyWithRetry(() => import("@/pages/TvCaxiasPage"), {
   fallback: <LoadingOverlay isVisible={true} />
 });
 
@@ -74,8 +82,10 @@ function AppContent() {
     <div className="min-h-screen bg-black">
       <LazyLoad>
         <Switch>
+          <Route path="/" component={LandingPage} />
+          <Route path="/precos" component={PrecosPage} />
+          <Route path="/tv-caxias" component={TvCaxiasPage} />
           <Route path="/auth" component={LoginPage} />
-          <ProtectedRoute path="/" component={Home} />
           <Route component={NotFound} />
         </Switch>
       </LazyLoad>
