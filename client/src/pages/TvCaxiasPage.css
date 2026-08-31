@@ -5,11 +5,13 @@
  * guirlanda exclusiva recebe luzes coloridas fixas e sinos laterais, sem deslocar a composição.
  */
 
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;550;700;800&family=Archivo+Black&display=swap');
+
 * { box-sizing: border-box; }
 
 html { background: #0b0b0b; }
 
-.tv-caxias-page body {
+body {
   margin: 0;
   min-width: 320px;
   background: #f7f7f4;
