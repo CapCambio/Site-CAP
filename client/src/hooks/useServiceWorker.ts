@@ -8,12 +8,19 @@ export function useServiceWorker() {
       return;
     }
 
+    // Verificar se estamos na rota /precos (apenas lá o PWA deve funcionar)
+    const currentPath = window.location.pathname;
+    if (currentPath !== '/precos' && currentPath !== '/precos/') {
+      console.log('PWA desativado nesta rota:', currentPath);
+      return;
+    }
+
     // Função para registrar o service worker
     const registerServiceWorker = async () => {
       try {
         console.log('Tentando registrar o Service Worker...');
         const registration = await navigator.serviceWorker.register('/sw.js', {
-          scope: '/',
+          scope: '/precos',
         });
         
         // Verificar se há uma atualização disponível

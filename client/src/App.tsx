@@ -92,7 +92,11 @@ function AppContent() {
         </Switch>
       </LazyLoad>
       <Toaster />
-      <PWAInstallPrompt />
+      <Switch>
+        <Route path="/precos">
+          <PWAInstallPrompt />
+        </Route>
+      </Switch>
     </div>
   );
 }
