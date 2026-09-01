@@ -25,6 +25,8 @@ const mimeTypes = {
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf',
   '.eot': 'application/vnd.ms-fontobject',
+  '.webp': 'image/webp',
+  '.mp4': 'video/mp4',
 };
 
 function getMimeType(filePath) {
@@ -46,44 +48,29 @@ function serveFile(res, filePath) {
 }
 
 const server = http.createServer((req, res) => {
-  // Remove trailing slash for consistency
-  const url = req.url.replace(/\/$/, '') || '/';
+  const url = req.url;
   
-  // Handle /tv and /tv/ routes
-  if (url === '/tv' || url === '/tv/') {
-    const indexPath = path.join(PUBLIC_DIR, 'index.html');
-    serveFile(res, indexPath);
-    return;
-  }
-  
-  // Handle /tv/assets/... routes
-  if (url.startsWith('/tv/assets/')) {
-    const assetPath = url.replace('/tv', '');
+  // Handle assets (both /assets/... and /tv/assets/...)
+  if (url.startsWith('/assets/') || url.startsWith('/tv/assets/')) {
+    const assetPath = url.replace(/^\/tv/, '');
     const filePath = path.join(PUBLIC_DIR, assetPath);
     serveFile(res, filePath);
     return;
   }
   
-  // Handle other /tv/* routes (fallback to index.html for SPA routing)
-  if (url.startsWith('/tv/')) {
-    const indexPath = path.join(PUBLIC_DIR, 'index.html');
-    serveFile(res, indexPath);
+  // Handle other static files (sw.js, manifest.json, etc)
+  if (url.match(/\.(js|css|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|webp|mp4)$/)) {
+    const filePath = path.join(PUBLIC_DIR, url);
+    serveFile(res, filePath);
     return;
   }
   
-  // Handle root route (optional, for testing)
-  if (url === '/') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('TV Caxias is available at /tv');
-    return;
-  }
-  
-  // 404 for other routes
-  res.writeHead(404, { 'Content-Type': 'text/plain' });
-  res.end('404 Not Found');
+  // Handle all other routes (SPA routing) - serve index.html
+  const indexPath = path.join(PUBLIC_DIR, 'index.html');
+  serveFile(res, indexPath);
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`TV Caxias server running on port ${PORT}`);
-  console.log(`Access at: http://localhost:${PORT}/tv`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Access at: http://localhost:${PORT}`);
 });
