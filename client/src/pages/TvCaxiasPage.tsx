@@ -1,6 +1,8 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import "./TvCaxiasPage.css";
 
+const ASSET_BASE = import.meta.env.BASE_URL || '/';
+
 /**
  * STYLE NOTE — Painel Passivo de Cotações:
  * a tabela permanece limpa e estritamente informativa; a barra amarela
@@ -31,23 +33,23 @@ type GoogleSheetsResponse = {
  * disponíveis; itens ausentes, como o Dirham, permanecem com este valor.
  */
 const RATES: Rate[] = [
-  { id: "usd", flagUrl: "/assets/us_b1b2a6e3.png", currency: "Dólar Americano", buy: "5,0500", sell: "5,5700" },
-  { id: "eur", flagUrl: "/assets/eu_9ea20765.png", currency: "Euro", buy: "5,9000", sell: "6,4800" },
-  { id: "gbp", flagUrl: "/assets/gb_290d0f48.png", currency: "Libra Esterlina", buy: "6,9000", sell: "7,7400" },
-  { id: "aud", flagUrl: "/assets/au_058d7b28.png", currency: "Dólar Australiano", buy: "3,6000", sell: "4,0900" },
-  { id: "ars", flagUrl: "/assets/ar_b1abffe2.png", currency: "Peso Argentino", buy: "0,0035", sell: "0,0056" },
-  { id: "nzd", flagUrl: "/assets/nz_6e8f9064.png", currency: "Dólar Neozelandês", buy: "2,8000", sell: "3,3400" },
-  { id: "cad", flagUrl: "/assets/ca_d70af462.png", currency: "Dólar Canadense", buy: "3,6500", sell: "4,1400" },
-  { id: "chf", flagUrl: "/assets/ch_13a5032b.png", currency: "Franco Suíço", buy: "6,2200", sell: "7,0300" },
-  { id: "uyu", flagUrl: "/assets/uy_adcd611e.png", currency: "Peso Uruguaio", buy: "0,1200", sell: "0,1660" },
-  { id: "clp", flagUrl: "/assets/cl_05769a83.png", currency: "Peso Chileno", buy: "0,0045", sell: "0,0069" },
-  { id: "mxn", flagUrl: "/assets/mx_3ab0dcc8.png", currency: "Peso Mexicano", buy: "0,2800", sell: "0,3900" },
-  { id: "cop", flagUrl: "/assets/co_b59ac1cf.png", currency: "Peso Colombiano", buy: "0,00135", sell: "0,0022" },
-  { id: "cny", flagUrl: "/assets/cn_7e22b1c1.png", currency: "Iuan Chinês", buy: "0,7000", sell: "0,9100" },
-  { id: "jpy", flagUrl: "/assets/jp_931e9425.png", currency: "Iene Japonês", buy: "0,0300", sell: "0,0375" },
-  { id: "pen", flagUrl: "/assets/pe_a2792b99.png", currency: "Novo Sol Peruano", buy: "1,4500", sell: "1,8000" },
-  { id: "zar", flagUrl: "/assets/za_0f5e408d.png", currency: "Rand Africano", buy: "0,2800", sell: "0,3920" },
-  { id: "aed", flagUrl: "/assets/ae_c9f358b9.png", currency: "Dirham dos Emirados Árabes", buy: "1,2500", sell: "1,6700" },
+  { id: "usd", flagUrl: `${ASSET_BASE}assets/us_b1b2a6e3.png`, currency: "Dólar Americano", buy: "5,0500", sell: "5,5700" },
+  { id: "eur", flagUrl: `${ASSET_BASE}assets/eu_9ea20765.png`, currency: "Euro", buy: "5,9000", sell: "6,4800" },
+  { id: "gbp", flagUrl: `${ASSET_BASE}assets/gb_290d0f48.png`, currency: "Libra Esterlina", buy: "6,9000", sell: "7,7400" },
+  { id: "aud", flagUrl: `${ASSET_BASE}assets/au_058d7b28.png`, currency: "Dólar Australiano", buy: "3,6000", sell: "4,0900" },
+  { id: "ars", flagUrl: `${ASSET_BASE}assets/ar_b1abffe2.png`, currency: "Peso Argentino", buy: "0,0035", sell: "0,0056" },
+  { id: "nzd", flagUrl: `${ASSET_BASE}assets/nz_6e8f9064.png`, currency: "Dólar Neozelandês", buy: "2,8000", sell: "3,3400" },
+  { id: "cad", flagUrl: `${ASSET_BASE}assets/ca_d70af462.png`, currency: "Dólar Canadense", buy: "3,6500", sell: "4,1400" },
+  { id: "chf", flagUrl: `${ASSET_BASE}assets/ch_13a5032b.png`, currency: "Franco Suíço", buy: "6,2200", sell: "7,0300" },
+  { id: "uyu", flagUrl: `${ASSET_BASE}assets/uy_adcd611e.png`, currency: "Peso Uruguaio", buy: "0,1200", sell: "0,1660" },
+  { id: "clp", flagUrl: `${ASSET_BASE}assets/cl_05769a83.png`, currency: "Peso Chileno", buy: "0,0045", sell: "0,0069" },
+  { id: "mxn", flagUrl: `${ASSET_BASE}assets/mx_3ab0dcc8.png`, currency: "Peso Mexicano", buy: "0,2800", sell: "0,3900" },
+  { id: "cop", flagUrl: `${ASSET_BASE}assets/co_b59ac1cf.png`, currency: "Peso Colombiano", buy: "0,00135", sell: "0,0022" },
+  { id: "cny", flagUrl: `${ASSET_BASE}assets/cn_7e22b1c1.png`, currency: "Iuan Chinês", buy: "0,7000", sell: "0,9100" },
+  { id: "jpy", flagUrl: `${ASSET_BASE}assets/jp_931e9425.png`, currency: "Iene Japonês", buy: "0,0300", sell: "0,0375" },
+  { id: "pen", flagUrl: `${ASSET_BASE}assets/pe_a2792b99.png`, currency: "Novo Sol Peruano", buy: "1,4500", sell: "1,8000" },
+  { id: "zar", flagUrl: `${ASSET_BASE}assets/za_0f5e408d.png`, currency: "Rand Africano", buy: "0,2800", sell: "0,3920" },
+  { id: "aed", flagUrl: `${ASSET_BASE}assets/ae_c9f358b9.png`, currency: "Dirham dos Emirados Árabes", buy: "1,2500", sell: "1,6700" },
 ];
 
 const SHEET_ENDPOINT = "https://docs.google.com/spreadsheets/d/1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk/gviz/tq?tqx=out:json&gid=0";
@@ -57,52 +59,52 @@ const CHRISTMAS_MONTH_INDEX = 11;
 // Temas finalizados: ativação automática somente pelos respectivos meses.
 
 const HALLOWEEN_ASSETS = {
-  cornerWeb: "/assets/cap-halloween-corner-web-clean_0585394f.png",
-  connectorWeb: "/assets/cap-halloween-long-horizontal-web_de52f75c.png",
-  batLeft: "/assets/cap-halloween-bat-glide-left_58ed4c2b.png",
-  batCenter: "/assets/cap-halloween-bat-wings-wide_54b48ef0.png",
-  batRight: "/assets/cap-halloween-bat-dive-right_358dda51.png",
-  witchHat: "/assets/cap-witch-hat-refined_539e693f.png",
-  peekingCat: "/assets/cap-halloween-peeking-cat-yellow-eyes_01093d9a.png",
-  tableSpider: "/assets/cap-halloween-table-spider_241dbb43.png",
-  pumpkin: "/assets/cap-halloween-ticker-pumpkin_4e4625df.png",
-  ghost: "/assets/cap-halloween-ghost-clean_8f7597c2.png",
+  cornerWeb: `${ASSET_BASE}assets/cap-halloween-corner-web-clean_0585394f.png`,
+  connectorWeb: `${ASSET_BASE}assets/cap-halloween-long-horizontal-web_de52f75c.png`,
+  batLeft: `${ASSET_BASE}assets/cap-halloween-bat-glide-left_58ed4c2b.png`,
+  batCenter: `${ASSET_BASE}assets/cap-halloween-bat-wings-wide_54b48ef0.png`,
+  batRight: `${ASSET_BASE}assets/cap-halloween-bat-dive-right_358dda51.png`,
+  witchHat: `${ASSET_BASE}assets/cap-witch-hat-refined_539e693f.png`,
+  peekingCat: `${ASSET_BASE}assets/cap-halloween-peeking-cat-yellow-eyes_01093d9a.png`,
+  tableSpider: `${ASSET_BASE}assets/cap-halloween-table-spider_241dbb43.png`,
+  pumpkin: `${ASSET_BASE}assets/cap-halloween-ticker-pumpkin_4e4625df.png`,
+  ghost: `${ASSET_BASE}assets/cap-halloween-ghost-clean_8f7597c2.png`,
 } as const;
 
 const CHRISTMAS_ASSETS = {
-  titleGarlandStraight: "/assets/cap-christmas-title-garland_9710d700.png",
-  titleGarlandArched: "/assets/cap-christmas-title-garland-arched_3825cb80.png",
-  titleGarlandArchedClean: "/assets/cap-christmas-title-garland-arched-clean_e5a58cc9.png",
-  titleGarlandInvertedArch: "/assets/cap-christmas-title-garland-inverted-arch_285e4d08.png",
-  titleBellLeft: "/assets/cap-christmas-title-bell-left_8b454d7f.png",
-  titleBellRight: "/assets/cap-christmas-title-bell-right_54265210.png",
-  santaHat: "/assets/cap-christmas-santa-hat_c2d01403.png",
-  capReindeerFullBody: "/assets/cap-christmas-reindeer-full-body-c-overlay_bcb088ac.png",
-  capReindeerBust: "/assets/cap-christmas-reindeer-c-overlay_94d59979.png",
-  tickerTree: "/assets/cap-ticker-christmas-tree_f82241d9.png",
-  tickerGifts: "/assets/cap-ticker-christmas-gifts_0d258e5d.png",
-  tableBaubleRed: "/assets/cap-christmas-table-bauble-red_fbe9340f.png",
-  tableBaubleGold: "/assets/cap-christmas-table-bauble-gold_7b07ccd3.png",
-  tableBaubleGreen: "/assets/cap-christmas-table-bauble-green_69c5b6d9.png",
-  tableRealisticGarland: "/assets/cap-christmas-table-realistic-garland-reference_df008eb2.png",
-  tableReferenceGarland: "/assets/preview_natal_-_Copia-removebg-preview_271b8ee1.png",
+  titleGarlandStraight: `${ASSET_BASE}assets/cap-christmas-title-garland_9710d700.png`,
+  titleGarlandArched: `${ASSET_BASE}assets/cap-christmas-title-garland-arched_3825cb80.png`,
+  titleGarlandArchedClean: `${ASSET_BASE}assets/cap-christmas-title-garland-arched-clean_e5a58cc9.png`,
+  titleGarlandInvertedArch: `${ASSET_BASE}assets/cap-christmas-title-garland-inverted-arch_285e4d08.png`,
+  titleBellLeft: `${ASSET_BASE}assets/cap-christmas-title-bell-left_8b454d7f.png`,
+  titleBellRight: `${ASSET_BASE}assets/cap-christmas-title-bell-right_54265210.png`,
+  santaHat: `${ASSET_BASE}assets/cap-christmas-santa-hat_c2d01403.png`,
+  capReindeerFullBody: `${ASSET_BASE}assets/cap-christmas-reindeer-full-body-c-overlay_bcb088ac.png`,
+  capReindeerBust: `${ASSET_BASE}assets/cap-christmas-reindeer-c-overlay_94d59979.png`,
+  tickerTree: `${ASSET_BASE}assets/cap-ticker-christmas-tree_f82241d9.png`,
+  tickerGifts: `${ASSET_BASE}assets/cap-ticker-christmas-gifts_0d258e5d.png`,
+  tableBaubleRed: `${ASSET_BASE}assets/cap-christmas-table-bauble-red_fbe9340f.png`,
+  tableBaubleGold: `${ASSET_BASE}assets/cap-christmas-table-bauble-gold_7b07ccd3.png`,
+  tableBaubleGreen: `${ASSET_BASE}assets/cap-christmas-table-bauble-green_69c5b6d9.png`,
+  tableRealisticGarland: `${ASSET_BASE}assets/cap-christmas-table-realistic-garland-reference_df008eb2.png`,
+  tableReferenceGarland: `${ASSET_BASE}assets/preview_natal_-_Copia-removebg-preview_271b8ee1.png`,
 } as const;
 
 const ORIGINAL_BRAND_ASSETS = {
-  capLogo: "/assets/cap-logo-original_705cfd0e.png",
+  capLogo: `${ASSET_BASE}assets/cap-logo-original_705cfd0e.png`,
 } as const;
 
 const TRAVEL_SLIDES = [
   {
-    src: "/assets/cap-travel-aegean_81479119.jpg",
+    src: `${ASSET_BASE}assets/cap-travel-aegean_81479119.jpg`,
     alt: "Vista de uma cidade costeira do Mar Egeu",
   },
   {
-    src: "/assets/cap-travel-dubai_b7b8ab5d.jpg",
+    src: `${ASSET_BASE}assets/cap-travel-dubai_b7b8ab5d.jpg`,
     alt: "Skyline contemporâneo de Dubai ao entardecer",
   },
   {
-    src: "/assets/cap-travel-alps_7ab846c4.jpg",
+    src: `${ASSET_BASE}assets/cap-travel-alps_7ab846c4.jpg`,
     alt: "Trem atravessando uma paisagem alpina suíça",
   },
 ];
