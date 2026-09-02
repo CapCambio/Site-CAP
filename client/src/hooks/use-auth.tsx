@@ -107,11 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         setUser(null);
         localStorage.removeItem("auth_user");
-        toast({
-          title: t('toasts.sessionError'),
-          description: t('toasts.sessionErrorDesc'),
-          variant: "destructive"
-        });
+        // Não mostrar toast de erro de sessão - pode ser ambiente sem backend
       } finally {
         if (!cancelled) setIsLoading(false);
       }
