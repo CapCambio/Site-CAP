@@ -292,6 +292,7 @@ button:focus-visible, input:focus-visible {
   bottom: calc(var(--ticker-height) + 1.92rem);
   left: 3.77rem;
   width: clamp(41px, 3.5vw, 47px);
+  position: absolute;
 }
 
 .halloween-cap-web {
