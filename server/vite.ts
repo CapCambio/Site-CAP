@@ -70,6 +70,7 @@ export async function setupVite(app: Express, server: Server) {
 export function serveStatic(app: Express) {
   const distPath = path.resolve(import.meta.dirname, "public");
   const optimizedPath = path.resolve(import.meta.dirname, "..", "public", "optimized");
+  const homepagePath = path.resolve(import.meta.dirname, "..", "public", "homepage");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
@@ -77,14 +78,31 @@ export function serveStatic(app: Express) {
     );
   }
 
-  // Servir arquivos estáticos da pasta public
+  // Servir assets da homepage institucional em /homepage/*
+  app.use('/homepage', express.static(homepagePath));
+
+  // Servir arquivos estáticos do app React (assets, sw.js, manifests, etc.)
   app.use(express.static(distPath));
-  
+
   // Servir arquivos da pasta optimized
   app.use('/optimized', express.static(optimizedPath));
 
-  // fall through to index.html if the file doesn't exist
+  // Rotas do React app (plataforma, TV, auth) → index.html do React
+  const reactAppRoutes = ['/precos', '/tv', '/auth'];
+  for (const route of reactAppRoutes) {
+    app.use(route, (_req, res) => {
+      res.sendFile(path.resolve(distPath, "index.html"));
+    });
+  }
+
+  // Raiz e todas as outras rotas → homepage institucional estática
   app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+    const homepageIndex = path.resolve(homepagePath, "index.html");
+    if (fs.existsSync(homepageIndex)) {
+      res.sendFile(homepageIndex);
+    } else {
+      // fallback para o React se a homepage não existir
+      res.sendFile(path.resolve(distPath, "index.html"));
+    }
   });
 }

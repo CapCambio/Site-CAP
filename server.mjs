@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'dist', 'public');
+const HOMEPAGE_DIR = path.join(__dirname, 'public', 'homepage');
 
 // MIME types
 const mimeTypes = {
@@ -47,27 +48,49 @@ function serveFile(res, filePath) {
   });
 }
 
+// Rotas que pertencem ao app React (SPA da plataforma e TV)
+const REACT_APP_PREFIXES = ['/precos', '/tv', '/auth', '/api', '/sw.js', '/assets/', '/optimized/'];
+
+function isReactAppRoute(url) {
+  return REACT_APP_PREFIXES.some(prefix => url === prefix || url.startsWith(prefix));
+}
+
 const server = http.createServer((req, res) => {
-  const url = req.url;
-  
-  // Handle assets (both /assets/... and /tv/assets/...)
+  const url = req.url.split('?')[0]; // ignorar query string para roteamento
+
+  // ── Assets da homepage (/homepage/assets/... e /homepage/fonts/...)
+  if (url.startsWith('/homepage/')) {
+    const relativePath = url.replace('/homepage/', '');
+    const filePath = path.join(HOMEPAGE_DIR, relativePath);
+    serveFile(res, filePath);
+    return;
+  }
+
+  // ── Assets do app React (/assets/... e /tv/assets/...)
   if (url.startsWith('/assets/') || url.startsWith('/tv/assets/')) {
     const assetPath = url.replace(/^\/tv/, '');
     const filePath = path.join(PUBLIC_DIR, assetPath);
     serveFile(res, filePath);
     return;
   }
-  
-  // Handle other static files (sw.js, manifest.json, etc)
+
+  // ── Outros arquivos estáticos do React app (sw.js, manifest.json, etc.)
   if (url.match(/\.(js|css|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|webp|mp4)$/)) {
     const filePath = path.join(PUBLIC_DIR, url);
     serveFile(res, filePath);
     return;
   }
-  
-  // Handle all other routes (SPA routing) - serve index.html
-  const indexPath = path.join(PUBLIC_DIR, 'index.html');
-  serveFile(res, indexPath);
+
+  // ── Rotas do React app (plataforma, TV, auth)
+  if (isReactAppRoute(url)) {
+    const indexPath = path.join(PUBLIC_DIR, 'index.html');
+    serveFile(res, indexPath);
+    return;
+  }
+
+  // ── Tudo o resto (/, /sobre, /privacidade, etc.) → homepage institucional
+  const homepageIndex = path.join(HOMEPAGE_DIR, 'index.html');
+  serveFile(res, homepageIndex);
 });
 
 server.listen(PORT, '0.0.0.0', () => {
