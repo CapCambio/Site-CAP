@@ -96,7 +96,7 @@ const ORIGINAL_BRAND_ASSETS = {
 
 const TRAVEL_SLIDES = [
   {
-    src: `${ASSET_BASE}assets/C%C3%A2mbio1.jpg`,
+    src: `${ASSET_BASE}assets/cambio1.jpg`,
     alt: "CAP Câmbio — principais moedas do mundo",
   },
   {
@@ -108,7 +108,7 @@ const TRAVEL_SLIDES = [
     alt: "Envios internacionais via DHL",
   },
   {
-    src: `${ASSET_BASE}assets/C%C3%A2mbio2.jpg`,
+    src: `${ASSET_BASE}assets/cambio2.jpg`,
     alt: "CAP Câmbio — compra e venda de moedas estrangeiras",
   },
   {
