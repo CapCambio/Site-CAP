@@ -96,16 +96,28 @@ const ORIGINAL_BRAND_ASSETS = {
 
 const TRAVEL_SLIDES = [
   {
-    src: `${ASSET_BASE}assets/cap-travel-aegean_81479119.jpg`,
-    alt: "Vista de uma cidade costeira do Mar Egeu",
+    src: `${ASSET_BASE}assets/C%C3%A2mbio1.jpg`,
+    alt: "CAP Câmbio — principais moedas do mundo",
   },
   {
-    src: `${ASSET_BASE}assets/cap-travel-dubai_b7b8ab5d.jpg`,
-    alt: "Skyline contemporâneo de Dubai ao entardecer",
+    src: `${ASSET_BASE}assets/Remessa1.jpg`,
+    alt: "Envio de dinheiro ao exterior via Remessa Expressa",
   },
   {
-    src: `${ASSET_BASE}assets/cap-travel-alps_7ab846c4.jpg`,
-    alt: "Trem atravessando uma paisagem alpina suíça",
+    src: `${ASSET_BASE}assets/DHL1.jpg`,
+    alt: "Envios internacionais via DHL",
+  },
+  {
+    src: `${ASSET_BASE}assets/C%C3%A2mbio2.jpg`,
+    alt: "CAP Câmbio — compra e venda de moedas estrangeiras",
+  },
+  {
+    src: `${ASSET_BASE}assets/Remessa2.jpg`,
+    alt: "Receba sua remessa via MoneyGram",
+  },
+  {
+    src: `${ASSET_BASE}assets/DHL2.jpg`,
+    alt: "Envie documentos e encomendas via DHL",
   },
 ];
 
