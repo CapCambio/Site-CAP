@@ -25,7 +25,7 @@ export default defineConfig({
   // Configuração de base URL para CDN ou /tv para TV Caxias
   base: process.env.CDN_URL || (process.env.TV_CAXIAS_MODE === 'true' ? '/tv/' : '/'),
   root: path.resolve(import.meta.dirname, "client"),
-  publicDir: path.resolve(import.meta.dirname, "client", "public"),
+  publicDir: path.resolve(import.meta.dirname, "public"),
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
