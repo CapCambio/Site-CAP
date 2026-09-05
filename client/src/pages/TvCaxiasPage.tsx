@@ -96,7 +96,7 @@ const ORIGINAL_BRAND_ASSETS = {
 
 const TRAVEL_SLIDES = [
   {
-    src: `${ASSET_BASE}assets/cambio2.jpg`,
+    src: `${ASSET_BASE}assets/Cambio2.jpg`,
     alt: "CAP Câmbio — compra e venda de moedas estrangeiras",
   },
 ];
