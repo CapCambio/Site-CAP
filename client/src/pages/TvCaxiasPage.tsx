@@ -96,28 +96,8 @@ const ORIGINAL_BRAND_ASSETS = {
 
 const TRAVEL_SLIDES = [
   {
-    src: `${ASSET_BASE}assets/cambio1.jpg`,
-    alt: "CAP Câmbio — principais moedas do mundo",
-  },
-  {
-    src: `${ASSET_BASE}assets/Remessa1.jpg`,
-    alt: "Envio de dinheiro ao exterior via Remessa Expressa",
-  },
-  {
-    src: `${ASSET_BASE}assets/DHL1.jpg`,
-    alt: "Envios internacionais via DHL",
-  },
-  {
     src: `${ASSET_BASE}assets/cambio2.jpg`,
     alt: "CAP Câmbio — compra e venda de moedas estrangeiras",
-  },
-  {
-    src: `${ASSET_BASE}assets/Remessa2.jpg`,
-    alt: "Receba sua remessa via MoneyGram",
-  },
-  {
-    src: `${ASSET_BASE}assets/DHL2.jpg`,
-    alt: "Envie documentos e encomendas via DHL",
   },
 ];
 
