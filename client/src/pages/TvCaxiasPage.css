@@ -133,124 +133,6 @@ button:focus-visible, input:focus-visible {
 
 .travel-carousel__slide.is-active { opacity: 1; }
 
-/* ── Novo carrossel com camadas HTML/CSS ───────────────────────────────────── */
-
-/* Cada slide ocupa todo o container do carrossel */
-.tv-slide {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  isolation: isolate;
-  background: #151515;
-  opacity: 0;
-  transition: opacity 900ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.tv-slide.is-active { opacity: 1; }
-
-/* Foto de fundo — cobre todo o slide */
-.tv-slide__background {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center right;
-  z-index: 1;
-}
-
-/* Véu escuro sobre a metade esquerda para garantir legibilidade do texto */
-.tv-slide__veil {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 58%;
-  background: linear-gradient(
-    90deg,
-    rgb(8 8 8 / 97%) 0%,
-    rgb(8 8 8 / 92%) 55%,
-    rgb(8 8 8 / 72%) 75%,
-    transparent 100%
-  );
-  z-index: 2;
-  pointer-events: none;
-}
-
-/* Camada textual — posicionada sobre o véu */
-.tv-slide__copy {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 54%;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 6% 8%;
-  color: #fff;
-}
-
-/* Logotipo do serviço */
-.tv-slide__logo {
-  width: clamp(52px, 14%, 96px);
-  height: auto;
-  max-height: 20%;
-  margin-bottom: 6%;
-  object-fit: contain;
-  object-position: left center;
-  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 60%));
-  flex-shrink: 0;
-}
-
-/* Título principal */
-.tv-slide__title {
-  margin: 0;
-  color: #fff;
-  font-family: "Archivo Black", "DM Sans", Impact, Arial, sans-serif;
-  font-size: clamp(0.95rem, 2.4vw, 1.75rem);
-  font-weight: 900;
-  line-height: 1.0;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  text-shadow: 0 2px 6px rgb(0 0 0 / 70%);
-}
-
-/* Subtítulo */
-.tv-slide__subtitle {
-  margin: 5% 0 0;
-  color: rgb(230 230 230 / 92%);
-  font-family: "DM Sans", Arial, sans-serif;
-  font-size: clamp(0.62rem, 1.3vw, 1rem);
-  font-weight: 500;
-  line-height: 1.25;
-  text-shadow: 0 1px 4px rgb(0 0 0 / 60%);
-}
-
-/* Slide DHL: subtítulo "Via DHL" em destaque */
-.tv-slide__subtitle--highlight {
-  color: #ffd300;
-  font-weight: 800;
-  font-size: clamp(0.75rem, 1.6vw, 1.2rem);
-  text-transform: uppercase;
-}
-
-/* Selo/badge de informação complementar */
-.tv-slide__badge {
-  display: inline-block;
-  margin-top: 7%;
-  padding: 0.3em 0.55em;
-  background: #ffd300;
-  color: #171717;
-  font-family: "DM Sans", Arial, sans-serif;
-  font-size: clamp(0.55rem, 1.1vw, 0.82rem);
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0.01em;
-  text-shadow: none;
-  flex-shrink: 0;
-}
-
 .broadcast-shell--original .travel-carousel {
   top: 48.5%;
 }
@@ -617,7 +499,6 @@ button:focus-visible, input:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .travel-carousel__slide { transition: none; }
-  .tv-slide { transition: none; }
 }
 
 .quote-stage {

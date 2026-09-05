@@ -94,49 +94,30 @@ const ORIGINAL_BRAND_ASSETS = {
   capLogo: `${ASSET_BASE}assets/cap-logo-original_705cfd0e.png`,
 } as const;
 
-type CarouselSlide = {
-  background: string;
-  backgroundAlt: string;
-  logo?: string;
-  logoAlt?: string;
-  title: string;
-  subtitle?: string;
-  badge?: string;
-};
-
-const TRAVEL_SLIDES: CarouselSlide[] = [
+const TRAVEL_SLIDES = [
   {
-    background: `${ASSET_BASE}assets/carousel-01-cambio.jpg`,
-    backgroundAlt: "",
-    logo: `${ASSET_BASE}assets/logo-cap.png`,
-    logoAlt: "CAP Câmbio",
-    title: "COMPRA E VENDA DE MOEDAS",
-    subtitle: "Pague e receba em dinheiro ou Pix.",
+    src: `${ASSET_BASE}assets/Cambio1.jpg`,
+    alt: "CAP Câmbio — principais moedas do mundo",
   },
   {
-    background: `${ASSET_BASE}assets/carousel-02-remessa.jpg`,
-    backgroundAlt: "",
-    logo: `${ASSET_BASE}assets/logo-remessa.png`,
-    logoAlt: "Remessa Expressa",
-    title: "ENVIO DE DINHEIRO AO EXTERIOR",
-    subtitle: "Envie dinheiro para pessoas em outros países.",
+    src: `${ASSET_BASE}assets/Remessa1.jpg`,
+    alt: "Envio de dinheiro ao exterior via Remessa Expressa",
   },
   {
-    background: `${ASSET_BASE}assets/carousel-03-dhl.jpg`,
-    backgroundAlt: "",
-    logo: `${ASSET_BASE}assets/logo-dhl.png`,
-    logoAlt: "DHL",
-    title: "ENVIOS INTERNACIONAIS",
-    subtitle: "Via DHL",
-    badge: "Disponível em Bento Gonçalves e Passo Fundo",
+    src: `${ASSET_BASE}assets/DHL1.jpg`,
+    alt: "Envios internacionais via DHL",
   },
   {
-    background: `${ASSET_BASE}assets/carousel-04-cambio.jpg`,
-    backgroundAlt: "",
-    logo: `${ASSET_BASE}assets/logo-cap.png`,
-    logoAlt: "CAP Câmbio",
-    title: "CÂMBIO PARA SUA VIAGEM",
-    subtitle: "Compra e venda de moedas estrangeiras.",
+    src: `${ASSET_BASE}assets/Cambio2.jpg`,
+    alt: "CAP Câmbio — compra e venda de moedas estrangeiras",
+  },
+  {
+    src: `${ASSET_BASE}assets/Remessa2.jpg`,
+    alt: "Receba sua remessa via MoneyGram",
+  },
+  {
+    src: `${ASSET_BASE}assets/DHL2.jpg`,
+    alt: "Envie documentos e encomendas via DHL",
   },
 ];
 
@@ -320,31 +301,16 @@ export default function TvCaxiasPage() {
         {christmasActive && <img className="christmas-title-bell christmas-title-bell--right" src={CHRISTMAS_ASSETS.titleBellLeft} alt="" aria-hidden="true" />}
         {originalLayoutActive && <img className="brand-logo" src={ORIGINAL_BRAND_ASSETS.capLogo} alt="CAP Câmbio" />}
         <p className="brand-status"><span className="brand-status__first-line">Cotações</span><span>atualizadas</span></p>
-        <div className="travel-carousel" aria-label="Serviços CAP Câmbio">
+        <div className="travel-carousel" aria-label="Destinos para viajar">
           {TRAVEL_SLIDES.map((slide, index) => (
-            <article
-              key={slide.background}
-              className={`tv-slide ${index === activeTravelSlide ? "is-active" : ""}`}
+            <img
+              key={slide.src}
+              className={`travel-carousel__slide ${index === activeTravelSlide ? "is-active" : ""}`}
+              src={slide.src}
+              alt={slide.alt}
               aria-hidden={index !== activeTravelSlide}
-            >
-              <img
-                className="tv-slide__background"
-                src={slide.background}
-                alt={slide.backgroundAlt}
-                loading={index === 0 ? "eager" : "lazy"}
-              />
-              <div className="tv-slide__veil" aria-hidden="true" />
-              <div className="tv-slide__copy">
-                {slide.logo && (
-                  <img className="tv-slide__logo" src={slide.logo} alt={slide.logoAlt ?? ""} />
-                )}
-                <h2 className="tv-slide__title">{slide.title}</h2>
-                {slide.subtitle && <p className="tv-slide__subtitle">{slide.subtitle}</p>}
-                {slide.badge && (
-                  <strong className="tv-slide__badge">{slide.badge}</strong>
-                )}
-              </div>
-            </article>
+              loading={index === 0 ? "eager" : "lazy"}
+            />
           ))}
         </div>
         {halloweenPreviewActive && <img className="halloween-cap-web" src={HALLOWEEN_ASSETS.cornerWeb} alt="" aria-hidden="true" />}
