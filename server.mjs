@@ -8,7 +8,9 @@ const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'dist', 'public');
-const HOMEPAGE_DIR = path.join(__dirname, 'public', 'homepage');
+const HOMEPAGE_DIR = process.env.NODE_ENV === 'production' 
+  ? path.join(__dirname, 'dist', 'public', 'homepage')
+  : path.join(__dirname, 'public', 'homepage');
 
 // MIME types
 const mimeTypes = {
