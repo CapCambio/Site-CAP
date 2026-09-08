@@ -102,9 +102,6 @@ function AppContent() {
 }
 
 function App() {
-  // Registrar o Service Worker
-  useServiceWorker();
-
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

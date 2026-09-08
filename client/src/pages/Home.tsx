@@ -6,6 +6,7 @@ import { useDateSelection } from "../hooks/useDateSelection";
 import { useIsMobile } from "../hooks/use-mobile";
 import { useAuth } from "../hooks/use-auth";
 import { useDragDrop } from "../hooks/use-drag-drop";
+import { useServiceWorker } from "@/hooks/useServiceWorker";
 import { ArrowDown, ArrowUp, Loader2 } from "lucide-react";
 import { formatCurrencyValue, formatPercentage } from "../lib/currency";
 import { format } from "date-fns";
@@ -42,6 +43,9 @@ export default function Home() {
   const [isHistoricalView, setIsHistoricalView] = useState(false);
   const [expandedCards, setExpandedCards] = useState<{[key: string]: boolean}>({});
   const { user, showAdminPanel } = useAuth();
+
+  // Registrar o Service Worker apenas na página /precos
+  useServiceWorker();
 
   const { 
     currencies, 
