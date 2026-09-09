@@ -230,8 +230,8 @@ export default function TvCaxiasPage() {
   const dollar = rates.find((rate) => rate.id === "usd") ?? rates[0];
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
-  const halloweenPreviewActive = seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
-  const christmasActive = true; // Ativado manualmente para versão natal
+  const halloweenPreviewActive = true; // Ativado manualmente para versão halloween
+  const christmasActive = false; // Desativado versão natal
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
   const halloweenTopDecorationActive = halloweenPreviewActive;
