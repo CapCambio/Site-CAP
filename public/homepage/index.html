@@ -97,9 +97,18 @@
         dialog.addEventListener('click', function (event) { if (event.target === dialog) hide(); });
         document.addEventListener('click', function (event) {
           var link = event.target.closest('a[href]');
-          if (!link || link.closest('.cap-whatsapp-option') || !/whatsapp\.com|wa\.me/i.test(link.href)) return;
-          event.preventDefault();
-          dialog.classList.add('is-open');
+          if (link && !link.closest('.cap-whatsapp-option') && /whatsapp\.com|wa\.me/i.test(link.href)) {
+            event.preventDefault();
+            dialog.classList.add('is-open');
+            return;
+          }
+
+          var solutionButton = event.target.closest('button');
+          var solutionText = solutionButton && solutionButton.textContent.trim();
+          if (/^(Consultar câmbio|Consultar remessa|Consultar envio)/i.test(solutionText || '')) {
+            event.preventDefault();
+            dialog.classList.add('is-open');
+          }
         });
       })();
     </script>
