@@ -39,11 +39,11 @@ export function WhatsAppFloatingButton() {
 
       {/* Dialog com os contatos */}
       <Dialog open={showBranchDialog} onOpenChange={setShowBranchDialog}>
-        <DialogContent className="bg-zinc-900 border-yellow-500/20">
-          <DialogHeader>
-            <DialogTitle className="text-white">{t('whatsapp.selectBranch')}</DialogTitle>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-[512px] gap-4 rounded-lg border border-yellow-500/20 bg-zinc-900 p-6">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-left text-lg font-semibold leading-none text-white">{t('whatsapp.selectBranch')}</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-3 mt-4">
+          <div className="mt-4 flex flex-col gap-3">
             {[
               { name: t('whatsapp.branchCaxias'), link: "https://api.whatsapp.com/send?phone=5554984348005&text=Vim%20do%20site%20e%20gostaria%20de%20informa%C3%A7%C3%B5es" },
               { name: t('whatsapp.branchBento'), link: "https://api.whatsapp.com/send?phone=5554999578486&text=Vim%20do%20site%20e%20gostaria%20de%20informa%C3%A7%C3%B5es" },
