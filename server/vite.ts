@@ -81,23 +81,13 @@ export function serveStatic(app: Express) {
   // Servir assets da homepage institucional em /homepage/*
   app.use('/homepage', express.static(homepagePath));
 
-  // Servir assets da homepage também na raiz para compatibilidade com o build
-  app.use('/assets', express.static(path.join(homepagePath, 'assets')));
+  // Assets da plataforma usam /assets; a homepage usa /homepage/assets.
+  app.use('/assets', express.static(path.join(distPath, 'assets')));
   app.use('/fonts', express.static(path.join(homepagePath, 'fonts')));
 
-  // Middleware para servir assets da homepage quando acessados via rota raiz
-  app.use((req, res, next) => {
-    if (req.path.startsWith('/assets/') || req.path.startsWith('/fonts/')) {
-      const assetPath = path.join(homepagePath, req.path);
-      if (fs.existsSync(assetPath)) {
-        return res.sendFile(assetPath);
-      }
-    }
-    next();
-  });
-
   // Servir arquivos estáticos do app React (assets, sw.js, manifests, etc.)
-  app.use(express.static(distPath));
+  // Desabilitar o index automático para que / caia na homepage institucional.
+  app.use(express.static(distPath, { index: false }));
 
   // Servir arquivos da pasta optimized
   app.use('/optimized', express.static(optimizedPath));
