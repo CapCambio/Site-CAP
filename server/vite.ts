@@ -102,13 +102,18 @@ export function serveStatic(app: Express) {
   // Servir arquivos da pasta optimized
   app.use('/optimized', express.static(optimizedPath));
 
-  // Redirecionamento de /auth para /precos (botao "Acessar plataforma" da homepage)
+  // Redirecionamento de /auth para /cotacoes (botao "Acessar plataforma" da homepage)
   app.get('/auth', (req, res) => {
-    res.redirect('/precos');
+    res.redirect('/cotacoes');
+  });
+
+  // Compatibilidade: redireciona URL antiga para a nova rota pública
+  app.get('/precos', (req, res) => {
+    res.redirect('/cotacoes');
   });
 
   // Rotas do React app (plataforma, TV, auth) → index.html do React
-  const reactAppRoutes = ['/precos', '/tv'];
+  const reactAppRoutes = ['/cotacoes', '/tv'];
   for (const route of reactAppRoutes) {
     app.use(route, (_req, res) => {
       res.sendFile(path.resolve(distPath, "index.html"));

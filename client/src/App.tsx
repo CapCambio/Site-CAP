@@ -83,7 +83,7 @@ function AppContent() {
       <LazyLoad>
         <Switch>
           <Route path="/" component={LandingPage} />
-          <Route path="/precos" component={PrecosPage} />
+          <Route path="/cotacoes" component={PrecosPage} />
           <Route path="/tv">
             <TvCaxiasPage />
           </Route>
@@ -93,7 +93,7 @@ function AppContent() {
       </LazyLoad>
       <Toaster />
       <Switch>
-        <Route path="/precos">
+        <Route path="/cotacoes">
           <PWAInstallPrompt />
         </Route>
       </Switch>

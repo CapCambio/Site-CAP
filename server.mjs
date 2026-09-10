@@ -51,7 +51,7 @@ function serveFile(res, filePath) {
 }
 
 // Rotas que pertencem ao app React (SPA da plataforma e TV)
-const REACT_APP_PREFIXES = ['/precos', '/tv', '/api', '/sw.js', '/assets/', '/optimized/'];
+const REACT_APP_PREFIXES = ['/cotacoes', '/tv', '/api', '/sw.js', '/assets/', '/optimized/'];
 
 function isReactAppRoute(url) {
   return REACT_APP_PREFIXES.some(prefix => url === prefix || url.startsWith(prefix));
@@ -100,9 +100,16 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // ── Redirecionamento de /auth para /precos (botao "Acessar plataforma" da homepage)
+  // ── Redirecionamento de /auth para /cotacoes (botao "Acessar plataforma" da homepage)
   if (url === '/auth') {
-    res.writeHead(302, { 'Location': '/precos' });
+    res.writeHead(302, { 'Location': '/cotacoes' });
+    res.end();
+    return;
+  }
+
+  // ── Compatibilidade: redireciona a rota antiga para a nova URL pública
+  if (url === '/precos') {
+    res.writeHead(302, { 'Location': '/cotacoes' });
     res.end();
     return;
   }
