@@ -9,12 +9,12 @@ export default function LandingPage() {
           Soluções cambiais com segurança, transparência e atendimento especializado desde 2006.
         </p>
         <div className="flex gap-4">
-          <Link
-            href="/precos"
-            className="px-6 py-3 bg-[#f3b234] text-black font-semibold rounded-lg hover:bg-[#e5a12d] transition-colors"
+          <a
+            href="https://capcambio.up.railway.app/cotacoes"
+            className="px-6 py-3 bg-[#f3b234] text-black font-semibold rounded-lg hover:bg-[#e5a12d] transition-colors inline-block"
           >
             Ver Cotações
-          </Link>
+          </a>
           <Link
             href="/tv"
             className="px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors"
