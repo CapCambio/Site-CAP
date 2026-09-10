@@ -399,6 +399,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
 // API routes
+  app.get("/api/health", (_req, res) => {
+    res.json({ status: "ok" });
+  });
+
 app.get("/api/currencies", async (req, res) => {
   try {
     const now = Date.now();
