@@ -1,29 +1,23 @@
 {
-  "lastUpdate": "2026-08-31T18:33:28.793Z",
+  "lastUpdate": "2026-09-10T17:54:39.214Z",
   "currencies": [
-    {
-      "code": "USD",
-      "name": "Dólar Americano",
-      "buyPrice": 5.1,
-      "sellPrice": 5.56
-    },
     {
       "code": "EUR",
       "name": "Euro",
-      "buyPrice": 5.95,
-      "sellPrice": 6.48
+      "buyPrice": 5.9,
+      "sellPrice": 6.4
     },
     {
       "code": "GBP",
       "name": "Libra Esterlina",
-      "buyPrice": 6.95,
-      "sellPrice": 7.73
+      "buyPrice": 6.85,
+      "sellPrice": 7.6
     },
     {
       "code": "AUD",
       "name": "Dólar Australiano",
-      "buyPrice": 3.65,
-      "sellPrice": 4.1
+      "buyPrice": 3.6,
+      "sellPrice": 4.07
     },
     {
       "code": "ARS",
@@ -35,25 +29,25 @@
       "code": "NZD",
       "name": "Dólar Neozelandês",
       "buyPrice": 2.9,
-      "sellPrice": 3.34
+      "sellPrice": 3.25
     },
     {
       "code": "CAD",
       "name": "Dólar Canadense",
-      "buyPrice": 3.68,
-      "sellPrice": 4.12
+      "buyPrice": 3.58,
+      "sellPrice": 4.09
     },
     {
       "code": "CHF",
       "name": "Franco Suiço",
-      "buyPrice": 6.3,
-      "sellPrice": 7.06
+      "buyPrice": 6.17,
+      "sellPrice": 6.92
     },
     {
       "code": "UYU",
       "name": "Peso Uruguaio",
       "buyPrice": 0.12,
-      "sellPrice": 0.166
+      "sellPrice": 0.164
     },
     {
       "code": "CLP",
@@ -65,7 +59,7 @@
       "code": "MXN",
       "name": "Peso Mexicano",
       "buyPrice": 0.28,
-      "sellPrice": 0.39
+      "sellPrice": 0.38
     },
     {
       "code": "COP",
@@ -77,19 +71,19 @@
       "code": "JPY",
       "name": "Iene Japonês",
       "buyPrice": 0.03,
-      "sellPrice": 0.0396
+      "sellPrice": 0.0406
     },
     {
       "code": "PEN",
       "name": "Novo Sol Peruano",
       "buyPrice": 1.45,
-      "sellPrice": 1.79
+      "sellPrice": 1.78
     },
     {
       "code": "ZAR",
       "name": "Rand Africano",
       "buyPrice": 0.28,
-      "sellPrice": 0.392
+      "sellPrice": 0.388
     }
   ]
 }

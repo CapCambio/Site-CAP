@@ -13,31 +13,31 @@
     "id": 2,
     "name": "Euro",
     "code": "EUR",
-    "buyPrice": 5.95,
-    "sellPrice": 6.48,
-    "change": -0.46,
-    "displayOrder": 2,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "buyPrice": 5.9,
+    "sellPrice": 6.4,
+    "change": 0,
+    "displayOrder": 1,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 3,
     "name": "Libra Esterlina",
     "code": "GBP",
-    "buyPrice": 6.95,
-    "sellPrice": 7.73,
-    "change": -0.13,
-    "displayOrder": 3,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "buyPrice": 6.85,
+    "sellPrice": 7.6,
+    "change": 0,
+    "displayOrder": 2,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 4,
     "name": "Dólar Australiano",
     "code": "AUD",
-    "buyPrice": 3.65,
-    "sellPrice": 4.1,
-    "change": -0.24,
-    "displayOrder": 4,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "buyPrice": 3.6,
+    "sellPrice": 4.07,
+    "change": 0,
+    "displayOrder": 3,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 5,
@@ -54,40 +54,40 @@
     "name": "Dólar Neozelandês",
     "code": "NZD",
     "buyPrice": 2.9,
-    "sellPrice": 3.34,
-    "change": -0.3,
-    "displayOrder": 6,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "sellPrice": 3.25,
+    "change": 0,
+    "displayOrder": 5,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 7,
     "name": "Dólar Canadense",
     "code": "CAD",
-    "buyPrice": 3.68,
-    "sellPrice": 4.12,
-    "change": -0.24,
-    "displayOrder": 7,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "buyPrice": 3.58,
+    "sellPrice": 4.09,
+    "change": 0,
+    "displayOrder": 6,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 8,
     "name": "Franco Suiço",
     "code": "CHF",
-    "buyPrice": 6.3,
-    "sellPrice": 7.06,
+    "buyPrice": 6.17,
+    "sellPrice": 6.92,
     "change": 0,
-    "displayOrder": 8,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "displayOrder": 7,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 9,
     "name": "Peso Uruguaio",
     "code": "UYU",
     "buyPrice": 0.12,
-    "sellPrice": 0.166,
+    "sellPrice": 0.164,
     "change": 0,
-    "displayOrder": 9,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "displayOrder": 8,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 10,
@@ -104,10 +104,10 @@
     "name": "Peso Mexicano",
     "code": "MXN",
     "buyPrice": 0.28,
-    "sellPrice": 0.39,
+    "sellPrice": 0.38,
     "change": 0,
-    "displayOrder": 11,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "displayOrder": 10,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 12,
@@ -134,29 +134,29 @@
     "name": "Iene Japonês",
     "code": "JPY",
     "buyPrice": 0.03,
-    "sellPrice": 0.0396,
+    "sellPrice": 0.0406,
     "change": 0,
-    "displayOrder": 13,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "displayOrder": 12,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 15,
     "name": "Novo Sol Peruano",
     "code": "PEN",
     "buyPrice": 1.45,
-    "sellPrice": 1.79,
-    "change": -0.56,
-    "displayOrder": 14,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "sellPrice": 1.78,
+    "change": 0,
+    "displayOrder": 13,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   },
   {
     "id": 16,
     "name": "Rand Africano",
     "code": "ZAR",
     "buyPrice": 0.28,
-    "sellPrice": 0.392,
-    "change": -0.25,
-    "displayOrder": 15,
-    "lastUpdate": "2026-08-31T18:33:28.801Z"
+    "sellPrice": 0.388,
+    "change": 0,
+    "displayOrder": 14,
+    "lastUpdate": "2026-09-10T17:54:39.245Z"
   }
 ]

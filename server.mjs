@@ -51,7 +51,7 @@ function serveFile(res, filePath) {
 }
 
 // Rotas que pertencem ao app React (SPA da plataforma e TV)
-const REACT_APP_PREFIXES = ['/precos', '/tv', '/auth', '/api', '/sw.js', '/assets/', '/optimized/'];
+const REACT_APP_PREFIXES = ['/precos', '/tv', '/api', '/sw.js', '/assets/', '/optimized/'];
 
 function isReactAppRoute(url) {
   return REACT_APP_PREFIXES.some(prefix => url === prefix || url.startsWith(prefix));
@@ -97,6 +97,13 @@ const server = http.createServer((req, res) => {
   if (url.match(/\.(js|css|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|webp|mp4)$/)) {
     const filePath = path.join(PUBLIC_DIR, url);
     serveFile(res, filePath);
+    return;
+  }
+
+  // ── Redirecionamento de /auth para /precos (botao "Acessar plataforma" da homepage)
+  if (url === '/auth') {
+    res.writeHead(302, { 'Location': '/precos' });
+    res.end();
     return;
   }
 
