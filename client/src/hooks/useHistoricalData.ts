@@ -5,7 +5,7 @@ import { formatDate } from '../lib/currency';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 
-export function useHistoricalData() {
+export function useHistoricalData(enabled = true) {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<HistoryFilter>({
     code: 'USD',
@@ -44,7 +44,7 @@ export function useHistoricalData() {
     },
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // 5 minutos
-    enabled: !!filter.code,
+    enabled: enabled && !!filter.code,
   });
 
   // Mostrar erro ao usuário quando houver erro

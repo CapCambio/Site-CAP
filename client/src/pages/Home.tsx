@@ -170,7 +170,7 @@ export default function Home() {
     updateFilter,
     isLoading: isLoadingHistory,
     refetch: fetchHistoricalData
-  } = useHistoricalData();
+  } = useHistoricalData(activeTab === "history");
 
   const {
     selectedDate,
