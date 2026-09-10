@@ -728,3 +728,57 @@ button:focus-visible, input:focus-visible {
   .flag-image { width: 21px; }
   .rate-value { font-size: 0.88rem; }
 }
+
+/* Keep every display on the same 16:9 broadcast canvas. */
+.tv-canvas-viewport {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #0b0b0b;
+}
+
+.broadcast-shell {
+  width: min(100vw, calc(100dvh * 16 / 9));
+  height: min(100dvh, calc(100vw * 9 / 16));
+  aspect-ratio: 16 / 9;
+  container-type: size;
+}
+
+.broadcast-shell .brand-rail {
+  --ticker-height: 3.7cqh;
+  --cap-bottom: 0.4cqh;
+  padding: 7cqh 3cqw 3cqh;
+}
+
+.broadcast-shell--original .brand-rail { padding-top: 12cqh; }
+.broadcast-shell--halloween-preview .brand-rail { padding-top: 7cqh; }
+.broadcast-shell--christmas-preview .brand-rail { padding-top: 9cqh; }
+.broadcast-shell .brand-logo { top: 1.8cqh; width: 10.3cqw; }
+.broadcast-shell .brand-status { font-size: clamp(2rem, 3.4cqw, 4rem); }
+.broadcast-shell .travel-carousel { top: 43.5%; height: 35%; }
+.broadcast-shell--original .travel-carousel { top: 48.5%; }
+.broadcast-shell .cap-mark { right: 0.8cqw; font-size: 12cqw; }
+.broadcast-shell .side-ticker__track { font-size: clamp(1.08rem, 1.4cqw, 1.35rem); }
+
+.broadcast-shell .quote-table-wrap {
+  --currency-flag-inset: 4.2cqw;
+  --rate-value-width: 9.4cqw;
+  --quote-table-header-height: 4.6cqh;
+  --table-spider-size: 3.75cqw;
+  --table-spider-half-size: 1.875cqw;
+}
+
+.broadcast-shell .quote-table thead th,
+.broadcast-shell .quote-table tbody th,
+.broadcast-shell .quote-table tbody td {
+  padding-right: 2.2cqw;
+  padding-left: 2.2cqw;
+}
+
+.broadcast-shell .quote-table thead th { font-size: clamp(.78rem, 1.1cqw, 1.05rem); }
+.broadcast-shell .quote-table .currency-cell { gap: 1cqw; font-size: clamp(.8rem, 1.2cqw, 1.08rem); }
+.broadcast-shell .flag-image { width: 2.1cqw; }
+.broadcast-shell .rate-value { font-size: clamp(.92rem, 1.3cqw, 1.18rem); }

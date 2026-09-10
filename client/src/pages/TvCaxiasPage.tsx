@@ -55,8 +55,17 @@ const RATES: Rate[] = [
 const SHEET_ENDPOINT = "https://docs.google.com/spreadsheets/d/1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk/gviz/tq?tqx=out:json&gid=0";
 
 const HALLOWEEN_MONTH_INDEX = 9;
-const CHRISTMAS_MONTH_INDEX = 11;
-// Temas finalizados: ativação automática somente pelos respectivos meses.
+// Período natalino: 26 de novembro até 06 de janeiro.
+function isChristmasSeason(date: Date) {
+  const month = date.getMonth();
+  const day = date.getDate();
+
+  const isLateNovember = month === 10 && day >= 26;
+  const isDecember = month === 11;
+  const isEarlyJanuary = month === 0 && day <= 6;
+
+  return isLateNovember || isDecember || isEarlyJanuary;
+}
 
 const HALLOWEEN_ASSETS = {
   cornerWeb: `${ASSET_BASE}assets/cap-halloween-corner-web-clean_0585394f.png`,
@@ -231,7 +240,7 @@ export default function TvCaxiasPage() {
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
   const halloweenPreviewActive = seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
-  const christmasActive = seasonalDate.getMonth() === CHRISTMAS_MONTH_INDEX;
+  const christmasActive = isChristmasSeason(seasonalDate);
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
   const halloweenTopDecorationActive = halloweenPreviewActive;
@@ -289,7 +298,8 @@ export default function TvCaxiasPage() {
   }, []);
 
   return (
-    <main className={`broadcast-shell ${originalLayoutActive ? "broadcast-shell--original" : ""} ${halloweenPreviewActive ? "broadcast-shell--halloween-preview" : ""} ${christmasActive ? "broadcast-shell--christmas-preview" : ""}`}>
+    <div className="tv-canvas-viewport">
+      <main className={`broadcast-shell ${originalLayoutActive ? "broadcast-shell--original" : ""} ${halloweenPreviewActive ? "broadcast-shell--halloween-preview" : ""} ${christmasActive ? "broadcast-shell--christmas-preview" : ""}`}>
       <aside className="brand-rail" aria-label="Status das cotações">
         {halloweenTopDecorationActive && <HalloweenTopDecor />}
         {christmasActive && <img className="christmas-title-garland" src={CHRISTMAS_ASSETS.titleGarlandStraight} alt="" aria-hidden="true" />}
@@ -361,6 +371,7 @@ export default function TvCaxiasPage() {
           {halloweenPreviewActive && <img className="halloween-table-spider" src={HALLOWEEN_ASSETS.tableSpider} alt="" aria-hidden="true" />}
         </div>
       </section>
-    </main>
+      </main>
+    </div>
   );
 }
