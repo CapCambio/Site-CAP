@@ -1,4 +1,3 @@
-import { Link } from "wouter";
 import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 
 export default function LandingPage() {
@@ -9,19 +8,13 @@ export default function LandingPage() {
         <p className="text-lg text-gray-600 mb-8">
           Soluções cambiais com segurança, transparência e atendimento especializado desde 2006.
         </p>
-        <div className="flex gap-4">
+        <div>
           <a
             href="https://capcambio.up.railway.app/cotacoes"
             className="px-6 py-3 bg-[#f3b234] text-black font-semibold rounded-lg hover:bg-[#e5a12d] transition-colors inline-block"
           >
             Ver Cotações
           </a>
-          <Link
-            href="/tv"
-            className="px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            TV Caxias
-          </Link>
         </div>
       </div>
       <WhatsAppFloatingButton />

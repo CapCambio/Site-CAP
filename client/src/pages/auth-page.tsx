@@ -148,7 +148,7 @@ export default function LoginPage() {
 
   // Verificar se já está autenticado
   if (isAuthorized) {
-    return <Redirect to="/" />;
+    return <Redirect to="/cotacoes" />;
   }
 
   return (
