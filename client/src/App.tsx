@@ -83,7 +83,7 @@ function AppContent() {
       <LazyLoad>
         <Switch>
           <Route path="/" component={LandingPage} />
-          <Route path="/cotacoes" component={PrecosPage} />
+          <ProtectedRoute path="/cotacoes" component={PrecosPage} />
           <Route path="/tv">
             <TvCaxiasPage />
           </Route>
