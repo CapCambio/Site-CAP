@@ -68,8 +68,25 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // ── Assets do app React (/assets/... e /tv/assets/...)
-  if (url.startsWith('/assets/') || url.startsWith('/tv/assets/')) {
+  // ── Assets da homepage (/assets/... e /fonts/...) - verificar primeiro
+  if (url.startsWith('/assets/') || url.startsWith('/fonts/')) {
+    // Primeiro tenta servir da homepage
+    const homepageAssetPath = path.join(HOMEPAGE_DIR, url);
+    if (fs.existsSync(homepageAssetPath)) {
+      serveFile(res, homepageAssetPath);
+      return;
+    }
+    // Se não existir na homepage, tenta servir do React app
+    const assetPath = url.replace(/^\/tv/, '');
+    const filePath = path.join(PUBLIC_DIR, assetPath);
+    if (fs.existsSync(filePath)) {
+      serveFile(res, filePath);
+      return;
+    }
+  }
+
+  // ── Assets do app React (/tv/assets/...)
+  if (url.startsWith('/tv/assets/')) {
     const assetPath = url.replace(/^\/tv/, '');
     const filePath = path.join(PUBLIC_DIR, assetPath);
     serveFile(res, filePath);
