@@ -99,6 +99,7 @@
           var link = event.target.closest('a[href]');
           if (link && !link.closest('.cap-whatsapp-option') && /whatsapp\.com|wa\.me/i.test(link.href)) {
             event.preventDefault();
+            event.stopPropagation();
             dialog.classList.add('is-open');
             return;
           }
@@ -107,9 +108,10 @@
           var solutionText = solutionButton && solutionButton.textContent.trim();
           if (/^(Consultar câmbio|Consultar remessa|Consultar envio)/i.test(solutionText || '')) {
             event.preventDefault();
+            event.stopPropagation();
             dialog.classList.add('is-open');
           }
-        });
+        }, true);
       })();
     </script>
   </body>
