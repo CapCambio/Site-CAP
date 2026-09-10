@@ -22,8 +22,8 @@ export default defineConfig({
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
-  // Configuração de base URL para CDN ou /tv para TV Caxias
-  base: process.env.CDN_URL || (process.env.TV_CAXIAS_MODE === 'true' ? '/tv/' : '/'),
+  // O servidor publica os assets do app na raiz, inclusive quando a rota é /tv.
+  base: process.env.CDN_URL || '/',
   root: path.resolve(import.meta.dirname, "client"),
   publicDir: path.resolve(import.meta.dirname, "public"),
   build: {
