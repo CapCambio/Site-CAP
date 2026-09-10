@@ -81,6 +81,10 @@ export function serveStatic(app: Express) {
   // Servir assets da homepage institucional em /homepage/*
   app.use('/homepage', express.static(homepagePath));
 
+  // Servir assets da homepage também na raiz para compatibilidade
+  app.use('/assets', express.static(path.join(homepagePath, 'assets')));
+  app.use('/fonts', express.static(path.join(homepagePath, 'fonts')));
+
   // Servir arquivos estáticos do app React (assets, sw.js, manifests, etc.)
   app.use(express.static(distPath));
 
