@@ -236,13 +236,11 @@ function ratesFromSheet(responseText: string): Rate[] {
 export default function TvCaxiasPage() {
   const [rates, setRates] = useState(RATES);
   const [seasonalDate, setSeasonalDate] = useState(() => new Date());
-  const christmasPreview = typeof window !== "undefined"
-    && new URLSearchParams(window.location.search).get("tema") === "natal";
   const dollar = rates.find((rate) => rate.id === "usd") ?? rates[0];
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
   const halloweenPreviewActive = seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
-  const christmasActive = christmasPreview || isChristmasSeason(seasonalDate);
+  const christmasActive = isChristmasSeason(seasonalDate);
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
   const halloweenTopDecorationActive = halloweenPreviewActive;
