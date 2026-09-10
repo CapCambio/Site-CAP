@@ -734,16 +734,17 @@ button:focus-visible, input:focus-visible {
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  display: grid;
-  place-items: center;
+  display: block;
   overflow: hidden;
-  background: #0b0b0b;
+  background: #f7f7f4;
 }
 
 .broadcast-shell {
-  width: min(100vw, calc(100dvh * 16 / 9));
-  height: min(100dvh, calc(100vw * 9 / 16));
-  aspect-ratio: 16 / 9;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  overflow: hidden;
   container-type: size;
 }
 
