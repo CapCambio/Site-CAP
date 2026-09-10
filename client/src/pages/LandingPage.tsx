@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 
 export default function LandingPage() {
   return (
@@ -23,6 +24,7 @@ export default function LandingPage() {
           </Link>
         </div>
       </div>
+      <WhatsAppFloatingButton />
     </div>
   );
 }
