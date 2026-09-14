@@ -239,7 +239,7 @@ export default function TvCaxiasPage() {
   const dollar = rates.find((rate) => rate.id === "usd") ?? rates[0];
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
-  const halloweenPreviewActive = seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
+  const halloweenPreviewActive = true; // Halloween ativado manualmente
   const christmasActive = isChristmasSeason(seasonalDate);
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
