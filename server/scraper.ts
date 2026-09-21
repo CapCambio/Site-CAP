@@ -93,6 +93,9 @@ function parsePrice(value: unknown): number {
     normalized = parts[parts.length - 1].trim();
   }
 
+  // Remover espaços extras após processar
+  normalized = normalized.replace(/\s+/g, '');
+
   const hasComma = normalized.includes(',');
   const hasDot = normalized.includes('.');
 
