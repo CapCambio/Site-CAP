@@ -87,6 +87,12 @@ function parsePrice(value: unknown): number {
     return 0;
   }
 
+  // Se houver valores separados por "/", pegar apenas o último
+  if (normalized.includes('/')) {
+    const parts = normalized.split('/');
+    normalized = parts[parts.length - 1].trim();
+  }
+
   const hasComma = normalized.includes(',');
   const hasDot = normalized.includes('.');
 
