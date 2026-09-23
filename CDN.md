@@ -175,8 +175,8 @@ Use ferramentas como:
 ```bash
 NODE_ENV=production
 PORT=8080
-APP_URL=https://ctrcambio.com.br
-CDN_URL=https://cdn.ctrcambio.com.br/
+APP_URL=https://capcambio.com.br
+CDN_URL=https://cdn.capcambio.com.br/
 
 # Outras configurações...
 EMAIL_ENABLED=true

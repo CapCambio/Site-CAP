@@ -12,8 +12,8 @@
     },
     "lastNotificationSent": null,
     "cardOrder": [
-      "USD",
       "EUR",
+      "USD",
       "GBP",
       "AUD",
       "ARS",
@@ -27,7 +27,8 @@
       "CNY",
       "JPY",
       "PEN",
-      "ZAR"
+      "ZAR",
+      "AED"
     ],
     "pushSubscriptions": [
       {
@@ -46,7 +47,8 @@
           "auth": "MTq0dqsJFSp0SVRU0XXzHw"
         }
       }
-    ]
+    ],
+    "language": "es"
   },
   "usuario@exemplo.com": {
     "email": "usuario@exemplo.com",
@@ -135,14 +137,6 @@
           "auth": "zop8OLg6EpY4Gpxw1xrPHw",
           "p256dh": "BO9EIca07ZEx_Y02WMMTfMuVlpFADjITaHiO070BsX1nTcmgso16wyQ2aDn2wYhmXjl6iU1g6iq5fDczTJ77Hqw"
         }
-      },
-      {
-        "endpoint": "https://fcm.googleapis.com/fcm/send/dOWAZLw3LLs:APA91bG_fY_HOGSOwUbfuQVD1fettSqtOEUJ7h1Il9sVDuHm5r5GkBlJRy7S7peEitQxGbicy5OeHdqLrbZdR-6i8fYLdmIToMUYLJ9mZMETR69c0mY4XCxrbGAUAk-1BErxXIgWRg0Y",
-        "expirationTime": null,
-        "keys": {
-          "p256dh": "BIK9CH6yCIbyw4_ALOkhv8ZFSWZ7VleRsH1GtpD23KrerK3fLdIhnSpzr9rlR4mhT3rUeMrMmEuegvgnLupD0nU",
-          "auth": "ypte4AHSY27Vd5RtQCEdmA"
-        }
       }
     ],
     "cardOrder": [
@@ -161,7 +155,8 @@
       "CNY",
       "JPY",
       "PEN",
-      "ZAR"
+      "ZAR",
+      "AED"
     ],
     "lastNotificationSent": null,
     "language": "pt"

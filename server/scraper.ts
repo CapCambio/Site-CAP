@@ -15,7 +15,7 @@ export interface ScrapedCurrency {
 // Google Sheets
 const SPREADSHEET_ID = '1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk';
 
-const SOURCE_URL =
+export const SOURCE_URL =
   `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
 
 // Arquivos locais

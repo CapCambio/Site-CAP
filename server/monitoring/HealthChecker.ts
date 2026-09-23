@@ -5,6 +5,7 @@ import { logger, LogLevel } from './Logger';
 import { authService } from '../auth/AuthService';
 import { alertSystem } from '../alert-system';
 import { pool } from '../db';
+import { SOURCE_URL } from '../scraper';
 
 export interface HealthCheck {
   name: string;
@@ -285,22 +286,22 @@ export class HealthChecker {
    */
   private async checkExternalDependencies(): Promise<HealthCheck> {
     const start = Date.now();
-    
+
     try {
-      // Testa conexão com site de scraping
-      const response = await fetch('https://ctrcambio.com.br/tvcaxias/', {
-        method: 'HEAD'
+      // Testa conexão com a planilha-fonte das cotações
+      const response = await fetch(SOURCE_URL, {
+        method: 'GET'
       });
-      
+
       const responseTime = Date.now() - start;
-      
+
       if (response.ok) {
         return {
           name: 'external_dependencies',
           status: 'healthy',
           responseTime,
           metadata: {
-            ctrCambio: 'accessible',
+            source: 'accessible',
             statusCode: response.status
           }
         };
@@ -308,7 +309,7 @@ export class HealthChecker {
         return {
           name: 'external_dependencies',
           status: 'degraded',
-          message: `CTR Câmbio returned status ${response.status}`,
+          message: `Fonte de cotações retornou status ${response.status}`,
           responseTime
         };
       }

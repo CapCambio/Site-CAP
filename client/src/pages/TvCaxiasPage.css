@@ -50,8 +50,8 @@ button:focus-visible, input:focus-visible {
 }
 
 .brand-rail {
-  --ticker-height: clamp(36px, 5vh, 40px);
-  --cap-bottom: 0.4rem;
+  --ticker-height: clamp(100px, 12vh, 120px);
+  --cap-bottom: 3rem;
   --halloween-top-offset: clamp(0.25rem, 0.6vh, 0.45rem);
   position: relative;
   display: flex;
@@ -143,7 +143,7 @@ button:focus-visible, input:focus-visible {
   margin: 0;
   color: rgb(0 0 0 / 22%);
   font-family: "Archivo Black", Impact, sans-serif;
-  font-size: 12rem;
+  font-size: 14.5rem;
   font-weight: 900;
   letter-spacing: -0.15em;
   line-height: 1;
@@ -279,28 +279,29 @@ button:focus-visible, input:focus-visible {
 
 .halloween-witch-hat {
   z-index: 3;
-  bottom: calc(var(--ticker-height) + 5.76rem);
+  bottom: calc(var(--ticker-height) + 6.2rem);
   left: calc(48% - 1.3rem);
   width: clamp(88px, 8vw, 106px);
-  transform: rotate(1deg) scale(1.2);
+  transform: rotate(1deg) scale(1.3);
 }
 
 .halloween-cap-cat {
   z-index: 0;
-  bottom: calc(var(--ticker-height) + 1.92rem);
-  left: 3.77rem;
-  width: clamp(41px, 3.5vw, 47px);
+  bottom: calc(var(--ticker-height) + 2.2rem);
+  left: 3.3rem;
+  width: clamp(43px, 3.7vw, 50px);
   position: absolute;
 }
 
 .halloween-cap-web {
   z-index: 0;
-  right: 1.6rem;
-  bottom: var(--ticker-height);
-  width: clamp(32px, 3.2vw, 41px);
+  right: 1.2rem;
+  bottom: calc(var(--ticker-height) - 0.1rem);
+  width: clamp(38px, 3.8vw, 48px);
   transform: rotate(360deg);
   transform-origin: 50% 50%;
 }
+
 
 /* STYLE NOTE — Natal usa enfeites próprios: a guirlanda de topo horizontal ampliada,
    luzes de pisca-pisca e sinos laterais enquadram o título; chapéu no A e rena diagonal no C preservam a
@@ -469,7 +470,7 @@ button:focus-visible, input:focus-visible {
 
 .christmas-santa-hat {
   z-index: 3;
-  bottom: calc(var(--ticker-height) + 3.55rem);
+  bottom: calc(var(--ticker-height) + 4rem); /* raised hat a bit more */
   left: calc(47% - 1.2rem);
   width: clamp(105px, 9.4vw, 128px);
   height: auto;
@@ -480,7 +481,7 @@ button:focus-visible, input:focus-visible {
   z-index: 2;
   bottom: calc(var(--ticker-height) - 0.41rem);
   left: -0.65rem;
-  width: clamp(84px, 7.8vw, 100px);
+  width: clamp(80px, 7vw, 100px); /* slightly larger */
   height: auto;
 }
 
@@ -489,6 +490,41 @@ button:focus-visible, input:focus-visible {
   left: 2.55rem;
   width: clamp(54px, 4.9vw, 64px);
 }
+
+.halloween-witch {
+  position: absolute;
+  z-index: 3;
+  bottom: calc(var(--ticker-height) + 7rem);
+  left: 0.5rem;
+  width: clamp(140px, 10vw, 180px);
+  height: auto;
+  pointer-events: none;
+}
+
+.cap-witch-p {
+  position: absolute;
+  z-index: 5;
+  bottom: calc(var(--ticker-height) + 6.3rem);
+  left: 14.8rem;
+  width: clamp(120px, 12vw, 200px);
+  height: auto;
+  pointer-events: none;
+}
+
+
+
+
+/* Bats image positioned below the travel carousel */
+.carousel-bats {
+  position: absolute;
+  z-index: 6; /* above other rail elements */
+  top: 65%; /* roughly below the carousel */
+  left: 2rem; /* horizontal offset */
+  width: clamp(150px, 12vw, 250px);
+  height: auto;
+  pointer-events: none;
+}
+
 
 @keyframes sidebar-ticker {
   from { transform: translateX(0); }
@@ -749,8 +785,8 @@ button:focus-visible, input:focus-visible {
 }
 
 .broadcast-shell .brand-rail {
-  --ticker-height: 3.7cqh;
-  --cap-bottom: 0.4cqh;
+  --ticker-height: 5.8cqh;
+  --cap-bottom: 1.45cqh;
   padding: 7cqh 3cqw 3cqh;
 }
 
@@ -761,25 +797,39 @@ button:focus-visible, input:focus-visible {
 .broadcast-shell .brand-status { font-size: clamp(2rem, 3.4cqw, 4rem); }
 .broadcast-shell .travel-carousel { top: 43.5%; height: 35%; }
 .broadcast-shell--original .travel-carousel { top: 48.5%; }
-.broadcast-shell .cap-mark { right: 0.8cqw; font-size: 12cqw; }
+.broadcast-shell .cap-mark { right: 0.8cqw; font-size: 14.5cqw; }
 .broadcast-shell .side-ticker__track { font-size: clamp(1.08rem, 1.4cqw, 1.35rem); }
 
+.broadcast-shell .quote-stage,
 .broadcast-shell .quote-table-wrap {
-  --currency-flag-inset: 4.2cqw;
+  overflow: visible;
+}
+
+.broadcast-shell .quote-table-wrap {
+  --currency-flag-inset: 3.8cqw;
   --rate-value-width: 9.4cqw;
   --quote-table-header-height: 4.6cqh;
   --table-spider-size: 3.75cqw;
   --table-spider-half-size: 1.875cqw;
+  --table-spider-side-gap: 0.875cqw;
+  --table-spider-nudge-x: -1.02cqw;
+  --table-spider-thread-nudge-x: 0.15cqw;
 }
 
 .broadcast-shell .quote-table thead th,
 .broadcast-shell .quote-table tbody th,
 .broadcast-shell .quote-table tbody td {
   padding-right: 2.2cqw;
-  padding-left: 2.2cqw;
+  padding-left: 4cqw;
+}
+
+.broadcast-shell .quote-table .currency-head,
+.broadcast-shell .quote-table .currency-cell {
+  padding-left: var(--currency-flag-inset);
 }
 
 .broadcast-shell .quote-table thead th { font-size: clamp(.78rem, 1.1cqw, 1.05rem); }
 .broadcast-shell .quote-table .currency-cell { gap: 1cqw; font-size: clamp(.8rem, 1.2cqw, 1.08rem); }
 .broadcast-shell .flag-image { width: 2.1cqw; }
 .broadcast-shell .rate-value { font-size: clamp(.92rem, 1.3cqw, 1.18rem); }
+
