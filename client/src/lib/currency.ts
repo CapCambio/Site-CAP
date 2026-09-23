@@ -20,6 +20,7 @@ export const currencyFlags: Record<string, string> = {
   COP: "co",
   NZD: "nz", // Nova Zelândia
   ZAR: "za", // África do Sul
+  AED: "ae", // Emirados Árabes Unidos
 };
 
 // Currency details like full names
@@ -31,7 +32,7 @@ export const currencyDetails: Record<string, { name: string }> = {
   AUD: { name: "Dólar Australiano" },
   JPY: { name: "Iene" },
   CHF: { name: "Franco Suíço" },
-  CNY: { name: "Yuan" },
+  CNY: { name: "Iuan" },
   ARS: { name: "Peso Argentino" },
   UYU: { name: "Peso Uruguaio" },
   PEN: { name: "Nuevo Sol" },
@@ -42,6 +43,7 @@ export const currencyDetails: Record<string, { name: string }> = {
   COP: { name: "Peso Colombiano" },
   NZD: { name: "Dólar Neozelandês" },
   ZAR: { name: "Rand Africano" },
+  AED: { name: "Dirham dos Emirados Árabes" },
 };
 
 // Format currency values according to their rules

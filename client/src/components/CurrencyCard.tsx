@@ -189,7 +189,7 @@ export function CurrencyCard({
                 </span>
               )}
               {((change === null || change === 0) && shouldShowVariation) && (
-                <span className="text-sm font-medium text-gray-500">
+                <span className="text-sm font-medium text-gray-500 flex items-center">
                   — 0,00%
                 </span>
               )}

@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense, useRef } from "react";
-import { TabType } from "../lib/types";
+import { Currency, TabType } from "../lib/types";
 import { useCurrencyData } from "../hooks/useCurrencyData";
 import { useHistoricalData } from "../hooks/useHistoricalData";
 import { useDateSelection } from "../hooks/useDateSelection";
@@ -74,7 +74,7 @@ export default function Home() {
     handleTouchStart,
     handleTouchEnd,
     cancelDragMode
-  } = useDragDrop(currencies, user?.email);
+  } = useDragDrop(currencies, user?.email, !isMobile);
 
   // Estado para controlar tooltip de primeira vez
   const [showReorderHint, setShowReorderHint] = useState(false);
@@ -202,6 +202,36 @@ export default function Home() {
     }));
   };
 
+  // Usar orderedCurrencies se tiver dados, senão usar currencies
+  const currencyList = orderedCurrencies.length > 0 ? orderedCurrencies : currencies;
+
+  const renderCard = (currency: Currency, index: number) => (
+    <DraggableCurrencyCard
+      key={currency.code}
+      currency={currency}
+      isExpanded={expandedCards[currency.code] || false}
+      onToggleExpand={() => handleToggleCardExpand(currency.code)}
+      isHistoricalView={isHistoricalView}
+      historicalPrice={historicalPrices[currency.code]}
+      selectedDate={selectedDate}
+      index={index}
+      isDragging={draggedItem?.index === index}
+      isDragOver={dragOverIndex === index}
+      draggedIndex={draggedIndex}
+      selectedForDrag={selectedForDrag}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      handleMouseDown={handleMouseDown}
+      handleMouseUp={handleMouseUp}
+      handleTouchStart={handleTouchStart}
+      handleTouchEnd={handleTouchEnd}
+      cancelDragMode={cancelDragMode}
+    />
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -235,35 +265,18 @@ export default function Home() {
                     <div key={index} className="h-36 bg-gray-100 rounded-lg animate-pulse" />
                   ))}
                 </div>
+              ) : isMobile ? (
+                <div className="space-y-3">
+                  {currencyList.map((currency, index) => renderCard(currency, index))}
+                </div>
               ) : (
-                <div className={`${isMobile ? 'space-y-3' : 'currency-desktop-layout'}`}>
-                  {/* Usar orderedCurrencies se tiver dados, senão usar currencies */}
-                  {(orderedCurrencies.length > 0 ? orderedCurrencies : currencies).map((currency, index) => (
-                    <DraggableCurrencyCard
-                      key={currency.code}
-                      currency={currency}
-                      isExpanded={expandedCards[currency.code] || false}
-                      onToggleExpand={() => handleToggleCardExpand(currency.code)}
-                      isHistoricalView={isHistoricalView}
-                      historicalPrice={historicalPrices[currency.code]}
-                      selectedDate={selectedDate}
-                      index={index}
-                      isDragging={draggedItem?.index === index}
-                      isDragOver={dragOverIndex === index}
-                      draggedIndex={draggedIndex}
-                      selectedForDrag={selectedForDrag}
-                      onDragStart={handleDragStart}
-                      onDragEnd={handleDragEnd}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                      handleMouseDown={handleMouseDown}
-                      handleMouseUp={handleMouseUp}
-                      handleTouchStart={handleTouchStart}
-                      handleTouchEnd={handleTouchEnd}
-                      cancelDragMode={cancelDragMode}
-                    />
-                  ))}
+                <div className="currency-desktop-layout">
+                  <div className="currency-column">
+                    {currencyList.map((currency, index) => (index % 2 === 0 ? renderCard(currency, index) : null))}
+                  </div>
+                  <div className="currency-column">
+                    {currencyList.map((currency, index) => (index % 2 === 1 ? renderCard(currency, index) : null))}
+                  </div>
                 </div>
               )}
             </div>

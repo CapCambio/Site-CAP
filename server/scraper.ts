@@ -415,9 +415,11 @@ function extractCurrenciesFromGoogleSheet(
     pesomexicano: 'MXN',
     pesocolombiano: 'COP',
     yuanchines: 'CNY',
+    iuanchines: 'CNY',
     ienejapones: 'JPY',
     novosolperuano: 'PEN',
-    randafricano: 'ZAR'
+    randafricano: 'ZAR',
+    dirhamdosemiradosarabes: 'AED'
   };
 
   const results: ScrapedCurrency[] = [];
@@ -706,14 +708,15 @@ export async function scrapeCurrencyData(): Promise<
         UYU: 'Peso Uruguaio',
         CHF: 'Franco Suíço',
         JPY: 'Iene Japonês',
-        CNY: 'Yuan Chinês',
+        CNY: 'Iuan Chinês',
         MXN: 'Peso Mexicano',
         PYG: 'Guarani Paraguaio',
         PEN: 'Novo Sol Peruano',
         BOB: 'Boliviano',
         COP: 'Peso Colombiano',
         NZD: 'Dólar Neozelandês',
-        ZAR: 'Rand Sul-Africano'
+        ZAR: 'Rand Sul-Africano',
+        AED: 'Dirham dos Emirados Árabes'
       };
 
       const currencies: ScrapedCurrency[] =
@@ -826,7 +829,7 @@ export async function scrapeCurrencyData(): Promise<
       sellPrice: 0.00185
     },
     {
-      name: 'Yuan Chinês',
+      name: 'Iuan Chinês',
       code: 'CNY',
       buyPrice: 0.75,
       sellPrice: 0.90

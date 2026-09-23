@@ -7,7 +7,7 @@ interface DragItem {
   type: string;
 }
 
-export function useDragDrop(initialItems: Currency[], userEmail?: string | null) {
+export function useDragDrop(initialItems: Currency[], userEmail?: string | null, twoColumnLayout = false) {
   const [items, setItems] = useState<Currency[]>([]);
   const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -17,6 +17,7 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null)
   const isInitialized = useRef(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const scrollInterval = useRef<NodeJS.Timeout | null>(null);
+  const pendingMoveRef = useRef<number | null>(null);
   
   // Gerar chave única para cada usuário
   const getStorageKey = () => {
@@ -283,6 +284,17 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null)
 
   const handleDragEnd = (e: React.DragEvent) => {
     stopAutoScroll();
+
+    // Movimento entre colunas é aplicado só agora: mover o card de coluna durante
+    // o arrasto remontaria o nó DOM e o navegador abortaria o drag nativo.
+    if (pendingMoveRef.current !== null && draggedIndex !== null) {
+      const newItems = [...items];
+      const [dragged] = newItems.splice(draggedIndex, 1);
+      newItems.splice(pendingMoveRef.current, 0, dragged);
+      setItems(newItems);
+      pendingMoveRef.current = null;
+    }
+
     setDraggedItem(null);
     setDraggedIndex(null);
     setDragOverIndex(null);
@@ -296,7 +308,12 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null)
     
     if (draggedIndex !== null && draggedIndex !== index) {
       setDragOverIndex(index);
-      
+
+      // Em layout de 2 colunas, não trocar com cards da outra coluna em tempo real
+      if (twoColumnLayout && draggedIndex % 2 !== index % 2) {
+        return;
+      }
+
       // Swap em tempo real
       const newItems = [...items];
       const [dragged] = newItems.splice(draggedIndex, 1);
@@ -321,6 +338,12 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null)
       return;
     }
 
+    // Drop em outra coluna não teve swap ao vivo; agenda para o dragend
+    if (twoColumnLayout && draggedIndex % 2 !== dropIndex % 2) {
+      pendingMoveRef.current = dropIndex;
+      return;
+    }
+
     // A ordem já foi atualizada no handleDragOver
     setDraggedIndex(null);
     setIsLongPressActive(false);
@@ -329,6 +352,7 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null)
 
   const cancelDragMode = () => {
     stopAutoScroll();
+    pendingMoveRef.current = null;
     setIsLongPressActive(false);
     setSelectedForDrag(null);
     setDraggedItem(null);
