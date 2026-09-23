@@ -833,3 +833,41 @@ button:focus-visible, input:focus-visible {
 .broadcast-shell .flag-image { width: 2.1cqw; }
 .broadcast-shell .rate-value { font-size: clamp(.92rem, 1.3cqw, 1.18rem); }
 
+/* Adaptação fluida dos enfeites temáticos para qualquer resolução de TV/Monitor */
+.broadcast-shell .cap-witch-p {
+  right: 0.8cqw;
+  bottom: calc(var(--ticker-height) + 1.2cqh);
+  width: clamp(100px, 14cqw, 190px);
+}
+
+.broadcast-shell .halloween-witch-hat {
+  bottom: calc(var(--ticker-height) + 4.8cqh);
+  left: calc(48% - 1.3cqw);
+  width: clamp(70px, 7.5cqw, 110px);
+}
+
+.broadcast-shell .halloween-cap-cat {
+  bottom: calc(var(--ticker-height) + 1.5cqh);
+  left: 3cqw;
+  width: clamp(35px, 3.8cqw, 52px);
+}
+
+.broadcast-shell .halloween-cap-web {
+  right: 1cqw;
+  bottom: calc(var(--ticker-height) - 0.2cqh);
+  width: clamp(30px, 3.5cqw, 48px);
+}
+
+.broadcast-shell .halloween-witch {
+  bottom: calc(var(--ticker-height) + 5cqh);
+  left: 0.5cqw;
+  width: clamp(100px, 11cqw, 180px);
+}
+
+.broadcast-shell .carousel-bats {
+  top: 65%;
+  left: 2cqw;
+  width: clamp(120px, 13cqw, 220px);
+}
+
+
