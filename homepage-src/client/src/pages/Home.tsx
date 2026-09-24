@@ -337,12 +337,12 @@ export default function Home() {
 	                    <div className="mt-3 flex items-start gap-2 text-xs text-white/80 xl:mt-2.5 xl:hidden"><Clock3 className="mt-0.5 size-3.5 shrink-0 text-[#facb2e]" /><div><p className="font-semibold">Horários de atendimento</p><ul className="mt-1 grid gap-0.5 leading-5 text-white/72">{activeOffice.hours.map(hour => <li key={hour}>{hour}</li>)}</ul></div></div>
 	                    <div className="mt-4 flex flex-wrap gap-2 xl:mt-3.5">
                       <a href={`tel:${activeOffice.phone.replace(/\D/g, "")}`} className="cap-outline inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold text-white/80"><Phone className="size-3.5 text-[#facb2e]" />{activeOffice.phone}</a>
-                      <a href={activeOffice.whatsappLink} target="_blank" rel="noreferrer" className="cap-outline inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold text-white/80"><MessageCircle className="size-3.5 text-[#facb2e]" />{activeOffice.whatsapp}</a>
+                      <a href={activeOffice.whatsappLink} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="cap-outline inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold text-white/80"><MessageCircle className="size-3.5 text-[#facb2e]" />{activeOffice.whatsapp}</a>
 	                    </div>
                     <a href={`mailto:${activeOffice.email}`} className="mt-3 inline-flex max-w-full items-center gap-2 text-sm text-white/72 transition hover:text-[#facb2e] xl:mt-2.5 xl:text-[.8125rem]"><Mail className="size-4 shrink-0 text-[#facb2e]" /><span className="truncate">{activeOffice.email}</span></a>
 	                  </div>
 	                  <div className="flex flex-col justify-end gap-2 xl:gap-1.5">
-	                    <a href={activeOffice.whatsappLink} target="_blank" rel="noreferrer" className="cap-cta inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold xl:py-[.55rem] xl:text-[.8125rem]">Conversar no WhatsApp <MessageCircle className="size-4" /></a>
+	                    <a href={activeOffice.whatsappLink} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="cap-cta inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold xl:py-[.55rem] xl:text-[.8125rem]">Conversar no WhatsApp <MessageCircle className="size-4" /></a>
 	                    <a href={activeOffice.map} target="_blank" rel="noreferrer" className="cap-outline inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold xl:py-[.55rem] xl:text-[.8125rem]">Como chegar <ExternalLink className="size-4 text-[#facb2e]" /></a>
 	                  </div>
 	                </div>

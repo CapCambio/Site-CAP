@@ -36,7 +36,7 @@ export default function WhatsAppFloat() {
       const target = event.target as HTMLElement | null;
       if (!target) return;
       const link = target.closest("a[href]");
-      if (link && !link.closest("[data-cap-whatsapp-option]") && /whatsapp\.com|wa\.me/i.test(link.getAttribute("href") || "")) {
+      if (link && !link.closest("[data-cap-whatsapp-option]") && !link.hasAttribute("data-cap-whatsapp-direct") && /whatsapp\.com|wa\.me/i.test(link.getAttribute("href") || "")) {
         event.preventDefault();
         event.stopPropagation();
         setHideCaxias(false);
