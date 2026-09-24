@@ -42,7 +42,8 @@ export default function WhatsAppFloat() {
         event.preventDefault();
         event.stopPropagation();
         setHideCaxias(false);
-        setCustomMessage(null);
+        const linkMessage = link.getAttribute("data-cap-whatsapp-message");
+        setCustomMessage(linkMessage ? encodeURIComponent(linkMessage) : null);
         setOpen(true);
       }
     };
