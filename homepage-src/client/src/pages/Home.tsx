@@ -28,7 +28,9 @@ import { useEffect, useState } from "react";
 import { getNextRotatorIndex, isRotatorAutoplayActive, rotatorAutoplayDuration, rotatorTitles } from "@shared/cityRotator";
 
 const whatsappGeneralMessage = encodeURIComponent("Olá! Vim pelo site da CAP e gostaria de mais informações.");
+const whatsappCambioMessage = encodeURIComponent("Olá! Vim pelo site da CAP e gostaria de consultar cotações de moeda.");
 const whatsappCaxias = `https://api.whatsapp.com/send?phone=5554984348005&text=${whatsappGeneralMessage}`;
+const whatsappCambio = `https://api.whatsapp.com/send?phone=5554984348005&text=${whatsappCambioMessage}`;
 const footerWhatsApp = `https://api.whatsapp.com/send?phone=5554984348005&text=${encodeURIComponent("Olá, gostaria de falar com a equipe da CAP Câmbio.")}`;
 const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 const capLogoUrl = asset("cap-logo.png");
@@ -158,11 +160,11 @@ export default function Home() {
             {[ ["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre", "sobre"], ["Lojas", "lojas"], ["FAQ", "faq"] ].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="cap-nav-link text-sm font-medium">{label}</button>)}
           </nav>
           <div className="hidden items-center gap-3 sm:flex">
-            <a href={whatsappCaxias} target="_blank" rel="noreferrer" className="cap-cta inline-flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-bold"><WhatsAppIcon className="size-4" />Fale Conosco</a>
+            <a href={whatsappCaxias} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="cap-cta inline-flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-bold"><WhatsAppIcon className="size-4" />Fale Conosco</a>
           </div>
           <button onClick={() => setMenuOpen(current => !current)} className="rounded-lg p-2 text-white lg:hidden" aria-label="Abrir menu" aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
         </div>
-        {menuOpen && <div className="border-t border-white/10 bg-black px-4 py-4 lg:hidden"><nav className="container grid gap-1" aria-label="Navegação móvel">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre", "sobre"], ["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => navigate(id)} className="rounded-lg px-3 py-3 text-left text-sm font-semibold text-white/80 hover:bg-white/5">{label}</button>)}<a href={whatsappCaxias} target="_blank" rel="noreferrer" className="cap-cta mt-2 inline-flex items-center justify-center gap-1 rounded-lg px-3 py-3 text-center text-sm font-bold"><WhatsAppIcon className="size-4" />Fale Conosco</a></nav></div>}
+        {menuOpen && <div className="border-t border-white/10 bg-black px-4 py-4 lg:hidden"><nav className="container grid gap-1" aria-label="Navegação móvel">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre", "sobre"], ["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => navigate(id)} className="rounded-lg px-3 py-3 text-left text-sm font-semibold text-white/80 hover:bg-white/5">{label}</button>)}<a href={whatsappCaxias} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="cap-cta mt-2 inline-flex items-center justify-center gap-1 rounded-lg px-3 py-3 text-center text-sm font-bold"><WhatsAppIcon className="size-4" />Fale Conosco</a></nav></div>}
       </header>
 
       <main>
@@ -178,7 +180,7 @@ export default function Home() {
               <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#facb2e]/25 bg-[#facb2e]/10 px-3 py-1.5 text-xs font-bold text-[#facb2e]"><span className="cap-pulse h-1.5 w-1.5 rounded-full bg-[#facb2e]" />Desde 2006 no mercado cambial</div>
               <h1 className="cap-display max-w-[680px] text-5xl font-extrabold leading-[.95] text-white sm:text-6xl lg:text-7xl">Câmbio que acompanha <span className="text-[#facb2e]">o seu próximo passo.</span></h1>
               <p className="mt-7 max-w-[600px] text-base leading-7 text-white/75 sm:text-lg">Câmbio seguro, transparente e próximo de você. Consulte a cotação, reserve sua moeda e retire na loja CAP mais conveniente.</p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row"><span aria-hidden="true" className="invisible inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold lg:hidden">Encontre sua solução <ArrowDownRight className="size-4" /></span><a href={whatsappCaxias} target="_blank" rel="noreferrer" className="cap-cta inline-flex h-12 items-center justify-center gap-1 rounded-full px-6 text-sm font-bold"><WhatsAppIcon className="size-4" />Consultar cotação</a></div>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row"><span aria-hidden="true" className="invisible inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold lg:hidden">Encontre sua solução <ArrowDownRight className="size-4" /></span><a href={whatsappCambio} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="cap-cta inline-flex h-12 items-center justify-center gap-1 rounded-full px-6 text-sm font-bold"><WhatsAppIcon className="size-4" />Consultar cotação</a></div>
               <div className="mx-auto mt-5 flex w-fit min-w-[282px] items-center justify-center gap-2 rounded-xl border border-[#facb2e]/30 bg-black/60 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm lg:hidden"><BadgeCheck className="size-4 shrink-0 text-[#facb2e]" /><span className="whitespace-nowrap">Confiança que atravessa fronteiras</span></div>
             </div>
             <div className="hidden lg:relative lg:z-auto lg:mx-0 lg:block lg:w-full lg:max-w-[410px] lg:translate-x-10 lg:overflow-visible">
@@ -271,7 +273,7 @@ export default function Home() {
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
                 {["Cotações atualizadas", "Gráficos e histórico", "Alertas personalizados", "Conversor de moedas"].map(item => <div key={item} className="flex items-center gap-2 text-sm font-semibold text-white/78"><BadgeCheck className="size-4 shrink-0 text-[#facb2e]" />{item}</div>)}
               </div>
-              <div className="mt-9"><div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center"><a href="/auth" target="_blank" rel="noreferrer" className="cap-cta inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold"><MonitorSmartphone className="size-4" />Acessar plataforma</a><a href={platformAccessWhatsApp} target="_blank" rel="noreferrer" className="cap-outline inline-flex h-12 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white/80">Solicitar acesso pelo WhatsApp <WhatsAppIcon className="size-4 text-[#facb2e]" /></a></div><p className="mt-5 max-w-xl text-xs font-bold leading-5 text-white/78">A plataforma é exclusiva para clientes autorizados pela equipe da CAP. Já é nosso cliente? Solicite seu acesso pelo WhatsApp.</p></div>
+              <div className="mt-9"><div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center"><a href="/auth" target="_blank" rel="noreferrer" className="cap-cta inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold"><MonitorSmartphone className="size-4" />Acessar plataforma</a><a href={platformAccessWhatsApp} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="cap-outline inline-flex h-12 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white/80">Solicitar acesso pelo WhatsApp <WhatsAppIcon className="size-4 text-[#facb2e]" /></a></div><p className="mt-5 max-w-xl text-xs font-bold leading-5 text-white/78">A plataforma é exclusiva para clientes autorizados pela equipe da CAP. Já é nosso cliente? Solicite seu acesso pelo WhatsApp.</p></div>
             </div>
           </div>
         </section>
@@ -375,7 +377,7 @@ export default function Home() {
             <div>
               <p className="cap-kicker text-white/42">Canais oficiais</p>
               <div className="mt-4 grid gap-3 text-sm text-white/65">
-                <a href={footerWhatsApp} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#facb2e]"><MessageCircle className="size-4" />WhatsApp</a>
+                <a href={footerWhatsApp} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#facb2e]"><MessageCircle className="size-4" />WhatsApp</a>
                 <a href="mailto:capcambio_caxias@hotmail.com" className="flex items-center gap-2 hover:text-[#facb2e]"><Mail className="size-4" />E-mail</a>
                 <a href="tel:+555432232000" className="flex items-center gap-2 hover:text-[#facb2e]"><Phone className="size-4" />Telefone</a>
                 <p className="border-t border-white/10 pt-3 text-xs leading-5 text-white/48">Caxias do Sul <span className="px-1 text-[#facb2e]">|</span> Bento Gonçalves <span className="px-1 text-[#facb2e]">|</span> Passo Fundo</p>
