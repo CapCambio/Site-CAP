@@ -372,7 +372,7 @@ export default function Home() {
             </div>
             <div>
               <p className="cap-kicker text-white/42">Navegação</p>
-              <div className="mt-4 grid gap-3 text-sm text-white/65">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre nós", "sobre"], ["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div>
+              <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-white/65"><div className="flex flex-col gap-3">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre nós", "sobre"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div><div className="flex flex-col gap-3">{[["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div></div>
             </div>
             <div>
               <p className="cap-kicker text-white/42">Canais oficiais</p>
