@@ -142,7 +142,7 @@ export default function Home() {
   const serviceMessages: Record<string, string> = {
     "Consultar câmbio": "Olá! Vim pelo site da CAP e gostaria de consultar cotações de moeda.",
     "Consultar remessa": "Olá! Vim pelo site da CAP e gostaria de saber sobre transferências internacionais.",
-    "Consultar envio": "Olá! Vim pelo site da CAP e gostaria de saber sobre envios internacionais.",
+    "Consultar envio": "Olá! Vim pelo site da CAP e gostaria de saber sobre envios internacionais DHL.",
   };
 
   const openServiceInquiry = (cta: string) => {
