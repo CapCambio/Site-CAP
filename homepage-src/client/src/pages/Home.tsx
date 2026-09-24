@@ -368,6 +368,7 @@ export default function Home() {
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             <div className="flex flex-col items-center text-center">
               <img src={capLogoUrl} alt="CAP Câmbio" className="h-20 w-auto object-contain" />
+              <img src="/homepage/assets/abracam.png" alt="Selo ABRACAM de conformidade" className="mt-4 h-auto w-32 object-contain" />
             </div>
             <div>
               <p className="cap-kicker text-white/42">Navegação</p>
