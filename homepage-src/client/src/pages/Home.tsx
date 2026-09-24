@@ -366,9 +366,9 @@ export default function Home() {
       <footer className="border-t border-white/10 bg-[#070707] pb-8 pt-14 lg:pt-8">
         <div className="container">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
+            <div className="flex flex-col items-center text-center">
               <img src={capLogoUrl} alt="CAP Câmbio" className="h-20 w-auto object-contain" />
-              <p className="mt-5 max-w-xs text-sm leading-6 text-white/48">Câmbio seguro e transparente para pessoas e negócios em movimento.</p>
+              <p className="mt-5 max-w-xs text-sm leading-6 text-white/48">Câmbio que acompanha o seu próximo passo.</p>
             </div>
             <div>
               <p className="cap-kicker text-white/42">Navegação</p>
