@@ -375,7 +375,7 @@ export default function Home() {
               </div>
             </div>
             <div id="legal">
-              <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-[#facb2e]"><a href="/privacidade">Políticas de Privacidade</a><a href="/termos">Termos de uso</a></div>
+              <div className="flex flex-col gap-2 text-sm font-semibold text-[#facb2e]"><a href="/privacidade">Políticas de Privacidade</a><a href="/termos">Termos de uso</a></div>
             </div>
           </div>
           <div className="mt-12 flex flex-col justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/34 sm:flex-row"><p>© {new Date().getFullYear()} CAP Câmbio. Todos os direitos reservados.</p><p>Desenvolvido para uma experiência mais clara e segura.</p></div>
