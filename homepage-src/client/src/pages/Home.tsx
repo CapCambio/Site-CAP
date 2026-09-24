@@ -27,7 +27,8 @@ import {
 import { useEffect, useState } from "react";
 import { getNextRotatorIndex, isRotatorAutoplayActive, rotatorAutoplayDuration, rotatorTitles } from "@shared/cityRotator";
 
-const whatsappCaxias = "https://api.whatsapp.com/send?phone=5554984348005&text=Vim%20do%20site%20da%20CAP%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es";
+const whatsappGeneralMessage = encodeURIComponent("Olá! Vim pelo site da CAP e gostaria de mais informações.");
+const whatsappCaxias = `https://api.whatsapp.com/send?phone=5554984348005&text=${whatsappGeneralMessage}`;
 const footerWhatsApp = `https://api.whatsapp.com/send?phone=5554984348005&text=${encodeURIComponent("Olá, gostaria de falar com a equipe da CAP Câmbio.")}`;
 const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 const capLogoUrl = asset("cap-logo.png");
@@ -37,7 +38,7 @@ const offices = [
     address: "Rua Borges Medeiros 391, Loja 8 · Hipermercado Zaffari · Centro",
     phone: "(54) 3223.2000",
     whatsapp: "(54) 98434.8005",
-    whatsappLink: "https://api.whatsapp.com/send?phone=5554984348005&text=Vim%20do%20site%20da%20CAP%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es",
+    whatsappLink: `https://api.whatsapp.com/send?phone=5554984348005&text=${whatsappGeneralMessage}`,
     email: "capcambio_caxias@hotmail.com",
     map: "https://www.google.com/maps/search/?api=1&query=Rua+Borges+Medeiros+391+Caxias+do+Sul+RS",
 	    photo: asset("caxias.png"),
@@ -51,7 +52,7 @@ const offices = [
     address: "Rua Treze de Maio 877, Loja 204 · Shopping Lá América · São Bento",
     phone: "(54) 3453.5060",
     whatsapp: "(54) 99957.8486",
-    whatsappLink: "https://api.whatsapp.com/send?phone=5554999578486&text=Vim%20do%20site%20da%20CAP%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es",
+    whatsappLink: `https://api.whatsapp.com/send?phone=5554999578486&text=${whatsappGeneralMessage}`,
     email: "capcambio_bento@hotmail.com",
     map: "https://www.google.com/maps/search/?api=1&query=Rua+Treze+de+Maio+877+Bento+Goncalves+RS",
 	    photo: asset("bento.png"),
@@ -65,7 +66,7 @@ const offices = [
     address: "Av. Brasil Leste 200, Loja 40 · Shopping Bourbon · Petrópolis",
     phone: "(54) 3046.0088",
     whatsapp: "(54) 99628.0422",
-    whatsappLink: "https://api.whatsapp.com/send?phone=5554996280422&text=Vim%20do%20site%20da%20CAP%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es",
+    whatsappLink: `https://api.whatsapp.com/send?phone=5554996280422&text=${whatsappGeneralMessage}`,
     email: "capcambio_passo@hotmail.com",
     map: "https://www.google.com/maps/search/?api=1&query=Av+Brasil+Leste+200+Passo+Fundo+RS",
 	    photo: asset("passo.png"),
@@ -136,8 +137,14 @@ export default function Home() {
     scrollToId(id);
   };
 
+  const serviceMessages: Record<string, string> = {
+    "Consultar câmbio": "Olá! Vim pelo site da CAP e gostaria de consultar cotações de moeda.",
+    "Consultar remessa": "Olá! Vim pelo site da CAP e gostaria de saber sobre transferências internacionais.",
+    "Consultar envio": "Olá! Vim pelo site da CAP e gostaria de saber sobre envios internacionais.",
+  };
+
   const openServiceInquiry = (cta: string) => {
-    window.dispatchEvent(new CustomEvent("cap:open-whatsapp", { detail: { hideCaxias: /^Consultar envio/i.test(cta) } }));
+    window.dispatchEvent(new CustomEvent("cap:open-whatsapp", { detail: { hideCaxias: /^Consultar envio/i.test(cta), message: serviceMessages[cta] } }));
   };
 
   return (
