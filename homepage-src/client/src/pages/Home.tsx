@@ -365,14 +365,13 @@ export default function Home() {
 
       <footer className="border-t border-white/10 bg-[#070707] pb-8 pt-14 lg:pt-8">
         <div className="container">
-          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            <div id="legal" className="flex flex-col items-center text-center">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="flex flex-col items-center text-center">
               <img src={capLogoUrl} alt="CAP Câmbio" className="h-20 w-auto object-contain" />
-              <div className="mt-5 flex flex-col gap-2 text-sm font-semibold text-[#facb2e]"><a href="/privacidade">Políticas de Privacidade</a><a href="/termos">Termos de uso</a></div>
             </div>
             <div>
               <p className="cap-kicker text-white/42">Navegação</p>
-              <div className="mt-4 grid grid-cols-[auto_auto] gap-x-3 gap-y-3 text-sm text-white/65"><div className="flex flex-col gap-3">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre nós", "sobre"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div><div className="flex flex-col gap-3">{[["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div></div>
+              <div className="mt-4 grid gap-3 text-sm text-white/65">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre nós", "sobre"], ["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div>
             </div>
             <div>
               <p className="cap-kicker text-white/42">Canais oficiais</p>
@@ -381,6 +380,9 @@ export default function Home() {
                 <a href="mailto:capcambio_caxias@hotmail.com" className="flex items-center gap-2 hover:text-[#facb2e]"><Mail className="size-4" />E-mail</a>
                 <a href="tel:+555432232000" className="flex items-center gap-2 hover:text-[#facb2e]"><Phone className="size-4" />Telefone</a>
               </div>
+            </div>
+            <div id="legal">
+              <div className="flex flex-col gap-2 text-sm font-semibold text-[#facb2e]"><a href="/privacidade">Políticas de Privacidade</a><a href="/termos">Termos de uso</a></div>
             </div>
           </div>
           <div className="mt-12 flex flex-col justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/34 sm:flex-row"><p>© {new Date().getFullYear()} CAP Câmbio. Todos os direitos reservados.</p><p>Desenvolvido para uma experiência mais clara e segura.</p></div>
