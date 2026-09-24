@@ -372,7 +372,7 @@ export default function Home() {
             </div>
             <div>
               <p className="cap-kicker text-white/42">Navegação</p>
-              <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-white/65"><div className="flex flex-col gap-3">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre nós", "sobre"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div><div className="flex flex-col gap-3">{[["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div></div>
+              <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-3 text-sm text-white/65"><div className="flex flex-col gap-3">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre nós", "sobre"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div><div className="flex flex-col gap-3">{[["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div></div>
             </div>
             <div>
               <p className="cap-kicker text-white/42">Canais oficiais</p>
@@ -380,7 +380,6 @@ export default function Home() {
                 <a href={footerWhatsApp} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#facb2e]"><MessageCircle className="size-4" />WhatsApp</a>
                 <a href="mailto:capcambio_caxias@hotmail.com" className="flex items-center gap-2 hover:text-[#facb2e]"><Mail className="size-4" />E-mail</a>
                 <a href="tel:+555432232000" className="flex items-center gap-2 hover:text-[#facb2e]"><Phone className="size-4" />Telefone</a>
-                <p className="border-t border-white/10 pt-3 text-xs leading-5 text-white/48">Caxias do Sul <span className="px-1 text-[#facb2e]">|</span> Bento Gonçalves <span className="px-1 text-[#facb2e]">|</span> Passo Fundo</p>
               </div>
             </div>
           </div>
