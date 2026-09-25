@@ -151,6 +151,11 @@ button:focus-visible, input:focus-visible {
   white-space: nowrap;
 }
 
+.cap-mark__letter {
+  position: relative;
+  display: inline-block;
+}
+
 .side-ticker {
   position: absolute;
   right: 0;
@@ -269,35 +274,43 @@ button:focus-visible, input:focus-visible {
 }
 
 .halloween-bat {
-  width: clamp(36px, 3.9vw, 50px);
+  width: clamp(59px, 6.4vw, 81px);
   z-index: 1;
 }
 
-.halloween-bat--one { top: 4.1rem; left: calc(1.1rem - 5px); transform: rotate(-8deg); }
-.halloween-bat--two { top: 0.8rem; left: calc(43.5% - 5px); transform: rotate(5deg); }
-.halloween-bat--three { top: 3.3rem; right: calc(6% - 5px); transform: rotate(8deg); }
+.halloween-bat--one { top: calc(4.1rem - 6px); left: calc(1.1rem - 13px); transform: rotate(-8deg); }
+.halloween-bat--two { top: calc(0.8rem - 8px); left: calc(43.5% - 10px); width: clamp(68px, 7.4vw, 93px); transform: rotate(5deg); }
+.halloween-bat--three { top: 3.3rem; right: calc(6% - 17px); transform: rotate(8deg); }
 
 .halloween-witch-hat {
+  position: absolute;
   z-index: 3;
-  bottom: calc(var(--ticker-height) + 6.2rem);
-  left: calc(48% - 1.3rem);
-  width: clamp(88px, 8vw, 106px);
-  transform: rotate(1deg) scale(1.3);
+  top: -0.17em;
+  left: 50%;
+  transform: translateX(-38%) rotate(-6deg) scale(1.3);
+  width: 0.51em;
+  height: auto;
+  pointer-events: none;
 }
 
 .halloween-cap-cat {
-  z-index: 0;
-  bottom: calc(var(--ticker-height) + 2.2rem);
-  left: 3.3rem;
-  width: clamp(43px, 3.7vw, 50px);
   position: absolute;
+  z-index: 0;
+  bottom: 0.30em;
+  left: 0.21em;
+  width: 0.27em;
+  height: auto;
+  pointer-events: none;
 }
 
 .halloween-cap-web {
+  position: absolute;
   z-index: 0;
-  right: 1.2rem;
-  bottom: calc(var(--ticker-height) - 0.1rem);
-  width: clamp(38px, 3.8vw, 48px);
+  bottom: 0.13em;
+  right: 0.04em;
+  width: 0.24em;
+  height: auto;
+  pointer-events: none;
   transform: rotate(360deg);
   transform-origin: 50% 50%;
 }
@@ -504,9 +517,11 @@ button:focus-visible, input:focus-visible {
 .cap-witch-p {
   position: absolute;
   z-index: 5;
-  bottom: calc(var(--ticker-height) + 6.3rem);
-  left: 14.8rem;
-  width: clamp(120px, 12vw, 200px);
+  top: -0.18818em;
+  left: -0.09403em;
+  width: 0.8em;
+  /* o preflight (img { max-width: 100% }) a limitaria à largura da letra P */
+  max-width: none;
   height: auto;
   pointer-events: none;
 }
@@ -514,16 +529,6 @@ button:focus-visible, input:focus-visible {
 
 
 
-/* Bats image positioned below the travel carousel */
-.carousel-bats {
-  position: absolute;
-  z-index: 6; /* above other rail elements */
-  top: 65%; /* roughly below the carousel */
-  left: 2rem; /* horizontal offset */
-  width: clamp(150px, 12vw, 250px);
-  height: auto;
-  pointer-events: none;
-}
 
 
 @keyframes sidebar-ticker {
@@ -794,7 +799,7 @@ button:focus-visible, input:focus-visible {
 .broadcast-shell--halloween-preview .brand-rail { padding-top: 7cqh; }
 .broadcast-shell--christmas-preview .brand-rail { padding-top: 9cqh; }
 .broadcast-shell .brand-logo { top: 1.8cqh; width: 10.3cqw; }
-.broadcast-shell .brand-status { font-size: clamp(2rem, 3.4cqw, 4rem); }
+.broadcast-shell .brand-status { font-size: clamp(2rem, 3.4cqw, 4rem); margin-top: 3.78858cqh; }
 .broadcast-shell .travel-carousel { top: 43.5%; height: 35%; }
 .broadcast-shell--original .travel-carousel { top: 48.5%; }
 .broadcast-shell .cap-mark { right: 0.8cqw; font-size: 14.5cqw; }

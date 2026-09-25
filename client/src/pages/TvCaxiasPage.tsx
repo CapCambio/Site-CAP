@@ -239,8 +239,8 @@ export default function TvCaxiasPage() {
   const dollar = rates.find((rate) => rate.id === "usd") ?? rates[0];
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
-  const halloweenPreviewActive = seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
-  const christmasActive = isChristmasSeason(seasonalDate);
+  const halloweenPreviewActive = true;
+  const christmasActive = false;
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
   const halloweenTopDecorationActive = halloweenPreviewActive;
@@ -323,20 +323,29 @@ export default function TvCaxiasPage() {
             />
           ))}
         </div>
-        {halloweenPreviewActive && <img className="halloween-cap-web" src={HALLOWEEN_ASSETS.cornerWeb} alt="" aria-hidden="true" />}
-        {halloweenPreviewActive && <img className="halloween-cap-cat" src={HALLOWEEN_ASSETS.peekingCat} alt="" aria-hidden="true" />}
-        {halloweenPreviewActive && <img className="cap-witch-p" src="/assets/bruxinha%20P.png" alt="" aria-hidden="true" />}
-        <span className="cap-mark" aria-hidden="true">CAP</span>
-        {witchHatActive && <img className="halloween-witch-hat" src={HALLOWEEN_ASSETS.witchHat} alt="" aria-hidden="true" />}
-        {christmasActive && <img className="christmas-santa-hat" src={CHRISTMAS_ASSETS.santaHat} alt="" aria-hidden="true" />}
-        {christmasActive && <img className="christmas-cap-reindeer christmas-cap-reindeer--full-body" src={CHRISTMAS_ASSETS.capReindeerFullBody} alt="" aria-hidden="true" />}
+        <span className="cap-mark" aria-hidden="true">
+          <span className="cap-mark__letter cap-mark__letter--c">
+            C
+            {halloweenPreviewActive && <img className="halloween-cap-cat" src={HALLOWEEN_ASSETS.peekingCat} alt="" aria-hidden="true" />}
+          </span>
+          <span className="cap-mark__letter cap-mark__letter--a">
+            A
+            {witchHatActive && <img className="halloween-witch-hat" src={HALLOWEEN_ASSETS.witchHat} alt="" aria-hidden="true" />}
+            {christmasActive && <img className="christmas-santa-hat" src={CHRISTMAS_ASSETS.santaHat} alt="" aria-hidden="true" />}
+            {christmasActive && <img className="christmas-cap-reindeer christmas-cap-reindeer--full-body" src={CHRISTMAS_ASSETS.capReindeerFullBody} alt="" aria-hidden="true" />}
+          </span>
+          <span className="cap-mark__letter cap-mark__letter--p">
+            P
+            {halloweenPreviewActive && <img className="halloween-cap-web" src={HALLOWEEN_ASSETS.cornerWeb} alt="" aria-hidden="true" />}
+            {halloweenPreviewActive && <img className="cap-witch-p" src="/assets/bruxinha%20p2.png" alt="" aria-hidden="true" />}
+          </span>
+        </span>
         {/* witch temporarily removed */}
           <div className="side-ticker" aria-label="Informações em movimento">
             <div className="side-ticker__track">
               <span className="side-ticker__cycle"><TickerContent dollar={dollar} euro={euro} halloweenActive={halloweenPreviewActive} christmasActive={christmasActive} /></span>
               <span className="side-ticker__cycle" aria-hidden="true"><TickerContent dollar={dollar} euro={euro} halloweenActive={halloweenPreviewActive} christmasActive={christmasActive} /></span>
             </div>
-          <img className="carousel-bats" src={`${ASSET_BASE}assets/3morcegos.png`} alt="" aria-hidden="true" />
         </div>
       </aside>
 
