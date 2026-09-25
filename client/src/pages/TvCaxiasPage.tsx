@@ -239,8 +239,8 @@ export default function TvCaxiasPage() {
   const dollar = rates.find((rate) => rate.id === "usd") ?? rates[0];
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
-  const halloweenPreviewActive = true;
-  const christmasActive = false;
+  const halloweenPreviewActive = seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
+  const christmasActive = isChristmasSeason(seasonalDate);
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
   const halloweenTopDecorationActive = halloweenPreviewActive;
@@ -337,7 +337,7 @@ export default function TvCaxiasPage() {
           <span className="cap-mark__letter cap-mark__letter--p">
             P
             {halloweenPreviewActive && <img className="halloween-cap-web" src={HALLOWEEN_ASSETS.cornerWeb} alt="" aria-hidden="true" />}
-            {halloweenPreviewActive && <img className="cap-witch-p" src="/assets/bruxinha%20P.png" alt="" aria-hidden="true" />}
+            {halloweenPreviewActive && <img className="cap-witch-p" src="/assets/bruxinha%20p2.png" alt="" aria-hidden="true" />}
           </span>
         </span>
         {/* witch temporarily removed */}
