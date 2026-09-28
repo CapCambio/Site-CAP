@@ -628,7 +628,6 @@ button:focus-visible, input:focus-visible {
 }
 
 .quote-table tbody tr:nth-child(even) > * { background: #f0f1f0; }
-.quote-table tbody tr:hover > * { background: inherit; }
 
 .quote-table tbody th, .quote-table tbody td {
   min-height: 0;
