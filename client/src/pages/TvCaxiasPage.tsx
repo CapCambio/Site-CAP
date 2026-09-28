@@ -235,11 +235,11 @@ function ratesFromSheet(responseText: string): Rate[] {
 
 export default function TvCaxiasPage() {
   const [rates, setRates] = useState(RATES);
-  const [seasonalDate, setSeasonalDate] = useState(() => new Date('2026-10-01'));
+  const [seasonalDate, setSeasonalDate] = useState(() => new Date());
   const dollar = rates.find((rate) => rate.id === "usd") ?? rates[0];
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
-  const halloweenPreviewActive = true;
+  const halloweenPreviewActive = seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
   const christmasActive = isChristmasSeason(seasonalDate);
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
@@ -352,7 +352,7 @@ export default function TvCaxiasPage() {
 
       <section className="quote-stage quote-stage--table-only" aria-label="Tabela de cotações">
         <div className="quote-table-wrap relative">
-  <img className="absolute bottom-0 right-0 w-1/2 z-20 pointer-events-none" src="/assets/abóbora.png" alt="Abóbora" aria-hidden="true" />
+  {halloweenPreviewActive && <img className="absolute bottom-0 right-0 w-[48.41%] z-20 pointer-events-none translate-x-[49.60504%] translate-y-[10.09766%]" src="/assets/árvore.png" alt="Árvore de abóboras" aria-hidden="true" />}
   
           <table className="quote-table">
             <thead>
