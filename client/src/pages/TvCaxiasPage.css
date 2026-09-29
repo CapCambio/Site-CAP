@@ -794,7 +794,7 @@ button:focus-visible, input:focus-visible {
   padding: 7cqh 3cqw 3cqh;
 }
 
-.broadcast-shell--original .brand-rail { padding-top: 12cqh; }
+.broadcast-shell--original .brand-rail { padding-top: 10.5cqh; }
 .broadcast-shell--halloween-preview .brand-rail { padding-top: 7cqh; }
 .broadcast-shell--christmas-preview .brand-rail { padding-top: 9cqh; }
 .broadcast-shell .brand-logo { top: 1.8cqh; width: 10.3cqw; }
