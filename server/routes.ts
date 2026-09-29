@@ -1169,7 +1169,8 @@ app.get("/api/currencies", async (req, res) => {
         tipo: tipo,
         ativo: true,
         valor: tipo === 'valor-especifico' ? Number(valor) : null,
-        condicao_valor: tipo === 'valor-especifico' ? condicaoAutomatica : null
+        condicao_valor: tipo === 'valor-especifico' ? condicaoAutomatica : null,
+        validade: validade || null
       });
 
       res.json({ 

@@ -45,6 +45,19 @@ export async function initializeCurrencyHistoryTable() {
   }
 }
 
+// Adicionar coluna validade na tabela alerts se não existir
+export async function initializeAlertsTable() {
+  try {
+    await pool.query(`
+      ALTER TABLE alerts
+      ADD COLUMN IF NOT EXISTS validade TIMESTAMP WITH TIME ZONE
+    `);
+    console.log('✅ Coluna validade verificada na tabela alerts');
+  } catch (error) {
+    console.error('❌ Erro ao verificar coluna validade na tabela alerts:', error);
+  }
+}
+
 export interface User {
   id: number;
   email: string;
@@ -63,6 +76,7 @@ export interface Alert {
   ativo: boolean;
   valor: number | null;
   condicao_valor: string | null;
+  validade: string | null;
   created_at: string;
 }
 
@@ -164,10 +178,10 @@ export async function getAlertsByUser(email: string): Promise<Alert[]> {
 
 export async function addAlert(alert: Partial<Alert>): Promise<Alert> {
   const result = await pool.query(
-    `INSERT INTO alerts (user_email, currency_code, tipo, ativo, valor, condicao_valor)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO alerts (user_email, currency_code, tipo, ativo, valor, condicao_valor, validade)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
-    [alert.user_email?.toLowerCase(), alert.currency_code, alert.tipo || null, alert.ativo || true, alert.valor || null, alert.condicao_valor || null]
+    [alert.user_email?.toLowerCase(), alert.currency_code, alert.tipo || null, alert.ativo || true, alert.valor || null, alert.condicao_valor || null, alert.validade || null]
   );
   return result.rows[0];
 }
