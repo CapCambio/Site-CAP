@@ -235,7 +235,7 @@ function ratesFromSheet(responseText: string): Rate[] {
 
 export default function TvCaxiasPage() {
   const [rates, setRates] = useState(RATES);
-  const [seasonalDate, setSeasonalDate] = useState(() => new Date());
+  const [seasonalDate, setSeasonalDate] = useState(() => new Date(2026, HALLOWEEN_MONTH_INDEX, 15));
   const dollar = rates.find((rate) => rate.id === "usd") ?? rates[0];
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
