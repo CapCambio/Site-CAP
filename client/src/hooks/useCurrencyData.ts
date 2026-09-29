@@ -88,16 +88,16 @@ export function useCurrencyData() {
     }
   }, [currencies]);
 
-  // Configura a atualização automática a cada 5 minutos
+  // Configura a atualização automática a cada 1 minuto
   useEffect(() => {
     // Não atualiza imediatamente na primeira carga - usa cache do React Query
-    // Configura o timer para atualizar a cada 5 minutos
+    // Configura o timer para atualizar a cada 1 minuto
     const timer = setInterval(() => {
       console.log('Executando atualização automática...');
       refreshData().catch(err => {
         console.error('Erro na atualização automática:', err);
       });
-    }, 5 * 60 * 1000); // 5 minutos
+    }, 1 * 60 * 1000); // 1 minuto
 
     // Limpa o timer quando o componente é desmontado
     return () => clearInterval(timer);
