@@ -13,7 +13,7 @@ export interface ScrapedCurrency {
 }
 
 // Google Sheets
-const SPREADSHEET_ID = '1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk';
+const SPREADSHEET_ID = '1muwUxuSAFeswsV0xdvBz_rrFgTYTH9nCy6Df0jRybo4';
 
 export const SOURCE_URL =
   `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
