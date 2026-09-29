@@ -318,6 +318,11 @@ export async function deletePushSubscription(id: number): Promise<boolean> {
   return (result.rowCount || 0) > 0;
 }
 
+export async function deletePushSubscriptionByEndpoint(endpoint: string): Promise<boolean> {
+  const result = await pool.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [endpoint]);
+  return (result.rowCount || 0) > 0;
+}
+
 export async function deletePushSubscriptionsByUser(email: string): Promise<boolean> {
   const result = await pool.query('DELETE FROM push_subscriptions WHERE email = $1', [email.toLowerCase()]);
   return (result.rowCount || 0) > 0;

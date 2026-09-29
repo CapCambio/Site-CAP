@@ -6,6 +6,7 @@ import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
 import { jsonStorage } from './json-storage';
 import { logger } from './logger';
+import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint } from './db';
 
 // Registrar helpers Handlebars
 Handlebars.registerHelper('gt', (a: number, b: number) => a > b);
@@ -984,9 +985,19 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     variacao: number,
     language: string = 'pt'
   ) {
-    const subscriptions = userData.pushSubscriptions;
+    // Carregar subscriptions do banco de dados em vez do JSON
+    const dbSubscriptions = await getPushSubscriptionsByUser(email);
+    const subscriptions = dbSubscriptions.map(sub => ({
+      endpoint: sub.endpoint,
+      expirationTime: null,
+      keys: {
+        p256dh: sub.p256dh,
+        auth: sub.auth
+      }
+    }));
+
     if (!subscriptions || subscriptions.length === 0) {
-      console.log(`⚠️ Usuário ${email} não possui assinaturas push ativas`);
+      console.log(`⚠️ Usuário ${email} não possui assinaturas push ativas no banco de dados`);
       return;
     }
 
@@ -1029,14 +1040,10 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
         successCount++;
       } catch (error: unknown) {
         if (error && typeof error === 'object' && 'statusCode' in error && error.statusCode === 410) {
-          // Assinatura expirada, remover do array
-          console.log(`   ❌ Assinatura push expirada (410) para ${email}, removendo...`);
+          // Assinatura expirada, remover do banco de dados
+          console.log(`   ❌ Assinatura push expirada (410) para ${email}, removendo do banco...`);
           logger.pushSent(email, subscription.endpoint, false, 'Subscription expired (410)');
-          const index = subscriptions.indexOf(subscription);
-          if (index > -1) {
-            subscriptions.splice(index, 1);
-          }
-          this.saveAlerts();
+          await deletePushSubscriptionByEndpoint(subscription.endpoint);
         } else {
           const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
           const statusCode = error && typeof error === 'object' && 'statusCode' in error ? error.statusCode : 'N/A';
