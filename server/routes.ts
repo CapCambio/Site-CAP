@@ -1230,7 +1230,8 @@ app.get("/api/currencies", async (req, res) => {
             tipo: alert.tipo,
             ativo: alert.ativo,
             valor: alert.valor,
-            condicaoValor: alert.condicao_valor
+            condicaoValor: alert.condicao_valor,
+            validade: alert.validade
           };
         }
         return acc;
