@@ -147,7 +147,7 @@ export function AlertModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-zinc-900 text-white border-zinc-800 max-h-[95vh] overflow-y-auto landscape:pt-12 [@media(orientation:landscape)_and_(max-width:768px)]:[--dialog-close-top:1rem]">
+      <DialogContent className="sm:max-w-[500px] bg-zinc-900 text-white border-zinc-800 landscape:pt-12 [@media(orientation:landscape)_and_(max-width:768px)]:[--dialog-close-top:1rem]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
             {t('alerts.createAlert')} - {currencyName} ({currencyCode})
