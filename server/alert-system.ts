@@ -160,7 +160,11 @@ class AlertSystem {
   constructor() {
     console.log('🔔 [AlertSystem] Constructor iniciado');
     this.ensureDataDirectoryExists();
-    this.loadAlerts();
+    this.loadAlerts().then(() => {
+      console.log('🔔 [AlertSystem] Alertas carregados do banco de dados');
+    }).catch(error => {
+      console.error('❌ [AlertSystem] Erro ao carregar alertas:', error);
+    });
     this.setupWebPush();
     console.log('🔔 [AlertSystem] Chamando setupEmail()');
     this.setupEmail();
@@ -624,14 +628,49 @@ class AlertSystem {
     }
   }
 
-  private loadAlerts() {
+  private async loadAlerts() {
     try {
-      if (existsSync(ALERTS_FILE)) {
-        const data = readFileSync(ALERTS_FILE, 'utf8');
-        this.data = JSON.parse(data);
+      console.log('🔔 [loadAlerts] Carregando alertas do banco de dados...');
+
+      // Importar função do banco de dados
+      const { getAlerts } = await import('./db');
+      const alerts = await getAlerts();
+
+      console.log(`🔔 [loadAlerts] Total de alertas encontrados: ${alerts.length}`);
+
+      // Converter alertas do banco para a estrutura do AlertSystem
+      this.data = {};
+
+      for (const alert of alerts) {
+        const email = alert.user_email;
+
+        if (!this.data[email]) {
+          this.data[email] = {
+            alerts: {},
+            pushSubscriptions: [],
+            language: 'pt'
+          };
+        }
+
+        this.data[email].alerts[alert.currency_code] = {
+          tipo: alert.tipo,
+          ativo: alert.ativo,
+          valor: alert.valor,
+          condicaoValor: alert.condicao_valor,
+          limite: 0.5, // Valor padrão, pode ser ajustado
+          validade: alert.validade
+        };
+      }
+
+      console.log(`🔔 [loadAlerts] ${Object.keys(this.data).length} usuários carregados com alertas`);
+
+      // Log detalhado dos alertas carregados
+      for (const [email, userData] of Object.entries(this.data)) {
+        const alertCount = Object.keys(userData.alerts).length;
+        console.log(`  - ${email}: ${alertCount} alerta(s)`);
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar alertas:', error);
+      console.error('❌ Erro ao carregar alertas do banco de dados:', error);
     }
   }
 
