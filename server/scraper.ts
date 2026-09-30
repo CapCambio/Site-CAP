@@ -289,18 +289,27 @@ async function fetchGoogleSheet(): Promise<string> {
   );
 
   console.log(
-    `🔗 URL: ${SOURCE_URL}` 
+    `🔗 URL: ${SOURCE_URL}`
   );
 
-  const response = await fetch(SOURCE_URL, {
-    headers: {
-      'User-Agent':
-        'Mozilla/5.0 (compatible; CurrencyBot/1.0)',
-      'Accept':
-        'application/json,text/plain,*/*'
-    },
-    redirect: 'follow'
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+
+  let response;
+  try {
+    response = await fetch(SOURCE_URL, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (compatible; CurrencyBot/1.0)',
+        'Accept':
+          'application/json,text/plain,*/*'
+      },
+      redirect: 'follow',
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   console.log(
     `📡 Status HTTP: ${response.status} ${response.statusText}` 

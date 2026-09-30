@@ -1263,6 +1263,7 @@ app.get("/api/currencies", async (req, res) => {
 
 // Função para atualizar as moedas (usada tanto no endpoint quanto no timer)
 export async function refreshCurrencies() {
+  console.log(`⏰ [${new Date().toISOString()}] refreshCurrencies() iniciado`);
   try {
     // OTIMIZAÇÃO 3: Verificar hash do conteúdo antes de fazer scraping
     const { changed } = await hasContentChanged();
