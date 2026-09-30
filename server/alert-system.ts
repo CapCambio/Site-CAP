@@ -317,8 +317,11 @@ class AlertSystem {
       }
       
       // Envia um único email por usuário com todos os alertas coletados
+      console.log(`\n📧 [checkAllCurrencies] Total de usuários com alertas: ${allAlertsByEmail.size}`);
       for (const [email, alerts] of Array.from(allAlertsByEmail.entries())) {
+        console.log(`📧 [checkAllCurrencies] Usuário: ${email} - Total de alertas: ${alerts.length}`);
         if (alerts.length > 0) {
+          console.log(`📧 [checkAllCurrencies] Chamando sendAlert para ${email}`);
           await this.sendAlert(email, alerts);
           // Marca data da última notificação enviada
           if (this.data[email]) {
@@ -365,9 +368,17 @@ class AlertSystem {
     }
 
     // Verifica alertas para todos os usuários
+    console.log(`\n🔍 [collectAlertsForCurrency] Verificando alertas para ${currencyCode}...`);
+    console.log(`🔍 [collectAlertsForCurrency] Total de usuários cadastrados: ${Object.keys(this.data).length}`);
+
     for (const [email, userData] of Object.entries(this.data)) {
       const alert = userData.alerts[currencyCode];
-      if (!alert || !alert.ativo) continue;
+      if (!alert || !alert.ativo) {
+        console.log(`  - ${email}: Sem alerta ativo para ${currencyCode}`);
+        continue;
+      }
+
+      console.log(`  - ${email}: Alerta encontrado para ${currencyCode} (tipo: ${alert.tipo}, limite: ${alert.limite}%, ativo: ${alert.ativo})`);
 
       // Verificar validade do alerta
       if (alert.validade) {
@@ -523,26 +534,7 @@ class AlertSystem {
         }
       });
 
-      console.log('📧 [setupEmail] Transporter criado, verificando conexão...');
-      console.log('📧 [setupEmail] Configuração completa:', {
-        host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.EMAIL_PORT || '587', 10),
-        secure: process.env.EMAIL_SECURE === 'true',
-        user: emailUser
-      });
-
-      // Verificar a conexão com o servidor SMTP
-      this.emailTransporter.verify((error: Error, success) => {
-        if (error) {
-          console.error('❌ Falha ao conectar ao servidor de e-mail:', error.message);
-          console.error('❌ Código do erro:', error.code);
-          console.error('❌ Comando do erro:', error.command);
-          console.error('❌ Detalhes do erro:', error);
-        } else {
-          console.log('✅ Servidor de e-mail configurado com sucesso');
-          console.log('✅ Resposta do servidor:', success);
-        }
-      });
+      console.log('✅ [setupEmail] Transporter criado com sucesso (conexão será testada ao enviar email)');
     } catch (error) {
       console.error('❌ Erro ao configurar o transporte de e-mail:', error);
     }
@@ -820,9 +812,17 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     console.log(`🔍 Coletando alertas para ${currencyCode} (Variação: ${variacao > 0 ? '+' : ''}${variacao.toFixed(2)}%)`);
     
     // Verifica alertas para todos os usuários
+    console.log(`\n🔍 [collectAlertsForCurrency] Verificando alertas para ${currencyCode}...`);
+    console.log(`🔍 [collectAlertsForCurrency] Total de usuários cadastrados: ${Object.keys(this.data).length}`);
+
     for (const [email, userData] of Object.entries(this.data)) {
       const alert = userData.alerts[currencyCode];
-      if (!alert || !alert.ativo) continue;
+      if (!alert || !alert.ativo) {
+        console.log(`  - ${email}: Sem alerta ativo para ${currencyCode}`);
+        continue;
+      }
+
+      console.log(`  - ${email}: Alerta encontrado para ${currencyCode} (tipo: ${alert.tipo}, limite: ${alert.limite}%, ativo: ${alert.ativo})`);
       
       let shouldAlert = false;
       
@@ -1178,7 +1178,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
    * Envia um ou mais alertas para o usuário em notificações agrupadas
    */
   async sendAlert(
-    email: string, 
+    email: string,
     alerts: Array<{
       currencyCode: string;
       buyPrice: number;
@@ -1187,8 +1187,12 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       alertType: string;
     }>
   ) {
+    console.log(`\n📧 [sendAlert] Chamado para ${email} com ${alerts.length} alerta(s)`);
     const userData = this.data[email];
-    if (!userData) return;
+    if (!userData) {
+      console.log(`📧 [sendAlert] Usuário ${email} não encontrado`);
+      return;
+    }
 
     // Obtém o idioma do usuário (padrão: pt)
     const userLanguage = userData.language || 'pt';
