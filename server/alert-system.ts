@@ -158,10 +158,13 @@ class AlertSystem {
   private templateCache: { [key: string]: Handlebars.TemplateDelegate } = {};
 
   constructor() {
+    console.log('🔔 [AlertSystem] Constructor iniciado');
     this.ensureDataDirectoryExists();
     this.loadAlerts();
     this.setupWebPush();
+    console.log('🔔 [AlertSystem] Chamando setupEmail()');
     this.setupEmail();
+    console.log('🔔 [AlertSystem] Constructor finalizado');
   }
 
   private ensureDataDirectoryExists() {
