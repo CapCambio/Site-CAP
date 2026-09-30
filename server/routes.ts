@@ -1371,14 +1371,12 @@ export async function refreshCurrencies() {
         change = 0;
       }
 
-      // OTIMIZAÇÃO 1: Só faz upsert quando o preço mudou
-      if (isNewPrice) {
-        const savedCurrency = await jsonStorage.upsertCurrency({
-          ...currency,
-          change,
-          lastUpdate: now.toISOString()
-        });
-      }
+      // Sempre atualiza a moeda com a variação recalculada (o change pode mudar mesmo quando o preço não)
+      const savedCurrency = await jsonStorage.upsertCurrency({
+        ...currency,
+        change,
+        lastUpdate: now.toISOString()
+      });
 
       // Adiciona ao histórico sempre que o preço mudou
       if (isNewPrice && currency.code) {
