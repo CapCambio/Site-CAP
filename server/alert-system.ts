@@ -480,6 +480,11 @@ class AlertSystem {
   }
 
   private setupEmail() {
+    console.log('📧 [setupEmail] Iniciando configuração de email...');
+    console.log('📧 [setupEmail] EMAIL_ENABLED:', process.env.EMAIL_ENABLED);
+    console.log('📧 [setupEmail] EMAIL_USER:', process.env.EMAIL_USER ? '*** (definido)' : 'NÃO DEFINIDO');
+    console.log('📧 [setupEmail] EMAIL_PASS:', process.env.EMAIL_PASS ? '*** (definido)' : 'NÃO DEFINIDO');
+
     const emailEnabled = process.env.EMAIL_ENABLED === 'true';
     const emailUser = process.env.EMAIL_USER;
     const emailPass = process.env.EMAIL_PASS;
