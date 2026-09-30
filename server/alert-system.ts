@@ -504,6 +504,10 @@ class AlertSystem {
     }
 
     try {
+      console.log('📧 [setupEmail] Criando transporter com host:', process.env.EMAIL_HOST || 'smtp.gmail.com');
+      console.log('📧 [setupEmail] Porta:', process.env.EMAIL_PORT || '587');
+      console.log('📧 [setupEmail] Secure:', process.env.EMAIL_SECURE === 'true');
+
       this.emailTransporter = nodemailer.createTransport({
         host: process.env.EMAIL_HOST || 'smtp.gmail.com',
         port: parseInt(process.env.EMAIL_PORT || '587', 10),
@@ -517,12 +521,16 @@ class AlertSystem {
         }
       });
 
+      console.log('📧 [setupEmail] Transporter criado, verificando conexão...');
+
       // Verificar a conexão com o servidor SMTP
-      this.emailTransporter.verify((error: Error) => {
+      this.emailTransporter.verify((error: Error, success) => {
         if (error) {
-          console.error('❌ Falha ao conectar ao servidor de e-mail:', error);
+          console.error('❌ Falha ao conectar ao servidor de e-mail:', error.message);
+          console.error('❌ Detalhes do erro:', error);
         } else {
           console.log('✅ Servidor de e-mail configurado com sucesso');
+          console.log('✅ Resposta do servidor:', success);
         }
       });
     } catch (error) {
@@ -1312,6 +1320,8 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       const subject = subjects[userLanguage] || subjects['pt'];
 
       // Envia o e-mail usando o método de retentativa
+      console.log('📧 [sendEmailNotification] Chamando sendWithRetry...');
+      console.log('📧 [sendEmailNotification] emailTransporter existe?', !!this.emailTransporter);
       await this.sendWithRetry({
         from: process.env.EMAIL_FROM || '"CAP Câmbio" <capcambiocx@gmail.com>',
         to: email,
@@ -1323,6 +1333,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
           'Importance': 'high'
         }
       });
+      console.log('📧 [sendEmailNotification] sendWithRetry concluído');
 
       console.log(`📧 E-mail com ${alerts.length} alerta(s) enviado para ${email} (idioma: ${userLanguage})`);
       return true;
@@ -1476,14 +1487,19 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
   private async sendWithRetry(mailOptions: any, maxRetries = 3, delayMs = 5000): Promise<boolean> {
     let lastError: Error | null = null;
 
+    console.log('📧 [sendWithRetry] Iniciando envio de e-mail para:', mailOptions.to);
+    console.log('📧 [sendWithRetry] Assunto:', mailOptions.subject);
+
     for (let i = 0; i < maxRetries; i++) {
       try {
+        console.log(`📧 [sendWithRetry] Tentativa ${i + 1} de ${maxRetries}...`);
         await this.emailTransporter.sendMail(mailOptions);
+        console.log('✅ [sendWithRetry] E-mail enviado com sucesso!');
         return true;
       } catch (error) {
         lastError = error as Error;
         console.warn(`⚠️ Tentativa ${i + 1} de ${maxRetries} falhou ao enviar e-mail:`, error);
-        
+
         if (i < maxRetries - 1) {
           console.log(`⏳ Aguardando ${delayMs}ms antes de tentar novamente...`);
           await new Promise(resolve => setTimeout(resolve, delayMs));
