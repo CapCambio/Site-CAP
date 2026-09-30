@@ -161,14 +161,7 @@ class AlertSystem {
     this.ensureDataDirectoryExists();
     this.loadAlerts();
     this.setupWebPush();
-
-    // Carrega as variáveis de ambiente antes de configurar o e-mail
-    import('dotenv').then(dotenv => {
-      dotenv.config();
-      this.setupEmail();
-    }).catch(error => {
-      console.error('❌ Erro ao carregar variáveis de ambiente:', error);
-    });
+    this.setupEmail();
   }
 
   private ensureDataDirectoryExists() {
@@ -293,22 +286,22 @@ class AlertSystem {
             const current = sortedHistory[sortedHistory.length - 1];
 
             // Calcular variação
-            const variacao = ((current.sellPrice - previous.sellPrice) / previous.sellPrice) * 100;
+            const variacao = ((current.sell_price - previous.sell_price) / previous.sell_price) * 100;
 
-            console.log(`- Primeiro registro: ${new Date(previous.timestamp).toISOString()} - Venda: R$ ${previous.sellPrice}`);
-            console.log(`- Último registro:   ${new Date(current.timestamp).toISOString()} - Venda: R$ ${current.sellPrice}`);
+            console.log(`- Primeiro registro: ${new Date(previous.timestamp).toISOString()} - Venda: R$ ${previous.sell_price}`);
+            console.log(`- Último registro:   ${new Date(current.timestamp).toISOString()} - Venda: R$ ${current.sell_price}`);
 
             // Verificar se os preços são diferentes
-            if (previous.sellPrice !== current.sellPrice) {
+            if (previous.sell_price !== current.sell_price) {
               console.log(`✅ Alteração de preço detectada para ${currency.code}`);
-              logger.priceCheck(currency.code, previous.sellPrice, current.sellPrice, variacao);
+              logger.priceCheck(currency.code, previous.sell_price, current.sell_price, variacao);
 
               // Coletar alertas para esta moeda e adicionar ao mapa do usuário
               await this.collectAlertsForCurrency(
                 currency.code,
-                current.buyPrice,
-                current.sellPrice,
-                previous.sellPrice,
+                current.buy_price,
+                current.sell_price,
+                previous.sell_price,
                 allAlertsByEmail
               );
             } else {
