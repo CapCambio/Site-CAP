@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { format, isSameDay } from 'date-fns';
+import { isSameDay } from 'date-fns';
 
 export interface IntradayChartData {
   hour: string;        // "01", "02", "03"...
@@ -12,10 +12,10 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
 
-  const { 
-    data: intradayData, 
+  const {
+    data: intradayData,
     isLoading,
-    refetch 
+    refetch
   } = useQuery({
     queryKey: ['/api/history/intraday', currencyCode, todayStr],
     queryFn: async () => {
@@ -26,48 +26,68 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
         throw new Error('Failed to fetch intraday data');
       }
       const data = await response.json();
-      return data.map((item: any) => ({
-        ...item,
-        timestamp: new Date(item.timestamp)
-      }));
-    },
-    staleTime: 1 * 60 * 1000, // 1 minuto
-    refetchOnWindowFocus: false,
-    refetchInterval: 5 * 60 * 1000, // Refetch a cada 5 minutos
-  });
 
-  // Usar dados de fallback dos preços atuais (passados como parâmetro)
+      // Buscar último preço antes de hoje para usar como baseline do gráfico
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+      const threeDaysAgoStr = threeDaysAgo.toISOString().split('T')[0];
+      const baselineResponse = await fetch(
+        `/api/history/${currencyCode}?startDate=${threeDaysAgoStr}&endDate=${todayStr}`
+      );
+      let baselineSellPrice: number | null = null;
+      let baselineBuyPrice: number | null = null;
+      if (baselineResponse.ok) {
+        const baselineData = await baselineResponse.json();
+        const todayStart = new Date(todayStr);
+        const beforeToday = baselineData
+          .filter((e: any) => new Date(e.timestamp) < todayStart)
+          .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        if (beforeToday.length > 0) {
+          baselineSellPrice = beforeToday[0].sell_price;
+          baselineBuyPrice = beforeToday[0].buy_price;
+        }
+      }
+
+      return {
+        records: data.map((item: any) => ({ ...item, timestamp: new Date(item.timestamp) })),
+        baselineSellPrice,
+        baselineBuyPrice
+      };
+    },
+    staleTime: 1 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchInterval: 5 * 60 * 1000,
+  });
 
   // Processar dados intraday
   const processIntradayData = (): IntradayChartData[] => {
     const currentHour = today.getHours();
     const chartData: IntradayChartData[] = [];
 
-    // Se não há dados intraday para hoje, usar dados atuais da moeda
-    const hasTodayData = intradayData && intradayData.length > 0;
-    
-    // Preços de fallback dos dados atuais
-    const fallbackSellPrice = currentCurrencyData?.sellPrice || null;
-    const fallbackBuyPrice = currentCurrencyData?.buyPrice || null;
-    
-    let lastKnownSellPrice: number | null = null;
-    let lastKnownBuyPrice: number | null = null;
+    const records = intradayData?.records || [];
+    const hasTodayData = records.length > 0;
+
+    // Baseline = último preço antes de hoje (para horas antes da primeira mudança)
+    const baselineSellPrice = intradayData?.baselineSellPrice ?? null;
+    const baselineBuyPrice = intradayData?.baselineBuyPrice ?? null;
+
+    let lastKnownSellPrice: number | null = baselineSellPrice;
+    let lastKnownBuyPrice: number | null = baselineBuyPrice;
 
     // Criar array de todas as 24 horas (0 até 23)
     for (let hour = 0; hour <= 23; hour++) {
-      const hourStr = hour.toString(); // Remover padStart para não ter zero à esquerda
-      
+      const hourStr = hour.toString();
+
       // Procurar dados reais para esta hora
       let hourData = null;
       if (hasTodayData) {
-        hourData = intradayData.find((entry: any) => {
+        hourData = records.find((entry: any) => {
           const entryDate = new Date(entry.timestamp);
           return isSameDay(entryDate, today) && entryDate.getHours() === hour;
         });
       }
 
       if (hourData) {
-        // Tem dados reais para esta hora
         lastKnownSellPrice = hourData.sellPrice;
         lastKnownBuyPrice = hourData.buyPrice;
         chartData.push({
@@ -77,22 +97,16 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
           hasRealData: true
         });
       } else if (hour <= currentHour) {
-        // Para horas passadas e atual sem dados, usar dados conhecidos ou fallback
-        const sellPrice: number | null = lastKnownSellPrice || fallbackSellPrice;
-        const buyPrice: number | null = lastKnownBuyPrice || fallbackBuyPrice;
-        
+        const sellPrice: number | null = lastKnownSellPrice;
+        const buyPrice: number | null = lastKnownBuyPrice;
+
         if (sellPrice !== null) {
           chartData.push({
             hour: hourStr,
-            sellPrice: sellPrice,
-            buyPrice: buyPrice,
+            sellPrice,
+            buyPrice,
             hasRealData: false
           });
-          // Se ainda não temos preços conhecidos, usar os atuais
-          if (lastKnownSellPrice === null) {
-            lastKnownSellPrice = sellPrice;
-            lastKnownBuyPrice = buyPrice;
-          }
         } else {
           chartData.push({
             hour: hourStr,
@@ -102,7 +116,6 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
           });
         }
       } else {
-        // Para horas futuras, não incluir dados (null)
         chartData.push({
           hour: hourStr,
           sellPrice: null,
