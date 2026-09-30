@@ -1,29 +1,29 @@
 {
-  "lastUpdate": "2026-09-23T17:05:34.076Z",
+  "lastUpdate": "2026-09-29T18:03:08.348Z",
   "currencies": [
     {
       "code": "USD",
       "name": "Dólar Americano",
       "buyPrice": 5.05,
-      "sellPrice": 5.54
+      "sellPrice": 5.66
     },
     {
       "code": "EUR",
       "name": "Euro",
-      "buyPrice": 5.85,
-      "sellPrice": 6.33
+      "buyPrice": 5.9,
+      "sellPrice": 6.39
     },
     {
       "code": "GBP",
       "name": "Libra Esterlina",
-      "buyPrice": 6.8,
-      "sellPrice": 7.53
+      "buyPrice": 6.85,
+      "sellPrice": 7.6
     },
     {
       "code": "AUD",
       "name": "Dólar Australiano",
       "buyPrice": 3.6,
-      "sellPrice": 4.03
+      "sellPrice": 4.05
     },
     {
       "code": "ARS",
@@ -35,31 +35,31 @@
       "code": "NZD",
       "name": "Dólar Neozelandês",
       "buyPrice": 2.9,
-      "sellPrice": 3.2
+      "sellPrice": 3.23
     },
     {
       "code": "CAD",
       "name": "Dólar Canadense",
       "buyPrice": 3.6,
-      "sellPrice": 4.03
+      "sellPrice": 4.07
     },
     {
       "code": "CHF",
       "name": "Franco Suiço",
       "buyPrice": 6.17,
-      "sellPrice": 6.87
+      "sellPrice": 6.89
     },
     {
       "code": "UYU",
       "name": "Peso Uruguaio",
       "buyPrice": 0.12,
-      "sellPrice": 0.166
+      "sellPrice": 0.168
     },
     {
       "code": "CLP",
       "name": "Peso Chileno",
       "buyPrice": 0.0045,
-      "sellPrice": 0.0068
+      "sellPrice": 0.0069
     },
     {
       "code": "MXN",
@@ -77,25 +77,25 @@
       "code": "CNY",
       "name": "Iuan Chinês",
       "buyPrice": 0.7,
-      "sellPrice": 0.91
+      "sellPrice": 0.92
     },
     {
       "code": "JPY",
       "name": "Iene Japonês",
       "buyPrice": 0.03,
-      "sellPrice": 0.0399
+      "sellPrice": 0.0404
     },
     {
       "code": "PEN",
       "name": "Novo Sol Peruano",
       "buyPrice": 1.45,
-      "sellPrice": 1.77
+      "sellPrice": 1.78
     },
     {
       "code": "ZAR",
       "name": "Rand Africano",
       "buyPrice": 0.28,
-      "sellPrice": 0.386
+      "sellPrice": 0.387
     },
     {
       "code": "AED",

@@ -6,7 +6,7 @@ import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
 import { jsonStorage } from './json-storage';
 import { logger } from './logger';
-import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint } from './db';
+import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint, getCurrencyHistory } from './db';
 
 // Registrar helpers Handlebars
 Handlebars.registerHelper('gt', (a: number, b: number) => a > b);
@@ -277,7 +277,7 @@ class AlertSystem {
           // Obter histórico recente para calcular variação (últimos 30 minutos)
           const now = new Date();
           const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000); // Últimos 30 minutos
-          const history = await jsonStorage.getCurrencyHistory(currency.code, thirtyMinutesAgo, now);
+          const history = await getCurrencyHistory(currency.code, thirtyMinutesAgo, now);
           
           console.log(`\n📊 Dados históricos para ${currency.code} (últimos 30 minutos):`);
           console.log(`- Total de registros: ${history.length}`);

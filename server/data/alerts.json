@@ -12,8 +12,8 @@
     },
     "lastNotificationSent": null,
     "cardOrder": [
-      "EUR",
       "USD",
+      "EUR",
       "GBP",
       "AUD",
       "ARS",
@@ -48,7 +48,7 @@
         }
       }
     ],
-    "language": "es"
+    "language": "pt"
   },
   "usuario@exemplo.com": {
     "email": "usuario@exemplo.com",
