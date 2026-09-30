@@ -1,7 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { scrapeCurrencyData, updateCurrenciesWithScrapedData, hasContentChanged } from "./scraper";
-import { InsertCurrencyHistory } from "../shared/schema";
 import { jsonStorage } from "./json-storage";
 import { alertSystem } from "./init-alert-system";
 import fs from "fs";
@@ -1380,13 +1379,6 @@ export async function refreshCurrencies() {
 
       // Adiciona ao histórico sempre que o preço mudou
       if (isNewPrice && currency.code) {
-        const history: InsertCurrencyHistory = {
-          code: currency.code,
-          buyPrice: currency.buyPrice,
-          sellPrice: currency.sellPrice,
-          timestamp: now.toISOString()
-        };
-
         try {
           await db.addCurrencyHistory({
             code: currency.code,
@@ -1395,67 +1387,62 @@ export async function refreshCurrencies() {
             timestamp: now.toISOString()
           });
           savedCurrencies.push(currency);
-          
-          // VERIFICAÇÃO DE ALERTAS NO MOMENTO EXATO DA ATUALIZAÇÃO (lógica da versão antiga)
-          if (previousPrices.has(currency.code)) {
-            const previous = previousPrices.get(currency.code)!;
-            // Verifica se o preço de venda mudou
-            if (previous.sellPrice !== currency.sellPrice) {
-              try {
-                console.log(`🔔 Verificando alertas para ${currency.code} (${previous.sellPrice} -> ${currency.sellPrice})`);
-                
-                // Calcular variação para o alerta
-                const variacao = ((currency.sellPrice - previous.sellPrice) / previous.sellPrice) * 100;
-                
-                // Verificar alertas para todos os usuários
-                for (const [email, userData] of Object.entries(alertSystem.getAllAlerts())) {
-                  const userAlerts = userData.alerts || {};
-                  const alert = userAlerts[currency.code];
-                  if (!alert || !alert.ativo) continue;
-
-                  let shouldAlert = false;
-                  
-                  // Verifica se o alerta deve ser disparado baseado no tipo
-                  switch (alert.tipo) {
-                    case 'subida':
-                      shouldAlert = variacao > 0; // Avisa sempre que subir
-                      break;
-                    case 'descida':
-                      shouldAlert = variacao < 0; // Avisa sempre que descer
-                      break;
-                    case 'valor-especifico':
-                      // Verifica se o preço atual atende à condição do valor específico definido
-                      if (alert.valor !== undefined && alert.condicaoValor) {
-                        const targetPrice = currency.sellPrice;
-                        const conditionMet = alert.condicaoValor === 'acima' 
-                          ? targetPrice >= alert.valor
-                          : targetPrice <= alert.valor;
-                        shouldAlert = conditionMet && (previous.sellPrice !== currency.sellPrice);
-                      }
-                      break;
-                  }
-
-                  if (shouldAlert) {
-                    if (!allAlertsByEmail.has(email)) {
-                      allAlertsByEmail.set(email, []);
-                    }
-                    allAlertsByEmail.get(email)!.push({
-                      currencyCode: currency.code,
-                      buyPrice: currency.buyPrice,
-                      sellPrice: currency.sellPrice,
-                      variacao,
-                      alertType: alert.tipo,
-                      alert: { ...alert }
-                    });
-                  }
-                }
-              } catch (error) {
-                console.error(`Erro ao verificar alertas para ${currency.code}:`, error);
-              }
-            }
-          }
         } catch (error) {
           console.error(`Erro ao salvar histórico para ${currency.code}:`, error);
+        }
+      }
+
+      // VERIFICAÇÃO DE ALERTAS (independente do histórico)
+      if (isNewPrice && previousPrices.has(currency.code)) {
+        const previous = previousPrices.get(currency.code)!;
+        if (previous.sellPrice !== currency.sellPrice) {
+          try {
+            console.log(`🔔 Verificando alertas para ${currency.code} (${previous.sellPrice} -> ${currency.sellPrice})`);
+
+            const variacao = ((currency.sellPrice - previous.sellPrice) / previous.sellPrice) * 100;
+
+            for (const [email, userData] of Object.entries(alertSystem.getAllAlerts())) {
+              const userAlerts = userData.alerts || {};
+              const alert = userAlerts[currency.code];
+              if (!alert || !alert.ativo) continue;
+
+              let shouldAlert = false;
+
+              switch (alert.tipo) {
+                case 'subida':
+                  shouldAlert = variacao > 0;
+                  break;
+                case 'descida':
+                  shouldAlert = variacao < 0;
+                  break;
+                case 'valor-especifico':
+                  if (alert.valor !== undefined && alert.condicaoValor) {
+                    const targetPrice = currency.sellPrice;
+                    const conditionMet = alert.condicaoValor === 'acima'
+                      ? targetPrice >= alert.valor
+                      : targetPrice <= alert.valor;
+                    shouldAlert = conditionMet && (previous.sellPrice !== currency.sellPrice);
+                  }
+                  break;
+              }
+
+              if (shouldAlert) {
+                if (!allAlertsByEmail.has(email)) {
+                  allAlertsByEmail.set(email, []);
+                }
+                allAlertsByEmail.get(email)!.push({
+                  currencyCode: currency.code,
+                  buyPrice: currency.buyPrice,
+                  sellPrice: currency.sellPrice,
+                  variacao,
+                  alertType: alert.tipo,
+                  alert: { ...alert }
+                });
+              }
+            }
+          } catch (error) {
+            console.error(`Erro ao verificar alertas para ${currency.code}:`, error);
+          }
         }
       }
     }
