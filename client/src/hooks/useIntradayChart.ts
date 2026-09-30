@@ -129,7 +129,18 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
   };
 
   const chartData = processIntradayData();
-  
+
+  // O último ponto ativo sempre reflete o preço atual
+  if (currentCurrencyData?.sellPrice) {
+    for (let i = chartData.length - 1; i >= 0; i--) {
+      if (chartData[i].sellPrice !== null) {
+        chartData[i].sellPrice = currentCurrencyData.sellPrice;
+        chartData[i].buyPrice = currentCurrencyData.buyPrice ?? chartData[i].buyPrice;
+        break;
+      }
+    }
+  }
+
   // Verificar se há dados suficientes para mostrar gráfico
   const hasRealData = chartData.some(item => item.hasRealData);
   const hasAnyValidData = chartData.some(item => item.sellPrice !== null);
