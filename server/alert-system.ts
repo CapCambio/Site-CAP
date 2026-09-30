@@ -507,6 +507,8 @@ class AlertSystem {
       console.log('📧 [setupEmail] Criando transporter com host:', process.env.EMAIL_HOST || 'smtp.gmail.com');
       console.log('📧 [setupEmail] Porta:', process.env.EMAIL_PORT || '587');
       console.log('📧 [setupEmail] Secure:', process.env.EMAIL_SECURE === 'true');
+      console.log('📧 [setupEmail] User:', emailUser);
+      console.log('📧 [setupEmail] Pass:', emailPass ? '*** (definido)' : 'NÃO DEFINIDO');
 
       this.emailTransporter = nodemailer.createTransport({
         host: process.env.EMAIL_HOST || 'smtp.gmail.com',
@@ -522,11 +524,19 @@ class AlertSystem {
       });
 
       console.log('📧 [setupEmail] Transporter criado, verificando conexão...');
+      console.log('📧 [setupEmail] Configuração completa:', {
+        host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.EMAIL_PORT || '587', 10),
+        secure: process.env.EMAIL_SECURE === 'true',
+        user: emailUser
+      });
 
       // Verificar a conexão com o servidor SMTP
       this.emailTransporter.verify((error: Error, success) => {
         if (error) {
           console.error('❌ Falha ao conectar ao servidor de e-mail:', error.message);
+          console.error('❌ Código do erro:', error.code);
+          console.error('❌ Comando do erro:', error.command);
           console.error('❌ Detalhes do erro:', error);
         } else {
           console.log('✅ Servidor de e-mail configurado com sucesso');
