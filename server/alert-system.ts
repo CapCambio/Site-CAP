@@ -535,7 +535,10 @@ class AlertSystem {
         },
         tls: {
           rejectUnauthorized: process.env.NODE_ENV === 'production'
-        }
+        },
+        connectionTimeout: 10000, // 10 segundos
+        greetingTimeout: 10000,
+        socketTimeout: 10000
       });
 
       console.log('✅ [setupEmail] Transporter criado com sucesso (conexão será testada ao enviar email)');
