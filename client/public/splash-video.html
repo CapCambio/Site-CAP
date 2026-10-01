@@ -45,16 +45,9 @@
   <script>
     console.log('🎬 Splash screen carregada');
 
-    // Verifica se já exibiu a splash nessa sessão
-    if (sessionStorage.getItem('splashShown')) {
-      console.log('⏭️ Splash já exibida nesta sessão, redirecionando...');
-      window.location.replace('/');
-    }
-
     const video = document.getElementById('splash');
     const redirect = () => {
       console.log('🔄 Redirecionando para página principal...');
-      sessionStorage.setItem('splashShown', 'true');
       window.location.replace('/');
     };
 
