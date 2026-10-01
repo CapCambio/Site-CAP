@@ -660,7 +660,7 @@ class AlertSystem {
           ativo: alert.ativo,
           valor: alert.valor,
           condicaoValor: alert.condicao_valor,
-          limite: 0.5, // Valor padrão, pode ser ajustado
+          limite: 0, // Valor padrão: qualquer variação dispara
           validade: alert.validade
         };
       }
