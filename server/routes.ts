@@ -903,6 +903,7 @@ app.get("/api/currencies", async (req, res) => {
         // Remover todos os alertas do usuário excluído
         try {
           await db.deleteAlertsByUser(emailLower);
+          alertSystem.removeAllUserAlerts(emailLower);
           console.log(`✅ Todos os alertas do usuário ${email} foram removidos`);
         } catch (error) {
           console.error('Erro ao remover alertas do usuário:', error);
@@ -1084,6 +1085,11 @@ app.get("/api/currencies", async (req, res) => {
         timestamp: new Date().toISOString()
       });
       
+      alertSystem.registerPushSubscription(email.toLowerCase(), {
+        endpoint: subscription.endpoint,
+        keys: { p256dh: subscription.keys.p256dh, auth: subscription.keys.auth }
+      } as any);
+      
       console.log(`✅ Push subscription registrada para ${email}`);
       res.json({ success: true, message: 'Push subscription registrada' });
     } catch (error) {
@@ -1172,6 +1178,17 @@ app.get("/api/currencies", async (req, res) => {
         validade: validade || null
       });
 
+      // Atualizar o alertSystem em memória para o novo alerta disparar na próxima verificação
+      alertSystem.createAlert(
+        email.toLowerCase(),
+        currencyCode,
+        tipo as 'subida' | 'descida' | 'valor-especifico',
+        validade || null,
+        undefined,
+        tipo === 'valor-especifico' ? Number(valor) : undefined,
+        tipo === 'valor-especifico' ? condicaoAutomatica : undefined
+      );
+
       res.json({ 
         success: true, 
         message: "Alerta criado com sucesso!",
@@ -1203,6 +1220,7 @@ app.get("/api/currencies", async (req, res) => {
       
       if (alert) {
         await db.deleteAlert(alert.id);
+        alertSystem.removeAlert(emailLower, currencyCode);
       }
       
       res.json({ success: true, message: 'Alerta removido' });
