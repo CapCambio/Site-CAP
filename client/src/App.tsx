@@ -96,9 +96,6 @@ function AppContent() {
         <Route path="/cotacoes">
           <PWAInstallPrompt />
         </Route>
-        <Route path="/auth">
-          <PWAInstallPrompt />
-        </Route>
       </Switch>
     </div>
   );
