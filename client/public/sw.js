@@ -1,6 +1,6 @@
 // Service Worker seguro - não intercepta assets do Vite
 
-const CACHE_NAME = 'cap-cotacoes-v7';
+const CACHE_NAME = 'cap-cotacoes-v8';
 const OFFLINE_PAGE = '/offline.html';
 
 console.log('[Service Worker] Iniciando...');
@@ -92,9 +92,8 @@ self.addEventListener('fetch', (event) => {
   }
   
   // Para recursos estáticos específicos (manifest, ícones), usar Cache First
-  if (url.includes('/manifest.json') || 
-      url.includes('/optimized/') ||
-      url.includes('/splash/')) {
+  if (url.includes('/manifest.json') ||
+      url.includes('/optimized/')) {
     event.respondWith(
       caches.match(event.request)
         .then((cachedResponse) => {
