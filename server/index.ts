@@ -126,8 +126,9 @@ app.use((req, res, next) => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 
   // Iniciar sistema de alertas (verifica a cada 1 minuto)
-  log("✅ Iniciando sistema de alertas...");
-  alertSystem.startChecking(1);
+  // TEMPORARIAMENTE DESATIVADO - reativar amanhã para testes
+  // log("✅ Iniciando sistema de alertas...");
+  // alertSystem.startChecking(1);
 
   // Timer para verificar cotações periodicamente (independente de acesso à página)
   const CHECK_INTERVAL_MINUTES = 1; // Verificar a cada 1 minuto
