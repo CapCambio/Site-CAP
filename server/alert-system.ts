@@ -2,7 +2,6 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import webpush from 'web-push';
-import nodemailer from 'nodemailer';
 import Handlebars from 'handlebars';
 import { jsonStorage } from './json-storage';
 import { logger } from './logger';
@@ -154,7 +153,7 @@ interface AlertsData {
 
 class AlertSystem {
   private data: AlertsData = {};
-  private emailTransporter: any;
+  private emailConfigured: boolean = false;
   private templateCache: { [key: string]: Handlebars.TemplateDelegate } = {};
 
   constructor() {
@@ -500,51 +499,23 @@ class AlertSystem {
   private setupEmail() {
     console.log('📧 [setupEmail] Iniciando configuração de email...');
     console.log('📧 [setupEmail] EMAIL_ENABLED:', process.env.EMAIL_ENABLED);
-    console.log('📧 [setupEmail] EMAIL_USER:', process.env.EMAIL_USER ? '*** (definido)' : 'NÃO DEFINIDO');
     console.log('📧 [setupEmail] EMAIL_PASS:', process.env.EMAIL_PASS ? '*** (definido)' : 'NÃO DEFINIDO');
 
     const emailEnabled = process.env.EMAIL_ENABLED === 'true';
-    const emailUser = process.env.EMAIL_USER;
     const emailPass = process.env.EMAIL_PASS;
-    const emailFrom = process.env.EMAIL_FROM || 'no-reply@capcambio.com';
 
     if (!emailEnabled) {
       console.warn('⚠️ Envio de e-mails desativado (EMAIL_ENABLED=false)');
       return;
     }
 
-    if (!emailUser || !emailPass) {
-      console.error('❌ Credenciais de e-mail não configuradas. Configure EMAIL_USER e EMAIL_PASS no .env');
+    if (!emailPass) {
+      console.error('❌ Credenciais de e-mail não configuradas. Configure EMAIL_PASS no .env');
       return;
     }
 
-    try {
-      console.log('📧 [setupEmail] Criando transporter com host:', process.env.EMAIL_HOST || 'smtp.gmail.com');
-      console.log('📧 [setupEmail] Porta:', process.env.EMAIL_PORT || '587');
-      console.log('📧 [setupEmail] Secure:', process.env.EMAIL_SECURE === 'true');
-      console.log('📧 [setupEmail] User:', emailUser);
-      console.log('📧 [setupEmail] Pass:', emailPass ? '*** (definido)' : 'NÃO DEFINIDO');
-
-      this.emailTransporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.EMAIL_PORT || '587', 10),
-        secure: process.env.EMAIL_SECURE === 'true',
-        auth: {
-          user: emailUser,
-          pass: emailPass
-        },
-        tls: {
-          rejectUnauthorized: process.env.NODE_ENV === 'production'
-        },
-        connectionTimeout: 10000, // 10 segundos
-        greetingTimeout: 10000,
-        socketTimeout: 10000
-      });
-
-      console.log('✅ [setupEmail] Transporter criado com sucesso (conexão será testada ao enviar email)');
-    } catch (error) {
-      console.error('❌ Erro ao configurar o transporte de e-mail:', error);
-    }
+    this.emailConfigured = true;
+    console.log('✅ [setupEmail] Email configurado para envio via Brevo API (HTTP)');
   }
 
   /**
@@ -1324,11 +1295,10 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     console.log('🔍 Método sendEmailNotification chamado para o email:', email);
     console.log(`- Total de alertas: ${alerts.length}`);
 
-    if (!this.emailTransporter) {
+    if (!this.emailConfigured) {
       console.warn('⚠️ Serviço de e-mail não configurado');
-      console.log('📝 Estado do emailTransporter:', this.emailTransporter);
+      console.log('📝 Estado do emailConfigured:', this.emailConfigured);
       console.log('📝 EMAIL_ENABLED:', process.env.EMAIL_ENABLED);
-      console.log('📝 EMAIL_USER:', process.env.EMAIL_USER ? '*** (definido)' : 'não definido');
       console.log('📝 EMAIL_PASS:', process.env.EMAIL_PASS ? '*** (definido)' : 'não definido');
       return false;
     }
@@ -1377,17 +1347,11 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
 
       // Envia o e-mail usando o método de retentativa
       console.log('📧 [sendEmailNotification] Chamando sendWithRetry...');
-      console.log('📧 [sendEmailNotification] emailTransporter existe?', !!this.emailTransporter);
+      console.log('📧 [sendEmailNotification] emailConfigured?', this.emailConfigured);
       await this.sendWithRetry({
-        from: process.env.EMAIL_FROM || '"CAP Câmbio" <capcambiocx@gmail.com>',
         to: email,
         subject: subject,
-        html: htmlContent,
-        headers: {
-          'X-Priority': '1',
-          'X-MSMail-Priority': 'High',
-          'Importance': 'high'
-        }
+        html: htmlContent
       });
       console.log('📧 [sendEmailNotification] sendWithRetry concluído');
 
@@ -1540,26 +1504,53 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
   /**
    * Envia um e-mail com tentativas de repetição em caso de falha
    */
-  private async sendWithRetry(mailOptions: any, maxRetries = 3, delayMs = 5000): Promise<boolean> {
+  private async sendWithRetry(mailOptions: { to: string; subject: string; html: string }, maxRetries = 3, delayMs = 5000): Promise<boolean> {
     let lastError: Error | null = null;
 
     console.log('📧 [sendWithRetry] Iniciando envio de e-mail para:', mailOptions.to);
     console.log('📧 [sendWithRetry] Assunto:', mailOptions.subject);
 
+    const apiKey = process.env.EMAIL_PASS;
+    const emailFrom = process.env.EMAIL_FROM || '"CAP Câmbio" <capcambiocx@gmail.com>';
+    const fromMatch = emailFrom.match(/^(?:"?([^"]*)"?\s*)?<?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>?$/);
+    const fromName = fromMatch?.[1]?.trim() || 'CAP Câmbio';
+    const fromEmail = fromMatch?.[2] || 'capcambiocx@gmail.com';
+
     for (let i = 0; i < maxRetries; i++) {
       try {
         console.log(`📧 [sendWithRetry] Tentativa ${i + 1} de ${maxRetries}...`);
-        await this.emailTransporter.sendMail(mailOptions);
-        console.log('✅ [sendWithRetry] E-mail enviado com sucesso!');
+
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'api-key': apiKey!,
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            sender: { name: fromName, email: fromEmail },
+            to: [{ email: mailOptions.to }],
+            subject: mailOptions.subject,
+            htmlContent: mailOptions.html
+          })
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          throw new Error(`Brevo API ${response.status}: ${errorBody}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ [sendWithRetry] E-mail enviado com sucesso! MessageId:', result.messageId);
         return true;
       } catch (error) {
         lastError = error as Error;
-        console.warn(`⚠️ Tentativa ${i + 1} de ${maxRetries} falhou ao enviar e-mail:`, error);
+        console.warn(`⚠️ Tentativa ${i + 1} de ${maxRetries} falhou ao enviar e-mail:`, lastError.message);
 
         if (i < maxRetries - 1) {
           console.log(`⏳ Aguardando ${delayMs}ms antes de tentar novamente...`);
           await new Promise(resolve => setTimeout(resolve, delayMs));
-          delayMs *= 2; // Aumenta o tempo de espera para a próxima tentativa
+          delayMs *= 2;
         }
       }
     }
