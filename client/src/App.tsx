@@ -93,9 +93,6 @@ function AppContent() {
       </LazyLoad>
       <Toaster />
       <Switch>
-        <Route path="/cotacoes">
-          <PWAInstallPrompt />
-        </Route>
         <Route path="/auth">
           <PWAInstallPrompt />
         </Route>
