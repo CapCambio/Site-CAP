@@ -38,7 +38,7 @@
     "dev:local": "npm run dev",
     "setup:https": "node scripts/setup-https.js",
     "build": "vite build && node scripts/copy-homepage-assets.js",
-    "build:full": "vite build && node scripts/copy-homepage-assets.js && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && node scripts/copy-config.js && echo 'Build completed at '$(date)",
+    "build:full": "vite build && node scripts/copy-homepage-assets.js && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && node scripts/copy-config.js && node scripts/copy-email-templates.js && echo 'Build completed at '$(date)",
     "preview": "vite preview --port 4173",
     "start": "node server.mjs",
     "start:full": "NODE_ENV=production node dist/index.js",
