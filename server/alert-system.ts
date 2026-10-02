@@ -288,15 +288,14 @@ class AlertSystem {
           const previousSellPrice = this.lastCheckedPrices[currency.code];
           
           console.log(`\n📊 Verificando ${currency.code}:`);
-          console.log(`- Preço atual: R$ ${currentSellPrice}`);
-          console.log(`- Preço anterior: ${previousSellPrice !== undefined ? `R$ ${previousSellPrice}` : 'primeira verificação'}`);
+          console.log(`- Preço atual: R$ ${currentSellPrice} (tipo: ${typeof currentSellPrice})`);
+          console.log(`- Preço anterior: ${previousSellPrice !== undefined ? `R$ ${previousSellPrice} (tipo: ${typeof previousSellPrice})` : 'primeira verificação'}`);
           
-          // Só verificar alertas se o preço mudou (com tolerância de 0.001 para evitar problemas de ponto flutuante)
-          const epsilon = 0.001;
-          const priceChanged = previousSellPrice !== undefined && Math.abs(currentSellPrice - previousSellPrice) > epsilon;
-          
-          if (priceChanged) {
+          // Só verificar alertas se o preço mudou
+          if (previousSellPrice !== undefined && previousSellPrice !== currentSellPrice) {
             console.log(`✅ Alteração de preço detectada para ${currency.code}: R$ ${previousSellPrice} → R$ ${currentSellPrice}`);
+            console.log(`🔍 Diferença absoluta: ${Math.abs(currentSellPrice - previousSellPrice)}`);
+            console.log(`🔍 Comparação estrita: ${previousSellPrice} !== ${currentSellPrice} = ${previousSellPrice !== currentSellPrice}`);
             
             // Calcular variação
             const variacao = ((currentSellPrice - previousSellPrice) / previousSellPrice) * 100;
@@ -441,7 +440,7 @@ class AlertSystem {
               console.log(`- Cross condition: ${previousPrice.toFixed(4)} > ${alert.valor.toFixed(4)} && ${targetPrice.toFixed(4)} <= ${alert.valor.toFixed(4)} = ${crossCondition}`);
             }
             
-            shouldAlert = (conditionMet || crossCondition) && (Math.abs(previousSellPrice - newSellPrice) > epsilon);
+            shouldAlert = (conditionMet || crossCondition) && (previousSellPrice !== newSellPrice);
             
             console.log(`- Should alert: ${shouldAlert}`);
             

@@ -1414,11 +1414,13 @@ export async function refreshCurrencies() {
       // VERIFICAÇÃO DE ALERTAS (independente do histórico)
       if (isNewPrice && previousPrices.has(currency.code)) {
         const previous = previousPrices.get(currency.code)!;
-        // Adiciona tolerância epsilon para evitar problemas de ponto flutuante
-        const epsilon = 0.001;
-        if (Math.abs(previous.sellPrice - currency.sellPrice) > epsilon) {
+        if (previous.sellPrice !== currency.sellPrice) {
           try {
-            console.log(`🔔 Verificando alertas para ${currency.code} (${previous.sellPrice} -> ${currency.sellPrice})`);
+            console.log(`🔔 [routes] Verificando alertas para ${currency.code}:`);
+            console.log(`   Preço anterior: ${previous.sellPrice} (tipo: ${typeof previous.sellPrice})`);
+            console.log(`   Preço atual: ${currency.sellPrice} (tipo: ${typeof currency.sellPrice})`);
+            console.log(`   Diferença absoluta: ${Math.abs(currency.sellPrice - previous.sellPrice)}`);
+            console.log(`   Comparação estrita: ${previous.sellPrice} !== ${currency.sellPrice} = ${previous.sellPrice !== currency.sellPrice}`);
 
             const variacao = ((currency.sellPrice - previous.sellPrice) / previous.sellPrice) * 100;
 
@@ -1442,7 +1444,7 @@ export async function refreshCurrencies() {
                     const conditionMet = alert.condicaoValor === 'acima'
                       ? targetPrice >= alert.valor
                       : targetPrice <= alert.valor;
-                    shouldAlert = conditionMet && (Math.abs(previous.sellPrice - currency.sellPrice) > epsilon);
+                    shouldAlert = conditionMet && (previous.sellPrice !== currency.sellPrice);
                   }
                   break;
               }
