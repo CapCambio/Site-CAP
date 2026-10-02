@@ -125,18 +125,24 @@ app.use((req, res, next) => {
   // Usando a porta definida nas variáveis de ambiente ou 8080 como padrão
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 
-  // Iniciar sistema de alertas (verifica a cada 30 segundos)
-  log("✅ Iniciando sistema de alertas...");
-  alertSystem.startChecking(0.5);
-
   // Timer para verificar cotações periodicamente (independente de acesso à página)
   const CHECK_INTERVAL_MINUTES = 1; // Verificar a cada 1 minuto
   log(`⏰ Iniciando verificação automática de cotações a cada ${CHECK_INTERVAL_MINUTES} minutos`);
 
-  // Verificação inicial
-  refreshCurrencies().catch(error => {
-    console.error('Erro na verificação inicial de cotações:', error);
-  });
+  // Verificação inicial: popula as cotações ANTES de ligar o sistema de alertas.
+  // Isso faz a primeira verificação de alertas usar o preço VIVO da planilha como
+  // linha de base. Sem isso, o boot memorizava o snapshot velho gravado no deploy
+  // e, quando o scrape trazia o preço atual, a próxima verificação interpretava o
+  // salto "velho -> atual" como mudança real e disparava um alerta fantasma a cada
+  // redeploy/commit.
+  refreshCurrencies()
+    .catch(error => {
+      console.error('Erro na verificação inicial de cotações:', error);
+    })
+    .finally(() => {
+      log("✅ Iniciando sistema de alertas...");
+      alertSystem.startChecking(0.5);
+    });
 
   // Configura verificação periódica
   setInterval(() => {
