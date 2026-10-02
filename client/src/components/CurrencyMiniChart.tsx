@@ -331,7 +331,6 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
   const maxPrice = validPrices.length > 0 ? Math.max(...validPrices) : 0;
   const priceRange = maxPrice - minPrice;
   const isConstantPrice = priceRange === 0;
-  const validDataCount = validPrices.length;
   
   // Cálculo da margem conforme especificação
   const padding = isConstantPrice 
@@ -586,10 +585,7 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
               fill="url(#colorSell)"
               strokeWidth={2}
               connectNulls={false}
-              dot={chartType === 'day' ? 
-                (validDataCount === 1 || isConstantPrice ? { fill: '#f3b234', strokeWidth: 1, r: 2 } : false) :
-                { fill: '#f3b234', strokeWidth: 1, r: 2 }
-              }
+              dot={{ fill: '#f3b234', strokeWidth: 1, r: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>
