@@ -468,13 +468,11 @@ class AlertSystem {
         // Log específico para alerta disparado
         logger.alertTriggered(email, currencyCode, alert.tipo, newSellPrice, variacao);
 
-        // Se for alerta de valor-especifico, remove-o após o disparo
-        if (alert.tipo === 'valor-especifico') {
-          console.log(`🗑️ Removendo alerta de valor específico após disparo: ${email} - ${currencyCode} (valor: R$ ${alert.valor?.toFixed(2)})`);
-          delete this.data[email].alerts[currencyCode];
-          // Salva imediatamente para garantir que o alerta seja removido
-          this.saveAlerts();
-        }
+        // Desativa o alerta após o disparo (para todos os tipos)
+        console.log(`🗑️ Desativando alerta após disparo: ${email} - ${currencyCode} (tipo: ${alert.tipo})`);
+        delete this.data[email].alerts[currencyCode];
+        // Salva imediatamente para garantir que o alerta seja removido
+        this.saveAlerts();
       }
     }
   }
