@@ -1414,7 +1414,9 @@ export async function refreshCurrencies() {
       // VERIFICAÇÃO DE ALERTAS (independente do histórico)
       if (isNewPrice && previousPrices.has(currency.code)) {
         const previous = previousPrices.get(currency.code)!;
-        if (previous.sellPrice !== currency.sellPrice) {
+        // Adiciona tolerância epsilon para evitar problemas de ponto flutuante
+        const epsilon = 0.001;
+        if (Math.abs(previous.sellPrice - currency.sellPrice) > epsilon) {
           try {
             console.log(`🔔 Verificando alertas para ${currency.code} (${previous.sellPrice} -> ${currency.sellPrice})`);
 
@@ -1440,7 +1442,7 @@ export async function refreshCurrencies() {
                     const conditionMet = alert.condicaoValor === 'acima'
                       ? targetPrice >= alert.valor
                       : targetPrice <= alert.valor;
-                    shouldAlert = conditionMet && (previous.sellPrice !== currency.sellPrice);
+                    shouldAlert = conditionMet && (Math.abs(previous.sellPrice - currency.sellPrice) > epsilon);
                   }
                   break;
               }
