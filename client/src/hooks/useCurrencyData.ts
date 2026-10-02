@@ -26,7 +26,7 @@ export function useCurrencyData() {
   } = useQuery({
     queryKey: ['/api/currencies'],
     refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000, // 5 minutos (reduz requisições desnecessárias)
+    staleTime: 30 * 1000, // 30 segundos - permite atualização mais rápida
     queryFn: async () => {
       const currenciesResponse = await fetch('/api/currencies');
 
