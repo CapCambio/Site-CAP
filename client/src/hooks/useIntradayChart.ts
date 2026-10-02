@@ -49,7 +49,14 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
       }
 
       return {
-        records: data.map((item: any) => ({ ...item, timestamp: new Date(item.timestamp) })),
+        records: data.map((item: any) => ({
+          ...item,
+          // A API devolve snake_case; o processamento lê camelCase. Sem este
+          // mapeamento cada hora fica undefined e a linha só mostra o baseline.
+          sellPrice: Number(item.sell_price),
+          buyPrice: Number(item.buy_price),
+          timestamp: new Date(item.timestamp)
+        })),
         baselineSellPrice,
         baselineBuyPrice
       };
