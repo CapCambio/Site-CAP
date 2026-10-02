@@ -19,8 +19,12 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
   } = useQuery({
     queryKey: ['/api/history/intraday', currencyCode, todayStr],
     queryFn: async () => {
+      // startDate/endDate como "YYYY-MM-DD" viram 00:00 UTC no servidor, então
+      // endDate=today fechava o dia antes dele começar e não retornava nada.
+      // endDate no instante atual cobre o dia inteiro já decorrido.
+      const endDateStr = new Date().toISOString();
       const response = await fetch(
-        `/api/history/${currencyCode}?startDate=${todayStr}&endDate=${todayStr}`
+        `/api/history/${currencyCode}?startDate=${todayStr}&endDate=${endDateStr}`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch intraday data');
