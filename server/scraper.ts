@@ -288,6 +288,12 @@ async function fetchGoogleSheet(): Promise<string> {
     '🌐 Buscando dados do Google Sheets...'
   );
 
+  // Cache-buster: força o Google a devolver o conteúdo mais recente em vez
+  // de servir o cache interno (~30-60s). Não gera falsas mudanças: a resposta
+  // do gviz é byte-a-byte estável quando os dados não mudam (verificado),
+  // então o gate de hash continua parando os minutos sem edição.
+  const bustedUrl = `${SOURCE_URL}&cacheBust=${Date.now()}`;
+
   console.log(
     `🔗 URL: ${SOURCE_URL}`
   );
@@ -297,13 +303,14 @@ async function fetchGoogleSheet(): Promise<string> {
 
   let response;
   try {
-    response = await fetch(SOURCE_URL, {
+    response = await fetch(bustedUrl, {
       headers: {
         'User-Agent':
           'Mozilla/5.0 (compatible; CurrencyBot/1.0)',
         'Accept':
           'application/json,text/plain,*/*'
       },
+      cache: 'no-store',
       redirect: 'follow',
       signal: controller.signal
     });
