@@ -623,6 +623,7 @@ class AlertSystem {
 
         if (!this.data[email]) {
           this.data[email] = {
+            email,
             alerts: {},
             pushSubscriptions: [],
             language: 'pt'
@@ -630,10 +631,10 @@ class AlertSystem {
         }
 
         this.data[email].alerts[alert.currency_code] = {
-          tipo: alert.tipo,
+          tipo: alert.tipo as 'subida' | 'descida' | 'valor-especifico',
           ativo: alert.ativo,
-          valor: alert.valor,
-          condicaoValor: alert.condicao_valor,
+          valor: alert.valor || undefined,
+          condicaoValor: alert.condicao_valor as 'acima' | 'abaixo' | undefined,
           limite: 0, // Valor padrão: qualquer variação dispara
           validade: alert.validade
         };
