@@ -18,6 +18,7 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const scrollInterval = useRef<NodeJS.Timeout | null>(null);
   const pendingMoveRef = useRef<number | null>(null);
+  const lastSavedOrderRef = useRef<string | null>(null);
   
   // Gerar chave única para cada usuário
   const getStorageKey = () => {
@@ -158,15 +159,43 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     initializeOrder();
   }, [initialItems, userEmail]);
 
-  // Salvar ordem na API e localStorage quando mudar
+  // Re-sincronizar DADOS (preços) sem perder a ordem do usuário.
+  // O init acima só roda uma vez (isInitialized), então sem este efeito os
+  // cards mostrariam para sempre o snapshot da primeira montagem: o auto-refresh
+  // traz preços novos para initialItems, mas 'items' fica congelado e só um F5
+  // (remontagem) atualizaria. Reconstruímos 'items' com os objetos novos,
+  // preservando a ordem relativa; moedas novas entram no fim e removidas saem.
+  useEffect(() => {
+    if (!isInitialized.current) return;
+    if (initialItems.length === 0) return;
+
+    setItems(prev => {
+      if (prev.length === 0) return initialItems;
+      const byCode = new Map<string, Currency>(
+        initialItems.map(c => [c.code, c] as [string, Currency])
+      );
+      const kept = prev
+        .map(it => byCode.get(it.code))
+        .filter(Boolean) as Currency[];
+      const added = initialItems.filter(c => !prev.some(it => it.code === c.code));
+      return [...kept, ...added];
+    });
+  }, [initialItems]);
+
+  // Salvar ordem na API e localStorage quando a ORDEM mudar
   useEffect(() => {
     if (items.length > 0) {
       const order = items.map(item => item.code);
-      
+      const signature = order.join('|');
+
+      // Se a ordem é a mesma, não reescrever (evita POST a cada tick de preço)
+      if (signature === lastSavedOrderRef.current) return;
+      lastSavedOrderRef.current = signature;
+
       // SEMPRE salvar no localStorage (independente de login)
       const storageKey = getStorageKey();
       localStorage.setItem(storageKey, JSON.stringify(order));
-      
+
       // Tentar sincronizar com API se tiver usuário
       if (userEmail) {
         saveOrderToAPI(order);
