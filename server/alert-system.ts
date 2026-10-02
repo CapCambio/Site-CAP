@@ -155,6 +155,7 @@ class AlertSystem {
   private data: AlertsData = {};
   private emailConfigured: boolean = false;
   private templateCache: { [key: string]: Handlebars.TemplateDelegate } = {};
+  private lastCheckedPrices: { [currencyCode: string]: number } = {}; // Último preço verificado por moeda
 
   constructor() {
     console.log('🔔 [AlertSystem] Constructor iniciado');
@@ -273,47 +274,47 @@ class AlertSystem {
       // Para cada moeda, verificar se há alertas
       for (const currency of currencies) {
         try {
-          // Obter histórico recente para calcular variação (últimos 30 minutos)
-          const now = new Date();
-          const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000); // Últimos 30 minutos
-          const history = await getCurrencyHistory(currency.code, thirtyMinutesAgo, now);
-          
-          console.log(`\n📊 Dados históricos para ${currency.code} (últimos 30 minutos):`);
-          console.log(`- Total de registros: ${history.length}`);
-          
-          if (history.length >= 2) {
-            // Ordenar por timestamp (mais antigo primeiro)
-            const sortedHistory = [...history].sort((a, b) => 
-              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-            );
-            
-            // Pegar o mais antigo e o mais recente
-            const previous = sortedHistory[0];
-            const current = sortedHistory[sortedHistory.length - 1];
-
-            // Calcular variação
-            const variacao = ((current.sell_price - previous.sell_price) / previous.sell_price) * 100;
-
-            console.log(`- Primeiro registro: ${new Date(previous.timestamp).toISOString()} - Venda: R$ ${previous.sell_price}`);
-            console.log(`- Último registro:   ${new Date(current.timestamp).toISOString()} - Venda: R$ ${current.sell_price}`);
-
-            // Verificar se os preços são diferentes
-            if (previous.sell_price !== current.sell_price) {
-              console.log(`✅ Alteração de preço detectada para ${currency.code}`);
-              logger.priceCheck(currency.code, previous.sell_price, current.sell_price, variacao);
-
-              // Coletar alertas para esta moeda e adicionar ao mapa do usuário
-              await this.collectAlertsForCurrency(
-                currency.code,
-                current.buy_price,
-                current.sell_price,
-                previous.sell_price,
-                allAlertsByEmail
-              );
-            } else {
-              console.log(`ℹ️  Nenhuma alteração de preço para ${currency.code}`);
-            }
+          // Obter o preço atual do cache
+          const currentPrice = await jsonStorage.getCurrencyByCode(currency.code);
+          if (!currentPrice) {
+            console.log(`⚠️ Preço atual não encontrado para ${currency.code}`);
+            continue;
           }
+
+          const currentSellPrice = currentPrice.sellPrice;
+          const currentBuyPrice = currentPrice.buyPrice;
+          
+          // Obter o último preço verificado para esta moeda
+          const previousSellPrice = this.lastCheckedPrices[currency.code];
+          
+          console.log(`\n📊 Verificando ${currency.code}:`);
+          console.log(`- Preço atual: R$ ${currentSellPrice}`);
+          console.log(`- Preço anterior: ${previousSellPrice !== undefined ? `R$ ${previousSellPrice}` : 'primeira verificação'}`);
+          
+          // Só verificar alertas se o preço mudou
+          if (previousSellPrice !== undefined && previousSellPrice !== currentSellPrice) {
+            console.log(`✅ Alteração de preço detectada para ${currency.code}: R$ ${previousSellPrice} → R$ ${currentSellPrice}`);
+            
+            // Calcular variação
+            const variacao = ((currentSellPrice - previousSellPrice) / previousSellPrice) * 100;
+            logger.priceCheck(currency.code, previousSellPrice, currentSellPrice, variacao);
+
+            // Coletar alertas para esta moeda e adicionar ao mapa do usuário
+            await this.collectAlertsForCurrency(
+              currency.code,
+              currentBuyPrice,
+              currentSellPrice,
+              previousSellPrice,
+              allAlertsByEmail
+            );
+          } else if (previousSellPrice === undefined) {
+            console.log(`ℹ️ Primeira verificação para ${currency.code}, registrando preço inicial`);
+          } else {
+            console.log(`ℹ️ Nenhuma alteração de preço para ${currency.code}`);
+          }
+          
+          // Atualizar o último preço verificado
+          this.lastCheckedPrices[currency.code] = currentSellPrice;
         } catch (error) {
           console.error(`Erro ao verificar alertas para ${currency.code}:`, error);
         }
@@ -468,11 +469,13 @@ class AlertSystem {
         // Log específico para alerta disparado
         logger.alertTriggered(email, currencyCode, alert.tipo, newSellPrice, variacao);
 
-        // Desativa o alerta após o disparo (para todos os tipos)
-        console.log(`🗑️ Desativando alerta após disparo: ${email} - ${currencyCode} (tipo: ${alert.tipo})`);
-        delete this.data[email].alerts[currencyCode];
-        // Salva imediatamente para garantir que o alerta seja removido
-        this.saveAlerts();
+        // Se for alerta de valor-especifico, remove-o após o disparo
+        if (alert.tipo === 'valor-especifico') {
+          console.log(`🗑️ Removendo alerta de valor específico após disparo: ${email} - ${currencyCode} (valor: R$ ${alert.valor?.toFixed(2)})`);
+          delete this.data[email].alerts[currencyCode];
+          // Salva imediatamente para garantir que o alerta seja removido
+          this.saveAlerts();
+        }
       }
     }
   }
