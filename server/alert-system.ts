@@ -291,8 +291,11 @@ class AlertSystem {
           console.log(`- Preço atual: R$ ${currentSellPrice}`);
           console.log(`- Preço anterior: ${previousSellPrice !== undefined ? `R$ ${previousSellPrice}` : 'primeira verificação'}`);
           
-          // Só verificar alertas se o preço mudou
-          if (previousSellPrice !== undefined && previousSellPrice !== currentSellPrice) {
+          // Só verificar alertas se o preço mudou (com tolerância de 0.001 para evitar problemas de ponto flutuante)
+          const epsilon = 0.001;
+          const priceChanged = previousSellPrice !== undefined && Math.abs(currentSellPrice - previousSellPrice) > epsilon;
+          
+          if (priceChanged) {
             console.log(`✅ Alteração de preço detectada para ${currency.code}: R$ ${previousSellPrice} → R$ ${currentSellPrice}`);
             
             // Calcular variação
@@ -438,7 +441,7 @@ class AlertSystem {
               console.log(`- Cross condition: ${previousPrice.toFixed(4)} > ${alert.valor.toFixed(4)} && ${targetPrice.toFixed(4)} <= ${alert.valor.toFixed(4)} = ${crossCondition}`);
             }
             
-            shouldAlert = (conditionMet || crossCondition) && (previousSellPrice !== newSellPrice);
+            shouldAlert = (conditionMet || crossCondition) && (Math.abs(previousSellPrice - newSellPrice) > epsilon);
             
             console.log(`- Should alert: ${shouldAlert}`);
             
