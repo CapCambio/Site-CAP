@@ -3,6 +3,18 @@ import { Currency } from "@/lib/types";
 import { formatCurrencyValue } from "@/lib/currency";
 import { CurrencyLogo } from "./CurrencyLogo";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
+
+function getLocale(): string {
+  const lang = i18n.language || 'pt';
+  const localeMap: Record<string, string> = {
+    'pt': 'pt-BR',
+    'en': 'en-US',
+    'es': 'es-ES',
+    'fr': 'fr-FR'
+  };
+  return localeMap[lang] || 'pt-BR';
+}
 
 interface CurrencyConverterProps {
   currencies: Currency[];
@@ -188,17 +200,17 @@ export function CurrencyConverter({ currencies, userEmail }: CurrencyConverterPr
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/[^\d.]/g, '');
-    
+
     // Formatação automática com pontos de milhar
     if (value) {
       const cleanValue = value.replace(/\./g, '');
       const number = parseInt(cleanValue, 10);
-      
+
       if (!isNaN(number)) {
-        value = number.toLocaleString('pt-BR');
+        value = number.toLocaleString(getLocale());
       }
     }
-    
+
     setAmount(value);
   };
 

@@ -9,6 +9,18 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/http";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
+
+function getLocale(): string {
+  const lang = i18n.language || 'pt';
+  const localeMap: Record<string, string> = {
+    'pt': 'pt-BR',
+    'en': 'en-US',
+    'es': 'es-ES',
+    'fr': 'fr-FR'
+  };
+  return localeMap[lang] || 'pt-BR';
+}
 
 interface UserAlert {
   limite?: number;
@@ -109,7 +121,7 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
       return t('admin.indefiniteTime');
     }
     const date = new Date(alert.validade);
-    return `${t('admin.until')} ${date.toLocaleDateString('pt-BR')}`;
+    return `${t('admin.until')} ${date.toLocaleDateString(getLocale())}`;
   };
 
   if (!isOpen) return null;

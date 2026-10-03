@@ -24,82 +24,12 @@ import {
   WalletCards,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { getNextRotatorIndex, isRotatorAutoplayActive, rotatorAutoplayDuration, rotatorTitles } from "@shared/cityRotator";
 
-const whatsappGeneralMessage = encodeURIComponent("Olá! Vim pelo site da CAP e gostaria de mais informações.");
-const whatsappCambioMessage = encodeURIComponent("Olá! Vim pelo site da CAP e gostaria de consultar cotações de moeda.");
-const whatsappCaxias = `https://api.whatsapp.com/send?phone=5554984348005&text=${whatsappGeneralMessage}`;
-const whatsappCambio = `https://api.whatsapp.com/send?phone=5554984348005&text=${whatsappCambioMessage}`;
-const footerWhatsApp = `https://api.whatsapp.com/send?phone=5554984348005&text=${encodeURIComponent("Olá, gostaria de falar com a equipe da CAP Câmbio.")}`;
 const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 const capLogoUrl = asset("cap-logo.png");
-const offices = [
-  {
-    city: "Caxias do Sul",
-    address: "Rua Borges Medeiros 391, Loja 8 · Hipermercado Zaffari · Centro",
-    phone: "(54) 3223.2000",
-    whatsapp: "(54) 98434.8005",
-    whatsappLink: `https://api.whatsapp.com/send?phone=5554984348005&text=${whatsappGeneralMessage}`,
-    email: "capcambio_caxias@hotmail.com",
-    map: "https://www.google.com/maps/search/?api=1&query=Rua+Borges+Medeiros+391+Caxias+do+Sul+RS",
-	    photo: asset("caxias.png"),
-	    photoTreatment: "contain" as const,
-	    hoursPanelTop: "top-[18rem]",
-	    hours: ["Segunda a sexta: 9h às 20h", "Sábado: 10h às 20h", "Domingo: Fechado"],
-    dhlAuthorized: false,
-  },
-  {
-    city: "Bento Gonçalves",
-    address: "Rua Treze de Maio 877, Loja 204 · Shopping Lá América · São Bento",
-    phone: "(54) 3453.5060",
-    whatsapp: "(54) 99957.8486",
-    whatsappLink: `https://api.whatsapp.com/send?phone=5554999578486&text=${whatsappGeneralMessage}`,
-    email: "capcambio_bento@hotmail.com",
-    map: "https://www.google.com/maps/search/?api=1&query=Rua+Treze+de+Maio+877+Bento+Goncalves+RS",
-	    photo: asset("bento.png"),
-	    photoTreatment: "contain" as const,
-    hoursPanelTop: "top-[17rem]",
-	    hours: ["Segunda a sexta: 10h às 20h", "Sábado: 10h às 19h", "Domingo: Fechado"],
-    dhlAuthorized: true,
-  },
-  {
-    city: "Passo Fundo",
-    address: "Av. Brasil Leste 200, Loja 40 · Shopping Bourbon · Petrópolis",
-    phone: "(54) 3046.0088",
-    whatsapp: "(54) 99628.0422",
-    whatsappLink: `https://api.whatsapp.com/send?phone=5554996280422&text=${whatsappGeneralMessage}`,
-    email: "capcambio_passo@hotmail.com",
-    map: "https://www.google.com/maps/search/?api=1&query=Av+Brasil+Leste+200+Passo+Fundo+RS",
-	    photo: asset("passo.png"),
-	    photoTreatment: "contain" as const,
-	    hoursPanelTop: "top-[18rem]",
-	    hours: ["Segunda a sábado: 10h às 20h", "Domingo: Fechado"],
-    dhlAuthorized: true,
-  },
-];
-
-const services = [
-  { icon: Banknote, image: asset("icone-dinheiro.png"), imageSize: "h-[5.1rem]", logoAlt: "Ícone de notas de dinheiro em espécie", title: "Papel Moeda", text: "Compra e venda de moedas estrangeiras. Trabalhamos com as principais moedas do mundo com taxas competitivas.", cta: "Consultar câmbio" },
-  { icon: BriefcaseBusiness, image: asset("remessa-expressa.png"), imageSize: "h-16", logoAlt: "Logo Remessa Expressa", title: "Transferências Internacionais", text: <>Envie dinheiro para o exterior pelas redes <strong className="font-extrabold text-white/85">MoneyGram</strong> ou <strong className="font-extrabold text-white/85">RIA/Unitransfer</strong>, com orientação da nossa equipe sobre prazos e condições. Receba seus valores em espécie via <strong className="font-extrabold text-white/85">MoneyGram</strong>.</>, cta: "Consultar remessa" },
-  { icon: Globe2, image: asset("dhl-horizontal.png"), imageSize: "h-14", logoAlt: "Logo DHL", title: "Envios Internacionais de Pacotes e Documentos", text: <>Envie objetos para qualquer lugar do mundo com segurança. Nossas lojas de <strong className="font-extrabold text-white/85">Bento Gonçalves</strong> e <strong className="font-extrabold text-white/85">Passo Fundo</strong> são agentes autorizados <strong className="font-extrabold text-white/85">DHL</strong>.</>, cta: "Consultar envio" },
-];
-
-const differentials = [
-  { index: "01", title: "Taxas competitivas e sem letras miúdas", text: "Tenha clareza sobre as condições e o valor da operação antes de concluir." },
-  { index: "02", title: "Uma pessoa do outro lado", text: "Não somos só uma tela. Nossos atendentes possuem certificações ABT e PLDFT, prontos para acompanhar você durante toda a sua operação." },
-  { index: "03", title: "Tempo é parte do serviço", text: "Resposta rápida, processo organizado e suporte em tempo real." },
-];
-
-const reservationSteps = [
-  { index: "01", title: "Consulte a cotação", text: "Fale com nossa equipe pelo WhatsApp e informe a moeda e o valor desejado.", icon: MessageCircle },
-  { index: "02", title: "Reserve sua moeda", text: "Após a confirmação da equipe, deixamos sua reserva separada.", icon: CircleDollarSign },
-  { index: "03", title: "Escolha como pagar", text: "Pague na retirada ou antecipe o pagamento por Pix e envie o comprovante pelo WhatsApp.", icon: WalletCards },
-  { index: "04", title: "Retire na loja escolhida", text: "Passe em uma das lojas CAP dentro do horário de atendimento e retire sua reserva com praticidade.", icon: MapPin },
-];
-
-const platformAccessWhatsApp = `https://api.whatsapp.com/send?phone=5554984348005&text=${encodeURIComponent("Olá, sou cliente CAP e gostaria de solicitar acesso à plataforma de cotações.")}`;
-
 const scrollToId = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -111,8 +41,13 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
+function BoldParts({ parts }: { parts: string[] }) {
+  return <>{parts.map((p: string, i: number) => i % 2 === 1 ? <strong key={i} className="font-extrabold text-white/85">{p}</strong> : <span key={i}>{p}</span>)}</>;
+}
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const [activeWordIndex, setActiveWordIndex] = useState(0);
   const [isRotatorPaused, setIsRotatorPaused] = useState(false);
 
@@ -125,6 +60,39 @@ export default function Home() {
 
     return () => window.clearInterval(rotation);
   }, [isRotatorPaused]);
+
+  const { t, i18n } = useTranslation();
+
+  const langs: [string, string][] = [['pt', 'PT'], ['en', 'EN'], ['es', 'ES'], ['fr', 'FR']];
+  const changeLang = (code: string) => { i18n.changeLanguage(code); localStorage.setItem('preferred_language', code); setLangOpen(false); };
+
+  const waPhone = '5554984348005';
+  const waUrl = (msg: string) => `https://api.whatsapp.com/send?phone=${waPhone}&text=${encodeURIComponent(msg)}`;
+
+  const offices = [
+    { city: "Caxias do Sul", address: "Rua Borges Medeiros 391, Loja 8 · Hipermercado Zaffari · Centro", phone: "(54) 3223.2000", whatsapp: "(54) 98434.8005", email: "capcambio_caxias@hotmail.com", map: "https://www.google.com/maps/search/?api=1&query=Rua+Borges+Medeiros+391+Caxias+do+Sul+RS", photo: asset("caxias.png"), hoursPanelTop: "top-[18rem]", hours: [{ day: t('home.hours.weekday'), time: '9h – 20h' }, { day: t('home.hours.saturday'), time: '10h – 20h' }, { day: t('home.hours.sunday'), time: t('home.hours.closed') }], dhlAuthorized: false },
+    { city: "Bento Gonçalves", address: "Rua Treze de Maio 877, Loja 204 · Shopping Lá América · São Bento", phone: "(54) 3453.5060", whatsapp: "(54) 99957.8486", email: "capcambio_bento@hotmail.com", map: "https://www.google.com/maps/search/?api=1&query=Rua+Treze+de+Maio+877+Bento+Goncalves+RS", photo: asset("bento.png"), hoursPanelTop: "top-[17rem]", hours: [{ day: t('home.hours.weekday'), time: '10h – 20h' }, { day: t('home.hours.saturday'), time: '10h – 19h' }, { day: t('home.hours.sunday'), time: t('home.hours.closed') }], dhlAuthorized: true },
+    { city: "Passo Fundo", address: "Av. Brasil Leste 200, Loja 40 · Shopping Bourbon · Petrópolis", phone: "(54) 3046.0088", whatsapp: "(54) 99628.0422", email: "capcambio_passo@hotmail.com", map: "https://www.google.com/maps/search/?api=1&query=Av+Brasil+Leste+200+Passo+Fundo+RS", photo: asset("passo.png"), hoursPanelTop: "top-[18rem]", hours: [{ day: t('home.hours.weekdaySat'), time: '10h – 20h' }, { day: t('home.hours.sunday'), time: t('home.hours.closed') }], dhlAuthorized: true },
+  ].map(o => ({ ...o, whatsappLink: waUrl(t('home.whatsappGeneral')) }));
+
+  const services = [
+    { icon: Banknote, image: asset("icone-dinheiro.png"), imageSize: "h-[5.1rem]", title: t('home.services.s1title'), text: t('home.services.s1text'), cta: t('home.services.s1cta'), msgKey: 'whatsappCurrency' },
+    { icon: BriefcaseBusiness, image: asset("remessa-expressa.png"), imageSize: "h-16", title: t('home.services.s2title'), textParts: t('home.services.s2textParts', { returnObjects: true }) as string[], cta: t('home.services.s2cta'), msgKey: 'whatsappTransfer' },
+    { icon: Globe2, image: asset("dhl-horizontal.png"), imageSize: "h-14", title: t('home.services.s3title'), textParts: t('home.services.s3textParts', { returnObjects: true }) as string[], cta: t('home.services.s3cta'), msgKey: 'whatsappShipping' },
+  ];
+
+  const differentials = [
+    { index: "01", title: t('home.diff.d1title'), text: t('home.diff.d1text') },
+    { index: "02", title: t('home.diff.d2title'), text: t('home.diff.d2text') },
+    { index: "03", title: t('home.diff.d3title'), text: t('home.diff.d3text') },
+  ];
+
+  const reservationSteps = [
+    { index: "01", title: t('home.services.r1title'), text: t('home.services.r1text'), icon: MessageCircle },
+    { index: "02", title: t('home.services.r2title'), text: t('home.services.r2text'), icon: CircleDollarSign },
+    { index: "03", title: t('home.services.r3title'), text: t('home.services.r3text'), icon: WalletCards },
+    { index: "04", title: t('home.services.r4title'), text: t('home.services.r4text'), icon: MapPin },
+  ];
 
   const selectOffice = (titleIndex: number) => {
     setIsRotatorPaused(true);
@@ -139,32 +107,27 @@ export default function Home() {
     scrollToId(id);
   };
 
-  const serviceMessages: Record<string, string> = {
-    "Consultar câmbio": "Olá! Vim pelo site da CAP e gostaria de consultar cotações de moeda.",
-    "Consultar remessa": "Olá! Vim pelo site da CAP e gostaria de saber sobre transferências internacionais.",
-    "Consultar envio": "Olá! Vim pelo site da CAP e gostaria de saber sobre envios internacionais DHL.",
-  };
-
-  const openServiceInquiry = (cta: string) => {
-    window.dispatchEvent(new CustomEvent("cap:open-whatsapp", { detail: { hideCaxias: /^Consultar envio/i.test(cta), message: serviceMessages[cta] } }));
+  const openServiceInquiry = (msgKey: string, hideCaxias: boolean) => {
+    window.dispatchEvent(new CustomEvent("cap:open-whatsapp", { detail: { hideCaxias, message: t(`home.${msgKey}`) } }));
   };
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-[#facb2e] selection:text-black">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/85 backdrop-blur-xl">
         <div className="container flex h-[76px] items-center justify-between gap-5">
-          <button onClick={() => scrollToId("inicio")} className="group flex shrink-0 items-center text-left" aria-label="Ir para o início">
+          <button onClick={() => scrollToId("inicio")} className="group flex shrink-0 items-center text-left" aria-label={t('home.nav.goToStart')}>
             <img src={capLogoUrl} alt="CAP Câmbio" className="h-16 w-auto object-contain sm:h-[4.5rem]" />
           </button>
-          <nav className="hidden items-center gap-6 lg:flex" aria-label="Navegação principal">
-            {[ ["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre", "sobre"], ["Lojas", "lojas"], ["FAQ", "faq"] ].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="cap-nav-link text-sm font-medium">{label}</button>)}
+          <nav className="hidden items-center gap-6 lg:flex" aria-label={t('home.stores.mainNav')}>
+            {[[t('home.nav.services'),"servicos"],[t('home.nav.quotes'),"cotacoes"],[t('home.nav.about'),"sobre"],[t('home.nav.stores'),"lojas"],["FAQ","faq"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="cap-nav-link text-sm font-medium">{label}</button>)}
           </nav>
           <div className="hidden items-center gap-3 sm:flex">
-            <a href={whatsappCaxias} target="_blank" rel="noreferrer" className="cap-cta inline-flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-bold"><WhatsAppIcon className="size-4" />Fale Conosco</a>
+            <div className="relative"><button onClick={() => setLangOpen(v => !v)} className="cap-outline inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold" aria-label="Language"><Globe2 className="size-3.5" />{i18n.language.toUpperCase().slice(0,2)}</button>{langOpen && <div className="absolute right-0 top-full z-50 mt-1.5 overflow-hidden rounded-xl border border-white/10 bg-black shadow-2xl">{langs.map(([code, label]) => <button key={code} onClick={() => changeLang(code)} className={`block w-full px-4 py-2 text-left text-xs font-bold transition hover:bg-white/5 ${i18n.language === code ? 'text-[#facb2e]' : 'text-white/70'}`}>{label}</button>)}</div>}</div>
+            <a href={waUrl(t('home.whatsappGeneral'))} target="_blank" rel="noreferrer" className="cap-cta inline-flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-bold"><WhatsAppIcon className="size-4" />{t('home.nav.talkToUs')}</a>
           </div>
-          <button onClick={() => setMenuOpen(current => !current)} className="rounded-lg p-2 text-white lg:hidden" aria-label="Abrir menu" aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
+          <button onClick={() => setMenuOpen(current => !current)} className="rounded-lg p-2 text-white lg:hidden" aria-label={t('home.nav.openMenu')} aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
         </div>
-        {menuOpen && <div className="border-t border-white/10 bg-black px-4 py-4 lg:hidden"><nav className="container grid gap-1" aria-label="Navegação móvel">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre", "sobre"], ["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => navigate(id)} className="rounded-lg px-3 py-3 text-left text-sm font-semibold text-white/80 hover:bg-white/5">{label}</button>)}<a href={whatsappCaxias} target="_blank" rel="noreferrer" className="cap-cta mt-2 inline-flex items-center justify-center gap-1 rounded-lg px-3 py-3 text-center text-sm font-bold"><WhatsAppIcon className="size-4" />Fale Conosco</a></nav></div>}
+        {menuOpen && <div className="border-t border-white/10 bg-black px-4 py-4 lg:hidden"><nav className="container grid gap-1" aria-label={t('home.stores.mobileNav')}>{[[t('home.nav.services'),"servicos"],[t('home.nav.quotes'),"cotacoes"],[t('home.nav.about'),"sobre"],[t('home.nav.stores'),"lojas"],["FAQ","faq"]].map(([label, id]) => <button key={id} onClick={() => navigate(id)} className="rounded-lg px-3 py-3 text-left text-sm font-semibold text-white/80 hover:bg-white/5">{label}</button>)}<a href={waUrl(t('home.whatsappGeneral'))} target="_blank" rel="noreferrer" className="cap-cta mt-2 inline-flex items-center justify-center gap-1 rounded-lg px-3 py-3 text-center text-sm font-bold"><WhatsAppIcon className="size-4" />{t('home.nav.talkToUs')}</a><div className="mt-2 flex gap-1.5 border-t border-white/10 pt-3">{langs.map(([code, label]) => <button key={code} onClick={() => changeLang(code)} className={`rounded-lg px-3 py-2 text-xs font-bold transition ${i18n.language === code ? 'bg-[#facb2e] text-black' : 'text-white/60 hover:bg-white/5'}`}>{label}</button>)}</div></nav></div>}
       </header>
 
       <main>
@@ -177,42 +140,42 @@ export default function Home() {
           </div>
           <div className="container relative z-10 grid min-h-[600px] items-start gap-10 py-12 sm:py-16 lg:min-h-[520px] lg:grid-cols-[1.1fr_.9fr] lg:pb-2 lg:pt-10">
             <div className="max-w-[760px]">
-              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#facb2e]/25 bg-[#facb2e]/10 px-3 py-1.5 text-xs font-bold text-[#facb2e]"><span className="cap-pulse h-1.5 w-1.5 rounded-full bg-[#facb2e]" />Desde 2006 no mercado cambial</div>
-              <h1 className="cap-display max-w-[680px] text-5xl font-extrabold leading-[.95] text-white sm:text-6xl lg:text-7xl">Câmbio que acompanha <span className="text-[#facb2e]">o seu próximo passo.</span></h1>
-              <p className="mt-7 max-w-[600px] text-base leading-7 text-white/75 sm:text-lg">Câmbio seguro, transparente e próximo de você. Consulte a cotação, reserve sua moeda e retire na loja CAP mais conveniente.</p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row"><span aria-hidden="true" className="invisible inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold lg:hidden">Encontre sua solução <ArrowDownRight className="size-4" /></span><a href={whatsappCambio} data-cap-whatsapp-message="Olá! Vim pelo site da CAP e gostaria de consultar cotações de moeda." target="_blank" rel="noreferrer" className="cap-cta inline-flex h-12 items-center justify-center gap-1 rounded-full px-6 text-sm font-bold"><WhatsAppIcon className="size-4" />Consultar cotação</a></div>
-              <div className="mx-auto mt-5 flex w-fit min-w-[282px] items-center justify-center gap-2 rounded-xl border border-[#facb2e]/30 bg-black/60 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm lg:hidden"><BadgeCheck className="size-4 shrink-0 text-[#facb2e]" /><span className="whitespace-nowrap">Confiança que atravessa fronteiras</span></div>
+              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#facb2e]/25 bg-[#facb2e]/10 px-3 py-1.5 text-xs font-bold text-[#facb2e]"><span className="cap-pulse h-1.5 w-1.5 rounded-full bg-[#facb2e]" />{t('home.hero.since')}</div>
+              <h1 className="cap-display max-w-[680px] text-5xl font-extrabold leading-[.95] text-white sm:text-6xl lg:text-7xl">{t('home.hero.title1')} <span className="text-[#facb2e]">{t('home.hero.title2')}</span></h1>
+              <p className="mt-7 max-w-[600px] text-base leading-7 text-white/75 sm:text-lg">{t('home.hero.subtitle')}</p>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row"><span aria-hidden="true" className="invisible inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold lg:hidden">Encontre sua solução <ArrowDownRight className="size-4" /></span><a href={waUrl(t('home.whatsappCurrency'))} data-cap-whatsapp-message={t('home.whatsappCurrency')} target="_blank" rel="noreferrer" className="cap-cta inline-flex h-12 items-center justify-center gap-1 rounded-full px-6 text-sm font-bold"><WhatsAppIcon className="size-4" />{t('home.hero.cta')}</a></div>
+              <div className="mx-auto mt-5 flex w-fit min-w-[282px] items-center justify-center gap-2 rounded-xl border border-[#facb2e]/30 bg-black/60 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm lg:hidden"><BadgeCheck className="size-4 shrink-0 text-[#facb2e]" /><span className="whitespace-nowrap">{t('home.hero.trust1')} {t('home.hero.trust2')}</span></div>
             </div>
             <div className="hidden lg:relative lg:z-auto lg:mx-0 lg:block lg:w-full lg:max-w-[410px] lg:translate-x-10 lg:overflow-visible">
               <div className="cap-float relative overflow-hidden bg-black lg:aspect-[.78]">
-                <img src={asset("janela-paris.jpeg")} alt="Vista noturna de Paris pela janela de um avião, com carteira CAP Câmbio e euros" className="h-full w-full object-cover object-center" />
+                <img src={asset("janela-paris.jpeg")} alt={t('home.altParisWindow')} className="h-full w-full object-cover object-center" />
                 <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(90deg,#000_0%,transparent_17%,transparent_78%,#000_100%)]" />
                 <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,#000_0%,transparent_14%,transparent_76%,#000_100%)]" />
               </div>
-              <div className="absolute -left-28 top-[62%] hidden rounded-xl border border-[#facb2e]/30 bg-black px-4 py-3 text-sm font-semibold shadow-2xl sm:flex sm:items-center sm:gap-3"><BadgeCheck className="size-6 text-[#facb2e]" /><span>Confiança que<br /><span className="text-white/55">atravessa fronteiras</span></span></div>
+              <div className="absolute -left-28 top-[62%] hidden rounded-xl border border-[#facb2e]/30 bg-black px-4 py-3 text-sm font-semibold shadow-2xl sm:flex sm:items-center sm:gap-3"><BadgeCheck className="size-6 text-[#facb2e]" /><span>{t('home.hero.trust1')}<br /><span className="text-white/55">{t('home.hero.trust2')}</span></span></div>
             </div>
           </div>
         </section>
 
         <section id="servicos" className="scroll-mt-24 bg-[#0d0d0b] py-20 max-sm:py-10 sm:py-20 lg:pb-5 lg:pt-0">
           <div className="container">
-            <div className="max-w-2xl"><p className="cap-kicker text-[#facb2e]">Soluções CAP</p><h2 className="cap-display mt-3 text-4xl font-extrabold sm:text-5xl">A solução certa para cada objetivo.</h2></div>
+            <div className="max-w-2xl"><p className="cap-kicker text-[#facb2e]">{t('home.services.kicker')}</p><h2 className="cap-display mt-3 text-4xl font-extrabold sm:text-5xl">{t('home.services.title')}</h2></div>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
-              {services.map(({ icon: Icon, image, imageSize, logoAlt, title, text, cta }, index) => (
+              {services.map(({ icon: Icon, image, imageSize, title, text, textParts, cta, msgKey }, index) => (
                 <article key={`${title}-${index}`} className="group relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-black p-7 text-center transition duration-200 hover:border-[#facb2e]/45">
                   <div className={`mt-2 flex items-center justify-center ${image ? imageSize ?? "h-12" : "h-12"}`}>
-                    {image ? <img src={image} alt={logoAlt ?? title} className={`${imageSize ?? "h-12"} w-auto max-w-full rounded-lg object-contain`} /> : <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#facb2e] text-black"><Icon className="size-6" /></div>}
+                    {image ? <img src={image} alt={title} className={`${imageSize ?? "h-12"} w-auto max-w-full rounded-lg object-contain`} /> : <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#facb2e] text-black"><Icon className="size-6" /></div>}
                   </div>
                   <h3 className="cap-display mt-7 text-[1.65rem] font-extrabold leading-[1.05] sm:text-[1.75rem]">{title}</h3>
-                  <p className="mx-auto mt-3 max-w-sm text-[0.9375rem] leading-6 text-white/72 sm:text-base">{text}</p>
-                  <button onClick={() => openServiceInquiry(cta)} className="mt-7 inline-flex items-center gap-2 text-[0.9375rem] font-bold text-[#facb2e]">{cta} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></button>
+                  <p className="mx-auto mt-3 max-w-sm text-[0.9375rem] leading-6 text-white/72 sm:text-base">{textParts ? <BoldParts parts={textParts} /> : text}</p>
+                  <button onClick={() => openServiceInquiry(msgKey, msgKey === 'whatsappShipping')} className="mt-7 inline-flex items-center gap-2 text-[0.9375rem] font-bold text-[#facb2e]">{cta} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></button>
                   <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#facb2e] transition-all duration-300 group-hover:w-full" />
                 </article>
               ))}
             </div>
             <div id="reserva" className="scroll-mt-24 mt-12 max-sm:mt-8 sm:mt-14 lg:mt-10" aria-labelledby="reserva-title">
             <div className="max-w-3xl lg:max-w-none">
-              <h2 id="reserva-title" className="cap-display text-4xl font-extrabold leading-[1.02] sm:text-5xl lg:whitespace-nowrap">Se preferir, reserve sua moeda antes de sair de casa.</h2>
+              <h2 id="reserva-title" className="cap-display text-4xl font-extrabold leading-[1.02] sm:text-5xl lg:whitespace-nowrap">{t('home.services.reserveTitle')}</h2>
             </div>
             <ol className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {reservationSteps.map(({ index, title, text, icon: Icon }) => (
@@ -247,11 +210,11 @@ export default function Home() {
                 <path d="M 314 292 L 392 292" stroke="rgba(255,255,255,.19)" strokeWidth="1.5" />
                 <path d="M 334 306 L 414 306" stroke="rgba(250,203,46,.34)" strokeWidth="1.5" />
               </svg>
-              <img src={asset("plataforma-clientes.png")} alt="Plataforma de preços CAP Câmbio em computador e celular" className="relative z-10 w-[72%] max-w-[380px] object-contain drop-shadow-[0_22px_26px_rgba(0,0,0,.42)] sm:max-w-[400px]" />
+              <img src={asset("plataforma-clientes.png")} alt={t('home.altPlatform')} className="relative z-10 w-[72%] max-w-[380px] object-contain drop-shadow-[0_22px_26px_rgba(0,0,0,.42)] sm:max-w-[400px]" />
             </div>
             <div className="max-w-2xl">
-              <p className="cap-kicker text-[#facb2e]">CAP Cotações</p>
-              <h2 id="cotacoes-title" className="cap-display mt-3 text-4xl font-extrabold leading-[1.02] sm:text-5xl">Acompanhe o câmbio com mais praticidade.</h2>
+              <p className="cap-kicker text-[#facb2e]">{t('home.platform.kicker')}</p>
+              <h2 id="cotacoes-title" className="cap-display mt-3 text-4xl font-extrabold leading-[1.02] sm:text-5xl">{t('home.platform.title')}</h2>
               <div className="relative mt-6 flex min-h-[220px] items-center justify-center py-2 sm:hidden">
                 <svg aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 480 360" preserveAspectRatio="none">
                   <defs>
@@ -267,13 +230,13 @@ export default function Home() {
                   <circle cx="24" cy="280" r="5" fill="#facb2e" />
                   <circle cx="462" cy="110" r="5" fill="#facb2e" />
                 </svg>
-                <img src={asset("plataforma-clientes.png")} alt="Plataforma de preços CAP Câmbio em computador e celular" className="relative z-10 w-[72%] max-w-[320px] object-contain drop-shadow-[0_22px_26px_rgba(0,0,0,.42)]" />
+                <img src={asset("plataforma-clientes.png")} alt={t('home.altPlatform')} className="relative z-10 w-[72%] max-w-[320px] object-contain drop-shadow-[0_22px_26px_rgba(0,0,0,.42)]" />
               </div>
-              <p className="mt-5 max-w-xl text-base leading-7 text-white/75 sm:text-lg">Nossos clientes têm acesso exclusivo à CAP Cotações, uma plataforma para acompanhar nossas moedas em tempo real. Consulte gráficos e históricos, faça conversões e configure alertas personalizados para receber notificações.</p>
+              <p className="mt-5 max-w-xl text-base leading-7 text-white/75 sm:text-lg">{t('home.platform.desc')}</p>
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                {["Cotações atualizadas", "Gráficos e histórico", "Alertas personalizados", "Conversor de moedas"].map(item => <div key={item} className="flex items-center gap-2 text-sm font-semibold text-white/78"><BadgeCheck className="size-4 shrink-0 text-[#facb2e]" />{item}</div>)}
+                {[t('home.platform.f1'), t('home.platform.f2'), t('home.platform.f3'), t('home.platform.f4')].map(item => <div key={item} className="flex items-center gap-2 text-sm font-semibold text-white/78"><BadgeCheck className="size-4 shrink-0 text-[#facb2e]" />{item}</div>)}
               </div>
-              <div className="mt-9"><div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center"><a href="/auth" target="_blank" rel="noreferrer" className="cap-cta inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold"><MonitorSmartphone className="size-4" />Acessar plataforma</a><a href={platformAccessWhatsApp} data-cap-whatsapp-message="Olá, sou cliente CAP e gostaria de solicitar acesso à plataforma de cotações." target="_blank" rel="noreferrer" className="cap-outline inline-flex h-12 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white/80">Solicitar acesso pelo WhatsApp <WhatsAppIcon className="size-4 text-[#facb2e]" /></a></div><p className="mt-5 max-w-xl text-xs font-bold leading-5 text-white/78">A plataforma é exclusiva para clientes autorizados pela equipe da CAP. Já é nosso cliente? Solicite seu acesso pelo WhatsApp.</p></div>
+              <div className="mt-9"><div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center"><a href="/auth" target="_blank" rel="noreferrer" className="cap-cta inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold"><MonitorSmartphone className="size-4" />{t('home.platform.access')}</a><a href={waUrl(t('home.whatsappPlatform'))} data-cap-whatsapp-message={t('home.whatsappPlatform')} target="_blank" rel="noreferrer" className="cap-outline inline-flex h-12 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white/80">{t('home.platform.requestWhats')} <WhatsAppIcon className="size-4 text-[#facb2e]" /></a></div><p className="mt-5 max-w-xl text-xs font-bold leading-5 text-white/78">{t('home.platform.exclusive')}</p></div>
             </div>
           </div>
         </section>
@@ -282,9 +245,9 @@ export default function Home() {
           <div className="container grid items-start gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-stretch lg:gap-16">
             <div>
               <div className="max-w-2xl">
-                <p className="cap-kicker text-[#facb2e]">Por que a CAP</p>
-                <h2 className="cap-display mt-3 text-4xl font-extrabold leading-[1.02] sm:text-5xl">Menos ruído. Mais precisão.</h2>
-                <p className="mt-5 max-w-xl text-base leading-7 text-white/75 sm:text-lg">O mercado já tem complexidade suficiente. Nosso trabalho é descomplicar suas operações.</p>
+                <p className="cap-kicker text-[#facb2e]">{t('home.diff.kicker')}</p>
+                <h2 className="cap-display mt-3 text-4xl font-extrabold leading-[1.02] sm:text-5xl">{t('home.diff.title')}</h2>
+                <p className="mt-5 max-w-xl text-base leading-7 text-white/75 sm:text-lg">{t('home.diff.subtitle')}</p>
               </div>
               <div className="mt-8 divide-y divide-white/10 border-y border-white/10">
                 {differentials.map(({ index, title, text }) => (
@@ -297,15 +260,15 @@ export default function Home() {
             </div>
             <aside className="relative overflow-hidden rounded-[1.75rem] bg-[#facb2e] p-7 text-black shadow-[0_28px_70px_rgba(250,203,46,.12)] sm:p-9 lg:flex lg:self-stretch lg:flex-col lg:justify-center lg:p-10">
               <span aria-hidden="true" className="cap-display pointer-events-none absolute -bottom-3 right-4 select-none text-[8.5rem] font-black leading-none tracking-[-.15em] text-black/[.10] sm:-bottom-7 sm:right-6 sm:text-[12rem]">CAP</span>
-              <div className="relative mt-6 lg:mt-0"><h3 className="cap-display max-w-md text-3xl font-extrabold leading-[1.04] sm:text-4xl">Seus planos não têm fronteiras, seu dinheiro também não.</h3><p className="mt-6 max-w-md text-base leading-7 text-black/70">Damos ao seu dinheiro o poder de se movimentar sem barreiras.</p></div>
+              <div className="relative mt-6 lg:mt-0"><h3 className="cap-display max-w-md text-3xl font-extrabold leading-[1.04] sm:text-4xl">{t('home.diff.bannerTitle')}</h3><p className="mt-6 max-w-md text-base leading-7 text-black/70">{t('home.diff.bannerText')}</p></div>
             </aside>
           </div>
         </section>
 
         <section id="sobre" className="scroll-mt-24 py-20 max-sm:py-10 sm:py-20 lg:py-5">
           <div className="container grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]">
-            <div className="order-2 relative lg:order-2"><div className="cap-grid absolute inset-0 rounded-[2rem] opacity-35" /><article className="cap-surface relative flex min-h-[360px] flex-col items-center overflow-hidden rounded-[2rem] border-2 border-[#facb2e]/75 p-7 text-center shadow-2xl sm:p-9"><div aria-hidden="true" className="pointer-events-none absolute inset-3 rounded-[1.35rem] border border-[#facb2e]/20" /><div className="relative inline-flex items-center gap-2 rounded-full border border-[#facb2e]/30 bg-[#facb2e]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.18em] text-[#facb2e]"><ShieldCheck className="size-4" />Correspondente Cambial</div><div className="relative my-6 flex h-28 w-full items-center justify-center sm:h-32 lg:h-40"><img src={asset("invest-corretora.png")} alt="Invest Corretora" className="h-auto w-full max-w-[280px] object-contain lg:max-w-[360px] lg:scale-[1.3]" /></div><h3 className="cap-display relative text-lg font-extrabold uppercase sm:text-xl">INVEST SOCIEDADE CORRETORA DE CAMBIO LTDA</h3><p className="relative mt-3 max-w-xs text-xs leading-5 text-white/70">Atuação cambial orientada por segurança e transparência.</p></article></div>
-            <div className="order-1 lg:order-1"><p className="cap-kicker text-[#facb2e]">Quem somos</p><div className="mt-3"><h2 className="cap-display text-4xl font-extrabold leading-[1.02] sm:text-5xl"><span className="block">Confiança não é</span>{" "}<span className="block">uma promessa.</span><span className="block lg:hidden">É uma prática</span><span className="block lg:hidden">diária.</span></h2></div><h2 className="cap-display mt-3 hidden text-4xl font-extrabold leading-[1.02] sm:text-5xl lg:block">É uma prática diária.</h2><p className="mt-7 max-w-xl text-base leading-7 text-white/75">Com duas décadas de história e uma base sólida de clientes no Rio Grande do Sul, a CAP Câmbio nasceu para oferecer mais do que moeda estrangeira: oferecemos a tranquilidade necessária para você planejar seus próximos passos. Cuidamos do seu câmbio com atenção a cada detalhe, acompanhando você do início ao fim da sua operação.</p></div>
+            <div className="order-2 relative lg:order-2"><div className="cap-grid absolute inset-0 rounded-[2rem] opacity-35" /><article className="cap-surface relative flex min-h-[360px] flex-col items-center overflow-hidden rounded-[2rem] border-2 border-[#facb2e]/75 p-7 text-center shadow-2xl sm:p-9"><div aria-hidden="true" className="pointer-events-none absolute inset-3 rounded-[1.35rem] border border-[#facb2e]/20" /><div className="relative inline-flex items-center gap-2 rounded-full border border-[#facb2e]/30 bg-[#facb2e]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.18em] text-[#facb2e]"><ShieldCheck className="size-4" />{t('home.about.partnerLabel')}</div><div className="relative my-6 flex h-28 w-full items-center justify-center sm:h-32 lg:h-40"><img src={asset("invest-corretora.png")} alt="Invest Corretora" className="h-auto w-full max-w-[280px] object-contain lg:max-w-[360px] lg:scale-[1.3]" /></div><h3 className="cap-display relative text-lg font-extrabold uppercase sm:text-xl">INVEST SOCIEDADE CORRETORA DE CAMBIO LTDA</h3><p className="relative mt-3 max-w-xs text-xs leading-5 text-white/70">{t('home.about.partnerDesc')}</p></article></div>
+            <div className="order-1 lg:order-1"><p className="cap-kicker text-[#facb2e]">{t('home.about.kicker')}</p><div className="mt-3"><h2 className="cap-display text-4xl font-extrabold leading-[1.02] sm:text-5xl"><span className="block">{t('home.about.title1')}</span>{" "}<span className="block">{t('home.about.title2')}</span><span className="block lg:hidden">{t('home.about.title3').split(' ').slice(0, -1).join(' ')}</span><span className="block lg:hidden">{t('home.about.title3').split(' ').slice(-1)}</span></h2></div><h2 className="cap-display mt-3 hidden text-4xl font-extrabold leading-[1.02] sm:text-5xl lg:block">{t('home.about.title3')}</h2><p className="mt-7 max-w-xl text-base leading-7 text-white/75">{t('home.about.desc')}</p></div>
           </div>
         </section>
 
@@ -313,8 +276,8 @@ export default function Home() {
 	          <div className="container">
 	            <div className="grid gap-10 xl:grid-cols-[.72fr_1.28fr] xl:items-start xl:gap-8">
 	              <div>
-	                <p className="cap-kicker text-[#facb2e]">Encontre a CAP Câmbio</p>
-	                <h2 className="cap-display mt-3 max-w-3xl text-3xl font-extrabold leading-[1.08] sm:text-4xl xl:text-[2.15rem]">Dispomos de <span className="font-serif font-bold italic text-[#facb2e]">3 lojas</span> no Rio Grande do Sul.</h2>
+	                <p className="cap-kicker text-[#facb2e]">{t('home.stores.kicker')}</p>
+	                <h2 className="cap-display mt-3 max-w-3xl text-3xl font-extrabold leading-[1.08] sm:text-4xl xl:text-[2.15rem]">{t('home.stores.title1')} <span className="font-serif font-bold italic text-[#facb2e]">{t('home.stores.titleHighlight')}</span> {t('home.stores.title2')}</h2>
 <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-2 lg:flex lg:flex-col lg:gap-3 xl:mt-5 xl:gap-[.625rem]" aria-label={activeTitle.full}>
 		                  <span className="sr-only">{activeTitle.top} {activeTitle.bottom}</span>
 		                  {rotatorTitles.map((title, titleIndex) => {
@@ -334,16 +297,16 @@ export default function Home() {
 	                <div className="relative aspect-[16/9] overflow-hidden bg-[#0d0d0b] xl:aspect-[15/8]">
 	                  <img key={`${activeOffice.city}-backdrop`} src={activeOffice.photo} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover object-center opacity-35 blur-2xl" />
 	                  <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
-	                  <img key={activeOffice.city} src={activeOffice.photo} alt={`Fachada da unidade CAP Câmbio de ${activeOffice.city}`} className="relative z-10 h-full w-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+	                  <img key={activeOffice.city} src={activeOffice.photo} alt={`${t('home.stores.facade')} ${activeOffice.city}`} className="relative z-10 h-full w-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.03]" />
 	                  <div aria-hidden="true" className="absolute inset-0 z-20 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(0,0,0,.12)_52%,rgba(0,0,0,.82)_100%)]" />
 		                  <div aria-hidden="true" className="absolute inset-0 z-20 bg-[linear-gradient(180deg,rgba(0,0,0,.18)_0%,transparent_28%,rgba(0,0,0,.25)_55%,rgba(0,0,0,.96)_100%)]" />
-	                  <div className={`absolute right-3 ${activeOffice.hoursPanelTop} z-30 hidden w-[190px] rounded-xl border border-white/10 bg-black/75 p-3 text-xs text-white/80 shadow-xl backdrop-blur-md xl:block`}><div className="flex items-center gap-2 font-bold text-white"><Clock3 className="size-3.5 shrink-0 text-[#facb2e]" />Horários</div><ul className="mt-2 grid gap-1.5">{activeOffice.hours.map(hour => { const [day, time] = hour.split(": "); return <li key={hour} className="flex items-start justify-between gap-3 leading-4"><span className="text-white/64">{day}</span><span className="shrink-0 text-right font-semibold text-white">{time}</span></li>; })}</ul></div>
-		                  <div className="absolute inset-x-0 bottom-0 z-30 p-4 sm:p-5 xl:p-[1.125rem]"><p className="cap-kicker text-[#facb2e]">Unidade em destaque</p><h3 className="cap-display mt-1 text-2xl font-extrabold sm:text-3xl xl:text-[1.75rem]">{activeOffice.city}</h3>{activeOffice.dhlAuthorized ? <div aria-label="Agente Autorizado DHL" className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#facb2e]/40 bg-black/65 px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[.08em] text-[#facb2e] backdrop-blur-sm"><span>Agente autorizado</span><span aria-hidden="true" className="h-3 w-px bg-[#facb2e]/35" /><img src={asset("dhl-horizontal.png")} alt="DHL" className="h-3.5 w-auto object-contain" /></div> : null}</div>
+	                  <div className={`absolute right-3 ${activeOffice.hoursPanelTop} z-30 hidden w-[190px] rounded-xl border border-white/10 bg-black/75 p-3 text-xs text-white/80 shadow-xl backdrop-blur-md xl:block`}><div className="flex items-center gap-2 font-bold text-white"><Clock3 className="size-3.5 shrink-0 text-[#facb2e]" />{t('home.stores.hours')}</div><ul className="mt-2 grid gap-1.5">{activeOffice.hours.map(hour => <li key={hour.day} className="flex items-start justify-between gap-3 leading-4"><span className="text-white/64">{hour.day}</span><span className="shrink-0 text-right font-semibold text-white">{hour.time}</span></li>)}</ul></div>
+		                  <div className="absolute inset-x-0 bottom-0 z-30 p-4 sm:p-5 xl:p-[1.125rem]"><p className="cap-kicker text-[#facb2e]">{t('home.stores.featured')}</p><h3 className="cap-display mt-1 text-2xl font-extrabold sm:text-3xl xl:text-[1.75rem]">{activeOffice.city}</h3>{activeOffice.dhlAuthorized ? <div aria-label={t('home.stores.authorizedDhl')} className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#facb2e]/40 bg-black/65 px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[.08em] text-[#facb2e] backdrop-blur-sm"><span>{t('home.stores.authorizedAgent')}</span><span aria-hidden="true" className="h-3 w-px bg-[#facb2e]/35" /><img src={asset("dhl-horizontal.png")} alt="DHL" className="h-3.5 w-auto object-contain" /></div> : null}</div>
 	                </div>
 	                <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[1.15fr_.85fr] xl:gap-3.5 xl:p-[1.125rem]">
 	                  <div>
                     <div className="flex items-start gap-3"><MapPin className="mt-0.5 size-5 shrink-0 text-[#facb2e]" /><p className="text-sm leading-6 text-white/75 xl:text-[.8125rem] xl:leading-5">{activeOffice.address}</p></div>
-	                    <div className="mt-3 flex items-start gap-2 text-xs text-white/80 xl:mt-2.5 xl:hidden"><Clock3 className="mt-0.5 size-3.5 shrink-0 text-[#facb2e]" /><div><p className="font-semibold">Horários de atendimento</p><ul className="mt-1 grid gap-0.5 leading-5 text-white/72">{activeOffice.hours.map(hour => <li key={hour}>{hour}</li>)}</ul></div></div>
+	                    <div className="mt-3 flex items-start gap-2 text-xs text-white/80 xl:mt-2.5 xl:hidden"><Clock3 className="mt-0.5 size-3.5 shrink-0 text-[#facb2e]" /><div><p className="font-semibold">{t('home.stores.serviceHours')}</p><ul className="mt-1 grid gap-0.5 leading-5 text-white/72">{activeOffice.hours.map(hour => <li key={hour.day}>{hour.day} {hour.time}</li>)}</ul></div></div>
 	                    <div className="mt-4 flex flex-wrap gap-2 xl:mt-3.5">
                       <a href={`tel:${activeOffice.phone.replace(/\D/g, "")}`} className="cap-outline inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold text-white/80"><Phone className="size-3.5 text-[#facb2e]" />{activeOffice.phone}</a>
                       <a href={activeOffice.whatsappLink} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="cap-outline inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold text-white/80"><MessageCircle className="size-3.5 text-[#facb2e]" />{activeOffice.whatsapp}</a>
@@ -351,8 +314,8 @@ export default function Home() {
                     <a href={`mailto:${activeOffice.email}`} className="mt-3 inline-flex max-w-full items-center gap-2 text-sm text-white/72 transition hover:text-[#facb2e] xl:mt-2.5 xl:text-[.8125rem]"><Mail className="size-4 shrink-0 text-[#facb2e]" /><span className="truncate">{activeOffice.email}</span></a>
 	                  </div>
 	                  <div className="flex flex-col justify-end gap-2 xl:gap-1.5">
-	                    <a href={activeOffice.whatsappLink} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="cap-cta inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold xl:py-[.55rem] xl:text-[.8125rem]">Conversar no WhatsApp <MessageCircle className="size-4" /></a>
-	                    <a href={activeOffice.map} target="_blank" rel="noreferrer" className="cap-outline inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold xl:py-[.55rem] xl:text-[.8125rem]">Como chegar <ExternalLink className="size-4 text-[#facb2e]" /></a>
+	                    <a href={activeOffice.whatsappLink} data-cap-whatsapp-direct target="_blank" rel="noreferrer" className="cap-cta inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold xl:py-[.55rem] xl:text-[.8125rem]">{t('home.stores.chatWhats')} <MessageCircle className="size-4" /></a>
+	                    <a href={activeOffice.map} target="_blank" rel="noreferrer" className="cap-outline inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold xl:py-[.55rem] xl:text-[.8125rem]">{t('home.stores.directions')} <ExternalLink className="size-4 text-[#facb2e]" /></a>
 	                  </div>
 	                </div>
 	              </article>
@@ -360,7 +323,7 @@ export default function Home() {
 	          </div>
 	        </section>
 
-        <ArchivedFaq whatsappUrl={whatsappCaxias} />
+        <ArchivedFaq whatsappUrl={waUrl(t('home.whatsappGeneral'))} />
       </main>
 
       <footer className="border-t border-white/10 bg-[#070707] pb-8 pt-14 lg:pt-8">
@@ -370,22 +333,22 @@ export default function Home() {
               <img src={capLogoUrl} alt="CAP Câmbio" className="h-20 w-auto object-contain" />
             </div>
             <div>
-              <p className="cap-kicker text-white/42">Navegação</p>
-              <div className="mt-4 grid gap-3 text-sm text-white/65">{[["Serviços", "servicos"], ["CAP Cotações", "cotacoes"], ["Sobre nós", "sobre"], ["Lojas", "lojas"], ["FAQ", "faq"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div>
+              <p className="cap-kicker text-white/42">{t('home.footerNav.title')}</p>
+              <div className="mt-4 grid gap-3 text-sm text-white/65">{[[t('home.nav.services'),"servicos"],[t('home.nav.quotes'),"cotacoes"],[t('home.footerNav.aboutUs'),"sobre"],[t('home.nav.stores'),"lojas"],["FAQ","faq"]].map(([label, id]) => <button key={id} onClick={() => scrollToId(id)} className="w-fit text-left hover:text-[#facb2e]">{label}</button>)}</div>
             </div>
             <div>
-              <p className="cap-kicker text-white/42">Canais oficiais</p>
+              <p className="cap-kicker text-white/42">{t('home.footerChannels')}</p>
               <div className="mt-4 grid gap-3 text-sm text-white/65">
-                <a href={footerWhatsApp} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#facb2e]"><MessageCircle className="size-4" />WhatsApp</a>
+                <a href={waUrl(t('home.whatsappFooter'))} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#facb2e]"><MessageCircle className="size-4" />WhatsApp</a>
                 <a href="mailto:capcambio_caxias@hotmail.com" className="flex items-center gap-2 hover:text-[#facb2e]"><Mail className="size-4" />E-mail</a>
-                <a href="tel:+555432232000" className="flex items-center gap-2 hover:text-[#facb2e]"><Phone className="size-4" />Telefone</a>
+                <a href="tel:+555432232000" className="flex items-center gap-2 hover:text-[#facb2e]"><Phone className="size-4" />{t('home.channelPhone')}</a>
               </div>
             </div>
             <div id="legal">
-              <div className="flex flex-col gap-2 text-sm font-semibold text-[#facb2e]"><a href="/privacidade">Políticas de Privacidade</a><a href="/termos">Termos de uso</a></div>
+              <div className="flex flex-col gap-2 text-sm font-semibold text-[#facb2e]"><a href="/privacidade">{t('legal.privacy.kicker')}</a><a href="/termos">{t('legal.terms.kicker')}</a></div>
             </div>
           </div>
-          <div className="mt-12 flex flex-col justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/34 sm:flex-row"><p>© {new Date().getFullYear()} CAP Câmbio. Todos os direitos reservados.</p><p>Desenvolvido para uma experiência mais clara e segura.</p></div>
+          <div className="mt-12 flex flex-col justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/34 sm:flex-row"><p>© {new Date().getFullYear()} CAP Câmbio. {t('footer.copyright')}</p><p>{t('home.footerTagline')}</p></div>
         </div>
       </footer>
 

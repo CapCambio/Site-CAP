@@ -3,11 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Currency } from '../lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
-import { 
-  scrapeCurrencyData, 
-  storeCurrencyData, 
+import {
+  scrapeCurrencyData,
+  storeCurrencyData,
   getCachedCurrencyData,
-  shouldRefreshData
+  shouldRefreshData,
+  formatDateTime
 } from '../lib/currency';
 
 export function useCurrencyData() {
@@ -45,13 +46,9 @@ export function useCurrencyData() {
 
   // Get the formatted last update time
   const getFormattedLastUpdate = () => {
-    if (!lastUpdated) return 'Não disponível';
+    if (!lastUpdated) return t('common.notAvailable');
 
-    return lastUpdated.toLocaleDateString('pt-BR') + ' ' + 
-           lastUpdated.toLocaleTimeString('pt-BR', { 
-             hour: '2-digit', 
-             minute: '2-digit' 
-           });
+    return formatDateTime(lastUpdated);
   };
 
   // Refresh currency data

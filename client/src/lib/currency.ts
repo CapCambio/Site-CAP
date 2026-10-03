@@ -1,4 +1,5 @@
 import { Currency, CurrencyHistory, ScrapedCurrency } from "./types";
+import i18n from "./i18n";
 
 // Map currency codes to flag icons using flagcdn.com
 export const currencyFlags: Record<string, string> = {
@@ -23,28 +24,40 @@ export const currencyFlags: Record<string, string> = {
   AED: "ae", // Emirados Árabes Unidos
 };
 
-// Currency details like full names
-export const currencyDetails: Record<string, { name: string }> = {
-  USD: { name: "Dólar Americano" },
-  EUR: { name: "Euro" },
-  GBP: { name: "Libra Esterlina" },
-  CAD: { name: "Dólar Canadense" },
-  AUD: { name: "Dólar Australiano" },
-  JPY: { name: "Iene" },
-  CHF: { name: "Franco Suíço" },
-  CNY: { name: "Iuan" },
-  ARS: { name: "Peso Argentino" },
-  UYU: { name: "Peso Uruguaio" },
-  PEN: { name: "Nuevo Sol" },
-  CLP: { name: "Peso Chileno" },
-  MXN: { name: "Peso Mexicano" },
-  PYG: { name: "Guarani Paraguaio" },
-  BOB: { name: "Boliviano" },
-  COP: { name: "Peso Colombiano" },
-  NZD: { name: "Dólar Neozelandês" },
-  ZAR: { name: "Rand Africano" },
-  AED: { name: "Dirham dos Emirados Árabes" },
+// Currency codes list (names are translated via i18n keys: currencies.USD, currencies.EUR, etc.)
+export const currencyDetails: Record<string, {}> = {
+  USD: {},
+  EUR: {},
+  GBP: {},
+  CAD: {},
+  AUD: {},
+  JPY: {},
+  CHF: {},
+  CNY: {},
+  ARS: {},
+  UYU: {},
+  PEN: {},
+  CLP: {},
+  MXN: {},
+  PYG: {},
+  BOB: {},
+  COP: {},
+  NZD: {},
+  ZAR: {},
+  AED: {},
 };
+
+// Map i18n language codes to BCP 47 locale codes
+function getLocale(): string {
+  const lang = i18n.language || 'pt';
+  const localeMap: Record<string, string> = {
+    'pt': 'pt-BR',
+    'en': 'en-US',
+    'es': 'es-ES',
+    'fr': 'fr-FR'
+  };
+  return localeMap[lang] || 'pt-BR';
+}
 
 // Format currency values according to their rules
 // Shows up to 5 decimal places, and remove trailing zeros that don't change the value
@@ -54,19 +67,22 @@ export function formatCurrencyValue(code: string, value: number): string {
   }
   const valueStr = value.toString();
   const [intPart, rawDecPart = ''] = valueStr.split('.');
-  
+
   // Adiciona pontos de milhar na parte inteira
-  const formattedIntPart = parseInt(intPart).toLocaleString('pt-BR');
-  
+  const locale = getLocale();
+  const formattedIntPart = parseInt(intPart).toLocaleString(locale);
+
   const decPart = rawDecPart.length > 5 ? rawDecPart.slice(0, 5) : rawDecPart;
   const minTwoDecimals = decPart.replace(/0+$/, '').padEnd(2, '0');
-  
+
   // Oculta ,00 para todas as moedas quando não há centavos
   if (minTwoDecimals === "00") {
     return formattedIntPart;
   }
-  
-  return `${formattedIntPart},${minTwoDecimals}`;
+
+  // Use comma for pt-BR, dot for others
+  const decimalSep = locale === 'pt-BR' ? ',' : '.';
+  return `${formattedIntPart}${decimalSep}${minTwoDecimals}`;
 }
 
 // Format percentage changes
@@ -84,18 +100,19 @@ export function formatPercentage(value: number | null): string {
   return `${intPart},${decPart}%`;
 }
 
-// Format dates to Brazilian format
+// Format dates to locale format
 export function formatDate(date: Date | string): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString('pt-BR');
+  return dateObj.toLocaleDateString(getLocale());
 }
 
-// Format time to Brazilian format
+// Format time to locale format
 export function formatDateTime(date: Date): string {
-  return date.toLocaleDateString('pt-BR') + ' ' + 
-         date.toLocaleTimeString('pt-BR', { 
-           hour: '2-digit', 
-           minute: '2-digit' 
+  const locale = getLocale();
+  return date.toLocaleDateString(locale) + ' ' +
+         date.toLocaleTimeString(locale, {
+           hour: '2-digit',
+           minute: '2-digit'
          });
 }
 

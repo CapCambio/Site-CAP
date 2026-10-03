@@ -293,21 +293,25 @@ export default function LoginPage() {
               </DialogHeader>
               <div className="flex flex-col gap-3 mt-4">
                 {[
-                  { name: t('whatsapp.branchCaxias'), link: "https://api.whatsapp.com/send?phone=5554984348005&text=Vim%20do%20site%20e%20gostaria%20de%20informa%C3%A7%C3%B5es" },
-                  { name: t('whatsapp.branchBento'), link: "https://api.whatsapp.com/send?phone=5554999578486&text=Vim%20do%20site%20e%20gostaria%20de%20informa%C3%A7%C3%B5es" },
-                  { name: t('whatsapp.branchPasso'), link: "https://api.whatsapp.com/send?phone=5554996280422&text=Vim%20do%20site%20e%20gostaria%20de%20informa%C3%A7%C3%B5es" }
-                ].map((branch) => (
-                  <a
-                    key={branch.name}
-                    href={branch.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-3 rounded-md bg-zinc-800 hover:bg-zinc-700 transition-colors"
-                  >
-                    <FaWhatsapp className="text-green-500 text-xl" />
-                    <span className="text-yellow-500">{branch.name}</span>
-                  </a>
-                ))}
+                  { name: t('whatsapp.branchCaxias'), phone: "5554984348005" },
+                  { name: t('whatsapp.branchBento'), phone: "5554999578486" },
+                  { name: t('whatsapp.branchPasso'), phone: "5554996280422" }
+                ].map((branch) => {
+                  const message = encodeURIComponent(t('whatsapp.defaultMessage'));
+                  const link = `https://api.whatsapp.com/send?phone=${branch.phone}&text=${message}`;
+                  return (
+                    <a
+                      key={branch.name}
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 p-3 rounded-md bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                    >
+                      <FaWhatsapp className="text-green-500 text-xl" />
+                      <span className="text-yellow-500">{branch.name}</span>
+                    </a>
+                  );
+                })}
               </div>
             </DialogContent>
           </Dialog>

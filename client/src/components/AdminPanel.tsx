@@ -9,6 +9,18 @@ import { ArrowLeft, Settings, Search, Trash2, LogOut, Edit, Bell, TrendingUp, Tr
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
+
+function getLocale(): string {
+  const lang = i18n.language || 'pt';
+  const localeMap: Record<string, string> = {
+    'pt': 'pt-BR',
+    'en': 'en-US',
+    'es': 'es-ES',
+    'fr': 'fr-FR'
+  };
+  return localeMap[lang] || 'pt-BR';
+}
 
 interface AuthorizedEmail {
   email: string;
@@ -114,7 +126,7 @@ const UserAlerts: React.FC<{ email: string }> = ({ email }) => {
       return t('admin.indefiniteTime');
     }
     const date = new Date(alert.validade);
-    return `${t('admin.until')} ${date.toLocaleDateString('pt-BR')}`;
+    return `${t('admin.until')} ${date.toLocaleDateString(getLocale())}`;
   };
 
   if (isLoading) {
@@ -343,7 +355,7 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
       return t('admin.indefiniteTime');
     }
     const date = new Date(alert.validade);
-    return `${t('admin.until')} ${date.toLocaleDateString('pt-BR')}`;
+    return `${t('admin.until')} ${date.toLocaleDateString(getLocale())}`;
   };
 
   const getUserName = (email: string) => {
@@ -366,26 +378,30 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
   const generateMonthOptions = () => {
     const options = [];
     const now = new Date();
-    
+
+    const monthKeys = [
+      'admin.january', 'admin.february', 'admin.march', 'admin.april',
+      'admin.may', 'admin.june', 'admin.july', 'admin.august',
+      'admin.september', 'admin.october', 'admin.november', 'admin.december'
+    ];
+
     for (let i = 0; i < 12; i++) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const value = `${year}-${month}`;
-      
-      const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
-                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-      const label = `${monthNames[date.getMonth()]} ${year}`;
-      
+
+      const label = `${t(monthKeys[date.getMonth()])} ${year}`;
+
       options.push({ value, label });
     }
-    
+
     return options;
   };
 
   const getSelectedMonthLabel = () => {
     const selectedOption = monthOptions.find(option => option.value === selectedMonth);
-    return selectedOption ? selectedOption.label : 'Este mês';
+    return selectedOption ? selectedOption.label : t('admin.thisMonth');
   };
 
   const monthOptions = generateMonthOptions();

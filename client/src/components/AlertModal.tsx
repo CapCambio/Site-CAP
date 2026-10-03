@@ -10,6 +10,18 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { http } from "@/lib/http";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
+
+function getLocale(): string {
+  const lang = i18n.language || 'pt';
+  const localeMap: Record<string, string> = {
+    'pt': 'pt-BR',
+    'en': 'en-US',
+    'es': 'es-ES',
+    'fr': 'fr-FR'
+  };
+  return localeMap[lang] || 'pt-BR';
+}
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -76,11 +88,11 @@ export function AlertModal({
         });
       } else {
         const acao = tipo === 'subida' ? t('alerts.riseAction') : t('alerts.fallAction');
-        const dataValidade = new Date(validade).toLocaleDateString('pt-BR');
-        description = t('alerts.alertCreatedPeriod', { 
-          currencyName, 
-          action: acao, 
-          date: dataValidade 
+        const dataValidade = new Date(validade).toLocaleDateString(getLocale());
+        description = t('alerts.alertCreatedPeriod', {
+          currencyName,
+          action: acao,
+          date: dataValidade
         });
       }
 

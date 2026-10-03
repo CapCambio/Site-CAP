@@ -1,0 +1,202 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "close": "Close",
+    "back": "Back",
+    "learnMore": "Learn more"
+  },
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "CAP Câmbio",
+    "subtitle": "Exchange solutions with security and transparency",
+    "cta": "View Quotes"
+  },
+  "services": {
+    "title": "Our Services",
+    "currencyExchange": "Currency Exchange",
+    "wireTransfer": "International Transfers",
+    "shipping": "International Shipping"
+  },
+  "footer": {
+    "copyright": "All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "message": "The page you're looking for doesn't exist.",
+    "backHome": "Back to home",
+    "kicker": "Page not found",
+    "heading": "This destination is not available.",
+    "description": "The address may have been updated or doesn't exist. Return to the home page and find the right path for your operation.",
+    "contactCAP": "Contact CAP"
+  },
+  "legal": {
+    "back": "Back",
+    "footer": "Last visual update of this page: August 2026. For complete internal policies or specific questions, contact CAP Câmbio directly.",
+    "privacy": {
+      "kicker": "Privacy",
+      "title": "Clear information about how your contact details are used.",
+      "intro": "This unified notice describes, in plain language, how data collected through the institutional website and the CAP Cotações platform is used by CAP Câmbio.",
+      "s1t": "Submitted data",
+      "s1x": "Contact channels may request your name, email, phone number, and message. Avoid including bank details, passwords, documents, or sensitive information in messages.",
+      "s2t": "Purpose",
+      "s2x": "Information is recorded to respond to service requests, prepare a quote when applicable, and maintain basic contact history.",
+      "s3t": "Cookies and metrics",
+      "s3x": "The website uses cookies and measurement technologies, with your consent, to understand site usage and improve the platform experience.",
+      "s4t": "Access and protection",
+      "s4x": "Access to requests is restricted to the responsible service team. CAP Câmbio must continuously evaluate its internal security and data retention practices.",
+      "s5t": "Your channels",
+      "s5x": "For questions about a submitted contact request, use the official channels listed on this page and provide the necessary information to locate your request."
+    },
+    "terms": {
+      "kicker": "Terms of use",
+      "title": "Transparency before any operation.",
+      "intro": "These unified terms cover the institutional website and the CAP Cotações platform. Any operation must be confirmed directly with CAP Câmbio.",
+      "s1t": "CAP Cotações",
+      "s1x": "Information available on the platform is for reference and tracking purposes only. It does not represent a proposal, reservation, guaranteed rate, or final contracting condition.",
+      "s2t": "Service",
+      "s2x": "Conditions, currency availability, required documents, and timelines vary by operation. Confirm these details with a specialist before making a decision.",
+      "s3t": "Content",
+      "s3x": "The texts and elements on this website do not replace specific financial, legal, accounting, or tax advice for your situation.",
+      "s4t": "Updates",
+      "s4x": "Institutional and operational content may be updated to reflect changes in services and service channels."
+    }
+  },
+  "home": {
+    "whatsappGeneral": "Hello! I found CAP's website and would like more information.",
+    "whatsappCurrency": "Hello! I found CAP's website and would like to check currency quotes.",
+    "whatsappFooter": "Hello, I would like to speak with the CAP Cambio team.",
+    "whatsappPlatform": "Hello, I'm a CAP client and would like to request access to the quotes platform.",
+    "whatsappTransfer": "Hello! I found CAP's website and would like to know about international transfers.",
+    "whatsappShipping": "Hello! I found CAP's website and would like to know about DHL international shipping.",
+    "hours": {
+      "weekday": "Business day",
+      "weekdaySat": "Business day & Saturday",
+      "saturday": "Saturday",
+      "sunday": "Sunday",
+      "closed": "Closed"
+    },
+    "nav": {
+      "services": "Services",
+      "quotes": "CAP Quotes",
+      "about": "About",
+      "stores": "Offices",
+      "goToStart": "Go to home",
+      "openMenu": "Open menu",
+      "talkToUs": "Talk to Us"
+    },
+    "hero": {
+      "since": "In the exchange market since 2006",
+      "title1": "Exchange that keeps up",
+      "title2": "with your next step.",
+      "subtitle": "Secure, transparent exchange close to you. Check quotes, reserve your currency, and pick it up at the nearest CAP office.",
+      "cta": "Check quotes",
+      "trust1": "Trust that",
+      "trust2": "crosses borders"
+    },
+    "services": {
+      "kicker": "CAP Solutions",
+      "title": "The right solution for every goal.",
+      "s1title": "Cash Currency",
+      "s1text": "Buy and sell foreign currencies. We work with the world's major currencies at competitive rates.",
+      "s1cta": "Check exchange",
+      "s2title": "International Transfers",
+      "s2textParts": [
+        "Send money abroad through ",
+        "MoneyGram",
+        " or ",
+        "RIA/Unitransfer",
+        " networks, with guidance from our team on deadlines and conditions. Receive your funds in cash via ",
+        "MoneyGram",
+        "."
+      ],
+      "s2cta": "Check transfer",
+      "s3title": "International Package and Document Shipping",
+      "s3textParts": [
+        "Ship items anywhere in the world safely. Our offices in ",
+        "Bento Goncalves",
+        " and ",
+        "Passo Fundo",
+        " are authorized ",
+        "DHL",
+        " agents."
+      ],
+      "s3cta": "Check shipping",
+      "reserveTitle": "If you prefer, reserve your currency before leaving home.",
+      "r1title": "Check the quote",
+      "r1text": "Contact our team via WhatsApp and provide the currency and desired amount.",
+      "r2title": "Reserve your currency",
+      "r2text": "After team confirmation, we set your reservation aside.",
+      "r3title": "Choose how to pay",
+      "r3text": "Pay at pickup or pay early via Pix and send the receipt via WhatsApp.",
+      "r4title": "Pick up at the chosen office",
+      "r4text": "Visit one of the CAP offices during business hours and pick up your reservation conveniently."
+    },
+    "platform": {
+      "kicker": "CAP Quotes",
+      "title": "Track exchange rates with more convenience.",
+      "desc": "Our clients have exclusive access to CAP Cotacoes, a platform to track our currencies in real time. Check charts and history, make conversions, and set up custom alerts to receive notifications.",
+      "f1": "Real-time quotes",
+      "f2": "Charts and history",
+      "f3": "Custom alerts",
+      "f4": "Currency converter",
+      "access": "Access platform",
+      "requestWhats": "Request access via WhatsApp",
+      "exclusive": "The platform is exclusive to clients authorized by the CAP team. Already a client? Request your access via WhatsApp."
+    },
+    "diff": {
+      "kicker": "Why CAP",
+      "title": "Less noise. More precision.",
+      "subtitle": "The market is complex enough. Our job is to simplify your operations.",
+      "d1title": "Competitive rates, no fine print",
+      "d1text": "Have clarity about the conditions and cost of the transaction before completing it.",
+      "d2title": "A person on the other end",
+      "d2text": "We're not just a screen. Our agents hold ABT and PLDFT certifications, ready to support you throughout your transaction.",
+      "d3title": "Time is part of the service",
+      "d3text": "Quick response, organized process, and real-time support.",
+      "bannerTitle": "Your plans have no borders, and neither does your money.",
+      "bannerText": "We give your money the power to move without barriers."
+    },
+    "about": {
+      "kicker": "Who we are",
+      "title1": "Trust is not",
+      "title2": "a promise.",
+      "title3": "It is a daily practice.",
+      "desc": "With two decades of history and a solid client base in Rio Grande do Sul, CAP Cambio was born to offer more than foreign currency: we provide the peace of mind you need to plan your next steps. We handle your exchange with attention to every detail, supporting you from start to finish.",
+      "partnerLabel": "Exchange Correspondent",
+      "partnerDesc": "Exchange operations guided by security and transparency."
+    },
+    "stores": {
+      "kicker": "Find CAP Cambio",
+      "title1": "We have",
+      "titleHighlight": "3 offices",
+      "title2": "in Rio Grande do Sul.",
+      "hours": "Hours",
+      "featured": "Featured office",
+      "authorizedAgent": "Authorized agent",
+      "serviceHours": "Business hours",
+      "chatWhats": "Chat on WhatsApp",
+      "directions": "Get directions",
+      "facade": "CAP Cambio office facade in",
+      "mainNav": "Main navigation",
+      "mobileNav": "Mobile navigation",
+      "authorizedDhl": "Authorized DHL Agent"
+    },
+    "footerNav": {
+      "title": "Navigation",
+      "aboutUs": "About us"
+    },
+    "footerChannels": "Official channels",
+    "footerPolicies": "Privacy Policies",
+    "footerTagline": "Built for a clearer and safer experience.",
+    "altParisWindow": "Night view of Paris through an airplane window, with CAP Cambio wallet and euros",
+    "altPlatform": "CAP Cambio pricing platform on computer and mobile",
+    "channelPhone": "Phone"
+  }
+}

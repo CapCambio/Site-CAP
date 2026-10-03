@@ -1,0 +1,202 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "close": "Fechar",
+    "back": "Voltar",
+    "learnMore": "Saiba mais"
+  },
+  "nav": {
+    "home": "Início",
+    "services": "Serviços",
+    "about": "Sobre",
+    "contact": "Contato"
+  },
+  "hero": {
+    "title": "CAP Câmbio",
+    "subtitle": "Soluções cambiais com segurança e transparência",
+    "cta": "Ver Cotações"
+  },
+  "services": {
+    "title": "Nossos Serviços",
+    "currencyExchange": "Câmbio de Moedas",
+    "wireTransfer": "Transferências Internacionais",
+    "shipping": "Envios Internacionais"
+  },
+  "footer": {
+    "copyright": "Todos os direitos reservados.",
+    "privacyPolicy": "Política de Privacidade",
+    "termsOfUse": "Termos de Uso"
+  },
+  "notFound": {
+    "title": "Página Não Encontrada",
+    "message": "A página que você procura não existe.",
+    "backHome": "Voltar para o início",
+    "kicker": "Página não encontrada",
+    "heading": "Este destino não está disponível.",
+    "description": "O endereço pode ter sido atualizado ou não existe. Volte para a página inicial e encontre o caminho certo para a sua operação.",
+    "contactCAP": "Falar com a CAP"
+  },
+  "legal": {
+    "back": "Voltar",
+    "footer": "Última atualização visual desta página: agosto de 2026. Para políticas internas completas ou dúvidas específicas, entre em contato diretamente com a CAP Câmbio.",
+    "privacy": {
+      "kicker": "Privacidade",
+      "title": "Informações claras sobre o uso do seu contato.",
+      "intro": "Este aviso unificado descreve, em linguagem simples, como os dados tratados no site institucional e na plataforma CAP Cotações são utilizados pela CAP Câmbio.",
+      "s1t": "Dados enviados",
+      "s1x": "Os canais de contato podem solicitar nome, e-mail, telefone e mensagem. Evite incluir dados bancários, senhas, documentos ou informações sensíveis em mensagens.",
+      "s2t": "Finalidade",
+      "s2x": "As informações são registradas para responder à solicitação de atendimento, preparar uma cotação quando aplicável e manter o histórico básico do contato.",
+      "s3t": "Cookies e métricas",
+      "s3x": "O site utiliza cookies e tecnologias de medição, mediante seu consentimento, para compreender o uso do site e aprimorar a experiência na plataforma.",
+      "s4t": "Acesso e proteção",
+      "s4x": "O acesso aos pedidos é restrito ao atendimento responsável. A CAP Câmbio deve avaliar continuamente suas práticas internas de segurança e retenção de dados.",
+      "s5t": "Seus canais",
+      "s5x": "Para dúvidas sobre um contato enviado, use os canais oficiais divulgados nesta página e informe os dados necessários para localizar a solicitação."
+    },
+    "terms": {
+      "kicker": "Termos de uso",
+      "title": "Transparência antes de qualquer operação.",
+      "intro": "Estes termos unificados abrangem o site institucional e a plataforma CAP Cotações. Qualquer operação deve ser confirmada diretamente com a CAP Câmbio.",
+      "s1t": "CAP Cotações",
+      "s1x": "As informações disponibilizadas na plataforma têm caráter de acompanhamento e referência. Elas não representam proposta, reserva, taxa garantida ou condição final de contratação.",
+      "s2t": "Atendimento",
+      "s2x": "Condições, disponibilidade de moedas, documentos e prazos variam conforme a operação. Confirme esses pontos com um especialista antes de tomar uma decisão.",
+      "s3t": "Conteúdo",
+      "s3x": "Os textos e elementos deste site não substituem orientação financeira, jurídica, contábil ou tributária específica para o seu caso.",
+      "s4t": "Atualizações",
+      "s4x": "Os conteúdos institucionais e operacionais podem ser atualizados para refletir mudanças nos serviços e nos canais de atendimento."
+    }
+  },
+  "home": {
+    "whatsappGeneral": "Olá! Vim pelo site da CAP e gostaria de mais informações.",
+    "whatsappCurrency": "Olá! Vim pelo site da CAP e gostaria de consultar cotações de moeda.",
+    "whatsappFooter": "Olá, gostaria de falar com a equipe da CAP Câmbio.",
+    "whatsappPlatform": "Olá, sou cliente CAP e gostaria de solicitar acesso à plataforma de cotações.",
+    "whatsappTransfer": "Olá! Vim pelo site da CAP e gostaria de saber sobre transferências internacionais.",
+    "whatsappShipping": "Olá! Vim pelo site da CAP e gostaria de saber sobre envios internacionais DHL.",
+    "hours": {
+      "weekday": "Dia útil",
+      "weekdaySat": "Dia útil e sábado",
+      "saturday": "Sábado",
+      "sunday": "Domingo",
+      "closed": "Fechado"
+    },
+    "nav": {
+      "services": "Serviços",
+      "quotes": "CAP Cotações",
+      "about": "Sobre",
+      "stores": "Lojas",
+      "goToStart": "Ir para o início",
+      "openMenu": "Abrir menu",
+      "talkToUs": "Fale Conosco"
+    },
+    "hero": {
+      "since": "Desde 2006 no mercado cambial",
+      "title1": "Câmbio que acompanha",
+      "title2": "o seu próximo passo.",
+      "subtitle": "Câmbio seguro, transparente e próximo de você. Consulte a cotação, reserve sua moeda e retire na loja CAP mais conveniente.",
+      "cta": "Consultar cotação",
+      "trust1": "Confiança que",
+      "trust2": "atravessa fronteiras"
+    },
+    "services": {
+      "kicker": "Soluções CAP",
+      "title": "A solução certa para cada objetivo.",
+      "s1title": "Papel Moeda",
+      "s1text": "Compra e venda de moedas estrangeiras. Trabalhamos com as principais moedas do mundo com taxas competitivas.",
+      "s1cta": "Consultar câmbio",
+      "s2title": "Transferências Internacionais",
+      "s2textParts": [
+        "Envie dinheiro para o exterior pelas redes ",
+        "MoneyGram",
+        " ou ",
+        "RIA/Unitransfer",
+        ", com orientação da nossa equipe sobre prazos e condições. Receba seus valores em espécie via ",
+        "MoneyGram",
+        "."
+      ],
+      "s2cta": "Consultar remessa",
+      "s3title": "Envios Internacionais de Pacotes e Documentos",
+      "s3textParts": [
+        "Envie objetos para qualquer lugar do mundo com segurança. Nossas lojas de ",
+        "Bento Gonçalves",
+        " e ",
+        "Passo Fundo",
+        " são agentes autorizados ",
+        "DHL",
+        "."
+      ],
+      "s3cta": "Consultar envio",
+      "reserveTitle": "Se preferir, reserve sua moeda antes de sair de casa.",
+      "r1title": "Consulte a cotação",
+      "r1text": "Fale com nossa equipe pelo WhatsApp e informe a moeda e o valor desejado.",
+      "r2title": "Reserve sua moeda",
+      "r2text": "Após a confirmação da equipe, deixamos sua reserva separada.",
+      "r3title": "Escolha como pagar",
+      "r3text": "Pague na retirada ou antecipe o pagamento por Pix e envie o comprovante pelo WhatsApp.",
+      "r4title": "Retire na loja escolhida",
+      "r4text": "Passe em uma das lojas CAP dentro do horário de atendimento e retire sua reserva com praticidade."
+    },
+    "platform": {
+      "kicker": "CAP Cotações",
+      "title": "Acompanhe o câmbio com mais praticidade.",
+      "desc": "Nossos clientes têm acesso exclusivo à CAP Cotações, uma plataforma para acompanhar nossas moedas em tempo real. Consulte gráficos e históricos, faça conversões e configure alertas personalizados para receber notificações.",
+      "f1": "Cotações atualizadas",
+      "f2": "Gráficos e histórico",
+      "f3": "Alertas personalizados",
+      "f4": "Conversor de moedas",
+      "access": "Acessar plataforma",
+      "requestWhats": "Solicitar acesso pelo WhatsApp",
+      "exclusive": "A plataforma é exclusiva para clientes autorizados pela equipe da CAP. Já é nosso cliente? Solicite seu acesso pelo WhatsApp."
+    },
+    "diff": {
+      "kicker": "Por que a CAP",
+      "title": "Menos ruído. Mais precisão.",
+      "subtitle": "O mercado já tem complexidade suficiente. Nosso trabalho é descomplicar suas operações.",
+      "d1title": "Taxas competitivas e sem letras miúdas",
+      "d1text": "Tenha clareza sobre as condições e o valor da operação antes de concluir.",
+      "d2title": "Uma pessoa do outro lado",
+      "d2text": "Não somos só uma tela. Nossos atendentes possuem certificações ABT e PLDFT, prontos para acompanhar você durante toda a sua operação.",
+      "d3title": "Tempo é parte do serviço",
+      "d3text": "Resposta rápida, processo organizado e suporte em tempo real.",
+      "bannerTitle": "Seus planos não têm fronteiras, seu dinheiro também não.",
+      "bannerText": "Damos ao seu dinheiro o poder de se movimentar sem barreiras."
+    },
+    "about": {
+      "kicker": "Quem somos",
+      "title1": "Confiança não é",
+      "title2": "uma promessa.",
+      "title3": "É uma prática diária.",
+      "desc": "Com duas décadas de história e uma base sólida de clientes no Rio Grande do Sul, a CAP Câmbio nasceu para oferecer mais do que moeda estrangeira: oferecemos a tranquilidade necessária para você planejar seus próximos passos. Cuidamos do seu câmbio com atenção a cada detalhe, acompanhando você do início ao fim da sua operação.",
+      "partnerLabel": "Correspondente Cambial",
+      "partnerDesc": "Atuação cambial orientada por segurança e transparência."
+    },
+    "stores": {
+      "kicker": "Encontre a CAP Câmbio",
+      "title1": "Dispomos de",
+      "titleHighlight": "3 lojas",
+      "title2": "no Rio Grande do Sul.",
+      "hours": "Horários",
+      "featured": "Unidade em destaque",
+      "authorizedAgent": "Agente autorizado",
+      "serviceHours": "Horários de atendimento",
+      "chatWhats": "Conversar no WhatsApp",
+      "directions": "Como chegar",
+      "facade": "Fachada da unidade CAP Câmbio de",
+      "mainNav": "Navegação principal",
+      "mobileNav": "Navegação móvel",
+      "authorizedDhl": "Agente Autorizado DHL"
+    },
+    "footerNav": {
+      "title": "Navegação",
+      "aboutUs": "Sobre nós"
+    },
+    "footerChannels": "Canais oficiais",
+    "footerPolicies": "Políticas de Privacidade",
+    "footerTagline": "Desenvolvido para uma experiência mais clara e segura.",
+    "altParisWindow": "Vista noturna de Paris pela janela de um avião, com carteira CAP Câmbio e euros",
+    "altPlatform": "Plataforma de preços CAP Câmbio em computador e celular",
+    "channelPhone": "Telefone"
+  }
+}

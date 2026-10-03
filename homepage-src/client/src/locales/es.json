@@ -1,0 +1,202 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "close": "Cerrar",
+    "back": "Volver",
+    "learnMore": "Más información"
+  },
+  "nav": {
+    "home": "Inicio",
+    "services": "Servicios",
+    "about": "Acerca de",
+    "contact": "Contacto"
+  },
+  "hero": {
+    "title": "CAP Câmbio",
+    "subtitle": "Soluciones cambiarias con seguridad y transparencia",
+    "cta": "Ver Cotizaciones"
+  },
+  "services": {
+    "title": "Nuestros Servicios",
+    "currencyExchange": "Cambio de Monedas",
+    "wireTransfer": "Transferencias Internacionales",
+    "shipping": "Envíos Internacionales"
+  },
+  "footer": {
+    "copyright": "Todos los derechos reservados.",
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfUse": "Términos de Uso"
+  },
+  "notFound": {
+    "title": "Página No Encontrada",
+    "message": "La página que buscas no existe.",
+    "backHome": "Volver al inicio",
+    "kicker": "Página no encontrada",
+    "heading": "Este destino no está disponible.",
+    "description": "La dirección puede haber sido actualizada o no existe. Vuelve a la página principal y encuentra el camino correcto para tu operación.",
+    "contactCAP": "Hablar con CAP"
+  },
+  "legal": {
+    "back": "Volver",
+    "footer": "Última actualización visual de esta página: agosto de 2026. Para políticas internas completas o dudas específicas, contacte directamente a CAP Câmbio.",
+    "privacy": {
+      "kicker": "Privacidad",
+      "title": "Información clara sobre el uso de su contacto.",
+      "intro": "Este aviso unificado describe, en lenguaje sencillo, cómo los datos tratados en el sitio institucional y en la plataforma CAP Cotações son utilizados por CAP Câmbio.",
+      "s1t": "Datos enviados",
+      "s1x": "Los canales de contacto pueden solicitar nombre, correo electrónico, teléfono y mensaje. Evite incluir datos bancarios, contraseñas, documentos o información sensible en los mensajes.",
+      "s2t": "Finalidad",
+      "s2x": "La información se registra para responder a la solicitud de atención, preparar una cotización cuando corresponda y mantener el historial básico del contacto.",
+      "s3t": "Cookies y métricas",
+      "s3x": "El sitio utiliza cookies y tecnologías de medición, con su consentimiento, para comprender el uso del sitio y mejorar la experiencia en la plataforma.",
+      "s4t": "Acceso y protección",
+      "s4x": "El acceso a las solicitudes está restringido al equipo de atención responsable. CAP Câmbio debe evaluar continuamente sus prácticas internas de seguridad y retención de datos.",
+      "s5t": "Sus canales",
+      "s5x": "Para dudas sobre un contacto enviado, utilice los canales oficiales publicados en esta página e informe los datos necesarios para localizar su solicitud."
+    },
+    "terms": {
+      "kicker": "Términos de uso",
+      "title": "Transparencia antes de cualquier operación.",
+      "intro": "Estos términos unificados abarcan el sitio institucional y la plataforma CAP Cotações. Cualquier operación debe ser confirmada directamente con CAP Câmbio.",
+      "s1t": "CAP Cotações",
+      "s1x": "La información disponible en la plataforma tiene carácter de seguimiento y referencia. No representa propuesta, reserva, tasa garantizada ni condición final de contratación.",
+      "s2t": "Atención",
+      "s2x": "Las condiciones, disponibilidad de monedas, documentos y plazos varían según la operación. Confirme estos puntos con un especialista antes de tomar una decisión.",
+      "s3t": "Contenido",
+      "s3x": "Los textos y elementos de este sitio no sustituyen la orientación financiera, jurídica, contable o tributaria específica para su caso.",
+      "s4t": "Actualizaciones",
+      "s4x": "Los contenidos institucionales y operativos pueden ser actualizados para reflejar cambios en los servicios y en los canales de atención."
+    }
+  },
+  "home": {
+    "whatsappGeneral": "Hola! Encontre el sitio de CAP y me gustaria mas informacion.",
+    "whatsappCurrency": "Hola! Encontre el sitio de CAP y me gustaria consultar cotizaciones de moneda.",
+    "whatsappFooter": "Hola, me gustaria hablar con el equipo de CAP Cambio.",
+    "whatsappPlatform": "Hola, soy cliente de CAP y me gustaria solicitar acceso a la plataforma de cotizaciones.",
+    "whatsappTransfer": "Hola! Encontre el sitio de CAP y me gustaria saber sobre transferencias internacionales.",
+    "whatsappShipping": "Hola! Encontre el sitio de CAP y me gustaria saber sobre envios internacionales DHL.",
+    "hours": {
+      "weekday": "Día hábil",
+      "weekdaySat": "Día hábil y sábado",
+      "saturday": "Sábado",
+      "sunday": "Domingo",
+      "closed": "Cerrado"
+    },
+    "nav": {
+      "services": "Servicios",
+      "quotes": "CAP Cotizaciones",
+      "about": "Acerca de",
+      "stores": "Oficinas",
+      "goToStart": "Ir al inicio",
+      "openMenu": "Abrir menu",
+      "talkToUs": "Hable con nosotros"
+    },
+    "hero": {
+      "since": "En el mercado cambiario desde 2006",
+      "title1": "Cambio que acompana",
+      "title2": "tu proximo paso.",
+      "subtitle": "Cambio seguro, transparente y cerca de ti. Consulta la cotizacion, reserva tu moneda y recogela en la oficina CAP mas cercana.",
+      "cta": "Consultar cotizacion",
+      "trust1": "Confianza que",
+      "trust2": "cruza fronteras"
+    },
+    "services": {
+      "kicker": "Soluciones CAP",
+      "title": "La solucion correcta para cada objetivo.",
+      "s1title": "Efectivo",
+      "s1text": "Compra y venta de monedas extranjeras. Trabajamos con las principales monedas del mundo con tasas competitivas.",
+      "s1cta": "Consultar cambio",
+      "s2title": "Transferencias Internacionales",
+      "s2textParts": [
+        "Envie dinero al exterior a traves de las redes ",
+        "MoneyGram",
+        " o ",
+        "RIA/Unitransfer",
+        ", con orientacion de nuestro equipo sobre plazos y condiciones. Reciba sus fondos en efectivo via ",
+        "MoneyGram",
+        "."
+      ],
+      "s2cta": "Consultar transferencia",
+      "s3title": "Envios Internacionales de Paquetes y Documentos",
+      "s3textParts": [
+        "Envie objetos a cualquier lugar del mundo con seguridad. Nuestras oficinas de ",
+        "Bento Goncalves",
+        " y ",
+        "Passo Fundo",
+        " son agentes autorizados ",
+        "DHL",
+        "."
+      ],
+      "s3cta": "Consultar envio",
+      "reserveTitle": "Si prefiere, reserve su moneda antes de salir de casa.",
+      "r1title": "Consulte la cotizacion",
+      "r1text": "Contacte a nuestro equipo por WhatsApp e informe la moneda y el monto deseado.",
+      "r2title": "Reserve su moneda",
+      "r2text": "Tras la confirmacion del equipo, dejamos su reserva apartada.",
+      "r3title": "Elija como pagar",
+      "r3text": "Pague al retirar o anticipe el pago por Pix y envie el comprobante por WhatsApp.",
+      "r4title": "Retire en la oficina elegida",
+      "r4text": "Visite una de las oficinas CAP en el horario de atencion y retire su reserva con comodidad."
+    },
+    "platform": {
+      "kicker": "CAP Cotizaciones",
+      "title": "Siga el cambio con mas comodidad.",
+      "desc": "Nuestros clientes tienen acceso exclusivo a CAP Cotacoes, una plataforma para acompanar nuestras monedas en tiempo real. Consulte graficos e historicos, haga conversiones y configure alertas personalizadas para recibir notificaciones.",
+      "f1": "Cotizaciones actualizadas",
+      "f2": "Graficos e historico",
+      "f3": "Alertas personalizadas",
+      "f4": "Conversor de monedas",
+      "access": "Acceder a la plataforma",
+      "requestWhats": "Solicitar acceso por WhatsApp",
+      "exclusive": "La plataforma es exclusiva para clientes autorizados por el equipo de CAP. Ya es nuestro cliente? Solicite su acceso por WhatsApp."
+    },
+    "diff": {
+      "kicker": "Por que CAP",
+      "title": "Menos ruido. Mas precision.",
+      "subtitle": "El mercado ya es lo suficientemente complejo. Nuestro trabajo es simplificar sus operaciones.",
+      "d1title": "Tasas competitivas sin letras pequenas",
+      "d1text": "Tenga claridad sobre las condiciones y el costo de la operacion antes de concluirla.",
+      "d2title": "Una persona al otro lado",
+      "d2text": "No somos solo una pantalla. Nuestros agentes tienen certificaciones ABT y PLDFT, listos para acompanarlo durante toda su operacion.",
+      "d3title": "El tiempo es parte del servicio",
+      "d3text": "Respuesta rapida, proceso organizado y soporte en tiempo real.",
+      "bannerTitle": "Sus planes no tienen fronteras, su dinero tampoco.",
+      "bannerText": "Le damos a su dinero el poder de moverse sin barreras."
+    },
+    "about": {
+      "kicker": "Quienes somos",
+      "title1": "La confianza no es",
+      "title2": "una promesa.",
+      "title3": "Es una practica diaria.",
+      "desc": "Con dos decadas de historia y una base solida de clientes en Rio Grande do Sul, CAP Cambio nacio para ofrecer mas que moneda extranjera: ofrecemos la tranquilidad necesaria para que planifique sus proximos pasos. Cuidamos su cambio con atencion a cada detalle, acompanandolo del inicio al fin de su operacion.",
+      "partnerLabel": "Corresponsal Cambial",
+      "partnerDesc": "Operaciones cambiarias guiadas por seguridad y transparencia."
+    },
+    "stores": {
+      "kicker": "Encuentre CAP Cambio",
+      "title1": "Contamos con",
+      "titleHighlight": "3 oficinas",
+      "title2": "en Rio Grande do Sul.",
+      "hours": "Horarios",
+      "featured": "Oficina destacada",
+      "authorizedAgent": "Agente autorizado",
+      "serviceHours": "Horario de atencion",
+      "chatWhats": "Chatear por WhatsApp",
+      "directions": "Como llegar",
+      "facade": "Fachada de la oficina CAP Cambio de",
+      "mainNav": "Navegacion principal",
+      "mobileNav": "Navegacion movil",
+      "authorizedDhl": "Agente Autorizado DHL"
+    },
+    "footerNav": {
+      "title": "Navegacion",
+      "aboutUs": "Sobre nosotros"
+    },
+    "footerChannels": "Canales oficiales",
+    "footerPolicies": "Politicas de Privacidad",
+    "footerTagline": "Desarrollado para una experiencia mas clara y segura.",
+    "altParisWindow": "Vista nocturna de Paris por la ventana de un avion, con cartera CAP Cambio y euros",
+    "altPlatform": "Plataforma de precios CAP Cambio en computadora y movil",
+    "channelPhone": "Telefono"
+  }
+}

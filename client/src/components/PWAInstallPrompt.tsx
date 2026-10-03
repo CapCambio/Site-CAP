@@ -101,18 +101,18 @@ export function PWAInstallPrompt() {
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-white font-semibold text-sm">
-              {isIOS ? 'Instalar App' : 'Instalar CAP Cotações'}
+              {isIOS ? t('pwa.installApp') : t('pwa.installCapCotacoes')}
             </h3>
             <p className="text-gray-400 text-xs mt-1">
-              {isIOS 
-                ? 'Toque em Compartilhar e depois em "Adicionar à Tela Inicial"'
-                : 'Instale o app para receber notificações'}
+              {isIOS
+                ? t('pwa.iosInstructions')
+                : t('pwa.installDescription')}
             </p>
           </div>
           <button
             onClick={handleDismiss}
             className="flex-shrink-0 text-gray-400 hover:text-white transition-colors"
-            aria-label="Fechar"
+            aria-label={t('pwa.close')}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -124,7 +124,7 @@ export function PWAInstallPrompt() {
             onClick={handleInstallClick}
             className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
           >
-            Instalar
+            {t('pwa.installButton')}
           </button>
         )}
       </div>
