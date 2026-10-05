@@ -246,15 +246,18 @@
     "AUD": "Dólar Australiano",
     "JPY": "Yen Japonés",
     "CHF": "Franco Suizo",
-    "CNY": "Iuan Chino",
+    "CNY": "Yuan Chino",
     "ARS": "Peso Argentino",
     "UYU": "Peso Uruguayo",
     "PEN": "Sol Peruano",
     "CLP": "Peso Chileno",
     "MXN": "Peso Mexicano",
+    "PYG": "Guaraní Paraguayo",
+    "BOB": "Boliviano",
     "COP": "Peso Colombiano",
     "NZD": "Dólar Neozelandés",
-    "ZAR": "Rand Sudafricano"
+    "ZAR": "Rand Sudafricano",
+    "AED": "Dírham de los Emiratos"
   },
   "currency": {
     "buy": "Compra",

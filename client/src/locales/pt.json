@@ -252,9 +252,12 @@
     "PEN": "Sol Peruano",
     "CLP": "Peso Chileno",
     "MXN": "Peso Mexicano",
+    "PYG": "Guarani Paraguaio",
+    "BOB": "Boliviano",
     "COP": "Peso Colombiano",
     "NZD": "Dólar Neozelandês",
-    "ZAR": "Rand Sul-Africano"
+    "ZAR": "Rand Sul-Africano",
+    "AED": "Dirham dos Emirados"
   },
   "currency": {
     "buy": "Compra",
