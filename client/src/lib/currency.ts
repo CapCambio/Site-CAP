@@ -16,8 +16,6 @@ export const currencyFlags: Record<string, string> = {
   PEN: "pe",
   CLP: "cl",
   MXN: "mx",
-  PYG: "py",
-  BOB: "bo",
   COP: "co",
   NZD: "nz", // Nova Zelândia
   ZAR: "za", // África do Sul
@@ -39,8 +37,6 @@ export const currencyDetails: Record<string, {}> = {
   PEN: {},
   CLP: {},
   MXN: {},
-  PYG: {},
-  BOB: {},
   COP: {},
   NZD: {},
   ZAR: {},
