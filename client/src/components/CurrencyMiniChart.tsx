@@ -234,8 +234,14 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
     }
 
     // Procurar se há dados históricos para este dia
+    // Comparar em UTC para evitar problemas de timezone
+    // O servidor salva em UTC, então precisamos comparar em UTC
     const historyEntry = effectiveHistoricalData?.find((entry: CurrencyHistory) => {
-      return isSameDay(entry.timestamp, dayDate);
+      const entryDate = new Date(entry.timestamp);
+      // Criar data UTC a partir dos componentes locais do dayDate
+      const dayDateUTC = Date.UTC(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate());
+      const entryDateUTC = Date.UTC(entryDate.getUTCFullYear(), entryDate.getUTCMonth(), entryDate.getUTCDate());
+      return entryDateUTC === dayDateUTC;
     });
 
     // Se houver dados para este dia, atualiza o último preço conhecido
