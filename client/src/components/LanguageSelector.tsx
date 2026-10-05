@@ -46,7 +46,7 @@ export function LanguageSelector() {
               key={code}
               onClick={() => changeLanguage(code)}
               className={`block w-full px-4 py-2 text-left text-xs font-bold transition hover:bg-white/5 ${
-                i18n.language === code ? 'text-[#facb2e]' : 'text-white/70'
+                i18n.language === code ? 'text-[#facb2e]' : 'text-white'
               }`}
             >
               {label}
