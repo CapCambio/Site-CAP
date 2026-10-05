@@ -82,8 +82,8 @@
   .cap-cta { background: #facb2e; color: #000000; transition: transform 160ms cubic-bezier(.23,1,.32,1), box-shadow 160ms cubic-bezier(.23,1,.32,1), background 160ms cubic-bezier(.23,1,.32,1); }
   .cap-cta:hover { background: #ffe063; box-shadow: 0 12px 30px rgba(250,203,46,.2); transform: translateY(-2px); }
   .cap-cta:active { transform: scale(.97); }
-  .cap-outline { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.03); transition: background 160ms cubic-bezier(.23,1,.32,1), border-color 160ms cubic-bezier(.23,1,.32,1), transform 160ms cubic-bezier(.23,1,.32,1); }
-  .cap-outline:hover { background: rgba(255,255,255,.08); border-color: rgba(250,203,46,.58); transform: translateY(-2px); }
+  .cap-outline { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.03); color: rgba(255,255,255,.67); transition: background 160ms cubic-bezier(.23,1,.32,1), border-color 160ms cubic-bezier(.23,1,.32,1), color 160ms cubic-bezier(.23,1,.32,1), transform 160ms cubic-bezier(.23,1,.32,1); }
+  .cap-outline:hover { background: rgba(255,255,255,.08); border-color: rgba(250,203,46,.58); color: #facb2e; transform: translateY(-2px); }
   .cap-outline:active { transform: scale(.97); }
   .cap-nav-link { color: rgba(255,255,255,.67); transition: color 160ms cubic-bezier(.23,1,.32,1); }
   .cap-nav-link:hover { color: #facb2e; }
