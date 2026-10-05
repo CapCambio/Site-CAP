@@ -229,6 +229,15 @@
       "q6": "Which currencies does CAP work with?",
       "a6intro": "We work with:",
       "currencies": ["US Dollar", "Euro", "British Pound", "Australian Dollar", "Argentine Peso", "New Zealand Dollar", "Canadian Dollar", "Swiss Franc", "Uruguayan Peso", "Chilean Peso", "Mexican Peso", "Colombian Peso", "Chinese Yuan", "Japanese Yen", "Peruvian Nuevo Sol", "South African Rand", "UAE Dirham"]
+    },
+    "whatsapp": {
+      "contact": "Contact via WhatsApp",
+      "selectBranch": "Which CAP would you like to contact?",
+      "close": "Close",
+      "branchCaxias": "Caxias do Sul - RS",
+      "branchBento": "Bento Gonçalves - RS",
+      "branchPasso": "Passo Fundo - RS",
+      "defaultMessage": "Hello! I came from the CAP website and would like more information."
     }
   }
 }
