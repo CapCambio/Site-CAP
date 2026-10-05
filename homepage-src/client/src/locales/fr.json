@@ -197,6 +197,38 @@
     "footerTagline": "Developpe pour une experience plus claire et plus sure.",
     "altParisWindow": "Vue nocturne de Paris a travers la fenetre d'un avion, avec portefeuille CAP Cambio et euros",
     "altPlatform": "Plateforme de tarification CAP Cambio sur ordinateur et mobile",
-    "channelPhone": "Telephone"
+    "channelPhone": "Telephone",
+    "experiences": {
+      "kicker": "Experiences reelles",
+      "title": "La confiance se construit a chaque interaction.",
+      "subtitle": "CAP Cambio publie uniquement des temoignages avec l'autorisation et la validation de ceux qui les ont envoyes. Cet espace est prepare pour recevoir des experiences reelles de clients.",
+      "quote": "Votre experience merite d'etre partagee de maniere responsable.",
+      "quoteDesc": "Si vous avez deja ete servi par CAP Cambio, racontez comment c'etait. Les temoignages sont evalues avant toute publication.",
+      "contactTeam": "Parler a l'equipe"
+    },
+    "faq": {
+      "kicker": "Posez vos questions",
+      "title": "Des informations claires avant chaque decision.",
+      "subtitle": "Besoin d'aide? L'equipe est prete a ecouter vos besoins et a guider votre prochaine etape.",
+      "cta": "Discuter sur WhatsApp",
+      "q1": "Quels documents dois-je presenter pour acheter ou vendre des devises?",
+      "a1p1": "Personnes physiques residant au Bresil: Doivent presenter une piece d'identite avec photo et CPF, qui doit etre en situation reguliere et valide aupres de la Receita Federal et non expire.",
+      "a1p2": "Etrangers non residents: Peuvent utiliser leur document de voyage (passeport) ou le document de leur pays s'ils viennent d'Argentine, de Bolivie, du Paraguay ou de l'Uruguay.",
+      "a1p3": "Remarque: Selon le montant ou le profil de l'operation, des documents complementaires tels qu'une preuve de revenu ou de residence peuvent etre demandes.",
+      "q2": "Comment puis-je effectuer le paiement?",
+      "a2p1": "Change et expeditions internationales DHL: Le paiement peut etre effectue en especes, Pix ou TED (dans les heures bancaires).",
+      "a2p2": "Transferts internationaux: Via MoneyGram, le paiement est accepte uniquement en especes. Via RIA/Unitransfer, les especes ou Pix sont acceptes.",
+      "q3": "Dois-je reserver la devise avant d'aller au bureau?",
+      "a3": "Ce n'est pas obligatoire, mais nous recommandons la reservation via WhatsApp pour garantir la disponibilite de la devise et accelerer votre service. Vous pouvez nous demander de simplement mettre de cote le montant et le laisser reserve pour le paiement au retrait ou le paiement anticipe via Pix.",
+      "q4": "Comment puis-je etre paye si je vends de la devise etrangere?",
+      "a4": "Vous pouvez recevoir en especes ou directement sur votre compte via PIX (les limites d'operation varient selon le mode de paiement).",
+      "q5": "Comment puis-je recevoir de l'argent que quelqu'un m'a envoye?",
+      "a5p1": "Les paiements inferieurs a R$10 000 peuvent etre effectues en especes ou par virement.",
+      "a5p2": "Les paiements superieurs a R$10 000 doivent obligatoirement etre effectues par virement.",
+      "a5p3": "Rappel: nous ne payons que les envois effectues via le systeme MoneyGram.",
+      "q6": "Avec quelles devises travaille CAP?",
+      "a6intro": "Nous travaillons avec:",
+      "currencies": ["Dollar americain", "Euro", "Livre sterling", "Dollar australien", "Peso argentin", "Dollar neo-zelandais", "Dollar canadien", "Franc suisse", "Peso uruguayen", "Peso chilien", "Peso mexicain", "Peso colombien", "Yuan chinois", "Yen japonais", "Nuevo sol peruvien", "Rand sud-africain", "Dirham des Emirats arabes unis"]
+    }
   }
 }

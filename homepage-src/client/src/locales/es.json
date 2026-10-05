@@ -197,6 +197,38 @@
     "footerTagline": "Desarrollado para una experiencia mas clara y segura.",
     "altParisWindow": "Vista nocturna de Paris por la ventana de un avion, con cartera CAP Cambio y euros",
     "altPlatform": "Plataforma de precios CAP Cambio en computadora y movil",
-    "channelPhone": "Telefono"
+    "channelPhone": "Telefono",
+    "experiences": {
+      "kicker": "Experiencias reales",
+      "title": "La confianza se construye en cada atencion.",
+      "subtitle": "CAP Cambio solo publica relatos con autorizacion y validacion de quienes los enviaron. Este espacio esta preparado para recibir experiencias reales de clientes.",
+      "quote": "Su experiencia merece ser compartida con responsabilidad.",
+      "quoteDesc": "Si ya fue atendido por CAP Cambio, cuente como fue. Los relatos son evaluados antes de cualquier publicacion.",
+      "contactTeam": "Hablar con el equipo"
+    },
+    "faq": {
+      "kicker": "Resuelva sus dudas",
+      "title": "Informacion clara antes de cada decision.",
+      "subtitle": "Aun necesita ayuda? El equipo esta listo para escuchar su necesidad y orientar el proximo paso.",
+      "cta": "Chatear por WhatsApp",
+      "q1": "Que documentos necesito presentar para comprar o vender monedas?",
+      "a1p1": "Personas fisicas residentes en Brasil: Deben presentar un documento de identificacion con foto y CPF, que debe estar en situacion regular y valida ante la Receita Federal y no estar vencido.",
+      "a1p2": "Extranjeros no residentes: Pueden utilizar el documento de viaje (pasaporte) o el documento de su pais, si son de Argentina, Bolivia, Paraguay o Uruguay.",
+      "a1p3": "Nota: Dependiendo del monto o perfil de la operacion, documentos complementarios como comprobante de ingresos o residencia pueden ser solicitados.",
+      "q2": "Como puedo realizar el pago?",
+      "a2p1": "Cambio y envios internacionales DHL: El pago puede realizarse en efectivo, Pix o TED (dentro del horario bancario).",
+      "a2p2": "Transferencias internacionales: Via MoneyGram, el pago se acepta solo en efectivo. Via RIA/Unitransfer, se acepta efectivo o Pix.",
+      "q3": "Necesito reservar la moneda antes de ir a la tienda?",
+      "a3": "No es obligatorio, pero recomendamos la reserva por WhatsApp para garantizar la disponibilidad de la moneda y agilizar su atencion. Puede pedirnos que solo separe el valor y lo deje reservado para pagar al retirar o anticipar el pago via Pix.",
+      "q4": "Como puedo ser pagado si vendo moneda extranjera?",
+      "a4": "Puede recibir en efectivo o directamente en su cuenta via PIX (los limites de operacion varian segun la forma de pago).",
+      "q5": "Como puedo recibir dinero que alguien me envio?",
+      "a5p1": "Pagos inferiores a R$10.000 pueden realizarse en efectivo o via transferencia.",
+      "a5p2": "Pagos superiores a R$10.000 deben realizarse obligatoriamente via transferencia.",
+      "a5p3": "Recordando que solo pagamos remesas enviadas por el sistema MoneyGram.",
+      "q6": "Con que monedas trabaja CAP?",
+      "a6intro": "Trabajamos con:",
+      "currencies": ["Dolar Estadounidense", "Euro", "Libra Esterlina", "Dolar Australiano", "Peso Argentino", "Dolar Neozelandes", "Dolar Canadiense", "Franco Suizo", "Peso Uruguayo", "Peso Chileno", "Peso Mexicano", "Peso Colombiano", "Yuan Chino", "Yen Japones", "Nuevo Sol Peruano", "Rand Sudafricano", "Dirham de los Emiratos Arabes"]
+    }
   }
 }

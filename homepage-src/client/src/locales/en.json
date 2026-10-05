@@ -197,6 +197,38 @@
     "footerTagline": "Built for a clearer and safer experience.",
     "altParisWindow": "Night view of Paris through an airplane window, with CAP Cambio wallet and euros",
     "altPlatform": "CAP Cambio pricing platform on computer and mobile",
-    "channelPhone": "Phone"
+    "channelPhone": "Phone",
+    "experiences": {
+      "kicker": "Real experiences",
+      "title": "Trust is built in every interaction.",
+      "subtitle": "CAP Cambio only publishes testimonials with authorization and validation from those who sent them. This space is prepared to receive real customer experiences.",
+      "quote": "Your experience deserves to be shared responsibly.",
+      "quoteDesc": "If you've already been served by CAP Cambio, tell us how it was. Testimonials are reviewed before publication.",
+      "contactTeam": "Talk to the team"
+    },
+    "faq": {
+      "kicker": "Frequently asked questions",
+      "title": "Clear information before every decision.",
+      "subtitle": "Still need help? Our team is ready to listen to your needs and guide your next step.",
+      "cta": "Chat on WhatsApp",
+      "q1": "What documents do I need to present to buy or sell currencies?",
+      "a1p1": "Individuals residing in Brazil: Must present a photo ID and CPF, which must be in good standing with the Federal Revenue Service and not expired.",
+      "a1p2": "Non-resident foreigners: May use their travel document (passport) or their country's document if they are from Argentina, Bolivia, Paraguay, or Uruguay.",
+      "a1p3": "Note: Depending on the amount or profile of the transaction, supplementary documents such as proof of income or residence may be requested.",
+      "q2": "How can I make the payment?",
+      "a2p1": "Currency exchange and DHL international shipments: Payment can be made in cash, Pix, or TED (within banking hours).",
+      "a2p2": "International transfers: Via MoneyGram, payment is accepted only in cash. Via RIA/Unitransfer, cash or Pix is accepted.",
+      "q3": "Do I need to reserve the currency before going to the store?",
+      "a3": "It's not mandatory, but we recommend reserving via WhatsApp to ensure currency availability and speed up your service. You can ask us to just set aside the amount and leave it reserved for payment at pickup or advance payment via Pix.",
+      "q4": "How can I be paid if I sell foreign currency?",
+      "a4": "You can receive in cash or directly into your account via PIX (operation limits vary depending on the payment method).",
+      "q5": "How can I receive money that someone sent to me?",
+      "a5p1": "Payments below R$10,000 can be made in cash or via transfer.",
+      "a5p2": "Payments above R$10,000 must be made via transfer only.",
+      "a5p3": "Please note that we only pay remittances sent through the MoneyGram system.",
+      "q6": "Which currencies does CAP work with?",
+      "a6intro": "We work with:",
+      "currencies": ["US Dollar", "Euro", "British Pound", "Australian Dollar", "Argentine Peso", "New Zealand Dollar", "Canadian Dollar", "Swiss Franc", "Uruguayan Peso", "Chilean Peso", "Mexican Peso", "Colombian Peso", "Chinese Yuan", "Japanese Yen", "Peruvian Nuevo Sol", "South African Rand", "UAE Dirham"]
+    }
   }
 }
