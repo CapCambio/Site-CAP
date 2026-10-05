@@ -1,27 +1,4 @@
 {
-  "common": {
-    "loading": "Cargando...",
-    "close": "Cerrar",
-    "back": "Volver",
-    "learnMore": "Más información"
-  },
-  "nav": {
-    "home": "Inicio",
-    "services": "Servicios",
-    "about": "Acerca de",
-    "contact": "Contacto"
-  },
-  "hero": {
-    "title": "CAP Câmbio",
-    "subtitle": "Soluciones cambiarias con seguridad y transparencia",
-    "cta": "Ver Cotizaciones"
-  },
-  "services": {
-    "title": "Nuestros Servicios",
-    "currencyExchange": "Cambio de Monedas",
-    "wireTransfer": "Transferencias Internacionales",
-    "shipping": "Envíos Internacionales"
-  },
   "footer": {
     "copyright": "Todos los derechos reservados.",
     "privacyPolicy": "Política de Privacidad",

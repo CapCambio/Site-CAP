@@ -1,27 +1,4 @@
 {
-  "common": {
-    "loading": "Loading...",
-    "close": "Close",
-    "back": "Back",
-    "learnMore": "Learn more"
-  },
-  "nav": {
-    "home": "Home",
-    "services": "Services",
-    "about": "About",
-    "contact": "Contact"
-  },
-  "hero": {
-    "title": "CAP Câmbio",
-    "subtitle": "Exchange solutions with security and transparency",
-    "cta": "View Quotes"
-  },
-  "services": {
-    "title": "Our Services",
-    "currencyExchange": "Currency Exchange",
-    "wireTransfer": "International Transfers",
-    "shipping": "International Shipping"
-  },
   "footer": {
     "copyright": "All rights reserved.",
     "privacyPolicy": "Privacy Policy",
