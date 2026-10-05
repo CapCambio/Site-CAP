@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useTranslation } from "react-i18next";
 
 export function WhatsAppFloatingButton() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showBranchDialog, setShowBranchDialog] = useState(false);
 
   return (
@@ -38,7 +38,7 @@ export function WhatsAppFloatingButton() {
       </button>
 
       {/* Dialog com os contatos */}
-      <Dialog open={showBranchDialog} onOpenChange={setShowBranchDialog}>
+      <Dialog key={i18n.language} open={showBranchDialog} onOpenChange={setShowBranchDialog}>
         <DialogContent className="w-[calc(100%-2rem)] max-w-[512px] gap-4 rounded-lg border border-yellow-500/20 bg-zinc-900 p-6">
           <DialogHeader className="text-left">
             <DialogTitle className="text-left text-lg font-semibold leading-none text-white">{t('whatsapp.selectBranch')}</DialogTitle>
