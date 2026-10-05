@@ -192,8 +192,25 @@ input[type="date"]::-webkit-datetime-edit-year-field {
   .currency-item {
     margin-bottom: 1.5rem;
   }
-  
+
   .currency-item:last-child {
     margin-bottom: 0;
   }
+}
+
+/* CAP outline button style */
+.cap-outline {
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .03);
+  transition: background 160ms cubic-bezier(.23, 1, .32, 1), border-color 160ms cubic-bezier(.23, 1, .32, 1), transform 160ms cubic-bezier(.23, 1, .32, 1);
+}
+
+.cap-outline:hover {
+  background: rgba(255, 255, 255, .08);
+  border-color: rgba(250, 203, 46, .58);
+  transform: translateY(-2px);
+}
+
+.cap-outline:active {
+  transform: scale(.97);
 }
