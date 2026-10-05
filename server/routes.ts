@@ -1372,6 +1372,15 @@ export async function refreshCurrencies() {
                       existingCurrency.sellPrice !== currency.sellPrice || 
                       existingCurrency.buyPrice !== currency.buyPrice;
 
+      console.log(`🔍 [${currency.code}] Preço atual: ${currency.sellPrice}, Preço anterior: ${existingCurrency?.sellPrice || 'N/A'}, isNewPrice: ${isNewPrice}`);
+
+      // Verificar se já há registro hoje para esta moeda
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayHistory = await db.getCurrencyHistory(currency.code, todayStart);
+      const hasTodayRecord = todayHistory.length > 0;
+
+      console.log(`🔍 [${currency.code}] Registros hoje: ${todayHistory.length}`);
 
       // Calcula variação baseada no último preço do dia anterior (usando cache em memória)
       let change = 0;
@@ -1396,9 +1405,11 @@ export async function refreshCurrencies() {
         lastUpdate: now.toISOString()
       });
 
-      // Adiciona ao histórico sempre que o preço mudou
-      if (isNewPrice && currency.code) {
+      // Adiciona ao histórico sempre que o preço mudou OU se ainda não há registro hoje
+      if ((isNewPrice || !hasTodayRecord) && currency.code) {
         try {
+          const reason = isNewPrice ? 'preço mudou' : 'primeiro registro do dia';
+          console.log(`✅ [${currency.code}] Salvando histórico (${reason}): buy=${currency.buyPrice}, sell=${currency.sellPrice}`);
           await db.addCurrencyHistory({
             code: currency.code,
             buy_price: currency.buyPrice,
@@ -1407,8 +1418,10 @@ export async function refreshCurrencies() {
           });
           savedCurrencies.push(currency);
         } catch (error) {
-          console.error(`Erro ao salvar histórico para ${currency.code}:`, error);
+          console.error(`❌ Erro ao salvar histórico para ${currency.code}:`, error);
         }
+      } else {
+        console.log(`⚠️ [${currency.code}] Histórico NÃO salvo (isNewPrice=${isNewPrice}, hasTodayRecord=${hasTodayRecord})`);
       }
     }
 
