@@ -120,11 +120,15 @@ export function CurrencyCard({
                 e.stopPropagation();
                 setShowAlertModal(true);
               }}
-              className="h-auto px-1.5 sm:px-3 py-1 sm:py-2 border border-white/40 text-white hover:bg-white/10 hover:border-white hover:text-gray-200 flex items-center gap-1 sm:gap-2 transition-all duration-200 font-medium"
+              className="h-auto px-1.5 sm:px-3 py-1 sm:py-2 border border-white/40 text-white hover:bg-white/10 hover:border-white hover:text-gray-200 flex flex-col sm:flex-row items-center gap-0.5 sm:gap-2 transition-all duration-200 font-medium"
               title={t('alerts.createAlert')}
             >
-              <Bell className="h-4 w-4" />
-              <span className="text-xs">{t('alerts.createAlert')}</span>
+              <div className="flex items-center gap-1">
+                <Bell className="h-4 w-4" />
+                <span className="text-xs sm:hidden">{t('alerts.createAlertTop')}</span>
+              </div>
+              <span className="text-xs sm:hidden">{t('alerts.createAlertBottom')}</span>
+              <span className="text-xs hidden sm:inline">{t('alerts.createAlert')}</span>
             </Button>
           )}
           <span className="text-sm font-medium bg-[#f3b234] text-[#1a1a1a] px-2 py-1 rounded">

@@ -104,6 +104,8 @@
     "title": "Alertas",
     "configure": "Configurar Alertas",
     "createAlert": "Criar Alerta",
+    "createAlertTop": "",
+    "createAlertBottom": "Criar Alerta",
     "editAlert": "Editar Alerta",
     "deleteAlert": "Excluir Alerta",
     "alertType": "Tipo de Alerta",
