@@ -106,11 +106,9 @@ const UserAlerts: React.FC<{ email: string }> = ({ email }) => {
       case 'descida':
         return t('admin.alwaysFall');
       case 'valor-especifico':
-        // Verificar tanto 'valor' quanto 'valorEspecifico' para compatibilidade
-        const valor = typeof alert?.valor === 'number' ? alert.valor :
-                      typeof alert?.valorEspecifico === 'number' ? alert.valorEspecifico :
-                      '0,00';
-        const valorFormatado = typeof valor === 'number' ? valor.toFixed(2).replace('.', ',') : valor;
+        const valorRaw = alert?.valor ?? alert?.valorEspecifico ?? null;
+        const valorNum = valorRaw != null ? Number(valorRaw) : NaN;
+        const valorFormatado = !isNaN(valorNum) ? valorNum.toFixed(2).replace('.', ',') : '0,00';
         return `${t('admin.whenReach')}: R$ ${valorFormatado}`;
       default:
         return t('admin.alertBothCases');
@@ -334,11 +332,9 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
       case 'descida':
         return t('admin.alwaysFall');
       case 'valor-especifico':
-        // Verificar tanto 'valor' quanto 'valorEspecifico' para compatibilidade
-        const valor = typeof alert?.valor === 'number' ? alert.valor :
-                      typeof alert?.valorEspecifico === 'number' ? alert.valorEspecifico :
-                      '0,00';
-        const valorFormatado = typeof valor === 'number' ? valor.toFixed(2).replace('.', ',') : valor;
+        const valorRaw = alert?.valor ?? alert?.valorEspecifico ?? null;
+        const valorNum = valorRaw != null ? Number(valorRaw) : NaN;
+        const valorFormatado = !isNaN(valorNum) ? valorNum.toFixed(2).replace('.', ',') : '0,00';
         return `${t('admin.whenReach')}: R$ ${valorFormatado}`;
       default:
         return t('admin.alertBothCases');

@@ -45,16 +45,18 @@ export async function initializeCurrencyHistoryTable() {
   }
 }
 
-// Adicionar coluna validade na tabela alerts se não existir
+// Garantir colunas necessárias na tabela alerts
 export async function initializeAlertsTable() {
   try {
     await pool.query(`
       ALTER TABLE alerts
-      ADD COLUMN IF NOT EXISTS validade TIMESTAMP WITH TIME ZONE
+      ADD COLUMN IF NOT EXISTS validade TIMESTAMP WITH TIME ZONE,
+      ADD COLUMN IF NOT EXISTS valor DECIMAL(10, 6),
+      ADD COLUMN IF NOT EXISTS condicao_valor VARCHAR(10)
     `);
-    console.log('✅ Coluna validade verificada na tabela alerts');
+    console.log('✅ Colunas da tabela alerts verificadas');
   } catch (error) {
-    console.error('❌ Erro ao verificar coluna validade na tabela alerts:', error);
+    console.error('❌ Erro ao verificar colunas da tabela alerts:', error);
   }
 }
 

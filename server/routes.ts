@@ -1246,7 +1246,7 @@ app.get("/api/currencies", async (req, res) => {
           acc[alert.currency_code] = {
             tipo: alert.tipo,
             ativo: alert.ativo,
-            valor: alert.valor,
+            valor: alert.valor != null ? Number(alert.valor) : null,
             condicaoValor: alert.condicao_valor,
             validade: alert.validade
           };
