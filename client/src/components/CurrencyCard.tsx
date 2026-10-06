@@ -120,7 +120,7 @@ export function CurrencyCard({
                 e.stopPropagation();
                 setShowAlertModal(true);
               }}
-              className="h-auto px-3 py-2 border border-white/40 text-white hover:bg-white/10 hover:border-white hover:text-gray-200 flex items-center gap-2 transition-all duration-200 font-medium"
+              className="h-auto px-1.5 sm:px-3 py-1 sm:py-2 border border-white/40 text-white hover:bg-white/10 hover:border-white hover:text-gray-200 flex items-center gap-1 sm:gap-2 transition-all duration-200 font-medium"
               title={t('alerts.createAlert')}
             >
               <Bell className="h-4 w-4" />
