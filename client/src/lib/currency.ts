@@ -65,8 +65,7 @@ export function formatCurrencyValue(code: string, value: number): string {
   const [intPart, rawDecPart = ''] = valueStr.split('.');
 
   // Adiciona pontos de milhar na parte inteira
-  const locale = getLocale();
-  const formattedIntPart = parseInt(intPart).toLocaleString(locale);
+  const formattedIntPart = parseInt(intPart).toLocaleString('pt-BR');
 
   const decPart = rawDecPart.length > 5 ? rawDecPart.slice(0, 5) : rawDecPart;
   const minTwoDecimals = decPart.replace(/0+$/, '').padEnd(2, '0');
@@ -76,9 +75,7 @@ export function formatCurrencyValue(code: string, value: number): string {
     return formattedIntPart;
   }
 
-  // Use comma for pt-BR, dot for others
-  const decimalSep = locale === 'pt-BR' ? ',' : '.';
-  return `${formattedIntPart}${decimalSep}${minTwoDecimals}`;
+  return `${formattedIntPart},${minTwoDecimals}`;
 }
 
 // Format percentage changes
