@@ -558,6 +558,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
                   const sellPrice = data.sellPrice;
                   const buyPrice = data.buyPrice;
                   const hasRealData = data.hasRealData;
+                  // Formatar com vírgula como separador decimal
+                  const formatPrice = (price: number | null) => {
+                    if (price === null) return 'N/A';
+                    return price.toFixed(4).replace('.', ',');
+                  };
                   return (
                     <div style={{
                       backgroundColor: '#fff',
@@ -570,11 +575,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
                         {chartType === 'month' ? `${t('chart.dayLabel')} ${label}` : `${label}${t('chart.hourLabel')}`}
                       </p>
                       <p style={{ margin: '0 0 2px 0', color: '#000' }}>
-                        {t('chart.sellLabel')} R$ {sellPrice ? sellPrice.toFixed(4) : 'N/A'}
+                        {t('chart.sellLabel')} R$ {formatPrice(sellPrice)}
                       </p>
                       {buyPrice && (
                         <p style={{ margin: '0', color: '#000' }}>
-                          {t('chart.buyLabel')} R$ {buyPrice.toFixed(4)}
+                          {t('chart.buyLabel')} R$ {formatPrice(buyPrice)}
                         </p>
                       )}
                     </div>

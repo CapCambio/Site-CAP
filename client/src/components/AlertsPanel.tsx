@@ -104,7 +104,7 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
       case 'descida':
         return t('admin.alwaysFall');
       case 'valor-especifico':
-        const valor = typeof alert?.valor === 'number' && !isNaN(alert.valor) ? alert.valor.toFixed(2) : '0,00';
+        const valor = typeof alert?.valor === 'number' && !isNaN(alert.valor) ? alert.valor.toFixed(2).replace('.', ',') : '0,00';
         return `${t('admin.whenReach')}: R$ ${valor}`;
       default:
         return t('admin.alertBothCases');

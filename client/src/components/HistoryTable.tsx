@@ -121,15 +121,15 @@ export function HistoryTable({ data, code, isLoading }: HistoryTableProps) {
                       ) : isPositive ? (
                         <span className="text-green-600 flex items-center justify-end">
                           <ArrowUp className="mr-1 h-4 w-4" />
-                          {Math.abs(change).toFixed(2)}%
+                          {Math.abs(change).toFixed(2).replace('.', ',')}%
                         </span>
                       ) : isNegative ? (
                         <span className="text-red-600 flex items-center justify-end">
                           <ArrowDown className="mr-1 h-4 w-4" />
-                          {Math.abs(change).toFixed(2)}%
+                          {Math.abs(change).toFixed(2).replace('.', ',')}%
                         </span>
                       ) : (
-                        <span className="text-gray-500">0.00%</span>
+                        <span className="text-gray-500">0,00%</span>
                       )}
                     </td>
                   </tr>

@@ -121,7 +121,7 @@ export function HistoryChart({ data, filter, isLoading }: HistoryChartProps) {
                 label={{ value: t('chart.rate'), angle: -90, position: "insideLeft", offset: 10, style: { textAnchor: 'middle', fill: '#666', fontSize: 12 } }}
               />
               <Tooltip 
-                formatter={(value: number) => [`R$ ${value.toFixed(5).replace(/\.?0+$/, '')}`, '']}
+                formatter={(value: number) => [`R$ ${value.toFixed(5).replace(/\.?0+$/, '').replace('.', ',')}`, '']}
                 labelFormatter={(label) => `${t('chart.date')}: ${label}`}
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
               />

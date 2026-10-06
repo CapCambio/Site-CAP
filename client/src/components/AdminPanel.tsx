@@ -110,7 +110,7 @@ const UserAlerts: React.FC<{ email: string }> = ({ email }) => {
         const valor = typeof alert?.valor === 'number' ? alert.valor :
                       typeof alert?.valorEspecifico === 'number' ? alert.valorEspecifico :
                       '0,00';
-        const valorFormatado = typeof valor === 'number' ? valor.toFixed(2) : valor;
+        const valorFormatado = typeof valor === 'number' ? valor.toFixed(2).replace('.', ',') : valor;
         return `${t('admin.whenReach')}: R$ ${valorFormatado}`;
       default:
         return t('admin.alertBothCases');
@@ -338,7 +338,7 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
         const valor = typeof alert?.valor === 'number' ? alert.valor :
                       typeof alert?.valorEspecifico === 'number' ? alert.valorEspecifico :
                       '0,00';
-        const valorFormatado = typeof valor === 'number' ? valor.toFixed(2) : valor;
+        const valorFormatado = typeof valor === 'number' ? valor.toFixed(2).replace('.', ',') : valor;
         return `${t('admin.whenReach')}: R$ ${valorFormatado}`;
       default:
         return t('admin.alertBothCases');
