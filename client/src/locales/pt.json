@@ -257,7 +257,8 @@
     "COP": "Peso Colombiano",
     "NZD": "Dólar Neozelandês",
     "ZAR": "Rand Sul-Africano",
-    "AED": "Dirham dos EAU"
+    "AED": "Dirham dos Emirados Árabes Unidos",
+    "AED_short": "Dirham dos EAU"
   },
   "currency": {
     "buy": "Compra",

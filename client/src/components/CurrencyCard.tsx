@@ -41,8 +41,10 @@ export function CurrencyCard({
 }: CurrencyCardProps) {
   const { t } = useTranslation();
   const { code, buyPrice, sellPrice, change } = currency;
-  const name = t(`currencies.${code}`) || currency.name;
+  const fullName = t(`currencies.${code}`) || currency.name;
+  const shortName = t(`currencies.${code}_short`) || fullName;
   const isMobile = useIsMobile();
+  const name = isMobile ? shortName : fullName;
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const { user } = useAuth();

@@ -257,7 +257,8 @@
     "COP": "Colombian Peso",
     "NZD": "New Zealand Dollar",
     "ZAR": "South African Rand",
-    "AED": "UAE Dirham"
+    "AED": "UAE Dirham",
+    "AED_short": "UAE Dirham"
   },
   "currency": {
     "buy": "Buy",
