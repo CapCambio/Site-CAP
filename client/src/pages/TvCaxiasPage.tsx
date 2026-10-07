@@ -246,6 +246,14 @@ export default function TvCaxiasPage() {
   const halloweenTopDecorationActive = halloweenPreviewActive;
 
   useEffect(() => {
+    const previousTitle = document.title;
+    document.title = "CAP TV";
+    return () => {
+      document.title = previousTitle;
+    };
+  }, []);
+
+  useEffect(() => {
     let nextDayTimer: number | undefined;
 
     const scheduleNextDayCheck = () => {
