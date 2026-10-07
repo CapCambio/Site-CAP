@@ -180,9 +180,6 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
                     {t('alertsPanel.noAlertsDesc')}
                   </p>
                   <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 text-left max-w-lg mx-auto">
-                    <p className="text-sm text-zinc-300 mb-3 font-medium">
-                      {t('alertsPanel.createAlertStep1')}
-                    </p>
                     <ol className="text-sm text-zinc-400 space-y-2">
                       <li className="flex items-start gap-2">
                         <span className="bg-yellow-500 text-black rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
