@@ -214,31 +214,29 @@ export function CurrencyConverter({ currencies, userEmail }: CurrencyConverterPr
   return (
     <div className="currency-converter relative max-w-3xl mx-auto mt-1 mb-2 sm:mt-0 sm:mb-3">
       <div className="bg-[#252525] px-3 pt-2 pb-6 sm:px-6 sm:pt-2 sm:pb-6 rounded-xl">
-        <div className="relative mb-2 sm:mb-3">
-          <h2 className="text-[#f3b234] text-xl font-semibold text-center">{t('converter.title')}</h2>
+        <h2 className="text-[#f3b234] text-xl font-semibold mb-2 sm:mb-3 text-center">{t('converter.title')}</h2>
 
-          <div className="flex items-center justify-center mt-2 sm:mt-0 sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2">
-            <button
-              onClick={() => setMode("preciso")}
-              className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-150 ${
-                mode === "preciso" 
-                  ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
-                  : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
-              }`}
-            >
-              {t('converter.iNeed')}
-            </button>
-            <button
-              onClick={() => setMode("tenho")}
-              className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-all duration-150 ${
-                mode === "tenho" 
-                  ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
-                  : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
-              }`}
-            >
-              {t('converter.iHave')}
-            </button>
-          </div>
+        <div className="flex items-center justify-center mb-2 sm:mb-2">
+          <button
+            onClick={() => setMode("preciso")}
+            className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-150 ${
+              mode === "preciso" 
+                ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
+                : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
+            }`}
+          >
+            {t('converter.iNeed')}
+          </button>
+          <button
+            onClick={() => setMode("tenho")}
+            className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-all duration-150 ${
+              mode === "tenho" 
+                ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
+                : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
+            }`}
+          >
+            {t('converter.iHave')}
+          </button>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
