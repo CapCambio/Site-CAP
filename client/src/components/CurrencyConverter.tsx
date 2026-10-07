@@ -217,7 +217,7 @@ export function CurrencyConverter({ currencies, userEmail }: CurrencyConverterPr
         <div className="relative mb-2 sm:mb-3">
           <h2 className="text-[#f3b234] text-xl font-semibold text-center">{t('converter.title')}</h2>
 
-          <div className="flex items-center justify-center mt-2 sm:mt-0 sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2">
+          <div className="flex items-center justify-center mt-2 sm:mt-0 sm:absolute sm:left-0 sm:top-1/2 sm:-translate-y-1/2">
             <button
               onClick={() => setMode("preciso")}
               className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-150 ${
