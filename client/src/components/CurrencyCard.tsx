@@ -42,7 +42,9 @@ export function CurrencyCard({
   const { t } = useTranslation();
   const { code, buyPrice, sellPrice, change } = currency;
   const fullName = t(`currencies.${code}`) || currency.name;
-  const shortName = t(`currencies.${code}_short`) || fullName;
+  const shortKey = `currencies.${code}_short`;
+  const shortRaw = t(shortKey);
+  const shortName = shortRaw === shortKey ? fullName : shortRaw;
   const isMobile = useIsMobile();
   const name = isMobile ? shortName : fullName;
   const [showAlertModal, setShowAlertModal] = useState(false);
