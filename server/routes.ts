@@ -793,6 +793,14 @@ app.get("/api/currencies", async (req, res) => {
         byUser.get(email)!.distinctEndpoints = endpoints.size;
       }
 
+      const alertRows = await db.getAlerts();
+      const activeAlertsByEmail = new Map<string, number>();
+      for (const alert of alertRows) {
+        if (!alert.ativo) continue;
+        const email = alert.user_email.toLowerCase();
+        activeAlertsByEmail.set(email, (activeAlertsByEmail.get(email) || 0) + 1);
+      }
+
       const attempts = readPushLogEntries();
       const failures = new Map<string, { error: string; count: number; lastAt: string | null }>();
       let successCount = 0;
@@ -821,6 +829,15 @@ app.get("/api/currencies", async (req, res) => {
           total: subs.length,
           users: Array.from(byUser.values()).sort((a, b) => b.count - a.count)
         },
+        recipients: Array.from(activeAlertsByEmail.entries())
+          .map(([email, activeAlerts]) => ({
+            email,
+            activeAlerts,
+            pushSubscriptionRows: byUser.get(email)?.count ?? 0,
+            distinctEndpoints: byUser.get(email)?.distinctEndpoints ?? 0,
+            lastSubscription: byUser.get(email)?.last ?? null
+          }))
+          .sort((a, b) => a.pushSubscriptionRows - b.pushSubscriptionRows),
         pushServices: Array.from(hosts.entries())
           .map(([host, total]) => ({ host, total }))
           .sort((a, b) => b.total - a.total),
@@ -835,6 +852,25 @@ app.get("/api/currencies", async (req, res) => {
     } catch (error) {
       console.error('Erro no diagnóstico de push:', error);
       res.status(500).json({ error: 'Erro ao ler status de push' });
+    }
+  });
+
+  // Dispara um push de teste para os endpoints do próprio admin (somente leitura do banco)
+  app.get("/api/admin/push-test", authenticate, requireAdmin, async (req, res) => {
+    try {
+      const requested = String(req.query.email || '').toLowerCase().trim();
+      const sessionEmail = String((req as any).user?.email || '').toLowerCase();
+      const email = requested || sessionEmail;
+
+      if (!email) {
+        return res.status(400).json({ error: 'Informe ?email= ou entre logado' });
+      }
+
+      const result = await alertSystem.testPushForUser(email);
+      res.json(result);
+    } catch (error) {
+      console.error('Erro no teste de push:', error);
+      res.status(500).json({ error: 'Erro ao testar push' });
     }
   });
 

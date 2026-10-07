@@ -6,6 +6,7 @@ import Handlebars from 'handlebars';
 import { jsonStorage } from './json-storage';
 import { logger } from './logger';
 import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint, getCurrencyHistory } from './db';
+import type { PushSubscription as DbPushSubscription } from './db';
 
 // Registrar helpers Handlebars
 Handlebars.registerHelper('gt', (a: number, b: number) => a > b);
@@ -124,6 +125,20 @@ interface PushSubscription {
     p256dh: string;
     auth: string;
   };
+}
+
+interface PushTestAttempt {
+  endpointHost: string;
+  success: boolean;
+  statusCode: string | number;
+  message: string;
+}
+
+interface PushTestResult {
+  email: string;
+  subscriptionRows: number;
+  distinctEndpoints: number;
+  attempts: PushTestAttempt[];
 }
 
 interface Alert {
@@ -1092,9 +1107,76 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     }
 
     console.log(`📊 Resumo do envio para ${email}: ${successCount}/${subscriptions.length} notificações enviadas com sucesso\n`);
-    // #region agent log
-    fetch('http://127.0.0.1:7755/ingest/d33e14d9-8b7f-451e-8c44-954461d3c7f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'aff3bf'},body:JSON.stringify({sessionId:'aff3bf',location:'alert-system.ts:sendPushNotification',message:'push_send_summary',data:{email:email.replace(/(.{2}).*(@.*)/,'$1***$2'),total:subscriptions.length,success:successCount},timestamp:Date.now(),hypothesisId:'H1-H3',runId:'post-fix'})}).catch(()=>{});
-    // #endregion
+  }
+
+  /**
+   * Envia uma notificação de teste para cada endpoint distinto do usuário e devolve
+   * o resultado bruto de cada tentativa. Não remove assinaturas: é diagnóstico puro.
+   */
+  public async testPushForUser(email: string): Promise<PushTestResult> {
+    const rows = await getPushSubscriptionsByUser(email);
+
+    const distinctEndpoints = new Map<string, DbPushSubscription>();
+    for (const row of rows) {
+      if (!distinctEndpoints.has(row.endpoint)) distinctEndpoints.set(row.endpoint, row);
+    }
+
+    const payload = JSON.stringify({
+      title: 'Teste de notificação',
+      body: 'Se esta notificação apareceu, o caminho de push está funcionando.',
+      icon: 'https://iili.io/fBQNNwX.jpg',
+      data: {
+        url: `${process.env.APP_URL || ''}/dashboard`,
+        test: true
+      }
+    });
+
+    const attempts: PushTestAttempt[] = [];
+    for (const row of distinctEndpoints.values()) {
+      const attempt: PushTestAttempt = {
+        endpointHost: this.pushEndpointHost(row.endpoint),
+        success: false,
+        statusCode: 'N/A',
+        message: ''
+      };
+      try {
+        const response = await webpush.sendNotification(
+          {
+            endpoint: row.endpoint,
+            expirationTime: null,
+            keys: { p256dh: row.p256dh, auth: row.auth }
+          },
+          payload
+        );
+        attempt.success = true;
+        attempt.statusCode = response?.statusCode ?? 201;
+        attempt.message = 'aceita pelo serviço de push';
+      } catch (error: unknown) {
+        attempt.statusCode = error && typeof error === 'object' && 'statusCode' in error
+          ? String((error as { statusCode: unknown }).statusCode)
+          : 'N/A';
+        const body = error && typeof error === 'object' && 'body' in error
+          ? String((error as { body: unknown }).body).slice(0, 200)
+          : '';
+        attempt.message = `${error instanceof Error ? error.message : 'Erro desconhecido'}${body ? ` | corpo: ${body}` : ''}`;
+      }
+      attempts.push(attempt);
+    }
+
+    return {
+      email,
+      subscriptionRows: rows.length,
+      distinctEndpoints: distinctEndpoints.size,
+      attempts
+    };
+  }
+
+  private pushEndpointHost(endpoint: string): string {
+    try {
+      return new URL(endpoint).host;
+    } catch {
+      return 'endpoint-invalido';
+    }
   }
 
   /**
