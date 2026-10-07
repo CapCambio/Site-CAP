@@ -10,6 +10,7 @@ import { authService } from './auth/AuthService';
 import { authenticate, requireAdmin, optionalAuth } from './auth/JwtMiddleware';
 import { JwtService } from './auth/JwtService';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
+import { readPushLogEntries } from './logger';
 import * as db from './db';
 import { getCurrencyHistory as getCurrencyHistoryFromDB } from './db';
 
@@ -763,13 +764,50 @@ app.get("/api/currencies", async (req, res) => {
     try {
       const subs = await db.getPushSubscriptions();
 
-      const byUser = new Map<string, { email: string; count: number; last: string | null }>();
+      const byUser = new Map<string, { email: string; count: number; distinctEndpoints: number; last: string | null }>();
+      const endpointsByUser = new Map<string, Set<string>>();
+      const hosts = new Map<string, number>();
+
       for (const sub of subs) {
-        const entry = byUser.get(sub.email) || { email: sub.email, count: 0, last: null };
+        let entry = byUser.get(sub.email);
+        if (!entry) {
+          entry = { email: sub.email, count: 0, distinctEndpoints: 0, last: null };
+          byUser.set(sub.email, entry);
+          endpointsByUser.set(sub.email, new Set<string>());
+        }
         entry.count++;
+        endpointsByUser.get(sub.email)!.add(sub.endpoint);
+
+        try {
+          const host = new URL(sub.endpoint).host;
+          hosts.set(host, (hosts.get(host) || 0) + 1);
+        } catch {
+          hosts.set('endpoint-invalido', (hosts.get('endpoint-invalido') || 0) + 1);
+        }
+
         const ts = sub.timestamp ? new Date(sub.timestamp).toISOString() : null;
         if (ts && (!entry.last || ts > entry.last)) entry.last = ts;
-        byUser.set(sub.email, entry);
+      }
+
+      for (const [email, endpoints] of endpointsByUser) {
+        byUser.get(email)!.distinctEndpoints = endpoints.size;
+      }
+
+      const attempts = readPushLogEntries();
+      const failures = new Map<string, { error: string; count: number; lastAt: string | null }>();
+      let successCount = 0;
+      for (const attempt of attempts) {
+        if (attempt.success) {
+          successCount++;
+          continue;
+        }
+        const failure = failures.get(attempt.error || 'sem mensagem de erro') ||
+          { error: attempt.error || 'sem mensagem de erro', count: 0, lastAt: null };
+        failure.count++;
+        if (attempt.timestamp && (!failure.lastAt || attempt.timestamp > failure.lastAt)) {
+          failure.lastAt = attempt.timestamp;
+        }
+        failures.set(failure.error, failure);
       }
 
       res.json({
@@ -782,6 +820,16 @@ app.get("/api/currencies", async (req, res) => {
         subscriptions: {
           total: subs.length,
           users: Array.from(byUser.values()).sort((a, b) => b.count - a.count)
+        },
+        pushServices: Array.from(hosts.entries())
+          .map(([host, total]) => ({ host, total }))
+          .sort((a, b) => b.total - a.total),
+        sendAttempts: {
+          logEntriesScanned: attempts.length,
+          successCount,
+          failureCount: attempts.length - successCount,
+          byError: Array.from(failures.values()).sort((a, b) => b.count - a.count),
+          lastAttempts: attempts.slice(-10)
         }
       });
     } catch (error) {

@@ -1,4 +1,4 @@
-import { writeFileSync, appendFileSync, existsSync, mkdirSync } from 'fs';
+import { writeFileSync, appendFileSync, existsSync, mkdirSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -106,3 +106,46 @@ export const logger = {
     });
   }
 };
+
+export interface PushLogEntry {
+  email: string;
+  endpoint: string;
+  success: boolean;
+  error?: string;
+  timestamp: string;
+}
+
+// Os logs vivem no disco efêmero da instância: refletem apenas o processo atual
+export function readPushLogEntries(maxLines: number = 1000): PushLogEntry[] {
+  const entries: PushLogEntry[] = [];
+
+  for (const offset of [0, 1]) {
+    const file = getLogFileForDay(offset);
+    if (!existsSync(file)) continue;
+
+    let lines: string[] = [];
+    try {
+      lines = readFileSync(file, 'utf8').split('\n');
+    } catch {
+      continue;
+    }
+
+    for (const line of lines) {
+      if (!line.includes('PUSH ENVIADO')) continue;
+      const jsonStart = line.indexOf('| ');
+      if (jsonStart === -1) continue;
+      try {
+        entries.push(JSON.parse(line.slice(jsonStart + 2)));
+      } catch {
+        // linha parcialmente escrita
+      }
+    }
+  }
+
+  return entries.slice(-maxLines);
+}
+
+function getLogFileForDay(daysAgo: number): string {
+  const date = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+  return join(LOGS_DIR, `push-${date.toISOString().split('T')[0]}.log`);
+}
