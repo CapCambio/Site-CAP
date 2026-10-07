@@ -1128,14 +1128,21 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
         logger.pushSent(email, subscription.endpoint, true);
         successCount++;
       } catch (error: unknown) {
-        if (error && typeof error === 'object' && 'statusCode' in error && error.statusCode === 410) {
-          // Assinatura expirada, remover do banco de dados
-          console.log(`   ❌ Assinatura push expirada (410) para ${email}, removendo do banco...`);
-          logger.pushSent(email, subscription.endpoint, false, 'Subscription expired (410)');
+        const statusCode = error && typeof error === 'object' && 'statusCode' in error ? error.statusCode : 'N/A';
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+
+        // 404/410 = a assinatura não existe mais no serviço de push. 403 = as credenciais
+        // VAPID daquela assinatura não batem com as atuais (par de chaves antigo); nesse
+        // caso o navegador continua entregando a assinatura como viva e ela jamais seria
+        // recriada sem o self-heal do cliente, que agora existe. 401 fica de fora porque
+        // costuma significar problema global de autenticação, não assinatura morta.
+        const subscriptionIsDead = statusCode === 404 || statusCode === 410 || statusCode === 403;
+
+        if (subscriptionIsDead) {
+          console.log(`   ❌ Assinatura push inválida (${statusCode}) para ${email}, removendo do banco...`);
+          logger.pushSent(email, subscription.endpoint, false, `Subscription invalid (${statusCode})`);
           await deletePushSubscriptionByEndpoint(subscription.endpoint);
         } else {
-          const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-          const statusCode = error && typeof error === 'object' && 'statusCode' in error ? error.statusCode : 'N/A';
           console.error(`   ❌ Erro ao enviar notificação push para ${email}:`);
           console.error(`      Status: ${statusCode}`);
           console.error(`      Mensagem: ${errorMessage}`);
