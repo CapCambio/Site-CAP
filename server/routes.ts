@@ -758,6 +758,38 @@ app.get("/api/currencies", async (req, res) => {
     }
   });
 
+  // Diagnóstico de push notifications (somente admin, somente leitura)
+  app.get("/api/admin/push-status", authenticate, requireAdmin, async (req, res) => {
+    try {
+      const subs = await db.getPushSubscriptions();
+
+      const byUser = new Map<string, { email: string; count: number; last: string | null }>();
+      for (const sub of subs) {
+        const entry = byUser.get(sub.email) || { email: sub.email, count: 0, last: null };
+        entry.count++;
+        const ts = sub.timestamp ? new Date(sub.timestamp).toISOString() : null;
+        if (ts && (!entry.last || ts > entry.last)) entry.last = ts;
+        byUser.set(sub.email, entry);
+      }
+
+      res.json({
+        vapid: {
+          publicKeyConfigured: !!process.env.VAPID_PUBLIC_KEY,
+          privateKeyConfigured: !!process.env.VAPID_PRIVATE_KEY,
+          emailConfigured: !!process.env.VAPID_EMAIL,
+          publicKey: alertSystem.getVapidPublicKey() ?? null
+        },
+        subscriptions: {
+          total: subs.length,
+          users: Array.from(byUser.values()).sort((a, b) => b.count - a.count)
+        }
+      });
+    } catch (error) {
+      console.error('Erro no diagnóstico de push:', error);
+      res.status(500).json({ error: 'Erro ao ler status de push' });
+    }
+  });
+
   // Admin email management routes
   app.get("/api/admin/emails", authenticate, requireAdmin, async (req, res) => {
     try {

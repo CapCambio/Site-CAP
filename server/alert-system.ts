@@ -1214,8 +1214,8 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     // Obtém o idioma do usuário (padrão: pt)
     const userLanguage = userData.language || 'pt';
 
-    // Se houver assinatura push e alertas para notificar, envia uma notificação agrupada
-    if (userData.pushSubscriptions && alerts.length > 0) {
+    // Enviar notificação push agrupada; quais assinaturas existem é decidido em sendPushNotification (banco)
+    if (alerts.length > 0) {
       // Título baseado no idioma
       const titulo = this.getPushNotificationTitle(userLanguage);
 
