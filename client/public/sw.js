@@ -1,6 +1,6 @@
 // Service Worker seguro - não intercepta assets do Vite
 
-const CACHE_NAME = 'cap-cotacoes-v18';
+const CACHE_NAME = 'cap-cotacoes-v19';
 const OFFLINE_PAGE = '/offline.html';
 
 console.log('[Service Worker] Iniciando...');
