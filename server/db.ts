@@ -320,6 +320,11 @@ export async function getPushSubscriptionsByUser(email: string): Promise<PushSub
 }
 
 export async function addPushSubscription(sub: Partial<PushSubscription>): Promise<PushSubscription> {
+  // O cliente reenvia a mesma assinatura a cada carga e a cada retorno de aba: sem
+  // substituir aqui a tabela acumula dezenas de cópias e cada alerta dispara um
+  // push por cópia. Mantém-se uma linha por endpoint, sempre com as chaves atuais.
+  await pool.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [sub.endpoint]);
+
   const result = await pool.query(
     `INSERT INTO push_subscriptions (email, endpoint, p256dh, auth, timestamp)
      VALUES ($1, $2, $3, $4, $5)
