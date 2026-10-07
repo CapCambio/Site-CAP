@@ -829,6 +829,11 @@ app.get("/api/currencies", async (req, res) => {
           total: subs.length,
           users: Array.from(byUser.values()).sort((a, b) => b.count - a.count)
         },
+        alertTable: {
+          totalRows: alertRows.length,
+          activeRows: alertRows.filter(alert => alert.ativo).length
+        },
+        alertMemory: alertSystem.getAlertMemorySummary(),
         recipients: Array.from(activeAlertsByEmail.entries())
           .map(([email, activeAlerts]) => ({
             email,
@@ -838,6 +843,12 @@ app.get("/api/currencies", async (req, res) => {
             lastSubscription: byUser.get(email)?.last ?? null
           }))
           .sort((a, b) => a.pushSubscriptionRows - b.pushSubscriptionRows),
+        coverage: {
+          emailsWithActiveAlerts: activeAlertsByEmail.size,
+          emailsWithPushSubscriptions: byUser.size,
+          alertsWithoutPushSubscription: Array.from(activeAlertsByEmail.keys()).filter(email => !byUser.has(email)),
+          pushSubscriptionWithoutActiveAlerts: Array.from(byUser.keys()).filter(email => !activeAlertsByEmail.has(email))
+        },
         pushServices: Array.from(hosts.entries())
           .map(([host, total]) => ({ host, total }))
           .sort((a, b) => b.total - a.total),

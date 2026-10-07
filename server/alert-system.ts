@@ -141,6 +141,20 @@ interface PushTestResult {
   attempts: PushTestAttempt[];
 }
 
+interface AlertMemorySummary {
+  checkerRunning: boolean;
+  cycles: number;
+  lastCycleAt: string | null;
+  trackedCurrencies: number;
+  users: Array<{
+    email: string;
+    activeAlerts: number;
+    currencies: string[];
+    memoryPushSubscriptions: number;
+    lastNotificationSent: string | null;
+  }>;
+}
+
 interface Alert {
   tipo: 'subida' | 'descida' | 'valor-especifico';
   ativo: boolean;
@@ -171,6 +185,8 @@ class AlertSystem {
   private emailConfigured: boolean = false;
   private templateCache: { [key: string]: Handlebars.TemplateDelegate } = {};
   private lastCheckedPrices: { [currencyCode: string]: number } = {}; // Último preço verificado por moeda
+  private cycleCount: number = 0;
+  private lastCycleAt: string | null = null;
 
   constructor() {
     console.log('🔔 [AlertSystem] Constructor iniciado');
@@ -199,6 +215,26 @@ class AlertSystem {
    */
   public getVapidPublicKey(): string | undefined {
     return process.env.VAPID_PUBLIC_KEY;
+  }
+
+  /**
+   * Fotografia da memória que decide quem é alertado a cada ciclo, junto com o
+   * histórico de ciclos desta instância. Serve para comparar com a tabela alerts.
+   */
+  public getAlertMemorySummary(): AlertMemorySummary {
+    return {
+      checkerRunning: this.cycleCount > 0,
+      cycles: this.cycleCount,
+      lastCycleAt: this.lastCycleAt,
+      trackedCurrencies: Object.keys(this.lastCheckedPrices).length,
+      users: Object.values(this.data).map(userData => ({
+        email: userData.email,
+        activeAlerts: Object.values(userData.alerts).filter(alert => alert.ativo).length,
+        currencies: Object.keys(userData.alerts),
+        memoryPushSubscriptions: userData.pushSubscriptions?.length ?? 0,
+        lastNotificationSent: userData.lastNotificationSent ?? null
+      }))
+    };
   }
 
   /**
@@ -270,6 +306,8 @@ class AlertSystem {
    */
   private async checkAllCurrencies(): Promise<void> {
     try {
+      this.cycleCount++;
+      this.lastCycleAt = new Date().toISOString();
       logger.info('Iniciando verificação de cotações para alertas');
       console.log('🔍 Verificando cotações para alertas...');
 
