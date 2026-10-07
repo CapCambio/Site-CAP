@@ -161,7 +161,13 @@
     "notificationEmail": "E-mail: Você receberá um e-mail quando o alerta for disparado. Verifique a caixa de spam/lixo eletrônico se não receber.",
     "notificationPush": "Notificações Push: Receba alertas instantâneos no seu navegador ou dispositivo móvel.",
     "notificationInstall": "Instale o app: Receba notificações mesmo com o navegador fechado instalando o aplicativo no seu dispositivo.",
-    "notificationTroubleshoot": "Não recebeu notificações? Verifique se as notificações estão ativadas no seu navegador e se o site tem permissão para enviar notificações."
+    "notificationTroubleshoot": "Não recebeu notificações? Verifique se as notificações estão ativadas no seu navegador e se o site tem permissão para enviar notificações.",
+    "noAlertsActive": "Você ainda não tem alertas ativos. Crie um alerta para começar a receber as notificações.",
+    "enableNotifications": "Ativar notificações",
+    "notificationsOn": "Notificações ativadas",
+    "notifOff": "As notificações estão desativadas neste dispositivo. Toque em Ativar notificações e permita o aviso do navegador.",
+    "notifDenied": "Este navegador está bloqueando as notificações do site. Libere o acesso nas configurações de notificação do navegador e recarregue a página.",
+    "notifUnsupported": "Este navegador não aceita notificações push. Use um navegador atualizado ou receba os alertas por e-mail."
   },
   "auth": {
     "title": "CAP Cotações",
@@ -553,6 +559,8 @@
     "notificationsEnabled": "Notificações ativadas",
     "notificationsEnabledDesc": "Você receberá alertas push quando houver mudanças nas cotações.",
     "errorEnablePush": "Não foi possível ativar as notificações push.",
+    "notificationsRestored": "Notificações recuperadas",
+    "notificationsRestoredDesc": "Sua assinatura de notificações foi recriada para este dispositivo.",
     "errorAddEmail": "Não foi possível adicionar o email.",
     "emailAdded": "Email adicionado com sucesso"
   },

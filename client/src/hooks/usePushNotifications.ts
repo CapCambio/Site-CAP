@@ -44,6 +44,13 @@ async function getServerVapidKey(): Promise<string | null> {
   return cachedServerVapidKey;
 }
 
+// Alguns navegadores devolvem assinaturas sem as chaves p256dh/auth. O servidor lê
+// subscription.keys.p256dh ao registrar e cairia em 500 para sempre com uma dessas.
+async function hasValidCredentials(subscription: PushSubscription): Promise<boolean> {
+  const keys = subscription.toJSON()?.keys;
+  return Boolean(keys?.p256dh && keys?.auth);
+}
+
 // Assinatura criada com uma chave VAPID que o servidor já trocou é rejeitada para
 // sempre (403 "as credenciais VAPID ... não corresponde"), mas o navegador continua
 // devolvendo ela como se estivesse viva. Sem comparar a chave, cada carga do app
@@ -85,25 +92,36 @@ export function usePushNotifications() {
     setIsSupported(supported);
     
     if (supported && user?.email) {
-      // Verificar permissão atual
-      if (Notification.permission === 'default') {
-        // Pedir permissão automaticamente ao entrar na página
-        setTimeout(() => {
-          requestPermission();
-        }, 2000); // Esperar 2 segundos para não incomodar na entrada
-      } else if (Notification.permission === 'granted') {
-        // Se já tem permissão, verificar subscription
-        checkSubscription();
-      }
-      
       // Verificar permissões quando o usuário voltar para a página
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible') {
           checkSubscription();
         }
       };
-      
       document.addEventListener('visibilitychange', handleVisibilityChange);
+
+      if (Notification.permission === 'default') {
+        // Pedir permissão automaticamente ao entrar na página
+        const timer = setTimeout(() => {
+          // Reler a permissão: quem a concede pelos botões do app já tem assinatura
+          // para buscar, e requestPermission() nessa hora é só um no-op.
+          if (Notification.permission === 'granted') {
+            void checkSubscription();
+          } else {
+            void requestPermission();
+          }
+        }, 2000); // Esperar 2 segundos para não incomodar na entrada
+
+        return () => {
+          clearTimeout(timer);
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+      }
+
+      if (Notification.permission === 'granted') {
+        checkSubscription();
+      }
+
       return () => {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       };
@@ -123,9 +141,19 @@ export function usePushNotifications() {
         
         // Verifica se já tem uma assinatura ativa
         const subscription = await registration.pushManager.getSubscription();
-        if (subscription && user?.email && !(await isOrphanSubscription(subscription))) {
-          await syncPushSubscriptionWithServer(user.email, subscription);
-          setIsSubscribed(true);
+        if (
+          subscription &&
+          user?.email &&
+          !(await isOrphanSubscription(subscription)) &&
+          (await hasValidCredentials(subscription))
+        ) {
+          if (await syncPushSubscriptionWithServer(user.email, subscription)) {
+            setIsSubscribed(true);
+            return;
+          }
+          // O servidor recusou esta assinatura: marcar como ativa deixaria a tela
+          // dizendo "notificações ligadas" sem nada por trás.
+          setIsSubscribed(false);
           return;
         }
 
@@ -189,10 +217,17 @@ export function usePushNotifications() {
       });
       return false;
     }
-    
+
+    // Gate antes de qualquer unsubscribe: com a permissão negada pelo navegador,
+    // apagar a assinatura tiraria da pessoa algo que ela pode reativar sozinha, e
+    // o app ficaria mudo sem porta de saída nenhuma.
+    if (Notification.permission !== 'granted') {
+      return false;
+    }
+
     setIsLoading(true);
+    let replacedOrphan = false;
     try {
-      // 1. Verificar se já está inscrito
       let registration = await navigator.serviceWorker.getRegistration();
       if (!registration) {
         registration = await navigator.serviceWorker.register("/sw.js");
@@ -201,7 +236,10 @@ export function usePushNotifications() {
 
       const existingSubscription = await registration.pushManager.getSubscription();
       if (existingSubscription) {
-        if (!(await isOrphanSubscription(existingSubscription))) {
+        const usable =
+          !(await isOrphanSubscription(existingSubscription)) &&
+          (await hasValidCredentials(existingSubscription));
+        if (usable) {
           const synced = await syncPushSubscriptionWithServer(user.email, existingSubscription);
           if (!synced) {
             throw new Error("Falha ao sincronizar inscrição push no servidor");
@@ -210,36 +248,36 @@ export function usePushNotifications() {
           return true;
         }
         // Descartar a assinatura órfã libera o navegador a emitir uma nova pela chave atual.
+        replacedOrphan = true;
         await existingSubscription.unsubscribe();
       }
-      
-      // 2. Se não tem permissão, não pode continuar
-      if (Notification.permission !== 'granted') {
-        return false;
-      }
-      
-      // 3. Obter chave VAPID
+
       const publicKey = await getServerVapidKey();
       if (!publicKey) {
         throw new Error("Chave VAPID pública indisponível");
       }
-      
-      // 4. Criar subscription
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey) as BufferSource,
       });
-      
-      // 6. Registrar no servidor
+
       const registered = await syncPushSubscriptionWithServer(user.email, subscription);
 
       if (!registered) {
         throw new Error("Falha ao registrar no servidor");
       }
-      
+
       setIsSubscribed(true);
 
-      if (!options?.silent) {
+      // Quem tinha uma assinatura morta e acabou de recuperá-la precisa ver isso: sem
+      // aviso a pessoa acha que o push voltou sozinho e continua esperando em silêncio.
+      if (replacedOrphan) {
+        toast({
+          title: t('toasts.notificationsRestored'),
+          description: t('toasts.notificationsRestoredDesc')
+        });
+      } else if (!options?.silent) {
         toast({
           title: t('toasts.notificationsEnabled'),
         });

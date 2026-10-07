@@ -138,6 +138,9 @@ interface PushTestResult {
   email: string;
   subscriptionRows: number;
   distinctEndpoints: number;
+  // O envio real depende da memória de alertas, não das linhas no banco: sem alerta
+  // ativo o ciclo nem chega a tentar o push, ainda que o endpoint responda 201 ao teste.
+  activeAlertsInMemory: number;
   attempts: PushTestAttempt[];
 }
 
@@ -1166,6 +1169,12 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       if (!distinctEndpoints.has(row.endpoint)) distinctEndpoints.set(row.endpoint, row);
     }
 
+    const memoryKey = Object.keys(this.data)
+      .find(key => key.toLowerCase() === email.toLowerCase());
+    const activeAlertsInMemory = memoryKey
+      ? Object.values(this.data[memoryKey].alerts).filter(alert => alert.ativo).length
+      : 0;
+
     const payload = JSON.stringify({
       title: 'Teste de notificação',
       body: 'Se esta notificação apareceu, o caminho de push está funcionando.',
@@ -1212,6 +1221,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       email,
       subscriptionRows: rows.length,
       distinctEndpoints: distinctEndpoints.size,
+      activeAlertsInMemory,
       attempts
     };
   }

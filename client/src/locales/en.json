@@ -161,7 +161,13 @@
     "notificationEmail": "Email: You will receive an email when the alert is triggered. Check your spam/junk folder if you don't receive it.",
     "notificationPush": "Push Notifications: Receive instant alerts on your browser or mobile device.",
     "notificationInstall": "Install the app: Receive notifications even with the browser closed by installing the app on your device.",
-    "notificationTroubleshoot": "Didn't receive notifications? Check if notifications are enabled in your browser and if the site has permission to send notifications."
+    "notificationTroubleshoot": "Didn't receive notifications? Check if notifications are enabled in your browser and if the site has permission to send notifications.",
+    "noAlertsActive": "You don't have active alerts yet. Create an alert to start receiving notifications.",
+    "enableNotifications": "Turn notifications on",
+    "notificationsOn": "Notifications are on",
+    "notifOff": "Notifications are turned off on this device. Tap Turn notifications on and allow the browser prompt.",
+    "notifDenied": "This browser is blocking notifications for this site. Allow them in the browser's notification settings and reload the page.",
+    "notifUnsupported": "This browser doesn't support push notifications. Use an up-to-date browser or receive alerts by email."
   },
   "auth": {
     "title": "CAP Quotes",
@@ -556,6 +562,8 @@
     "notificationsEnabled": "Notifications enabled",
     "notificationsEnabledDesc": "You will receive push alerts when there are changes in currency rates.",
     "errorEnablePush": "Could not enable push notifications.",
+    "notificationsRestored": "Notifications restored",
+    "notificationsRestoredDesc": "Your notification subscription was recreated for this device.",
     "errorAddEmail": "Could not add the email.",
     "emailAdded": "Email added successfully"
   },

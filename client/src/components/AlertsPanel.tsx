@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Bell, Trash2, TrendingUp, TrendingDown, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { api } from "@/lib/http";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
@@ -46,6 +47,13 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const {
+    isSupported,
+    isSubscribed,
+    isLoading: notifLoading,
+    subscribe,
+    requestPermission
+  } = usePushNotifications();
 
   // Impedir scroll do body quando o painel está aberto
   useEffect(() => {
@@ -128,6 +136,64 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
   if (!isOpen) return null;
 
   const alertsArray = userAlerts?.alerts ? Object.entries(userAlerts.alerts) : [];
+
+  const notifPermission = typeof Notification !== "undefined" ? Notification.permission : "unsupported";
+  const notifState: "unsupported" | "denied" | "off" | "on" =
+    !isSupported ? "unsupported"
+      : notifPermission === "denied" ? "denied"
+        : isSubscribed ? "on"
+          : "off";
+
+  const enableNotifications = async () => {
+    // requestPermission() já assina quando a permissão vem dele; chamar os dois
+    // em sequência registraria a mesma assinatura duas vezes.
+    if (notifPermission === "granted") {
+      await subscribe();
+    } else {
+      await requestPermission();
+    }
+  };
+
+  // Renderiza também quando não há alertas: é justamente aí que a pessoa precisa de
+  // um botão para ativar o push, senão o app fica mudo sem nenhuma porta de saída.
+  const notificationsCard = (
+    <div className="mt-6 p-4 bg-zinc-800/50 rounded-lg border border-zinc-700">
+      <div className="flex items-start gap-3 text-sm">
+        <Bell className="h-5 w-5 mt-0.5 flex-shrink-0 text-yellow-400" />
+        <div className="text-zinc-300">
+          <h4 className="font-medium text-white mb-2">{t('alertsPanel.aboutNotifications')}</h4>
+          <ul className="space-y-2 text-sm">
+            <li>• {t('alertsPanel.notificationEmail')}</li>
+            <li>• {t('alertsPanel.notificationPush')}</li>
+            <li>• {t('alertsPanel.notificationInstall')}</li>
+            <li>• {t('alertsPanel.notificationTroubleshoot')}</li>
+          </ul>
+          {notifState === "off" && (
+            <p className="mt-2 text-amber-300">{t('alertsPanel.notifOff')}</p>
+          )}
+          {notifState === "denied" && (
+            <p className="mt-2 text-red-400">{t('alertsPanel.notifDenied')}</p>
+          )}
+          {notifState === "unsupported" && (
+            <p className="mt-2 text-zinc-400">{t('alertsPanel.notifUnsupported')}</p>
+          )}
+          {alertsArray.length === 0 && (
+            <p className="mt-2 text-zinc-400">{t('alertsPanel.noAlertsActive')}</p>
+          )}
+        </div>
+      </div>
+      {notifState !== "unsupported" && (
+        <Button
+          size="sm"
+          className="mt-3 bg-yellow-500 text-black hover:bg-yellow-400"
+          disabled={notifLoading || notifState === "on" || notifState === "denied"}
+          onClick={() => void enableNotifications()}
+        >
+          {notifState === "on" ? t('alertsPanel.notificationsOn') : t('alertsPanel.enableNotifications')}
+        </Button>
+      )}
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 z-50 bg-black text-white overflow-y-auto">
@@ -299,23 +365,9 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
                     </div>
                   ))}
                   
-                  {/* Informações sobre alertas */}
-                  <div className="mt-6 p-4 bg-zinc-800/50 rounded-lg border border-zinc-700">
-                    <div className="flex items-start gap-3 text-sm">
-                      <Bell className="h-5 w-5 mt-0.5 flex-shrink-0 text-yellow-400" />
-                      <div className="text-zinc-300">
-                        <h4 className="font-medium text-white mb-2">{t('alertsPanel.aboutNotifications')}</h4>
-                        <ul className="space-y-2 text-sm">
-                          <li>• {t('alertsPanel.notificationEmail')}</li>
-                          <li>• {t('alertsPanel.notificationPush')}</li>
-                          <li>• {t('alertsPanel.notificationInstall')}</li>
-                          <li>• {t('alertsPanel.notificationTroubleshoot')}</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
+              {!isLoading && notificationsCard}
             </CardContent>
           </Card>
         </main>

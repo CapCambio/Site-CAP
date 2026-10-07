@@ -161,7 +161,13 @@
     "notificationEmail": "Email: Vous recevrez un email lorsque l'alerte sera déclenchée. Vérifiez le dossier spam si vous ne le recevez pas.",
     "notificationPush": "Notifications Push: Recevez des alertes instantanées sur votre navigateur ou appareil mobile.",
     "notificationInstall": "Installez l'app: Recevez des notifications même avec le navigateur fermé en installant l'application sur votre appareil.",
-    "notificationTroubleshoot": "Vous n'avez pas reçu de notifications? Vérifiez si les notifications sont activées dans votre navigateur et si le site a la permission d'envoyer des notifications."
+    "notificationTroubleshoot": "Vous n'avez pas reçu de notifications? Vérifiez si les notifications sont activées dans votre navigateur et si le site a la permission d'envoyer des notifications.",
+    "noAlertsActive": "Vous n'avez pas encore d'alerte active. Créez une alerte pour commencer à recevoir des notifications.",
+    "enableNotifications": "Activer les notifications",
+    "notificationsOn": "Notifications activées",
+    "notifOff": "Les notifications sont désactivées sur cet appareil. Touchez Activer les notifications puis autorisez la demande du navigateur.",
+    "notifDenied": "Ce navigateur bloque les notifications du site. Autorisez-les dans les paramètres de notification du navigateur, puis rechargez la page.",
+    "notifUnsupported": "Ce navigateur ne prend pas en charge les notifications push. Utilisez un navigateur à jour ou recevez les alertes par e-mail."
   },
   "auth": {
     "title": "CAP Cotations",
@@ -556,6 +562,8 @@
     "notificationsEnabled": "Notifications activées",
     "notificationsEnabledDesc": "Vous recevrez des alertes push lorsqu'il y aura des changements dans les taux de change.",
     "errorEnablePush": "Impossible d'activer les notifications push.",
+    "notificationsRestored": "Notifications rétablies",
+    "notificationsRestoredDesc": "Votre abonnement aux notifications a été recréé pour cet appareil.",
     "errorAddEmail": "Impossible d'ajouter l'email.",
     "emailAdded": "Email ajouté avec succès"
   },
