@@ -877,7 +877,11 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
         if (!alert.validade) continue;
 
         // Interpreta a data como local, não UTC (mesma lógica do display)
-        const dateStr = alert.validade.split('T')[0];
+        // Converte para string caso seja objeto Date (PostgreSQL retorna Date)
+        const validadeStr = alert.validade instanceof Date
+          ? alert.validade.toISOString()
+          : String(alert.validade);
+        const dateStr = validadeStr.split('T')[0];
         const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade
 
         if (now > validadeDate) {
