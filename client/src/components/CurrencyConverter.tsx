@@ -219,7 +219,7 @@ export function CurrencyConverter({ currencies, userEmail }: CurrencyConverterPr
         <div className="flex items-center justify-center mb-2 sm:mb-2">
           <button
             onClick={() => setMode("preciso")}
-            className={`px-3 py-1 rounded-l-lg text-sm font-medium transition-all duration-150 ${
+            className={`px-4 py-1.5 text-[15px] leading-5 rounded-l-lg font-medium transition-all duration-150 sm:px-3 sm:py-1 sm:text-sm ${
               mode === "preciso" 
                 ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
                 : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
@@ -229,7 +229,7 @@ export function CurrencyConverter({ currencies, userEmail }: CurrencyConverterPr
           </button>
           <button
             onClick={() => setMode("tenho")}
-            className={`px-3 py-1 rounded-r-lg text-sm font-medium transition-all duration-150 ${
+            className={`px-4 py-1.5 text-[15px] leading-5 rounded-r-lg font-medium transition-all duration-150 sm:px-3 sm:py-1 sm:text-sm ${
               mode === "tenho" 
                 ? "bg-[#f3b234] text-[#1a1a1a] shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] border border-[#e6a429]" 
                 : "bg-white text-black hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)] border border-gray-200"
