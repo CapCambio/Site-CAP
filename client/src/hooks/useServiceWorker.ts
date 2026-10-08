@@ -8,9 +8,10 @@ export function useServiceWorker() {
       return;
     }
 
-    // Verificar se estamos na rota /precos (apenas lá o PWA deve funcionar)
+    // Verificar se estamos na rota /cotacoes ou /auth (apenas lá o PWA deve funcionar)
     const currentPath = window.location.pathname;
-    if (currentPath !== '/precos' && currentPath !== '/precos/') {
+    const allowedPaths = ['/cotacoes', '/cotacoes/', '/auth', '/auth/'];
+    if (!allowedPaths.includes(currentPath)) {
       console.log('PWA desativado nesta rota:', currentPath);
       return;
     }

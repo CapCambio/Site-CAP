@@ -2,10 +2,11 @@
   "name": "CAP Cotações",
   "short_name": "CAP Câmbio",
   "description": "Acompanhe as cotações de moedas em tempo real",
-  "start_url": "/splash-video.html",
+  "start_url": "/cotacoes",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
+  "scope": "/",
   "icons": [
     {
       "src": "/optimized/android-chrome-96x96.png",
@@ -57,16 +58,15 @@
       "name": "Ver cotações",
       "short_name": "Cotações",
       "description": "Visualize as cotações em tempo real",
-      "url": "/"
+      "url": "/cotacoes"
     },
     {
       "name": "Configurar alertas",
       "short_name": "Alertas",
       "description": "Configure alertas de cotações",
-      "url": "/alerts"
+      "url": "/cotacoes"
     }
   ],
   "prefer_related_applications": false,
-  "related_applications": [],
-  "scope": "/"
+  "related_applications": []
 }

@@ -1,17 +1,17 @@
 {
-  "lastUpdate": "2026-09-29T18:03:08.348Z",
+  "lastUpdate": "2026-10-05T18:45:48.523Z",
   "currencies": [
     {
       "code": "USD",
       "name": "Dólar Americano",
       "buyPrice": 5.05,
-      "sellPrice": 5.66
+      "sellPrice": 5.91
     },
     {
       "code": "EUR",
       "name": "Euro",
       "buyPrice": 5.9,
-      "sellPrice": 6.39
+      "sellPrice": 6.36
     },
     {
       "code": "GBP",

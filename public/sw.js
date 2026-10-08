@@ -1,22 +1,17 @@
 // Service Worker para Push Notifications e Cache
 
 // Versionamento dinâmico do cache para invalidação automática
-const CACHE_VERSION = '1.0.16'; // Atualizar este número em cada release
+const CACHE_VERSION = '1.0.17'; // Atualizar este número em cada release
 const CACHE_NAME = `cap-cotacoes-v${CACHE_VERSION}`;
 const OFFLINE_PAGE = '/offline.html';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
   '/offline.html',
   '/manifest.json',
   '/safari-pinned-tab.svg',
-  '/splash-video.html',
-  '/splash.mp4',
   // Ícones otimizados
   '/optimized/android-chrome-192x192.webp',
   '/optimized/android-chrome-512x512.webp',
   '/optimized/apple-touch-icon.webp',
-  '/optimized/cap-logo-fundo-optimized.webp',
   '/optimized/favicon-16x16.webp',
   '/optimized/favicon-32x32.webp',
   '/optimized/favicon-64x64.webp',
