@@ -315,10 +315,15 @@ class AlertSystem {
       console.log('🔍 Verificando cotações para alertas...');
 
       // Limpar alertas expirados proativamente (não depende de mudança de preço)
-      await this.cleanupExpiredAlerts();
+      try {
+        await this.cleanupExpiredAlerts();
+      } catch (error) {
+        console.error('❌ Erro no cleanupExpiredAlerts:', error);
+      }
 
       // Obter todas as moedas do sistema
       const currencies = await jsonStorage.getAllCurrencies();
+      console.log(`📊 Total de moedas encontradas: ${currencies.length}`);
       
       // Mapa para agrupar todos os alertas por usuário
       const allAlertsByEmail = new Map<string, Array<{
