@@ -1,7 +1,7 @@
 {
   "name": "CAP Cotações",
   "short_name": "CAP Cotações",
-  "start_url": "/cotacoes",
+  "start_url": "/splash-video.html",
   "display": "standalone",
   "display_override": ["standalone", "window-controls-overlay"],
   "background_color": "#000000",
