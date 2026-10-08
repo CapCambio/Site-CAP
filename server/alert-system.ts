@@ -452,7 +452,10 @@ class AlertSystem {
 
       // Verificar validade do alerta (redundante com cleanupExpiredAlerts, mas mantém como segurança)
       if (alert.validade) {
-        const dateStr = alert.validade.split('T')[0];
+        const validadeStr = alert.validade instanceof Date
+          ? alert.validade.toISOString()
+          : String(alert.validade);
+        const dateStr = validadeStr.split('T')[0];
         const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade
         const now = new Date();
         if (now > validadeDate) {
