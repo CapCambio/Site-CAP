@@ -60,6 +60,46 @@ export async function initializeAlertsTable() {
   }
 }
 
+// Inicializar tabela de sessões ativas (bloqueio de login simultâneo)
+export async function initializeActiveSessionsTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS active_sessions (
+        email VARCHAR(255) PRIMARY KEY,
+        last_activity TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      )
+    `);
+    console.log('✅ Tabela active_sessions inicializada');
+  } catch (error) {
+    console.error('❌ Erro ao inicializar tabela active_sessions:', error);
+  }
+}
+
+// Retorna o último heartbeat da sessão, ou null se não houver registro
+export async function getActiveSession(email: string): Promise<{ lastActivity: Date } | null> {
+  const result = await pool.query(
+    'SELECT last_activity FROM active_sessions WHERE email = $1',
+    [email.toLowerCase()]
+  );
+  if (result.rows.length === 0) return null;
+  return { lastActivity: result.rows[0].last_activity };
+}
+
+// Registra/renova o heartbeat da sessão (UPSERT — recria se a linha não existir)
+export async function touchActiveSession(email: string): Promise<void> {
+  await pool.query(
+    `INSERT INTO active_sessions (email, last_activity)
+     VALUES ($1, NOW())
+     ON CONFLICT (email) DO UPDATE SET last_activity = NOW()`,
+    [email.toLowerCase()]
+  );
+}
+
+// Remove a sessão (logout)
+export async function releaseActiveSession(email: string): Promise<void> {
+  await pool.query('DELETE FROM active_sessions WHERE email = $1', [email.toLowerCase()]);
+}
+
 export interface User {
   id: number;
   email: string;

@@ -14,15 +14,8 @@ import { readPushLogEntries } from './logger';
 import * as db from './db';
 import { getCurrencyHistory as getCurrencyHistoryFromDB } from './db';
 
-// Map em memória para controle de sessões ativas (email -> { sessionId, lastActivity })
-interface ActiveSession {
-  sessionId: string;
-  lastActivity: number;
-}
-const activeSessions = new Map<string, ActiveSession>();
-
-// Exportar para uso no AuthMiddleware
-(global as any).activeSessions = activeSessions;
+// Limiar de sessão viva (heartbeat mais recente que isso = logado em outro lugar)
+const HEARTBEAT_TIMEOUT = 30 * 1000; // 30 segundos
 
 // Interface para tipar os administradores
 interface AdminUser {
@@ -281,12 +274,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Usuários comuns: verificar se já existe sessão ativa em outro dispositivo
       if (!isAdminEmail) {
-        const HEARTBEAT_TIMEOUT = 30 * 1000; // 30 segundos
-        const activeSession = activeSessions.get(emailLower);
-        const now = Date.now();
-
+        const activeSession = await db.getActiveSession(emailLower);
         if (activeSession) {
-          const timeSinceLastActivity = now - activeSession.lastActivity;
+          const timeSinceLastActivity = Date.now() - activeSession.lastActivity.getTime();
           if (timeSinceLastActivity < HEARTBEAT_TIMEOUT) {
             // Sessão ativa com heartbeat recente — bloqueia login
             return res.status(409).json({
@@ -295,7 +285,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           } else {
             // Sem heartbeat por mais de 30 segundos — derruba sessão anterior
             console.log(`🔓 Sessão inativa derrubada para ${emailLower} (${Math.round(timeSinceLastActivity / 1000)}s sem heartbeat)`);
-            activeSessions.delete(emailLower);
           }
         }
       }
@@ -341,12 +330,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[Login] Cookie JWT definido para ${emailLower}`);
       console.log(`[Login] Headers de resposta:`, res.getHeaders());
 
-      // Registrar nova sessão no Map (apenas para usuários regulares)
+      // Registrar nova sessão (apenas para usuários regulares)
       if (!isAdminEmail) {
-        activeSessions.set(emailLower, {
-          sessionId: Date.now().toString(), // Usar timestamp como ID único
-          lastActivity: Date.now()
-        });
+        await db.touchActiveSession(emailLower);
       }
 
       return res.json({ user });
@@ -360,15 +346,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ user: (req as any).user });
   });
 
-  app.post("/api/auth/logout", (req, res) => {
+  app.post("/api/auth/logout", async (req, res) => {
     const user = (req as any).user;
     const email = user?.email || req.body?.email;
     const isAdmin = user?.isAdmin;
 
-    // Remover sessão do Map (apenas para usuários regulares)
+    // Remover sessão do banco (apenas para usuários regulares)
     if (email && !isAdmin) {
-      activeSessions.delete(email);
-      console.log(`🔓 Sessão removida do Map para ${email}`);
+      await db.releaseActiveSession(email);
+      console.log(`🔓 Sessão removida para ${email}`);
     }
 
     // Limpar cookie JWT
@@ -381,7 +367,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ message: 'Logout realizado com sucesso' });
   });
 
-  app.post("/api/auth/heartbeat", (req, res) => {
+  app.post("/api/auth/heartbeat", async (req, res) => {
     const user = (req as any).user;
     const email = user?.email;
     const isAdmin = user?.isAdmin;
@@ -390,10 +376,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json({ success: false });
     }
 
-    const activeSession = activeSessions.get(email);
-    if (activeSession) {
-      activeSession.lastActivity = Date.now();
-    }
+    // UPSERT: recria a linha se sumiu (ex.: após deploy), fechando a brecha em ~15s
+    await db.touchActiveSession(email);
 
     res.json({ success: true });
   });
