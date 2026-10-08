@@ -88,7 +88,9 @@ export function AlertModal({
         });
       } else {
         const acao = tipo === 'subida' ? t('alerts.riseAction') : t('alerts.fallAction');
-        const dataValidade = new Date(validade).toLocaleDateString(getLocale());
+        // Mesma correção de fuso: extrai a parte da data e interpreta como local.
+        const dateStr = validade.split('T')[0];
+        const dataValidade = new Date(dateStr + 'T00:00:00').toLocaleDateString(getLocale());
         description = t('alerts.alertCreatedPeriod', {
           currencyName,
           action: acao,

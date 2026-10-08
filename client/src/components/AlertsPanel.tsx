@@ -129,7 +129,10 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
     if (!alert.validade) {
       return t('admin.indefiniteTime');
     }
-    const date = new Date(alert.validade);
+    // Extrai a parte da data (YYYY-MM-DD) e interpreta como horário local,
+    // não UTC — senão "2026-10-07" vira 06/10 às 21h em BRT.
+    const dateStr = alert.validade.split('T')[0];
+    const date = new Date(dateStr + 'T00:00:00');
     return `${t('admin.until')} ${date.toLocaleDateString(getLocale())}`;
   };
 

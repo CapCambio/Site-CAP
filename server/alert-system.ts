@@ -5,7 +5,7 @@ import webpush from 'web-push';
 import Handlebars from 'handlebars';
 import { jsonStorage } from './json-storage';
 import { logger } from './logger';
-import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint, getCurrencyHistory } from './db';
+import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint, getCurrencyHistory, deleteAlertByUserAndCurrency } from './db';
 import type { PushSubscription as DbPushSubscription } from './db';
 
 // Registrar helpers Handlebars
@@ -314,6 +314,9 @@ class AlertSystem {
       logger.info('Iniciando verificação de cotações para alertas');
       console.log('🔍 Verificando cotações para alertas...');
 
+      // Limpar alertas expirados proativamente (não depende de mudança de preço)
+      await this.cleanupExpiredAlerts();
+
       // Obter todas as moedas do sistema
       const currencies = await jsonStorage.getAllCurrencies();
       
@@ -442,9 +445,10 @@ class AlertSystem {
 
       console.log(`  - ${email}: Alerta encontrado para ${currencyCode} (tipo: ${alert.tipo}, limite: ${alert.limite}%, ativo: ${alert.ativo})`);
 
-      // Verificar validade do alerta
+      // Verificar validade do alerta (redundante com cleanupExpiredAlerts, mas mantém como segurança)
       if (alert.validade) {
-        const validadeDate = new Date(alert.validade);
+        const dateStr = alert.validade.split('T')[0];
+        const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade
         const now = new Date();
         if (now > validadeDate) {
           console.log(`⏰ Alerta expirado: ${email} - ${currencyCode} (validade: ${alert.validade})`);
@@ -851,6 +855,38 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       delete this.data[email];
       this.saveAlerts();
       console.log(`🗑️ Todos os alertas do usuário ${email} foram removidos`);
+    }
+  }
+
+  /**
+   * Remove alertas expirados de todos os usuários (rodado a cada ciclo)
+   */
+  private async cleanupExpiredAlerts(): Promise<void> {
+    const now = new Date();
+    let cleaned = 0;
+
+    for (const [email, userData] of Object.entries(this.data)) {
+      if (!userData?.alerts) continue;
+
+      for (const [currencyCode, alert] of Object.entries(userData.alerts)) {
+        if (!alert.validade) continue;
+
+        // Interpreta a data como local, não UTC (mesma lógica do display)
+        const dateStr = alert.validade.split('T')[0];
+        const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade
+
+        if (now > validadeDate) {
+          console.log(`⏰ Alerta expirado: ${email} - ${currencyCode} (validade: ${alert.validade})`);
+          delete this.data[email].alerts[currencyCode];
+          await deleteAlertByUserAndCurrency(email.toLowerCase(), currencyCode);
+          cleaned++;
+        }
+      }
+    }
+
+    if (cleaned > 0) {
+      this.saveAlerts();
+      console.log(`🧹 ${cleaned} alerta(s) expirado(s) removido(s)`);
     }
   }
 

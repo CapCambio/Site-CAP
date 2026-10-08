@@ -230,6 +230,14 @@ export async function deleteAlertsByUser(email: string): Promise<boolean> {
   return (result.rowCount || 0) > 0;
 }
 
+export async function deleteAlertByUserAndCurrency(email: string, currencyCode: string): Promise<boolean> {
+  const result = await pool.query(
+    'DELETE FROM alerts WHERE user_email = $1 AND currency_code = $2',
+    [email.toLowerCase(), currencyCode]
+  );
+  return (result.rowCount || 0) > 0;
+}
+
 // Funções para histórico de moedas
 export async function getCurrencyHistory(code?: string, startDate?: Date, endDate?: Date, limit?: number): Promise<CurrencyHistory[]> {
   let query = 'SELECT * FROM currency_history';
