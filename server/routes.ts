@@ -5,6 +5,7 @@ import { jsonStorage } from "./json-storage";
 import { alertSystem } from "./init-alert-system";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 import { fileURLToPath } from 'url';
 import { authService } from './auth/AuthService';
 import { authenticate, requireAdmin, optionalAuth } from './auth/JwtMiddleware';
@@ -296,13 +297,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Erro ao atualizar último acesso:", error);
       }
 
-      // Gerar JWT
+      // Gerar JWT com um identificador de sessão (sid) por dispositivo
       const user = {
         email: emailLower,
         name: userName,
         isAdmin: isAdminEmail
       };
-      const token = JwtService.generateToken(user);
+      const sid = crypto.randomUUID();
+      const token = JwtService.generateToken(user, sid);
 
       console.log(`[Login] Gerando token para ${emailLower}`);
       console.log(`[Login] NODE_ENV: ${process.env.NODE_ENV}`);
@@ -332,7 +334,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Registrar nova sessão (apenas para usuários regulares)
       if (!isAdminEmail) {
-        await db.touchActiveSession(emailLower);
+        await db.claimActiveSession(emailLower, sid);
       }
 
       return res.json({ user });
@@ -342,18 +344,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/auth/me", authenticate, (req, res) => {
-    res.json({ user: (req as any).user });
+  app.get("/api/auth/me", authenticate, async (req, res) => {
+    const user = (req as any).user;
+
+    // Sessão única por usuário: um cookie que deixou de ser o dono da sessão
+    // (outro dispositivo fez login depois) é derrubado aqui, e não só no /login.
+    if (user && !user.isAdmin) {
+      const owner = await db.getCurrentSessionId(user.email);
+      if (owner && owner !== user.sid) {
+        res.clearCookie('jwt', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax' as const,
+        });
+        return res.status(401).json({ error: 'Sessão encerrada: outro dispositivo fez login', superseded: true });
+      }
+    }
+
+    res.json({ user });
   });
 
   app.post("/api/auth/logout", async (req, res) => {
     const user = (req as any).user;
     const email = user?.email || req.body?.email;
     const isAdmin = user?.isAdmin;
+    const sid = user?.sid;
 
-    // Remover sessão do banco (apenas para usuários regulares)
+    // Remover sessão do banco (apenas para usuários regulares).
+    // Só derruba se este dispositivo ainda for o dono — evita que o logout de uma
+    // aba já substituída expulse o dispositivo que está ativo agora.
     if (email && !isAdmin) {
-      await db.releaseActiveSession(email);
+      await db.releaseActiveSession(email, sid);
       console.log(`🔓 Sessão removida para ${email}`);
     }
 
@@ -371,14 +392,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const user = (req as any).user;
     const email = user?.email;
     const isAdmin = user?.isAdmin;
+    const sid = user?.sid;
 
     if (!email || isAdmin) {
       return res.json({ success: false });
     }
 
-    // UPSERT: recria a linha se sumiu (ex.: após deploy), fechando a brecha em ~15s
-    await db.touchActiveSession(email);
+    const clearAuthCookie = () => res.clearCookie('jwt', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+    });
 
+    if (sid) {
+      // UPSERT c/ identidade: renova só se este dispositivo ainda é o dono.
+      // Se outro dispositivo assumiu, derruba este (sessão única de verdade).
+      const stillOwner = await db.heartbeatActiveSession(email, sid);
+      if (!stillOwner) {
+        clearAuthCookie();
+        return res.status(401).json({ error: 'Sessão encerrada em outro dispositivo', superseded: true });
+      }
+      return res.json({ success: true });
+    }
+
+    // Token legado (sem sid): se alguém com sid real já assumiu, este está obsoleto.
+    const owner = await db.getCurrentSessionId(email);
+    if (owner) {
+      clearAuthCookie();
+      return res.status(401).json({ error: 'Sessão encerrada em outro dispositivo', superseded: true });
+    }
+    await db.touchActiveSession(email);
     res.json({ success: true });
   });
 

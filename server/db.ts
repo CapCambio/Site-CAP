@@ -66,8 +66,13 @@ export async function initializeActiveSessionsTable() {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS active_sessions (
         email VARCHAR(255) PRIMARY KEY,
+        session_id VARCHAR(64),
         last_activity TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       )
+    `);
+    // Tabela criada numa versão anterior não tinha session_id — adiciona de forma idempotente
+    await pool.query(`
+      ALTER TABLE active_sessions ADD COLUMN IF NOT EXISTS session_id VARCHAR(64)
     `);
     console.log('✅ Tabela active_sessions inicializada');
   } catch (error) {
@@ -75,17 +80,55 @@ export async function initializeActiveSessionsTable() {
   }
 }
 
-// Retorna o último heartbeat da sessão, ou null se não houver registro
-export async function getActiveSession(email: string): Promise<{ lastActivity: Date } | null> {
+// Retorna o heartbeat + dono da sessão, ou null se não houver registro
+export async function getActiveSession(email: string): Promise<{ lastActivity: Date; sessionId: string | null } | null> {
   const result = await pool.query(
-    'SELECT last_activity FROM active_sessions WHERE email = $1',
+    'SELECT last_activity, session_id FROM active_sessions WHERE email = $1',
     [email.toLowerCase()]
   );
   if (result.rows.length === 0) return null;
-  return { lastActivity: result.rows[0].last_activity };
+  return { lastActivity: result.rows[0].last_activity, sessionId: result.rows[0].session_id };
 }
 
-// Registra/renova o heartbeat da sessão (UPSERT — recria se a linha não existir)
+// Login: assume a posse da sessão para este dispositivo (UPSERT com novo session_id)
+export async function claimActiveSession(email: string, sessionId: string): Promise<void> {
+  await pool.query(
+    `INSERT INTO active_sessions (email, session_id, last_activity)
+     VALUES ($1, $2, NOW())
+     ON CONFLICT (email) DO UPDATE SET session_id = EXCLUDED.session_id, last_activity = NOW()`,
+    [email.toLowerCase(), sessionId]
+  );
+}
+
+// Sessão do dispositivo que atualmente "possui" o login deste e-mail, ou null
+export async function getCurrentSessionId(email: string): Promise<string | null> {
+  const result = await pool.query(
+    'SELECT session_id FROM active_sessions WHERE email = $1',
+    [email.toLowerCase()]
+  );
+  if (result.rows.length === 0) return null;
+  return result.rows[0].session_id;
+}
+
+// Heartbeat com identidade: renova apenas se este dispositivo ainda for o dono.
+// Retorna false quando a sessão foi substituída por outro dispositivo (seria expulso).
+// Se a linha sumiu (sem dono), reivindicar para este session_id (self-heal).
+export async function heartbeatActiveSession(email: string, sessionId: string): Promise<boolean> {
+  const updated = await pool.query(
+    'UPDATE active_sessions SET last_activity = NOW() WHERE email = $1 AND session_id = $2',
+    [email.toLowerCase(), sessionId]
+  );
+  if ((updated.rowCount ?? 0) > 0) return true;
+
+  const current = await getCurrentSessionId(email);
+  if (current === null) {
+    await claimActiveSession(email, sessionId);
+    return true;
+  }
+  return false;
+}
+
+// Heartbeat legado (token antigo, sem session_id): apenas renova.
 export async function touchActiveSession(email: string): Promise<void> {
   await pool.query(
     `INSERT INTO active_sessions (email, last_activity)
@@ -95,9 +138,17 @@ export async function touchActiveSession(email: string): Promise<void> {
   );
 }
 
-// Remove a sessão (logout)
-export async function releaseActiveSession(email: string): Promise<void> {
-  await pool.query('DELETE FROM active_sessions WHERE email = $1', [email.toLowerCase()]);
+// Remove a sessão (logout). Quando sessionId é informado, só derruba se este for o dono —
+// assim o logout de um dispositivo já substituído não expulsa o dispositivo atual.
+export async function releaseActiveSession(email: string, sessionId?: string | null): Promise<void> {
+  if (sessionId) {
+    await pool.query(
+      'DELETE FROM active_sessions WHERE email = $1 AND session_id = $2',
+      [email.toLowerCase(), sessionId]
+    );
+  } else {
+    await pool.query('DELETE FROM active_sessions WHERE email = $1', [email.toLowerCase()]);
+  }
 }
 
 export interface User {

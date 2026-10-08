@@ -4,6 +4,7 @@ export interface User {
   email: string;
   name: string;
   isAdmin: boolean;
+  sid?: string;
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
@@ -11,13 +12,16 @@ const JWT_EXPIRATION = 30 * 24 * 60 * 60 * 1000; // 30 dias em milissegundos
 
 export class JwtService {
   /**
-   * Gera um token JWT para o usuário
+   * Gera um token JWT para o usuário.
+   * `sid` identifica a sessão/dispositivo — usado no bloqueio de login simultâneo.
    */
-  static generateToken(user: User): string {
+  static generateToken(user: User, sid?: string): string {
+    const effectiveSid = sid ?? user.sid;
     const payload = {
       email: user.email,
       name: user.name,
       isAdmin: user.isAdmin,
+      ...(effectiveSid ? { sid: effectiveSid } : {}),
     };
 
     return jwt.sign(payload, JWT_SECRET, {
@@ -36,6 +40,7 @@ export class JwtService {
         email: decoded.email,
         name: decoded.name,
         isAdmin: decoded.isAdmin,
+        sid: decoded.sid,
       };
     } catch (error) {
       console.error('Erro ao verificar JWT:', error);

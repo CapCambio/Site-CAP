@@ -210,10 +210,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const sendHeartbeat = async () => {
       try {
-        await fetch('/api/auth/heartbeat', {
+        const response = await fetch('/api/auth/heartbeat', {
           method: 'POST',
           credentials: 'include',
         });
+
+        // 401 = este dispositivo perdeu a posse da sessão (outro fez login depois).
+        // A rota já limpou o cookie; derrubamos o estado para voltar à tela de login.
+        if (response.status === 401) {
+          setUser(null);
+          localStorage.removeItem('auth_user');
+          return;
+        }
       } catch (error) {
         // Ignora erros silenciosamente
       }
