@@ -214,7 +214,7 @@ export function CurrencyConverter({ currencies, userEmail }: CurrencyConverterPr
   return (
     <div className="currency-converter relative max-w-3xl mx-auto mt-1 mb-2 sm:mt-0 sm:mb-3">
       <div className="bg-[#252525] px-3 pt-2 pb-6 sm:px-6 sm:pt-2 sm:pb-6 rounded-xl">
-        <h2 className="text-[#f3b234] text-xl leading-tight font-semibold mb-0 sm:mb-1 text-center">{t('converter.title')}</h2>
+        <h2 className="text-[#f3b234] text-xl leading-tight font-semibold mb-2 sm:mb-1 text-center">{t('converter.title')}</h2>
 
         <div className="flex items-center justify-center mb-2 sm:mb-2">
           <button
