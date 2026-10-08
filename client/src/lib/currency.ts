@@ -70,11 +70,6 @@ export function formatCurrencyValue(code: string, value: number): string {
   const decPart = rawDecPart.length > 5 ? rawDecPart.slice(0, 5) : rawDecPart;
   const minTwoDecimals = decPart.replace(/0+$/, '').padEnd(2, '0');
 
-  // Oculta ,00 para todas as moedas quando não há centavos
-  if (minTwoDecimals === "00") {
-    return formattedIntPart;
-  }
-
   return `${formattedIntPart},${minTwoDecimals}`;
 }
 
