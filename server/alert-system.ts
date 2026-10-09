@@ -1152,7 +1152,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       body: mensagem,
       icon: 'https://iili.io/fBQNNwX.jpg',
       badge: 'https://iili.io/fBQNNwX.jpg',
-      image: 'https://iili.io/fBQNNwX.jpg',
+      image: 'https://capcambio.com.br/nota-push.jpg',
       actions: [
         {
           action: 'view-quotes',
