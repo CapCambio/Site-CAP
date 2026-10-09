@@ -1151,8 +1151,11 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       title: titulo,
       body: mensagem,
       icon: 'https://iili.io/fBQNNwX.jpg',
-      badge: 'https://capcambio.com.br/push-badge.png',
-      image: 'https://capcambio.com.br/nota-push.jpg',
+      // capcambio.com.br é WordPress (marketing) e devolve HTML para caminhos desconhecidos;
+      // o app real mora em capcambio.up.railway.app — badge e image precisam apontar para lá
+      // ou o Android cai no sino default (falha ao decodificar o badge).
+      badge: 'https://capcambio.up.railway.app/push-badge.png',
+      image: 'https://capcambio.up.railway.app/nota-push.jpg',
       actions: [
         {
           action: 'view-quotes',
