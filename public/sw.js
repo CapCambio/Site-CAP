@@ -1,7 +1,7 @@
 // Service Worker para Push Notifications e Cache
 
 // Versionamento dinâmico do cache para invalidação automática
-const CACHE_VERSION = '1.0.18'; // Atualizar este número em cada release
+const CACHE_VERSION = '1.0.19'; // Atualizar este número em cada release
 const CACHE_NAME = `cap-cotacoes-v${CACHE_VERSION}`;
 const OFFLINE_PAGE = '/offline.html';
 const ASSETS_TO_CACHE = [
@@ -162,8 +162,7 @@ self.addEventListener('push', (event) => {
     actions: data.actions || [
       {
         action: 'view-quotes',
-        title: 'Ver Cotações',
-        icon: '/generated-icon.png'
+        title: 'Ver Cotações'
       }
     ]
   };

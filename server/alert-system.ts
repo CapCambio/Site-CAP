@@ -1156,8 +1156,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       actions: [
         {
           action: 'view-quotes',
-          title: language === 'en' ? 'View Quotes' : language === 'es' ? 'Ver Cotizaciones' : language === 'fr' ? 'Voir les Cotations' : 'Ver Cotações',
-          icon: 'https://iili.io/fBQNNwX.jpg'
+          title: language === 'en' ? 'View Quotes' : language === 'es' ? 'Ver Cotizaciones' : language === 'fr' ? 'Voir les Cotations' : 'Ver Cotações'
         }
       ],
       data: {

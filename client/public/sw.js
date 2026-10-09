@@ -1,6 +1,6 @@
 // Service Worker seguro - não intercepta assets do Vite
 
-const CACHE_NAME = 'cap-cotacoes-v22';
+const CACHE_NAME = 'cap-cotacoes-v23';
 const OFFLINE_PAGE = '/offline.html';
 
 console.log('[Service Worker] Iniciando...');
@@ -169,8 +169,7 @@ self.addEventListener('push', (event) => {
     actions: data.actions || [
       {
         action: 'view-quotes',
-        title: 'Ver Cotações',
-        icon: '/optimized/android-chrome-96x96.png'
+        title: 'Ver Cotações'
       }
     ]
   };
