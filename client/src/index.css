@@ -167,6 +167,25 @@ input[type="date"]::-webkit-datetime-edit-year-field {
   background: rgba(0, 0, 0, 0.5);
 }
 
+/* Scrollbar discreta para modal de alerta */
+.alert-modal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.alert-modal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.alert-modal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(243, 178, 52, 0.3);
+  border-radius: 3px;
+}
+
+.alert-modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(243, 178, 52, 0.5);
+}
+
 /* Layout para desktop com colunas independentes */
 .currency-desktop-layout {
   display: flex;

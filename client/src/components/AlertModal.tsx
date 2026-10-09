@@ -161,7 +161,13 @@ export function AlertModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-zinc-900 text-white border-zinc-800 landscape:pt-12 [@media(orientation:landscape)_and_(max-width:768px)]:[--dialog-close-top:1rem]">
+      <DialogContent 
+        className="sm:max-w-[500px] bg-zinc-900 text-white border-zinc-800 max-h-[90vh] overflow-y-auto alert-modal-scrollbar landscape:pt-12 [@media(orientation:landscape)_and_(max-width:768px)]:[--dialog-close-top:1rem]"
+        style={{ 
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(243, 178, 52, 0.3) rgba(0, 0, 0, 0.1)'
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
             {t('alerts.createAlert')} - {currencyName} ({currencyCode})
