@@ -171,9 +171,6 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
             <li>• {t('alertsPanel.notificationInstall')}</li>
             <li>• {t('alertsPanel.notificationTroubleshoot')}</li>
           </ul>
-          {notifState === "off" && (
-            <p className="mt-2 text-amber-300">{t('alertsPanel.notifOff')}</p>
-          )}
           {notifState === "denied" && (
             <p className="mt-2 text-red-400">{t('alertsPanel.notifDenied')}</p>
           )}
@@ -185,16 +182,6 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
           )}
         </div>
       </div>
-      {notifState !== "unsupported" && (
-        <Button
-          size="sm"
-          className="mt-3 bg-yellow-500 text-black hover:bg-yellow-400"
-          disabled={notifLoading || notifState === "on" || notifState === "denied"}
-          onClick={() => void enableNotifications()}
-        >
-          {notifState === "on" ? t('alertsPanel.notificationsOn') : t('alertsPanel.enableNotifications')}
-        </Button>
-      )}
     </div>
   );
 
