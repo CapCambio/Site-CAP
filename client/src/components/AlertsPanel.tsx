@@ -199,7 +199,13 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
   );
 
   return (
-    <div className="fixed inset-0 z-50 bg-black text-white overflow-y-auto">
+    <div
+      className="fixed inset-0 z-50 bg-black text-white overflow-y-auto alert-modal-scrollbar"
+      style={{
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(243, 178, 52, 0.3) rgba(0, 0, 0, 0.1)'
+      }}
+    >
       <div className="min-h-full">
         {/* Header */}
         <header className="border-b border-yellow-500/20 bg-zinc-900/80 backdrop-blur-sm sticky top-0 z-10">
