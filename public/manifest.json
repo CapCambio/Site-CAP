@@ -1,6 +1,6 @@
 {
-  "name": "CAP Câmbio",
-  "short_name": "CAP Câmbio",
+  "name": "CAP Cotações",
+  "short_name": "CAP Cotações",
   "start_url": "/splash-video.html",
   "display": "standalone",
   "display_override": ["standalone", "window-controls-overlay"],
