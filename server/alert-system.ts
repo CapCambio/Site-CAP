@@ -545,6 +545,13 @@ class AlertSystem {
           delete this.data[email].alerts[currencyCode];
           // Salva imediatamente para garantir que o alerta seja removido
           this.saveAlerts();
+          // delete + saveAlerts() só tocam memória e JSON; sem isto a linha sobrevive no
+          // Postgres, o painel continua exibindo o alerta e loadAlerts() o traz de volta no restart.
+          try {
+            await deleteAlertByUserAndCurrency(email.toLowerCase(), currencyCode);
+          } catch (error) {
+            console.error('Erro ao remover alerta de valor específico do banco:', error);
+          }
         }
       }
     }
