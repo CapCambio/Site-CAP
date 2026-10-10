@@ -12,7 +12,7 @@ console.log('✅ DATABASE_URL carregada:', connectionString.replace(/:[^:@]+@/, 
 
 export const pool = new Pool({
   connectionString,
-  ssl: connectionString ? { rejectUnauthorized: false } : false,
+  ssl: connectionString ? { rejectUnauthorized: false } : false, // Supabase Pooler exige SSL sem verificação de certificado
   max: 15,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000

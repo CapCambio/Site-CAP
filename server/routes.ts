@@ -7,7 +7,6 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from 'url';
-import { authService } from './auth/AuthService';
 import { authenticate, requireAdmin, optionalAuth } from './auth/JwtMiddleware';
 import { JwtService } from './auth/JwtService';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
@@ -272,7 +271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isAuthorizedEmail = !!regularUser;
 
       if (!isAdminEmail && !isAuthorizedEmail) {
-        return res.status(401).json({ error: "Email não autorizado" });
+        return res.status(401).json({ error: "Credenciais inválidas" });
       }
 
       // Verificar senha para admins
@@ -282,11 +281,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         if (!expectedPassword) {
           console.error(`Senha de admin não configurada para ${emailLower}`);
-          return res.status(500).json({ error: "Senha de administrador não configurada" });
+          return res.status(401).json({ error: "Credenciais inválidas" });
         }
 
         if (password !== expectedPassword) {
-          return res.status(401).json({ error: "Senha incorreta para administrador" });
+          return res.status(401).json({ error: "Credenciais inválidas" });
         }
       }
 

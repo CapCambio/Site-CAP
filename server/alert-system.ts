@@ -462,6 +462,11 @@ class AlertSystem {
           console.log(`⏰ Alerta expirado: ${email} - ${currencyCode} (validade: ${alert.validade})`);
           delete this.data[email].alerts[currencyCode];
           this.saveAlerts();
+          try {
+            await deleteAlertByUserAndCurrency(email.toLowerCase(), currencyCode);
+          } catch (error) {
+            console.error('Erro ao remover alerta expirado do banco:', error);
+          }
           continue;
         }
       }
@@ -508,7 +513,7 @@ class AlertSystem {
               console.log(`- Cross condition: ${previousPrice.toFixed(4)} > ${alert.valor.toFixed(4)} && ${targetPrice.toFixed(4)} <= ${alert.valor.toFixed(4)} = ${crossCondition}`);
             }
             
-            shouldAlert = (conditionMet || crossCondition) && (previousSellPrice !== newSellPrice);
+            shouldAlert = crossCondition && (previousSellPrice !== newSellPrice);
             
             console.log(`- Should alert: ${shouldAlert}`);
             

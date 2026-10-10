@@ -150,8 +150,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: notificationBody,
-    icon: data.icon || '/generated-icon.png',
-    badge: data.badge || '/generated-icon.png',
+    icon: data.icon || '/optimized/android-chrome-192x192.webp',
+    badge: data.badge || '/optimized/favicon-64x64.webp',
     image: data.image,
     vibrate: [100, 50, 100],
     requireInteraction: false,

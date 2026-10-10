@@ -16,6 +16,7 @@ self.addEventListener('install', (event) => {
       .then((cache) => {
         console.log('[Service Worker] Cache aberto');
         return cache.addAll([
+          '/offline.html',
           '/manifest.json',
           '/optimized/android-chrome-96x96.png',
           '/optimized/android-chrome-144x144.png',
