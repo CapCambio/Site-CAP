@@ -452,8 +452,8 @@ class AlertSystem {
 
       // Verificar validade do alerta (redundante com cleanupExpiredAlerts, mas mantém como segurança)
       if (alert.validade) {
-        const validadeStr = alert.validade instanceof Date
-          ? alert.validade.toISOString()
+        const validadeStr = (alert.validade as any) instanceof Date
+          ? (alert.validade as Date).toISOString()
           : String(alert.validade);
         const dateStr = validadeStr.split('T')[0];
         const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade
@@ -893,8 +893,8 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
 
         // Interpreta a data como local, não UTC (mesma lógica do display)
         // Converte para string caso seja objeto Date (PostgreSQL retorna Date)
-        const validadeStr = alert.validade instanceof Date
-          ? alert.validade.toISOString()
+        const validadeStr = (alert.validade as any) instanceof Date
+          ? (alert.validade as Date).toISOString()
           : String(alert.validade);
         const dateStr = validadeStr.split('T')[0];
         const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade
@@ -1248,7 +1248,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     });
 
     const attempts: PushTestAttempt[] = [];
-    for (const row of distinctEndpoints.values()) {
+    for (const row of Array.from(distinctEndpoints.values())) {
       const attempt: PushTestAttempt = {
         endpointHost: this.pushEndpointHost(row.endpoint),
         success: false,

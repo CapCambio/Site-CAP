@@ -7,7 +7,7 @@ export interface User {
   sid?: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET!;
 if (!JWT_SECRET) {
   throw new Error('❌ JWT_SECRET não está definido nas variáveis de ambiente! Gere um segredo seguro e configure no Railway antes de fazer deploy.');
 }

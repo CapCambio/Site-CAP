@@ -45,7 +45,7 @@ function authRateLimiter(maxRequests: number, windowMs: number) {
 // Limpeza periódica do rate limiter (a cada 5 minutos)
 setInterval(() => {
   const now = Date.now();
-  for (const [ip, record] of authRateLimit.entries()) {
+  for (const [ip, record] of Array.from(authRateLimit.entries())) {
     if (now > record.resetTime) {
       authRateLimit.delete(ip);
     }
@@ -841,7 +841,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (ts && (!entry.last || ts > entry.last)) entry.last = ts;
       }
 
-      for (const [email, endpoints] of endpointsByUser) {
+      for (const [email, endpoints] of Array.from(endpointsByUser.entries())) {
         byUser.get(email)!.distinctEndpoints = endpoints.size;
       }
 
