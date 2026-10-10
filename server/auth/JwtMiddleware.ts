@@ -27,9 +27,9 @@ export const jwtMiddleware = async (req: Request, res: Response, next: NextFunct
   console.log(`[JWT Middleware] User verificado: ${!!user}, Email: ${user?.email}`);
 
   if (!user) {
-    // Token inválido ou expirado
-    console.log(`[JWT Middleware] Token inválido ou expirado`);
-    return res.status(401).json({ error: 'Token inválido ou expirado' });
+    console.log(`[JWT Middleware] Token inválido ou expirado, limpando cookie`);
+    res.clearCookie('jwt');
+    return next();
   }
 
   // Verificar se o usuário ainda está autorizado (cache de 24h)
