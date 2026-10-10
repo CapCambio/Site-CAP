@@ -11,6 +11,13 @@ const destDir = path.join(__dirname, '..', 'dist', 'emails', 'templates');
 // Criar diretório de destino
 fs.mkdirSync(destDir, { recursive: true });
 
+// Verificar se diretório de origem existe
+if (!fs.existsSync(sourceDir)) {
+  console.log('⚠️  server/emails/templates/ não encontrado — pulando cópia de templates');
+  console.log('✅ dist/emails/templates/ criado (vazio)');
+  process.exit(0);
+}
+
 // Copiar arquivos
 const files = fs.readdirSync(sourceDir);
 files.forEach(file => {
