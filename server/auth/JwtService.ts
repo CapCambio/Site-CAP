@@ -7,7 +7,10 @@ export interface User {
   sid?: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('❌ JWT_SECRET não está definido nas variáveis de ambiente! Gere um segredo seguro e configure no Railway antes de fazer deploy.');
+}
 const JWT_EXPIRATION = 30 * 24 * 60 * 60 * 1000; // 30 dias em milissegundos
 
 export class JwtService {

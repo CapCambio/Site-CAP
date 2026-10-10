@@ -495,7 +495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.warn('Usando cache expirado devido a erro:', error);
       return res.json(currenciesCache);
     }
-    res.status(500).json({ message: "Failed to fetch currencies" });
+    res.status(500).json({ message: "Erro ao buscar cotações" });
   }
 });
 
@@ -503,11 +503,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currency = await jsonStorage.getCurrencyByCode(req.params.code);
       if (!currency) {
-        return res.status(404).json({ message: "Currency not found" });
+        return res.status(404).json({ message: "Moeda não encontrada" });
       }
       res.json(currency);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch currency" });
+      res.status(500).json({ message: "Erro ao buscar moeda" });
     }
   });
 
@@ -544,7 +544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(history);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch currency history" });
+      res.status(500).json({ message: "Erro ao buscar histórico" });
     }
   });
 
@@ -553,7 +553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currency = await jsonStorage.upsertCurrency(req.body);
       res.status(201).json(currency);
     } catch (error) {
-      res.status(500).json({ message: "Failed to create currency" });
+      res.status(500).json({ message: "Erro ao criar moeda" });
     }
   });
 
@@ -562,7 +562,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const historyEntry = await jsonStorage.addCurrencyHistory(req.body);
       res.status(201).json(historyEntry);
     } catch (error) {
-      res.status(500).json({ message: "Failed to add history record" });
+      res.status(500).json({ message: "Erro ao adicionar registro" });
     }
   });
 
@@ -626,7 +626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Currencies refreshed successfully", count: savedCurrencies.length });
     } catch (error) {
       console.error("Error refreshing currencies:", error);
-      res.status(500).json({ message: "Failed to refresh currencies" });
+      res.status(500).json({ message: "Erro ao atualizar cotações" });
     }
   });
 
@@ -1473,7 +1473,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Rota para obter usuários (apenas admin)
-  app.get('/api/users', async (req, res) => {
+  app.get('/api/users', authenticate, requireAdmin, async (req, res) => {
     try {
       // Implemente a lógica para obter usuários aqui
       // Exemplo: const users = await jsonStorage.getAllUsers();
