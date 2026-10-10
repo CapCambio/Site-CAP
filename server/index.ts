@@ -39,6 +39,17 @@ if (missingVars.length > 0) {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Error handlers globais: previnem crash silencioso
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  // Dar tempo pros logs flusharem antes de morrer
+  setTimeout(() => process.exit(1), 1000);
+});
+
 const app = express();
 app.set('trust proxy', 1);
 app.use(cookieParser());
@@ -155,4 +166,35 @@ app.use((req, res, next) => {
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
   });
+
+  // Graceful shutdown: fecha conexões direitinho antes de morrer
+  const gracefulShutdown = async (signal: string) => {
+    log(`🛑 ${signal} recebido. Encerrando graciosamente...`);
+    
+    // Parar de aceitar novas requisições
+    server.close(async () => {
+      log('✅ Servor HTTP fechado. Não aceita mais requisições.');
+      
+      // Fechar pool do PostgreSQL
+      try {
+        const { pool } = await import('./db');
+        await pool.end();
+        log('✅ Pool PostgreSQL fechado.');
+      } catch (err) {
+        console.error('❌ Erro ao fechar pool PostgreSQL:', err);
+      }
+      
+      log('👋 Shutdown completo.');
+      process.exit(0);
+    });
+    
+    // Timeout de segurança: se não fechar em 10s, força
+    setTimeout(() => {
+      console.error('⚠️ Shutdown demorou mais de 10s. Forçando saída.');
+      process.exit(1);
+    }, 10000);
+  };
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 })();

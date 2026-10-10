@@ -5,19 +5,17 @@ const { Pool } = pg;
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  console.error('❌ DATABASE_URL não está definida nas variáveis de ambiente!');
-  console.error('A aplicação não conseguirá conectar ao banco de dados.');
-  console.error('Por favor, configure DATABASE_URL no Railway.');
-  // Não lançar erro para permitir que o servidor inicie e mostre os logs
+  throw new Error('❌ DATABASE_URL não está definida nas variáveis de ambiente! Configure no Railway antes de fazer deploy.');
 }
 
-if (connectionString) {
-  console.log('✅ DATABASE_URL carregada:', connectionString.replace(/:[^:@]+@/, ':****@'));
-}
+console.log('✅ DATABASE_URL carregada:', connectionString.replace(/:[^:@]+@/, ':****@'));
 
 export const pool = new Pool({
   connectionString,
-  ssl: connectionString ? { rejectUnauthorized: false } : false
+  ssl: connectionString ? { rejectUnauthorized: false } : false,
+  max: 15,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000
 });
 
 // Inicializar tabela de histórico de moedas

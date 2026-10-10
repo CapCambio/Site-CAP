@@ -18,6 +18,41 @@ import { getCurrencyHistory as getCurrencyHistoryFromDB } from './db';
 // Limiar de sessão viva (heartbeat mais recente que isso = logado em outro lugar)
 const HEARTBEAT_TIMEOUT = 30 * 1000; // 30 segundos
 
+// Rate limiter in-memory para endpoints de auth
+const authRateLimit = new Map<string, { count: number; resetTime: number }>();
+
+function authRateLimiter(maxRequests: number, windowMs: number) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const ip = req.ip || req.connection.remoteAddress || 'unknown';
+    const now = Date.now();
+    const record = authRateLimit.get(ip);
+
+    if (!record || now > record.resetTime) {
+      authRateLimit.set(ip, { count: 1, resetTime: now + windowMs });
+      return next();
+    }
+
+    if (record.count >= maxRequests) {
+      return res.status(429).json({ 
+        error: 'Muitas tentativas. Aguarde um minuto e tente novamente.' 
+      });
+    }
+
+    record.count++;
+    next();
+  };
+}
+
+// Limpeza periódica do rate limiter (a cada 5 minutos)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of authRateLimit.entries()) {
+    if (now > record.resetTime) {
+      authRateLimit.delete(ip);
+    }
+  }
+}, 5 * 60 * 1000);
+
 // Interface para tipar os administradores
 interface AdminUser {
   email: string;
@@ -161,7 +196,7 @@ async function updateLastAccess(email: string, isAdmin: boolean): Promise<void> 
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Rotas de autenticação
-  app.post("/api/auth/check-admin", async (req, res) => {
+  app.post("/api/auth/check-admin", authRateLimiter(20, 60 * 1000), async (req, res) => {
     try {
       const { email } = req.body;
 
@@ -209,7 +244,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }
 
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", authRateLimiter(10, 60 * 1000), async (req, res) => {
     try {
       const { email, password } = req.body;
 
@@ -421,11 +456,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
 // API routes
-  app.get("/api/health", (_req, res) => {
-    res.json({ status: "ok" });
+  app.get("/api/health", async (req, res) => {
+    try {
+      const { healthChecker } = await import('./monitoring/HealthChecker');
+      const health = await healthChecker.runHealthChecks();
+      res.json({ 
+        status: health.status, 
+        timestamp: health.timestamp,
+        uptime: health.uptime 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        status: "unhealthy", 
+        timestamp: new Date().toISOString() 
+      });
+    }
   });
 
-app.get("/api/currencies", async (req, res) => {
+  app.get("/api/currencies", async (req, res) => {
   try {
     const now = Date.now();
     
@@ -723,23 +771,6 @@ app.get("/api/currencies", async (req, res) => {
   app.use("/api/monitoring", monitoringRoutes);
   
   // Health check endpoint (redireciona para novo sistema)
-  app.get("/api/health", async (req, res) => {
-    try {
-      const { healthChecker } = await import('./monitoring/HealthChecker');
-      const health = await healthChecker.runHealthChecks();
-      res.json({ 
-        status: health.status, 
-        timestamp: health.timestamp,
-        uptime: health.uptime 
-      });
-    } catch (error) {
-      res.status(500).json({ 
-        status: "unhealthy", 
-        timestamp: new Date().toISOString() 
-      });
-    }
-  });
-
   // Admin route to get all user alerts
   app.get("/api/alerts/admin/all", authenticate, requireAdmin, async (req, res) => {
     try {
