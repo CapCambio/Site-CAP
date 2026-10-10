@@ -245,11 +245,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const adminPasswords = await loadAdminPasswords();
         const expectedPassword = adminPasswords[emailLower];
 
-        console.log(`🔐 Verificando senha para ${emailLower}:`);
-        console.log(`   Senha esperada: "${expectedPassword}"`);
-        console.log(`   Senha recebida: "${password}"`);
-        console.log(`   Senhas conferem: ${password === expectedPassword}`);
-
         if (!expectedPassword) {
           console.error(`Senha de admin não configurada para ${emailLower}`);
           return res.status(500).json({ error: "Senha de administrador não configurada" });
@@ -506,7 +501,7 @@ app.get("/api/currencies", async (req, res) => {
     }
   });
 
-  app.post("/api/currencies", async (req, res) => {
+  app.post("/api/currencies", authenticate, requireAdmin, async (req, res) => {
     try {
       const currency = await jsonStorage.upsertCurrency(req.body);
       res.status(201).json(currency);
@@ -515,7 +510,7 @@ app.get("/api/currencies", async (req, res) => {
     }
   });
 
-  app.post("/api/history", async (req, res) => {
+  app.post("/api/history", authenticate, requireAdmin, async (req, res) => {
     try {
       const historyEntry = await jsonStorage.addCurrencyHistory(req.body);
       res.status(201).json(historyEntry);
@@ -578,7 +573,7 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Endpoint para forçar um scraping manual dos dados da fonte
-  app.get("/api/refresh-currencies", async (req, res) => {
+  app.get("/api/refresh-currencies", authenticate, requireAdmin, async (req, res) => {
     try {
       const savedCurrencies = await refreshCurrencies();
       res.json({ message: "Currencies refreshed successfully", count: savedCurrencies.length });
@@ -1131,7 +1126,7 @@ app.get("/api/currencies", async (req, res) => {
 
 
   // Rota para listar emails autorizados (apenas admins)
-  app.get('/api/auth/authorized-emails', async (req, res) => {
+  app.get('/api/auth/authorized-emails', authenticate, requireAdmin, async (req, res) => {
     try {
       const adminEmails = await db.getAdminEmails();
       const authorizedEmails = await db.getAuthorizedEmails();
@@ -1157,7 +1152,7 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Rota para adicionar email autorizado (apenas admins)
-  app.post('/api/auth/add-email', async (req, res) => {
+  app.post('/api/auth/add-email', authenticate, requireAdmin, async (req, res) => {
     try {
       const { email, name } = req.body;
 
@@ -1190,7 +1185,7 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Rota para remover email autorizado (apenas admins)
-  app.post('/api/auth/remove-email', async (req, res) => {
+  app.post('/api/auth/remove-email', authenticate, requireAdmin, async (req, res) => {
     try {
       const { email } = req.body;
 
@@ -1224,9 +1219,17 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Registrar push subscription
-  app.post('/api/alerts/register-push', async (req, res) => {
+  app.post('/api/alerts/register-push', authenticate, async (req, res) => {
     try {
       const { email, subscription } = req.body;
+
+      // Verificar permissão
+      const userEmail = (req as any).user?.email?.toLowerCase();
+      const isAdmin = (req as any).user?.isAdmin === true;
+      if (!isAdmin && userEmail !== email?.toLowerCase()) {
+        return res.status(403).json({ error: 'Sem permissão para registrar push de outro usuário' });
+      }
+
       console.log('📥 Recebendo requisição de registro push:');
       console.log(`   Email: ${email}`);
       console.log(`   Subscription endpoint: ${subscription?.endpoint?.substring(0, 60)}...`);
@@ -1253,7 +1256,7 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Criar alerta
-  app.post("/api/alerts/create", async (req, res) => {
+  app.post("/api/alerts/create", authenticate, async (req, res) => {
     try {
       const { 
         email, 
@@ -1265,6 +1268,13 @@ app.get("/api/currencies", async (req, res) => {
 
       if (!email || !currencyCode || !tipo) {
         return res.status(400).json({ error: "Campos obrigatórios não fornecidos" });
+      }
+
+      // Verificar permissão
+      const userEmail = (req as any).user?.email?.toLowerCase();
+      const isAdmin = (req as any).user?.isAdmin === true;
+      if (!isAdmin && userEmail !== email.toLowerCase()) {
+        return res.status(403).json({ error: 'Sem permissão para criar alertas para outro usuário' });
       }
 
       // Valida o tipo de alerta
@@ -1363,10 +1373,17 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Remover alerta
-  app.delete('/api/alerts/:email/:currencyCode', async (req, res) => {
+  app.delete('/api/alerts/:email/:currencyCode', authenticate, async (req, res) => {
     try {
       const { email, currencyCode } = req.params;
       const emailLower = email.toLowerCase();
+      
+      // Verificar se o usuário tem permissão para deletar este alerta
+      const userEmail = (req as any).user?.email?.toLowerCase();
+      const isAdmin = (req as any).user?.isAdmin === true;
+      if (!isAdmin && userEmail !== emailLower) {
+        return res.status(403).json({ error: 'Sem permissão para gerenciar alertas de outro usuário' });
+      }
       
       // Buscar alerta do usuário
       const alerts = await db.getAlertsByUser(emailLower);
@@ -1386,13 +1403,22 @@ app.get("/api/currencies", async (req, res) => {
   });
 
   // Obter alertas do usuário
-  app.get('/api/alerts/:email', async (req, res) => {
+  app.get('/api/alerts/:email', authenticate, async (req, res) => {
     try {
       const { email } = req.params;
       if (!email) {
         return res.status(400).json({ error: 'Email é obrigatório' });
       }
-      const alerts = await db.getAlertsByUser(email.toLowerCase());
+
+      // Verificar permissão
+      const emailLower = email.toLowerCase();
+      const userEmail = (req as any).user?.email?.toLowerCase();
+      const isAdmin = (req as any).user?.isAdmin === true;
+      if (!isAdmin && userEmail !== emailLower) {
+        return res.status(403).json({ error: 'Sem permissão para ver alertas de outro usuário' });
+      }
+
+      const alerts = await db.getAlertsByUser(emailLower);
       
       // Converter para o formato esperado pelo frontend
       const alertsFormatted = alerts.reduce((acc: any, alert) => {
