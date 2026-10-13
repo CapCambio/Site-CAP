@@ -18,12 +18,14 @@ import { getCurrencyHistory as getCurrencyHistoryFromDB } from './db';
 // Limiar de sessão viva (heartbeat mais recente que isso = logado em outro lugar)
 const HEARTBEAT_TIMEOUT = 30 * 1000; // 30 segundos
 
-// Rate limiter in-memory para endpoints de auth
+// Rate limiter in-memory, com bucket por escopo (auth, currencies, history)
 const authRateLimit = new Map<string, { count: number; resetTime: number }>();
 
-function authRateLimiter(maxRequests: number, windowMs: number) {
+function authRateLimiter(maxRequests: number, windowMs: number, scope = "auth") {
   return (req: Request, res: Response, next: NextFunction) => {
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
+    // O bucket é por escopo: sem o prefixo, os endpoints de dados compartilhariam o
+    // mesmo contador do login (10/min) e uma carga de /cotacoes travaria o login com 429.
+    const ip = `${scope}:${req.ip || req.connection.remoteAddress || 'unknown'}`;
     const now = Date.now();
     const record = authRateLimit.get(ip);
 
@@ -468,7 +470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/currencies", async (req, res) => {
+  app.get("/api/currencies", authRateLimiter(300, 60 * 1000, "currencies"), async (req, res) => {
   try {
     const now = Date.now();
     
@@ -495,7 +497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 });
 
-  app.get("/api/currencies/:code", async (req, res) => {
+  app.get("/api/currencies/:code", authRateLimiter(300, 60 * 1000, "currencies"), async (req, res) => {
     try {
       const currency = await jsonStorage.getCurrencyByCode(req.params.code);
       if (!currency) {
@@ -507,7 +509,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/history/:code", async (req, res) => {
+  app.get("/api/history/:code", authRateLimiter(600, 60 * 1000, "history"), async (req, res) => {
     try {
       let startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
       let endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
@@ -527,9 +529,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         endDate = now;
       }
 
-      // Se não foi fornecida startDate, limitar a 1 ano atrás
+      // Sem startDate a query caía na janela máxima (1 ano ≈ 9,7 mil linhas / 0,96 MB),
+      // que nenhum consumidor legítimo pede: os 8 call sites do client sempre enviam
+      // startDate e endDate. Quem bate aqui sem datas é sondagem.
       if (!startDate) {
-        startDate = oneYearAgo;
+        startDate = new Date(now.getTime() - 31 * 24 * 60 * 60 * 1000);
       }
 
       const history = await getCurrencyHistoryFromDB(
