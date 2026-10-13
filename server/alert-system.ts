@@ -5,18 +5,9 @@ import { createHash } from 'crypto';
 import webpush from 'web-push';
 import Handlebars from 'handlebars';
 import { jsonStorage } from './json-storage';
-import { logger } from './logger';
+import { logger, devLog } from './logger';
 import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint, getCurrencyHistory, deleteAlertByUserAndCurrency } from './db';
 import type { PushSubscription as DbPushSubscription } from './db';
-
-// O ciclo de verificação roda a cada minuto por moeda e empurra e-mail de cliente para o
-// stdout. Em produção o trail diagnóstico continua nos arquivos via logger.*, então só o
-// console precisa ficar quieto.
-const devLog = (...args: unknown[]): void => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(...args);
-  }
-};
 
 // Registrar helpers Handlebars
 Handlebars.registerHelper('gt', (a: number, b: number) => a > b);

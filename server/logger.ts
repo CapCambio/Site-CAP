@@ -32,27 +32,36 @@ function writeLog(level: LogLevel, message: string, data?: any) {
   const timestamp = getTimestamp();
   const logFile = getLogFile(level);
   
-  let logMessage = `[${timestamp}] ${message}`;
-  
+  let fullMessage = `[${timestamp}] ${message}`;
+
   if (data) {
-    logMessage += ` | ${JSON.stringify(data)}`;
+    fullMessage += ` | ${JSON.stringify(data)}`;
   }
   
-  logMessage += '\n';
+  fullMessage += '\n';
   
   try {
-    appendFileSync(logFile, logMessage, 'utf8');
+    appendFileSync(logFile, fullMessage, 'utf8');
   } catch (error) {
     console.error('Erro ao escrever log:', error);
   }
   
-  // Também imprimir no console
+  // O arquivo recebe tudo; o stdout só ecoa fora de produção, onde os payloads com e-mail
+  // de cliente são úteis no console local. Em produção sobra o level error, que nunca
+  // carrega payload de cliente neste app.
   if (level === 'error') {
-    console.error(logMessage.trim());
-  } else {
-    console.log(logMessage.trim());
+    console.error(fullMessage.trim());
+  } else if (process.env.NODE_ENV === 'development') {
+    console.log(fullMessage.trim());
   }
 }
+
+// Trilha de diagnóstico com e-mail de cliente: console local apenas.
+export const devLog = (...args: unknown[]): void => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(...args);
+  }
+};
 
 // Funções de log
 export const logger = {

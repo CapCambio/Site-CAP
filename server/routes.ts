@@ -11,7 +11,7 @@ import { authenticate, requireAdmin, optionalAuth } from './auth/JwtMiddleware';
 import { JwtService } from './auth/JwtService';
 import { PasswordService } from './auth/PasswordService';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
-import { readPushLogEntries } from './logger';
+import { readPushLogEntries, devLog } from './logger';
 import * as db from './db';
 import { getCurrencyHistory as getCurrencyHistoryFromDB } from './db';
 
@@ -154,14 +154,14 @@ async function updateLastAccess(email: string, isAdmin: boolean): Promise<void> 
     const emailLower = email.toLowerCase();
     const now = new Date().toISOString();
     
-    console.log(`[${new Date().toISOString()}] Atualizando último acesso para: ${emailLower}, isAdmin: ${isAdmin}`);
+    devLog(`[${new Date().toISOString()}] Atualizando último acesso para: ${emailLower}, isAdmin: ${isAdmin}`);
     
     // Tenta atualizar usuário existente
     const existingUser = await db.getUserByEmail(emailLower);
     
     if (existingUser) {
       await db.updateUser(emailLower, { last_access: now });
-      console.log(`[${new Date().toISOString()}] Último acesso atualizado para ${emailLower}`);
+      devLog(`[${new Date().toISOString()}] Último acesso atualizado para ${emailLower}`);
     } else {
       // Se não encontrou, adiciona novo usuário
       console.warn(`[${new Date().toISOString()}] Usuário não encontrado: ${emailLower}, isAdmin: ${isAdmin}`);
@@ -174,7 +174,7 @@ async function updateLastAccess(email: string, isAdmin: boolean): Promise<void> 
           last_access: now,
           created_at: now
         });
-        console.log(`[${new Date().toISOString()}] Novo usuário adicionado: ${emailLower}`);
+        devLog(`[${new Date().toISOString()}] Novo usuário adicionado: ${emailLower}`);
       } catch (addError) {
         console.error(`[${new Date().toISOString()}] Erro ao adicionar novo usuário ${emailLower}:`, addError);
       }
@@ -245,7 +245,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const emailLower = email.toLowerCase();
 
-      console.log("Login attempt for:", emailLower);
+      devLog("Login attempt for:", emailLower);
 
       // Verificar se é admin usando banco de dados
       const adminEmails = await db.getAdminEmails();
@@ -306,7 +306,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
           } else {
             // Sem heartbeat por mais de 30 segundos — derruba sessão anterior
-            console.log(`🔓 Sessão inativa derrubada para ${emailLower} (${Math.round(timeSinceLastActivity / 1000)}s sem heartbeat)`);
+            devLog(`🔓 Sessão inativa derrubada para ${emailLower} (${Math.round(timeSinceLastActivity / 1000)}s sem heartbeat)`);
           }
         }
       }
@@ -402,7 +402,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // aba já substituída expulse o dispositivo que está ativo agora.
     if (email && !isAdmin) {
       await db.releaseActiveSession(email, sid);
-      console.log(`🔓 Sessão removida para ${email}`);
+      devLog(`🔓 Sessão removida para ${email}`);
     }
 
     // Limpar cookie JWT
@@ -647,7 +647,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       alertSystem.saveCardOrder(userEmail, order);
 
-      console.log(`✅ Ordem dos cards salva para ${userEmail}:`, order);
+      devLog(`✅ Ordem dos cards salva para ${userEmail}:`, order);
 
       res.json({ success: true, order });
     } catch (error) {
@@ -667,7 +667,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const order = alertSystem.getCardOrder(userEmail);
 
-      console.log(`📋 Carregando ordem dos cards para ${userEmail}:`, order);
+      devLog(`📋 Carregando ordem dos cards para ${userEmail}:`, order);
 
       res.json({ order });
     } catch (error) {
@@ -693,7 +693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       alertSystem.saveLanguage(userEmail, language);
 
-      console.log(`✅ Idioma salvo para ${userEmail}:`, language);
+      devLog(`✅ Idioma salvo para ${userEmail}:`, language);
 
       res.json({ success: true, language });
     } catch (error) {
@@ -713,7 +713,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const language = alertSystem.getLanguage(userEmail);
 
-      console.log(`📋 Carregando idioma para ${userEmail}:`, language);
+      devLog(`📋 Carregando idioma para ${userEmail}:`, language);
 
       res.json({ language });
     } catch (error) {
@@ -968,7 +968,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       ];
 
-      console.log('Todos os emails processados:', allEmails);
+      devLog('Todos os emails processados:', allEmails);
 
       // Ordenar por último acesso (mais recente primeiro), null por último
       allEmails.sort((a, b) => {
@@ -1083,7 +1083,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           await db.deleteAlertsByUser(emailLower);
           alertSystem.removeAllUserAlerts(emailLower);
-          console.log(`✅ Todos os alertas do usuário ${email} foram removidos`);
+          devLog(`✅ Todos os alertas do usuário ${email} foram removidos`);
         } catch (error) {
           console.error('Erro ao remover alertas do usuário:', error);
         }
@@ -1120,18 +1120,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (createdAt) {
             // Se temos data de criação, verificar se passou 6 meses
             if (createdAt < sixMonthsAgo) {
-              console.log(`🗑️ Removendo email sem acesso criado há mais de 6 meses: ${user.email} (criado em ${createdAt.toLocaleDateString()})`);
+              devLog(`🗑️ Removendo email sem acesso criado há mais de 6 meses: ${user.email} (criado em ${createdAt.toLocaleDateString()})`);
               shouldRemove = true;
             }
           } else {
             // Para emails antigos sem createdAt, assumir que são antigos e remover
-            console.log(`🗑️ Removendo email antigo sem registro de acesso: ${user.email}`);
+            devLog(`🗑️ Removendo email antigo sem registro de acesso: ${user.email}`);
             shouldRemove = true;
           }
         } else {
           // Se acessou há mais de 1 ano, remove
           if (lastAccess < oneYearAgo) {
-            console.log(`🗑️ Removendo email inativo há mais de 1 ano: ${user.email}`);
+            devLog(`🗑️ Removendo email inativo há mais de 1 ano: ${user.email}`);
             shouldRemove = true;
           }
         }
@@ -1261,7 +1261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log('📥 Recebendo requisição de registro push:');
-      console.log(`   Email: ${email}`);
+      devLog(`   Email: ${email}`);
       const _epHash = subscription?.endpoint
         ? crypto.createHash('sha256').update(subscription.endpoint).digest('hex').slice(0, 8)
         : 'none';
@@ -1280,7 +1280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         keys: { p256dh: subscription.keys.p256dh, auth: subscription.keys.auth }
       } as any);
       
-      console.log(`✅ Push subscription registrada para ${email}`);
+      devLog(`✅ Push subscription registrada para ${email}`);
       res.json({ success: true, message: 'Push subscription registrada' });
     } catch (error) {
       console.error('❌ Erro ao registrar push subscription:', error);
