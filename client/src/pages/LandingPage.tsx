@@ -13,7 +13,7 @@ export default function LandingPage() {
         </p>
         <div>
           <a
-            href="https://capcambio.up.railway.app/cotacoes"
+            href="/cotacoes"
             className="px-6 py-3 bg-[#f3b234] text-black font-semibold rounded-lg hover:bg-[#e5a12d] transition-colors inline-block"
           >
             {t('landing.cta')}
