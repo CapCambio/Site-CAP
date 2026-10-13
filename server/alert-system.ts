@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createHash } from 'crypto';
 import webpush from 'web-push';
 import Handlebars from 'handlebars';
 import { jsonStorage } from './json-storage';
@@ -277,7 +278,7 @@ class AlertSystem {
     
     if (!exists) {
       console.log(`   Adicionando nova assinatura para ${email}`);
-      console.log(`   Endpoint: ${subscription.endpoint.substring(0, 60)}...`);
+      console.log(`   Endpoint [sha256:${createHash('sha256').update(subscription.endpoint).digest('hex').slice(0, 8)}]`);
       this.data[email].pushSubscriptions.push(subscription);
     } else {
       console.log(`   Assinatura já existe para ${email}`);
@@ -1208,7 +1209,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     let successCount = 0;
     for (const subscription of subscriptions) {
       try {
-        console.log(`   → Enviando para endpoint: ${subscription.endpoint.substring(0, 60)}...`);
+        console.log(`   → Enviando para endpoint [sha256:${createHash('sha256').update(subscription.endpoint).digest('hex').slice(0, 8)}]`);
         await webpush.sendNotification(subscription, payload);
         console.log(`   ✅ PUSH ENVIADO COM SUCESSO para ${email}`);
         logger.pushSent(email, subscription.endpoint, true);

@@ -221,7 +221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (Object.keys(passwords).length > 0) {
-        console.log('✅ Senhas de admin carregadas do banco de dados:', Object.keys(passwords));
+        console.log('✅ Senhas de admin carregadas do banco de dados:', Object.keys(passwords).length);
         return passwords;
       }
 
@@ -1258,7 +1258,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('📥 Recebendo requisição de registro push:');
       console.log(`   Email: ${email}`);
-      console.log(`   Subscription endpoint: ${subscription?.endpoint?.substring(0, 60)}...`);
+      const _epHash = subscription?.endpoint
+        ? crypto.createHash('sha256').update(subscription.endpoint).digest('hex').slice(0, 8)
+        : 'none';
+      console.log(`   Subscription endpoint [sha256:${_epHash}]`);
       
       await db.addPushSubscription({
         email: email.toLowerCase(),
