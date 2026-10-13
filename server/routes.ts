@@ -336,9 +336,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sid = crypto.randomUUID();
       const token = JwtService.generateToken(user, sid);
 
-      console.log(`[Login] Gerando token para ${emailLower}`);
-      console.log(`[Login] NODE_ENV: ${process.env.NODE_ENV}`);
-      console.log(`[Login] Token gerado: ${token.substring(0, 20)}...`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Login] Gerando token para ${emailLower}`);
+        console.log(`[Login] NODE_ENV: ${process.env.NODE_ENV}`);
+        console.log(`[Login] Token gerado: ${token.substring(0, 20)}...`);
+      }
 
       // Definir cookie JWT
       const isProduction = process.env.NODE_ENV === 'production';
@@ -350,17 +352,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         path: '/'
       };
 
-      console.log(`[Login] Configuração de cookie:`, {
-        NODE_ENV: process.env.NODE_ENV,
-        isProduction,
-        secure: cookieConfig.secure,
-        sameSite: cookieConfig.sameSite
-      });
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Login] Configuração de cookie:`, {
+          NODE_ENV: process.env.NODE_ENV,
+          isProduction,
+          secure: cookieConfig.secure,
+          sameSite: cookieConfig.sameSite
+        });
+      }
 
       res.cookie('jwt', token, cookieConfig);
 
-      console.log(`[Login] Cookie JWT definido para ${emailLower}`);
-      console.log(`[Login] Headers de resposta:`, res.getHeaders());
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Login] Cookie JWT definido para ${emailLower}`);
+        console.log(`[Login] Headers de resposta:`, res.getHeaders());
+      }
 
       // Registrar nova sessão (apenas para usuários regulares)
       if (!isAdminEmail) {

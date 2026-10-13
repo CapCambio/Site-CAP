@@ -40,12 +40,14 @@ export const jwtRenewalMiddleware = (req: Request, res: Response, next: NextFunc
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
-      // Log de renovação (com rate limiting simples)
-      const now = Date.now();
-      const lastLogTime = (jwtRenewalMiddleware as any).lastLogTime || 0;
-      if (!lastLogTime || (now - lastLogTime) > 60000) { // Log no máximo uma vez por minuto
-        console.log(`🔄 JWT renovado para ${user.email} (${Math.round(timeUntilExpiration / (24 * 60 * 60 * 1000))} dias restantes)`);
-        (jwtRenewalMiddleware as any).lastLogTime = now;
+      // Log de renovação (com rate limiting simples, apenas em desenvolvimento)
+      if (process.env.NODE_ENV === 'development') {
+        const now = Date.now();
+        const lastLogTime = (jwtRenewalMiddleware as any).lastLogTime || 0;
+        if (!lastLogTime || (now - lastLogTime) > 60000) { // Log no máximo uma vez por minuto
+          console.log(`🔄 JWT renovado para ${user.email} (${Math.round(timeUntilExpiration / (24 * 60 * 60 * 1000))} dias restantes)`);
+          (jwtRenewalMiddleware as any).lastLogTime = now;
+        }
       }
     }
   }
