@@ -29,7 +29,7 @@ O servidor deve suportar configuração via variáveis de ambiente:
 - `NODE_ENV=production`
 - `PORT=8080` (ou porta configurada)
 - `APP_URL=https://seu-dominio.com`
-- `SESSION_SECRET` (segredo de sessão)
+- `JWT_SECRET` (segredo de assinatura JWT)
 - Configurações de email SMTP
 - Chaves VAPID para notificações push
 

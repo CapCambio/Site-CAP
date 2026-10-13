@@ -39,9 +39,6 @@ VAPID_PUBLIC_KEY=BL9-cnBD0We5zZUfrgcP7--C6o6cIWS6RYMO8dI0XPmMgfiwf4vPYIa3Tc6Ovvq
 VAPID_PRIVATE_KEY=tz-FMRJNIlH_JX1En9k4dan5oozLZsoHRB3h9TEADcw
 VAPID_EMAIL=capcambiocx@gmail.com
 
-# Session Secret
-SESSION_SECRET=ab072b0bf4c8b4a722ff5127536429df7eba9aba4731956870858207093101bb
-
 # Email (Brevo - configure após criar conta)
 EMAIL_ENABLED=true
 EMAIL_HOST=smtp-relay.brevo.com
@@ -92,7 +89,7 @@ ADMIN_PASSWORDS_JSON={"capcambiocx@gmail.com":"sua-senha-admin"}
 
 ### Aplicação não inicia
 - Verifique "Logs" em tempo real
-- Confirme que `SESSION_SECRET` está configurado
+- Confirme que `JWT_SECRET` está configurado
 
 ### Scraping não funciona
 - Verifique se há firewall bloqueando acesso externo
