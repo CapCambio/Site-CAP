@@ -1493,6 +1493,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Health check endpoint (público, para Railway e monitoring externo)
+  app.get('/health', async (req, res) => {
+    try {
+      // Verificar conexão com banco de dados
+      await db.pool.query('SELECT 1');
+      res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+      });
+    } catch (error) {
+      console.error('Health check failed:', error);
+      res.status(503).json({
+        status: 'error',
+        message: 'Database connection failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   return server;
 }
 
