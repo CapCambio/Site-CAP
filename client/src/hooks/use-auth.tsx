@@ -137,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('🔍 Response data:', data);
 
       if (!response.ok) {
-        if (response.status === 401 && data.error?.includes('Senha incorreta')) {
+        if (response.status === 401 && password) {
           throw new Error('Senha incorreta');
         }
         if (response.status === 409) {
