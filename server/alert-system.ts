@@ -9,6 +9,15 @@ import { logger } from './logger';
 import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint, getCurrencyHistory, deleteAlertByUserAndCurrency } from './db';
 import type { PushSubscription as DbPushSubscription } from './db';
 
+// O ciclo de verificação roda a cada minuto por moeda e empurra e-mail de cliente para o
+// stdout. Em produção o trail diagnóstico continua nos arquivos via logger.*, então só o
+// console precisa ficar quieto.
+const devLog = (...args: unknown[]): void => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(...args);
+  }
+};
+
 // Registrar helpers Handlebars
 Handlebars.registerHelper('gt', (a: number, b: number) => a > b);
 Handlebars.registerHelper('eq', (a: string, b: string) => a === b);
@@ -248,7 +257,7 @@ class AlertSystem {
    */
   public registerPushSubscription(email: string, subscription: PushSubscription): void {
     console.log('📝 registerPushSubscription chamado:');
-    console.log(`   Email: ${email}`);
+    devLog(`   Email: ${email}`);
     console.log(`   Subscription: ${subscription ? 'presente' : 'NULO'}`);
     
     if (!email || !subscription) {
@@ -258,7 +267,7 @@ class AlertSystem {
 
     // Verifica se o usuário já existe
     if (!this.data[email]) {
-      console.log(`   Criando novo usuário ${email}`);
+      devLog(`   Criando novo usuário ${email}`);
       this.data[email] = {
         email,
         alerts: {},
@@ -277,16 +286,16 @@ class AlertSystem {
     );
     
     if (!exists) {
-      console.log(`   Adicionando nova assinatura para ${email}`);
+      devLog(`   Adicionando nova assinatura para ${email}`);
       console.log(`   Endpoint [sha256:${createHash('sha256').update(subscription.endpoint).digest('hex').slice(0, 8)}]`);
       this.data[email].pushSubscriptions.push(subscription);
     } else {
-      console.log(`   Assinatura já existe para ${email}`);
+      devLog(`   Assinatura já existe para ${email}`);
     }
     
     this.saveAlerts();
-    console.log(`   Total de assinaturas para ${email}: ${this.data[email].pushSubscriptions.length}`);
-    console.log(`✅ Assinatura push registrada para ${email}`);
+    devLog(`   Total de assinaturas para ${email}: ${this.data[email].pushSubscriptions.length}`);
+    devLog(`✅ Assinatura push registrada para ${email}`);
   }
 
   /**
@@ -390,9 +399,9 @@ class AlertSystem {
       // Envia um único email por usuário com todos os alertas coletados
       console.log(`\n📧 [checkAllCurrencies] Total de usuários com alertas: ${allAlertsByEmail.size}`);
       for (const [email, alerts] of Array.from(allAlertsByEmail.entries())) {
-        console.log(`📧 [checkAllCurrencies] Usuário: ${email} - Total de alertas: ${alerts.length}`);
+        devLog(`📧 [checkAllCurrencies] Usuário: ${email} - Total de alertas: ${alerts.length}`);
         if (alerts.length > 0) {
-          console.log(`📧 [checkAllCurrencies] Chamando sendAlert para ${email}`);
+          devLog(`📧 [checkAllCurrencies] Chamando sendAlert para ${email}`);
           await this.sendAlert(email, alerts);
           // Marca data da última notificação enviada
           if (this.data[email]) {
@@ -445,11 +454,11 @@ class AlertSystem {
     for (const [email, userData] of Object.entries(this.data)) {
       const alert = userData.alerts[currencyCode];
       if (!alert || !alert.ativo) {
-        console.log(`  - ${email}: Sem alerta ativo para ${currencyCode}`);
+        devLog(`  - ${email}: Sem alerta ativo para ${currencyCode}`);
         continue;
       }
 
-      console.log(`  - ${email}: Alerta encontrado para ${currencyCode} (tipo: ${alert.tipo}, limite: ${alert.limite}%, ativo: ${alert.ativo})`);
+      devLog(`  - ${email}: Alerta encontrado para ${currencyCode} (tipo: ${alert.tipo}, limite: ${alert.limite}%, ativo: ${alert.ativo})`);
 
       // Verificar validade do alerta (redundante com cleanupExpiredAlerts, mas mantém como segurança)
       if (alert.validade) {
@@ -460,7 +469,7 @@ class AlertSystem {
         const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade
         const now = new Date();
         if (now > validadeDate) {
-          console.log(`⏰ Alerta expirado: ${email} - ${currencyCode} (validade: ${alert.validade})`);
+          devLog(`⏰ Alerta expirado: ${email} - ${currencyCode} (validade: ${alert.validade})`);
           delete this.data[email].alerts[currencyCode];
           this.saveAlerts();
           try {
@@ -489,7 +498,7 @@ class AlertSystem {
             const previousPrice = previousSellPrice;
             
             console.log(`\n🔍 Verificando alerta de valor específico (venda):`);
-            console.log(`- Email: ${email}`);
+            devLog(`- Email: ${email}`);
             console.log(`- Valor alvo: R$ ${alert.valor.toFixed(4)} (${alert.condicaoValor} deste valor)`);
             console.log(`- Preço atual: R$ ${targetPrice.toFixed(4)}`);
             console.log(`- Preço anterior: R$ ${previousPrice.toFixed(4)}`);
@@ -520,7 +529,7 @@ class AlertSystem {
             
             if (shouldAlert) {
               const conditionText = alert.condicaoValor === 'acima' ? 'acima' : 'abaixo';
-              console.log(`🔔 Alerta de valor específico: ${email} - ${currencyCode} (venda ${conditionText} de R$ ${alert.valor.toFixed(2)})`);
+              devLog(`🔔 Alerta de valor específico: ${email} - ${currencyCode} (venda ${conditionText} de R$ ${alert.valor.toFixed(2)})`);
               console.log(`   Preço atual: R$ ${targetPrice.toFixed(4)} (${conditionText} do valor alvo)`);
             }
           } else {
@@ -547,7 +556,7 @@ class AlertSystem {
 
         // Se for alerta de valor-especifico, remove-o após o disparo
         if (alert.tipo === 'valor-especifico') {
-          console.log(`🗑️ Removendo alerta de valor específico após disparo: ${email} - ${currencyCode} (valor: R$ ${alert.valor?.toFixed(2)})`);
+          devLog(`🗑️ Removendo alerta de valor específico após disparo: ${email} - ${currencyCode} (valor: R$ ${alert.valor?.toFixed(2)})`);
           delete this.data[email].alerts[currencyCode];
           // Salva imediatamente para garantir que o alerta seja removido
           this.saveAlerts();
@@ -726,7 +735,7 @@ class AlertSystem {
       // Log detalhado dos alertas carregados
       for (const [email, userData] of Object.entries(this.data)) {
         const alertCount = Object.keys(userData.alerts).length;
-        console.log(`  - ${email}: ${alertCount} alerta(s)`);
+        devLog(`  - ${email}: ${alertCount} alerta(s)`);
       }
 
       // Hidratar preferências (idioma + ordem dos cards) direto de `users`, para
@@ -785,7 +794,7 @@ class AlertSystem {
       import('./db')
         .then((db) => db.updateUserPreferences(email, { cardOrder }))
         .catch((err) => console.error('❌ Erro ao salvar ordem dos cards no banco:', err));
-      console.log(`✅ Ordem dos cards salva para ${email}:`, cardOrder);
+      devLog(`✅ Ordem dos cards salva para ${email}:`, cardOrder);
     } catch (error) {
       console.error('❌ Erro ao salvar ordem dos cards:', error);
     }
@@ -817,7 +826,7 @@ class AlertSystem {
       import('./db')
         .then((db) => db.updateUserPreferences(email, { language }))
         .catch((err) => console.error('❌ Erro ao salvar idioma no banco:', err));
-      console.log(`✅ Idioma salvo para ${email}:`, language);
+      devLog(`✅ Idioma salvo para ${email}:`, language);
     } catch (error) {
       console.error('❌ Erro ao salvar idioma:', error);
     }
@@ -877,7 +886,7 @@ const valorInfo = tipo === 'valor-especifico' && valorEspecifico !== undefined
 ? ` - ${condicaoValor} de R$ ${valorEspecifico.toFixed(2).replace('.', ',')}` 
 : '';
         
-console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${validadeInfo}`);
+devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${validadeInfo}`);
   }
 
   /**
@@ -887,7 +896,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     if (this.data[email]?.alerts[currencyCode]) {
       delete this.data[email].alerts[currencyCode];
       this.saveAlerts();
-      console.log(`🗑️ Alerto removido: ${email} - ${currencyCode}`);
+      devLog(`🗑️ Alerto removido: ${email} - ${currencyCode}`);
     }
   }
 
@@ -898,7 +907,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     if (this.data[email]) {
       delete this.data[email];
       this.saveAlerts();
-      console.log(`🗑️ Todos os alertas do usuário ${email} foram removidos`);
+      devLog(`🗑️ Todos os alertas do usuário ${email} foram removidos`);
     }
   }
 
@@ -924,7 +933,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
         const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade
 
         if (now > validadeDate) {
-          console.log(`⏰ Alerta expirado: ${email} - ${currencyCode} (validade: ${alert.validade})`);
+          devLog(`⏰ Alerta expirado: ${email} - ${currencyCode} (validade: ${alert.validade})`);
           delete this.data[email].alerts[currencyCode];
           await deleteAlertByUserAndCurrency(email.toLowerCase(), currencyCode);
           cleaned++;
@@ -975,11 +984,11 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     for (const [email, userData] of Object.entries(this.data)) {
       const alert = userData.alerts[currencyCode];
       if (!alert || !alert.ativo) {
-        console.log(`  - ${email}: Sem alerta ativo para ${currencyCode}`);
+        devLog(`  - ${email}: Sem alerta ativo para ${currencyCode}`);
         continue;
       }
 
-      console.log(`  - ${email}: Alerta encontrado para ${currencyCode} (tipo: ${alert.tipo}, limite: ${alert.limite}%, ativo: ${alert.ativo})`);
+      devLog(`  - ${email}: Alerta encontrado para ${currencyCode} (tipo: ${alert.tipo}, limite: ${alert.limite}%, ativo: ${alert.ativo})`);
       
       let shouldAlert = false;
       
@@ -1173,11 +1182,11 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     }));
 
     if (!subscriptions || subscriptions.length === 0) {
-      console.log(`⚠️ Usuário ${email} não possui assinaturas push ativas no banco de dados`);
+      devLog(`⚠️ Usuário ${email} não possui assinaturas push ativas no banco de dados`);
       return;
     }
 
-    console.log(`📤 Preparando envio de push para ${email}:`);
+    devLog(`📤 Preparando envio de push para ${email}:`);
     console.log(`   - Título: ${titulo}`);
     console.log(`   - Moedas: ${currencyCode}`);
     console.log(`   - Idioma: ${language}`);
@@ -1211,7 +1220,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       try {
         console.log(`   → Enviando para endpoint [sha256:${createHash('sha256').update(subscription.endpoint).digest('hex').slice(0, 8)}]`);
         await webpush.sendNotification(subscription, payload);
-        console.log(`   ✅ PUSH ENVIADO COM SUCESSO para ${email}`);
+        devLog(`   ✅ PUSH ENVIADO COM SUCESSO para ${email}`);
         logger.pushSent(email, subscription.endpoint, true);
         successCount++;
       } catch (error: unknown) {
@@ -1226,7 +1235,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
         const subscriptionIsDead = statusCode === 404 || statusCode === 410 || statusCode === 403;
 
         if (subscriptionIsDead) {
-          console.log(`   ❌ Assinatura push inválida (${statusCode}) para ${email}, removendo do banco...`);
+          devLog(`   ❌ Assinatura push inválida (${statusCode}) para ${email}, removendo do banco...`);
           logger.pushSent(email, subscription.endpoint, false, `Subscription invalid (${statusCode})`);
           await deletePushSubscriptionByEndpoint(subscription.endpoint);
         } else {
@@ -1238,7 +1247,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       }
     }
 
-    console.log(`📊 Resumo do envio para ${email}: ${successCount}/${subscriptions.length} notificações enviadas com sucesso\n`);
+    devLog(`📊 Resumo do envio para ${email}: ${successCount}/${subscriptions.length} notificações enviadas com sucesso\n`);
   }
 
   /**
@@ -1336,7 +1345,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
     const userData = this.data[email];
     if (!userData || alerts.length === 0) return;
 
-    console.log(`📨 Preparando para enviar notificações agrupadas para ${email} com ${alerts.length} alerta(s)`);
+    devLog(`📨 Preparando para enviar notificações agrupadas para ${email} com ${alerts.length} alerta(s)`);
 
     // Obtém o idioma do usuário (padrão: pt)
     const userLanguage = userData.language || 'pt';
@@ -1399,7 +1408,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
 
       logger.emailSent(email, `Alertas de cotações (${alerts.length} moedas)`, alerts.length);
 
-      console.log(`✅ Notificações agrupadas enviadas para ${email} com ${alerts.length} alerta(s)`);
+      devLog(`✅ Notificações agrupadas enviadas para ${email} com ${alerts.length} alerta(s)`);
     } catch (error) {
       console.error(`❌ Erro ao enviar notificações para ${email}:`, error);
       
@@ -1407,7 +1416,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       if (error && typeof error === 'object' && 'statusCode' in error) {
         userData.pushSubscriptions = [];
         this.saveAlerts();
-        console.log(`⚠️ Assinaturas push removidas para ${email} devido a erro`);
+        devLog(`⚠️ Assinaturas push removidas para ${email} devido a erro`);
       }
     }
   }
@@ -1425,10 +1434,10 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       alertType: string;
     }>
   ) {
-    console.log(`\n📧 [sendAlert] Chamado para ${email} com ${alerts.length} alerta(s)`);
+    devLog(`\n📧 [sendAlert] Chamado para ${email} com ${alerts.length} alerta(s)`);
     const userData = this.data[email];
     if (!userData) {
-      console.log(`📧 [sendAlert] Usuário ${email} não encontrado`);
+      devLog(`📧 [sendAlert] Usuário ${email} não encontrado`);
       return;
     }
 
@@ -1517,7 +1526,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       variationAbs: string;
     }>
   ) {
-    console.log('🔍 Método sendEmailNotification chamado para o email:', email);
+    devLog('🔍 Método sendEmailNotification chamado para o email:', email);
     console.log(`- Total de alertas: ${alerts.length}`);
 
     if (!this.emailConfigured) {
@@ -1580,7 +1589,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       });
       console.log('📧 [sendEmailNotification] sendWithRetry concluído');
 
-      console.log(`📧 E-mail com ${alerts.length} alerta(s) enviado para ${email} (idioma: ${userLanguage})`);
+      devLog(`📧 E-mail com ${alerts.length} alerta(s) enviado para ${email} (idioma: ${userLanguage})`);
       return true;
     } catch (error) {
       console.error('❌ Erro ao enviar e-mail:', error);
@@ -1732,8 +1741,8 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
   private async sendWithRetry(mailOptions: { to: string; subject: string; html: string }, maxRetries = 3, delayMs = 5000): Promise<boolean> {
     let lastError: Error | null = null;
 
-    console.log('📧 [sendWithRetry] Iniciando envio de e-mail para:', mailOptions.to);
-    console.log('📧 [sendWithRetry] Assunto:', mailOptions.subject);
+    devLog('📧 [sendWithRetry] Iniciando envio de e-mail para:', mailOptions.to);
+    devLog('📧 [sendWithRetry] Assunto:', mailOptions.subject);
 
     const apiKey = process.env.EMAIL_PASS;
     const emailFrom = process.env.EMAIL_FROM || '"CAP Câmbio" <capcambiocx@gmail.com>';
