@@ -59,6 +59,8 @@ app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: false,
     directives: {
+      // Sentinel do helmet: sem ele o helmet lança "needs a default-src" no startup e o container entra em crash loop.
+      defaultSrc: helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc,
       frameAncestors: ["'none'"],
       baseUri: ["'self'"],
     },
