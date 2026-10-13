@@ -40,7 +40,7 @@ const mailOptions = {
         <p><strong>Variação:</strong> <span style="color: #10b981; font-weight: bold;">+4.73%</span></p>
       </div>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://capcambio.com.br/cotacoes" style="display: inline-block; padding: 12px 24px; background: #f59e0b; color: #000; text-decoration: none; border-radius: 4px; font-weight: bold;">
+        <a href="https://capcambio.up.railway.app/cotacoes" style="display: inline-block; padding: 12px 24px; background: #f59e0b; color: #000; text-decoration: none; border-radius: 4px; font-weight: bold;">
           Ver Cotações
         </a>
       </div>
@@ -59,7 +59,7 @@ O Dólar Americano (USD) subiu 4.73% em relação ao último fechamento.
 Preço atual: R$ 6,20
 Variação: +4.73%
 
-Acesse: https://capcambio.com.br/cotacoes
+Acesse: https://capcambio.up.railway.app/cotacoes
 
 ---
 Este é um e-mail automático, por favor não responda.

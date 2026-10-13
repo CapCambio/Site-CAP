@@ -1,6 +1,6 @@
 // Service Worker seguro - não intercepta assets do Vite
 
-const CACHE_NAME = 'cap-cotacoes-v28';
+const CACHE_NAME = 'cap-cotacoes-v29';
 const OFFLINE_PAGE = '/offline.html';
 
 console.log('[Service Worker] Iniciando...');
@@ -165,7 +165,7 @@ self.addEventListener('push', (event) => {
     requireInteraction: false,
     data: {
       url: data.data?.url || '/',
-      actionUrl: data.data?.actionUrl || 'https://capcambio.com.br/cotacoes'
+      actionUrl: data.data?.actionUrl || 'https://capcambio.up.railway.app/cotacoes'
     },
     actions: data.actions || [
       {
@@ -191,7 +191,7 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
-  const targetUrl = event.notification.data.actionUrl || 'https://capcambio.com.br/cotacoes';
+  const targetUrl = event.notification.data.actionUrl || 'https://capcambio.up.railway.app/cotacoes';
   
   event.waitUntil(
     clients.matchAll({ type: 'window' })

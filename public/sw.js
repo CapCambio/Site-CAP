@@ -1,7 +1,7 @@
 // Service Worker para Push Notifications e Cache
 
 // Versionamento dinâmico do cache para invalidação automática
-const CACHE_VERSION = '1.0.25'; // Atualizar este número em cada release
+const CACHE_VERSION = '1.0.26'; // Atualizar este número em cada release
 const CACHE_NAME = `cap-cotacoes-v${CACHE_VERSION}`;
 const OFFLINE_PAGE = '/offline.html';
 const ASSETS_TO_CACHE = [
@@ -157,7 +157,7 @@ self.addEventListener('push', (event) => {
     requireInteraction: false,
     data: {
       url: data.data?.url || '/',
-      actionUrl: data.data?.actionUrl || 'https://capcambio.com.br/cotacoes'
+      actionUrl: data.data?.actionUrl || 'https://capcambio.up.railway.app/cotacoes'
     },
     actions: data.actions || [
       {
@@ -184,7 +184,7 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
   // Sempre redireciona para a página de cotações, independentemente de onde clicou
-  const targetUrl = event.notification.data.actionUrl || 'https://capcambio.com.br/cotacoes';
+  const targetUrl = event.notification.data.actionUrl || 'https://capcambio.up.railway.app/cotacoes';
   
   event.waitUntil(
     clients.matchAll({ type: 'window' })

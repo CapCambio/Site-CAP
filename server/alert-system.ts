@@ -1163,9 +1163,9 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       title: titulo,
       body: mensagem,
       icon: 'https://iili.io/fBQNNwX.jpg',
-      // capcambio.com.br/cotacoes é o app de cotações
-      badge: 'https://capcambio.com.br/optimized/android-chrome-192x192.webp',
-      image: 'https://capcambio.com.br/optimized/android-chrome-512x512.webp',
+      // capcambio.up.railway.app/cotacoes é o app de cotações (capcambio.com.br ainda é WordPress)
+      badge: 'https://capcambio.up.railway.app/optimized/android-chrome-192x192.webp',
+      image: 'https://capcambio.up.railway.app/optimized/android-chrome-512x512.webp',
       actions: [
         {
           action: 'view-quotes',
@@ -1174,7 +1174,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
       ],
       data: {
         url: `${process.env.APP_URL || ''}/dashboard`,
-        actionUrl: 'https://capcambio.com.br/cotacoes',
+        actionUrl: 'https://capcambio.up.railway.app/cotacoes',
         currencyCode,
         variacao: currencyCode === 'MULTIPLE' ? null : variacao,
         language
@@ -1530,7 +1530,7 @@ console.log(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo
           ...alert,
           currencyName: this.getCurrencyName(alert.currencyCode, userLanguage)
         })),
-        appUrl: process.env.APP_URL || 'https://capcambio.com.br',
+        appUrl: process.env.APP_URL || 'https://capcambio.up.railway.app',
         currentYear: new Date().getFullYear()
       };
 

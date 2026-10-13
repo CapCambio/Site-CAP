@@ -96,7 +96,7 @@ const mailOptions = {
 ${currencyCode} ${variationText} ${variationAbs}%
 Valor atual: R$ ${sellPrice.toFixed(2)}
 
-Acesse ${process.env.APP_URL || 'https://capcambio.com.br'} para mais detalhes.`,
+Acesse ${process.env.APP_URL || 'https://capcambio.up.railway.app'} para mais detalhes.`,
   // Headers para melhorar a entrega
   headers: {
     'X-Priority': '1', // Prioridade alta
