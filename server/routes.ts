@@ -9,6 +9,7 @@ import crypto from "crypto";
 import { fileURLToPath } from 'url';
 import { authenticate, requireAdmin, optionalAuth } from './auth/JwtMiddleware';
 import { JwtService } from './auth/JwtService';
+import { PasswordService } from './auth/PasswordService';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
 import { readPushLogEntries } from './logger';
 import * as db from './db';
@@ -284,7 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(401).json({ error: "Credenciais inválidas" });
         }
 
-        if (password !== expectedPassword) {
+        if (!PasswordService.verify(password || '', expectedPassword)) {
           return res.status(401).json({ error: "Credenciais inválidas" });
         }
       }

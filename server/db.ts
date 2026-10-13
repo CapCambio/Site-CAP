@@ -256,6 +256,32 @@ export async function deleteUser(email: string): Promise<boolean> {
   return (result.rowCount || 0) > 0;
 }
 
+// Migração: converte senhas admin em plaintext para bcrypt hash (roda no startup)
+export async function migrateAdminPasswordsToHash(): Promise<void> {
+  const bcrypt = (await import('bcryptjs')).default;
+  const BCRYPT_PATTERN = /^\$2[aby]\$\d{2}\$.{53}$/;
+
+  const admins = await pool.query(
+    "SELECT email, password FROM users WHERE is_admin = true AND password IS NOT NULL"
+  );
+
+  let migrated = 0;
+  for (const row of admins.rows) {
+    const stored = row.password as string;
+    if (!stored || BCRYPT_PATTERN.test(stored)) continue;
+    const hashed = bcrypt.hashSync(stored, 10);
+    await pool.query('UPDATE users SET password = $1 WHERE email = $2', [hashed, row.email]);
+    migrated++;
+    console.log(`🔐 Senha migrada p/ bcrypt: ${row.email}`);
+  }
+
+  if (migrated > 0) {
+    console.log(`✅ Migração de senhas: ${migrated} admin(s) convertidos para bcrypt`);
+  } else {
+    console.log('✅ Senhas admin já estão em bcrypt — nenhuma migração necessária');
+  }
+}
+
 // Funções para alertas
 export async function getAlerts(): Promise<Alert[]> {
   const result = await pool.query('SELECT * FROM alerts ORDER BY created_at DESC');
