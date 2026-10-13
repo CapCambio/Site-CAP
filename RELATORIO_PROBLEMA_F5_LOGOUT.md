@@ -8,6 +8,15 @@ Ao dar F5 (refresh) na página, o usuário era deslogado automaticamente e redir
 
 ✅ **RESOLVIDO** - O problema foi corrigido em 12/08/2026
 
+> **Complemento (2026-10-13).** O `cookie-parser` fechou a metade *"desloga ao dar F5"*. A outra metade
+> do sintoma descrito — a mensagem *"já existe uma sessão ativa em outro dispositivo"* — era governada
+> por um `Map` em memória que zerava a cada deploy/restart, e só ficou durável em 2026-10-08: `f79cb87`
+> moveu o controle de sessão para a tabela Postgres `active_sessions` (heartbeat em UPSERT) e `a28c4a6`
+> deu identidade por dispositivo (`sid` no JWT). Não reabrir este relatório por causa dessa mensagem.
+>
+> Nota de ambiente: o host citado abaixo, `web-production-b9ae9.up.railway.app`, não é mais o domínio
+> vivo — produção atende em `capcambio.up.railway.app`.
+
 ## Causa Raiz
 
 O servidor Express não tinha o middleware `cookie-parser` configurado. Isso causava:

@@ -1,8 +1,29 @@
 # Relatório: Problema no Line Chart - Apenas Bolinha no Dia Atual
 
 ## Data: 17/08/2026
-## Status: Pendente de Solução
+## Status: ✅ RESOLVIDO em 17/08/2026 (mesmo dia em que este relatório foi escrito)
 ## Prioridade: Alta
+
+---
+
+> **Carimbo de resolução (2026-10-13).** A linha de status acima ficou antiga e auditorias automáticas
+> passam a ler este arquivo como bug vivo. Estado real do gráfico hoje:
+>
+> - **Causa raiz:** a API devolve `sell_price`/`buy_price` (snake_case) e o mapeamento lia
+>   `sellPrice`/`buyPrice` → todos os dias do mês viravam `null`. Sobrava apenas o ponto do dia atual,
+>   que não vem do histórico e sim de `/api/currencies` (camelCase). É exatamente o que o log de debug
+>   na seção "Logs de Debug" abaixo já mostrava (`Historical Data` em snake_case vs. 1 ponto válido).
+> - **Corrigido em 17/08/2026:** `4858741`, `af96bfd`, `ac5a965` (conversão snake_case→camelCase na
+>   query e comparação de datas com `isSameDay`) e `9300d0a` (forward fill de sábados/domingos).
+>   `60c58ba` removeu os `console.log` de debug descritos na "Tentativa 2".
+> - **Endurecido depois:** `ba12abd` (2026-10-02), `cd72c6f` (2026-10-05, comparação de datas em UTC)
+>   e `44bb631` (2026-10-06).
+> - **Código atual:** normalização em `client/src/components/CurrencyMiniChart.tsx:109-110` e
+>   carry-forward em `:257`. `connectNulls={false}` (`:598`) permanece de propósito — a linha fecha
+>   porque os `null` são eliminados antes de chegarem ao Recharts, não pela configuração.
+>
+> Nada a fazer aqui. Se o gráfico voltar a mostrar um ponto só, o suspeito é o pipeline de dados
+> (leitura da planilha / gravação de histórico), não o componente.
 
 ---
 
