@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 import { jwtMiddleware } from './auth/JwtMiddleware';
 import { jwtRenewalMiddleware } from './auth/JwtRenewalMiddleware';
 import { UserValidationCache } from './auth/UserValidationCache';
-import { initializeCurrencyHistoryTable, initializeAlertsTable, initializeActiveSessionsTable, migrateAdminPasswordsToHash } from './db';
+import { initializeCurrencyHistoryTable, initializeAlertsTable, initializeActiveSessionsTable, initializeUserPreferencesColumns, migrateAdminPasswordsToHash } from './db';
 // import pg from 'pg';
 // import PgSession from 'connect-pg-simple';
 
@@ -102,6 +102,11 @@ app.use((req, res, next) => {
   await initializeCurrencyHistoryTable();
   await initializeAlertsTable();
   await initializeActiveSessionsTable();
+  try {
+    await initializeUserPreferencesColumns();
+  } catch (error) {
+    console.error('⚠️ Erro ao adicionar colunas de preferências:', error);
+  }
   try {
     await migrateAdminPasswordsToHash();
   } catch (error) {

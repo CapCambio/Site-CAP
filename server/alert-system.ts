@@ -727,6 +727,23 @@ class AlertSystem {
         const alertCount = Object.keys(userData.alerts).length;
         console.log(`  - ${email}: ${alertCount} alerta(s)`);
       }
+
+      // Hidratar preferências (idioma + ordem dos cards) direto de `users`, para
+      // sobreviver ao redeploy do Railway (o JSON em dist/data/ é efêmero).
+      try {
+        const { getAllUserPreferences } = await import('./db');
+        const prefs = await getAllUserPreferences();
+        for (const p of prefs) {
+          if (!this.data[p.email]) {
+            this.data[p.email] = { email: p.email, alerts: {}, pushSubscriptions: [] };
+          }
+          this.data[p.email].language = p.language;
+          this.data[p.email].cardOrder = p.cardOrder;
+        }
+        console.log(`🔔 [loadAlerts] Preferências carregadas para ${prefs.length} usuários`);
+      } catch (err) {
+        console.error('❌ [loadAlerts] Falha ao hidratar preferências (não bloqueia alertas):', err);
+      }
     } catch (error) {
       console.error('❌ Erro ao carregar alertas do banco de dados:', error);
     }
@@ -764,6 +781,9 @@ class AlertSystem {
       
       this.data[email].cardOrder = cardOrder;
       this.saveAlerts();
+      import('./db')
+        .then((db) => db.updateUserPreferences(email, { cardOrder }))
+        .catch((err) => console.error('❌ Erro ao salvar ordem dos cards no banco:', err));
       console.log(`✅ Ordem dos cards salva para ${email}:`, cardOrder);
     } catch (error) {
       console.error('❌ Erro ao salvar ordem dos cards:', error);
@@ -793,6 +813,9 @@ class AlertSystem {
 
       this.data[email].language = language;
       this.saveAlerts();
+      import('./db')
+        .then((db) => db.updateUserPreferences(email, { language }))
+        .catch((err) => console.error('❌ Erro ao salvar idioma no banco:', err));
       console.log(`✅ Idioma salvo para ${email}:`, language);
     } catch (error) {
       console.error('❌ Erro ao salvar idioma:', error);

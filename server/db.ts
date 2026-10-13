@@ -58,6 +58,58 @@ export async function initializeAlertsTable() {
   }
 }
 
+// Adicionar colunas de preferências de usuário (idioma + ordem dos cards)
+export async function initializeUserPreferencesColumns() {
+  try {
+    await pool.query(`
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS language VARCHAR(5) DEFAULT 'pt',
+      ADD COLUMN IF NOT EXISTS card_order JSONB
+    `);
+    console.log('✅ Colunas de preferências (language, card_order) verificadas');
+  } catch (error) {
+    console.error('❌ Erro ao verificar colunas de preferências:', error);
+  }
+}
+
+export async function updateUserPreferences(
+  email: string,
+  prefs: { language?: string; cardOrder?: string[] }
+): Promise<boolean> {
+  const fields: string[] = [];
+  const values: any[] = [];
+  let idx = 1;
+  if (prefs.language !== undefined) {
+    fields.push(`language = $${idx++}`);
+    values.push(prefs.language);
+  }
+  if (prefs.cardOrder !== undefined) {
+    fields.push(`card_order = $${idx++}`);
+    values.push(JSON.stringify(prefs.cardOrder));
+  }
+  if (fields.length === 0) return false;
+  values.push(email.toLowerCase());
+  const result = await pool.query(
+    `UPDATE users SET ${fields.join(', ')} WHERE email = $${idx}`,
+    values
+  );
+  return result.rowCount > 0;
+}
+
+export async function getAllUserPreferences(): Promise<
+  Array<{ email: string; language: string; cardOrder: string[] }>
+> {
+  // SELECT * para tolerar a corrida no primeiro boot pós-deploy: se ALTER TABLE ainda não
+  // commitou quando esta query roda, as colunas novas simplesmente não aparecem no row e os
+  // defaults abaixo preservam o comportamento.
+  const result = await pool.query('SELECT * FROM users');
+  return result.rows.map((r: any) => ({
+    email: r.email,
+    language: r.language || 'pt',
+    cardOrder: Array.isArray(r.card_order) ? r.card_order : []
+  }));
+}
+
 // Inicializar tabela de sessões ativas (bloqueio de login simultâneo)
 export async function initializeActiveSessionsTable() {
   try {
