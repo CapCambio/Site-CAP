@@ -66,7 +66,7 @@ class TemplateManager {
       // Adiciona variáveis de ambiente e funções auxiliares aos dados do template
       const templateData = {
         ...sanitizedData,
-        APP_URL: process.env.APP_URL || 'https://capcambio.com',
+        APP_URL: process.env.APP_URL || 'https://capcambio.up.railway.app',
         APP_NAME: process.env.APP_NAME || 'CAP Câmbio',
         now: new Date(),
         // Funções auxiliares
