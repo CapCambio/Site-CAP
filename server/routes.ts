@@ -627,7 +627,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Endpoint para forçar um scraping manual dos dados da fonte
-  app.get("/api/refresh-currencies", authenticate, requireAdmin, async (req, res) => {
+  app.get("/api/refresh-currencies", authRateLimiter(5, 60 * 1000), authenticate, requireAdmin, async (req, res) => {
     try {
       const savedCurrencies = await refreshCurrencies();
       res.json({ message: "Currencies refreshed successfully", count: savedCurrencies.length });
