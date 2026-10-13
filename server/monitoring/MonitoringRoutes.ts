@@ -35,7 +35,7 @@ router.get('/health', async (req: Request, res: Response) => {
 /**
  * Health check detalhado
  */
-router.get('/health/detailed', async (req: Request, res: Response) => {
+router.get('/health/detailed', authenticate, requireAdmin, async (req: Request, res: Response) => {
   try {
     const health = await healthChecker.runHealthChecks();
     

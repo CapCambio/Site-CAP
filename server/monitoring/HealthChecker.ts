@@ -6,6 +6,8 @@ import { authService } from '../auth/AuthService';
 import { alertSystem } from '../alert-system';
 import { pool } from '../db';
 import { SOURCE_URL } from '../scraper';
+import fsStatic from 'fs';
+import v8 from 'v8';
 
 export interface HealthCheck {
   name: string;
@@ -209,34 +211,37 @@ export class HealthChecker {
    */
   private async checkMemory(): Promise<HealthCheck> {
     const start = Date.now();
-    
+
     try {
       const memUsage = process.memoryUsage();
-      const totalMem = memUsage.heapTotal;
       const usedMem = memUsage.heapUsed;
-      const memoryUsagePercent = (usedMem / totalMem) * 100;
-      
+      // heap_size_limit é o teto real que o V8 pode alocar (≈ MEMORY_LIMIT do container).
+      // heapTotal é quanto V8 já reservou — a razão heapUsed/heapTotal só mede fragmentação de GC
+      // e fica cravada em ~90% mesmo em app saudável, gerando falso positivo.
+      const heapLimit = v8.getHeapStatistics().heap_size_limit;
+      const memoryUsagePercent = (usedMem / heapLimit) * 100;
+
       const responseTime = Date.now() - start;
-      
+
       let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
       let message: string | undefined;
-      
-      if (memoryUsagePercent > 90) {
+
+      if (memoryUsagePercent > 95) {
         status = 'unhealthy';
         message = 'Memory usage critical';
-      } else if (memoryUsagePercent > 75) {
+      } else if (memoryUsagePercent > 85) {
         status = 'degraded';
         message = 'Memory usage high';
       }
-      
+
       return {
         name: 'memory',
         status,
         message,
         responseTime,
         metadata: {
-          heapUsed: Math.round(usedMem / 1024 / 1024), // MB
-          heapTotal: Math.round(totalMem / 1024 / 1024), // MB
+          heapUsedMB: Math.round(usedMem / 1024 / 1024),
+          heapLimitMB: Math.round(heapLimit / 1024 / 1024),
           usagePercent: Math.round(memoryUsagePercent)
         }
       };
@@ -257,8 +262,7 @@ export class HealthChecker {
     const start = Date.now();
     
     try {
-      const fs = require('fs');
-      const stats = fs.statSync(process.cwd());
+      fsStatic.statSync(process.cwd());
       
       // Simples check - em produção usar algo mais robusto
       const responseTime = Date.now() - start;
@@ -328,32 +332,31 @@ export class HealthChecker {
    */
   private async checkCacheSystem(): Promise<HealthCheck> {
     const start = Date.now();
-    
+
     try {
-      // Verifica se cache está funcionando
-      const fs = require('fs');
       const cachePath = 'server/config/currency-cache.json';
-      
+
       let cacheAccessible = false;
       let cacheAge = 0;
-      
+
       try {
-        const stats = fs.statSync(cachePath);
+        const stats = fsStatic.statSync(cachePath);
         cacheAccessible = true;
         cacheAge = Date.now() - stats.mtime.getTime();
       } catch (error) {
-        // Cache file não existe ainda
+        // Cache file não existe — esperado no Railway (server/config é gitignored; cache real é em memória)
       }
-      
+
       const responseTime = Date.now() - start;
-      
+
       return {
         name: 'cache_system',
-        status: cacheAccessible ? 'healthy' : 'degraded',
+        status: 'healthy',
         responseTime,
         metadata: {
           accessible: cacheAccessible,
-          ageSeconds: Math.round(cacheAge / 1000)
+          ageSeconds: Math.round(cacheAge / 1000),
+          note: cacheAccessible ? undefined : 'arquivo em disco é opcional; cache runtime é in-memory'
         }
       };
     } catch (error) {
