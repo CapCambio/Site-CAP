@@ -54,7 +54,15 @@ process.on('uncaughtException', (error) => {
 const app = express();
 app.set('trust proxy', 1);
 app.use(helmet({
-  contentSecurityPolicy: false,
+  // Meta tag em client/index.html já cuida de script/style/img/font/connect.
+  // Aqui só adicionamos frame-ancestors e base-uri, que <meta> ignora e só funcionam via header.
+  contentSecurityPolicy: {
+    useDefaults: false,
+    directives: {
+      frameAncestors: ["'none'"],
+      baseUri: ["'self'"],
+    },
+  },
   crossOriginEmbedderPolicy: false,
 }));
 app.use(cookieParser());
