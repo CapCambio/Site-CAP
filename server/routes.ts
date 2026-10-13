@@ -72,17 +72,6 @@ interface ErrorWithMessage extends Error {
   status?: number;
 }
 
-// Declare session type
-declare module 'express-session' {
-  interface SessionData {
-    user?: {
-      email: string;
-      name: string;
-      isAdmin: boolean;
-    };
-  }
-}
-
 // Interface para o tipo Alert
 interface Alert {
   tipo: 'subida' | 'descida' | 'valor-especifico';

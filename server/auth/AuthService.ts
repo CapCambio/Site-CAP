@@ -3,7 +3,6 @@
  * Fonte única da verdade para dados de usuários
  */
 import * as db from '../db';
-import { Session } from 'express-session';
 
 export interface User {
   email: string;
@@ -267,39 +266,6 @@ export class AuthService {
     }
     
     return removedCount;
-  }
-
-  /**
-   * Cria sessão de usuário
-   */
-  createSession(user: User, session: Session & Partial<{ user: User }>): void {
-    session.user = {
-      email: user.email,
-      name: user.name,
-      isAdmin: user.isAdmin
-    };
-  }
-
-  /**
-   * Destroi sessão de usuário
-   */
-  destroySession(session: Session & { destroy: (callback?: (err?: any) => void) => void }): Promise<void> {
-    return new Promise((resolve, reject) => {
-      session.destroy((err: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-
-  /**
-   * Obtém usuário da sessão
-   */
-  getSessionUser(session: Session & Partial<{ user: User }>): User | null {
-    return session.user || null;
   }
 
   /**

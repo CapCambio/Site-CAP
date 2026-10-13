@@ -34,7 +34,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           // Agrupar dependências grandes em chunks separados
-          react: ['react', 'react-dom', 'react-router-dom'],
+          react: ['react', 'react-dom'],
           charts: ['recharts', 'react-chartjs-2'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover'],
           utils: ['date-fns', 'axios', 'zod'],
@@ -56,7 +56,7 @@ export default defineConfig({
   },
   // Otimizações de pré-carregamento
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: ['react', 'react-dom'],
     esbuildOptions: {
       // Habilita o tree shaking
       treeShaking: true,
