@@ -471,7 +471,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/currencies", authRateLimiter(300, 60 * 1000, "currencies"), async (req, res) => {
-  try {
+    // Cache de 30s no navegador (alinhado com staleTime do React Query)
+    res.setHeader('Cache-Control', 'public, max-age=30');
+    
+    try {
     const now = Date.now();
     
     // Usar cache se ainda válido
