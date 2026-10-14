@@ -163,7 +163,7 @@ interface Alert {
   tipo: 'subida' | 'descida' | 'valor-especifico';
   ativo: boolean;
   ultimoValor?: number;
-  validade: string | null;
+  validade: string | Date | null;
   limite?: number;
   valorEspecifico?: number;
   valor?: number; // Para alertas de valor específico
@@ -453,8 +453,8 @@ class AlertSystem {
 
       // Verificar validade do alerta (redundante com cleanupExpiredAlerts, mas mantém como segurança)
       if (alert.validade) {
-        const validadeStr = (alert.validade as any) instanceof Date
-          ? (alert.validade as Date).toISOString()
+        const validadeStr = alert.validade instanceof Date
+          ? alert.validade.toISOString()
           : String(alert.validade);
         const dateStr = validadeStr.split('T')[0];
         const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade
@@ -917,8 +917,8 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
 
         // Interpreta a data como local, não UTC (mesma lógica do display)
         // Converte para string caso seja objeto Date (PostgreSQL retorna Date)
-        const validadeStr = (alert.validade as any) instanceof Date
-          ? (alert.validade as Date).toISOString()
+        const validadeStr = alert.validade instanceof Date
+          ? alert.validade.toISOString()
           : String(alert.validade);
         const dateStr = validadeStr.split('T')[0];
         const validadeDate = new Date(dateStr + 'T23:59:59'); // Fim do dia da validade

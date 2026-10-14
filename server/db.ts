@@ -93,7 +93,7 @@ export async function updateUserPreferences(
     `UPDATE users SET ${fields.join(', ')} WHERE email = $${idx}`,
     values
   );
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 }
 
 export async function getAllUserPreferences(): Promise<
