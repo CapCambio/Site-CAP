@@ -261,7 +261,7 @@ export default function Home() {
               
               {isLoadingCurrencies || (isHistoricalView && isLoadingDateSelection) ? (
                 <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
-                  {Array.from({ length: 6 }).map((_, index) => (
+                  {Array.from({ length: 17 }).map((_, index) => (
                     <div key={index} className="h-36 bg-gray-100 rounded-lg animate-pulse" />
                   ))}
                 </div>
