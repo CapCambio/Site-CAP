@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, startOfDay, endOfDay } from 'date-fns';
 import { Currency } from '../lib/types';
 
@@ -13,6 +13,7 @@ interface HistoricalPriceByDate {
 
 export function useDateSelection() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const queryClient = useQueryClient();
   
   // Formatação para a API
   const dateStr = selectedDate.toISOString().split('T')[0];
@@ -29,13 +30,17 @@ export function useDateSelection() {
       const startDateStr = startOfDay(selectedDate).toISOString();
       const endDateStr = endOfDay(selectedDate).toISOString();
       
-      // Primeiro, obter todas as moedas para termos a lista completa
-      const currenciesResponse = await fetch('/api/currencies');
-      if (!currenciesResponse.ok) {
-        throw new Error('Failed to fetch currencies');
-      }
+      // Reaproveitar cache do React Query se disponível (evita segunda busca de /api/currencies)
+      let currencies: Currency[] = queryClient.getQueryData(['/api/currencies']) as Currency[];
       
-      const currencies: Currency[] = await currenciesResponse.json();
+      if (!currencies) {
+        // Se não está no cache, buscar da API
+        const currenciesResponse = await fetch('/api/currencies');
+        if (!currenciesResponse.ok) {
+          throw new Error('Failed to fetch currencies');
+        }
+        currencies = await currenciesResponse.json();
+      }
       
       // Iniciar um objeto vazio para armazenar o resultado
       const result: HistoricalPriceByDate = {};
