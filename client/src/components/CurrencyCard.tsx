@@ -5,10 +5,9 @@ import { Button } from "@/components/ui/button";
 import { CurrencyLogo } from "./CurrencyLogo";
 import { AlertModal } from "./AlertModal";
 import { formatCurrencyValue, formatPercentage } from "../lib/currency";
-import { CurrencyMiniChart } from "./CurrencyMiniChart";
 import { useIsMobile } from "../hooks/use-mobile";
 import { format, isSameDay } from 'date-fns';
-import { useState, useRef } from "react";
+import { useState, useRef, lazy, Suspense } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   Tooltip,
@@ -17,6 +16,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
+
+// Lazy load do gráfico (só carrega ao expandir card)
+const CurrencyMiniChart = lazy(() => import("./CurrencyMiniChart").then(module => ({ default: module.CurrencyMiniChart })));
 
 interface CurrencyCardProps {
   currency: Currency;
@@ -256,11 +258,13 @@ export function CurrencyCard({
         {/* Área expandível com o gráfico */}
         {isExpanded && (
           <div className="mt-3 pt-3 border-t border-gray-200 pb-12 mb-4">
-            <CurrencyMiniChart 
-              currencyCode={currency.code} 
-              currentPrice={displaySellPrice || undefined}
-              selectedDate={selectedDate}
-            />
+            <Suspense fallback={<div className="h-32 flex items-center justify-center"><div className="animate-pulse text-sm text-gray-400">Carregando gráfico...</div></div>}>
+              <CurrencyMiniChart 
+                currencyCode={currency.code} 
+                currentPrice={displaySellPrice || undefined}
+                selectedDate={selectedDate}
+              />
+            </Suspense>
           </div>
         )}
       </div>
