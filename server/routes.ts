@@ -393,7 +393,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/logout", async (req, res) => {
     const user = (req as any).user;
-    const email = user?.email || req.body?.email;
+    const email = user?.email;
     const isAdmin = user?.isAdmin;
     const sid = user?.sid;
 

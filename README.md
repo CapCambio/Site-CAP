@@ -108,6 +108,33 @@ npm install
 chmod -R 755 data/
 ```
 
+## 🏠 Como editar a Homepage
+
+A homepage institucional (`/homepage/`) tem seu próprio projeto em `homepage-src/`, separado do app principal.
+
+**Importante:** O Railway **NÃO** recompila `homepage-src/` automaticamente. Você precisa buildar manualmente antes de commitar.
+
+**Fluxo correto:**
+```bash
+# 1. Editar arquivos em homepage-src/
+# (faça suas alterações nos arquivos)
+
+# 2. Buildar a homepage
+cd homepage-src
+npm run build
+
+# 3. Voltar e commitar tudo
+cd ..
+git add homepage-src/ public/homepage/
+git commit -m "chore: atualiza homepage"
+git push
+```
+
+**O que acontece:**
+- `npm run build` em `homepage-src/` gera os arquivos em `public/homepage/`
+- O Railway copia `public/homepage/` para `dist/public/homepage/` durante o deploy
+- Se você esquecer de buildar, a homepage não atualiza (mas o app principal continua funcionando)
+
 ## 📞 Suporte
 
 - WhatsApp: Botão flutuante na interface
