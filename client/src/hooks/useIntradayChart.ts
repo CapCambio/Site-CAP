@@ -23,21 +23,23 @@ export function useIntradayChart(currencyCode: string, currentCurrencyData?: any
       // endDate=today fechava o dia antes dele começar e não retornava nada.
       // endDate no instante atual cobre o dia inteiro já decorrido.
       const endDateStr = new Date().toISOString();
-      const response = await fetch(
-        `/api/history/${currencyCode}?startDate=${todayStr}&endDate=${endDateStr}`
-      );
-      if (!response.ok) {
-        throw new Error('Failed to fetch intraday data');
-      }
-      const data = await response.json();
-
+      
       // Buscar último preço antes de hoje para usar como baseline do gráfico
       const threeDaysAgo = new Date();
       threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
       const threeDaysAgoStr = threeDaysAgo.toISOString().split('T')[0];
-      const baselineResponse = await fetch(
-        `/api/history/${currencyCode}?startDate=${threeDaysAgoStr}&endDate=${todayStr}`
-      );
+      
+      // Fazer as duas requisições em paralelo (Promise.all)
+      const [response, baselineResponse] = await Promise.all([
+        fetch(`/api/history/${currencyCode}?startDate=${todayStr}&endDate=${endDateStr}`),
+        fetch(`/api/history/${currencyCode}?startDate=${threeDaysAgoStr}&endDate=${todayStr}`)
+      ]);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch intraday data');
+      }
+      const data = await response.json();
+      
       let baselineSellPrice: number | null = null;
       let baselineBuyPrice: number | null = null;
       if (baselineResponse.ok) {
