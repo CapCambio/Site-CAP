@@ -373,7 +373,8 @@
   },
   "notFound": {
     "title": "Página No Encontrada",
-    "message": "¿Olvidaste agregar la página al enrutador?"
+    "message": "¿Olvidaste agregar la página al enrutador?",
+    "backHome": "Volver al inicio"
   },
   "notifications": {
     "title": "Notificaciones",

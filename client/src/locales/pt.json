@@ -373,7 +373,8 @@
   },
   "notFound": {
     "title": "Página Não Encontrada",
-    "message": "Você esqueceu de adicionar a página ao roteador?"
+    "message": "Você esqueceu de adicionar a página ao roteador?",
+    "backHome": "Voltar ao início"
   },
   "notifications": {
     "title": "Notificações",

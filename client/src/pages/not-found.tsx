@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, Home } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function NotFound() {
@@ -17,6 +18,15 @@ export default function NotFound() {
           <p className="mt-4 text-sm text-gray-600">
             {t('notFound.message')}
           </p>
+
+          <div className="mt-6">
+            <Button asChild className="w-full">
+              <a href="/">
+                <Home className="mr-2 h-4 w-4" />
+                {t('notFound.backHome', 'Voltar ao início')}
+              </a>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

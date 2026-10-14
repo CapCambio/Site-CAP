@@ -373,7 +373,8 @@
   },
   "notFound": {
     "title": "Page Not Found",
-    "message": "Did you forget to add the page to the router?"
+    "message": "Did you forget to add the page to the router?",
+    "backHome": "Back to Home"
   },
   "notifications": {
     "title": "Notifications",

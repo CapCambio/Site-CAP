@@ -373,7 +373,8 @@
   },
   "notFound": {
     "title": "Page Non Trouvée",
-    "message": "Avez-vous oublié d'ajouter la page au routeur?"
+    "message": "Avez-vous oublié d'ajouter la page au routeur?",
+    "backHome": "Retour à l'accueil"
   },
   "notifications": {
     "title": "Notifications",
