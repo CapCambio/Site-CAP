@@ -28,9 +28,7 @@ npm install
 # 3. Executar o servidor (definindo NODE_ENV corretamente)
 set NODE_ENV=development&& tsx server/index.ts
 
-Essa modificação deixará claro para os usuários que, se estiverem em um sistema Windows, devem usar essa sintaxe para começar o servidor. Isso deve melhorar a experiência de instalação e execução do projeto em diferentes plataformas. Se precisar de mais alterações, me avise!
-
-3 4. Executar
+# 4. Ou simplesmente
 npm run dev
 ```
 

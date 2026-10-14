@@ -28,7 +28,7 @@ Sistema completo de cotações de moedas em tempo real com conversão, históric
    ```
 
 4. **Acessar a aplicação:**
-   - Abrir o navegador em: `http://localhost:8080`
+   - Abrir o navegador em: `http://localhost:5000`
 
 ### Scripts disponíveis:
 - `npm run setup` - Instala todas as dependências
@@ -49,11 +49,8 @@ cap-cotacoes/
 ├── server/                 # Backend Express
 │   ├── config/            # Configurações
 │   └── routes.ts          # Rotas da API
-├── data/                  # Armazenamento JSON local
-│   ├── currencies.json    # Dados das moedas
-│   ├── history.json       # Histórico de cotações
-│   └── alerts.json        # Alertas de usuários
-└── shared/                # Tipos compartilhados
+├── shared/                # Tipos compartilhados
+└── PostgreSQL             # Banco de dados (alertas, sessões, histórico)
 ```
 
 ## 🔧 Configuração
@@ -63,9 +60,9 @@ O arquivo `.env` já está configurado com valores padrão. Você pode modificá
 
 ```env
 NODE_ENV=development
-PORT=8080
+PORT=5000
 APP_NAME="CAP Cotações"
-APP_URL="http://localhost:8080"
+APP_URL="http://localhost:5000"
 ```
 
 ### Dados Iniciais
@@ -82,7 +79,7 @@ O projeto já vem com dados iniciais pré-configurados na pasta `/data/`:
 - ✅ Sistema de alertas por email
 - ✅ Painel administrativo
 - ✅ Interface responsiva
-- ✅ Armazenamento local (sem dependências externas)
+- ✅ Armazenamento em PostgreSQL
 
 ## 🔒 Acesso Administrativo
 
@@ -93,8 +90,8 @@ Para acessar o painel administrativo, use:
 
 ### Erro de porta em uso:
 ```bash
-# Matar processos na porta 8080
-npx kill-port 8080
+# Matar processos na porta 5000
+npx kill-port 5000
 # Ou usar outra porta modificando o arquivo .env
 ```
 
@@ -118,4 +115,4 @@ chmod -R 755 data/
 
 ---
 
-**Desenvolvido para funcionar 100% offline com armazenamento local**
+**Sistema de cotações com armazenamento em PostgreSQL e integração com serviços externos (Brevo para e-mails, VAPID para push)**
