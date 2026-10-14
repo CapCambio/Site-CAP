@@ -119,7 +119,15 @@ export function usePushNotifications() {
       }
 
       if (Notification.permission === 'granted') {
-        checkSubscription();
+        // Adiar verificação para depois do primeiro render (não compete com carregamento principal)
+        const timer = setTimeout(() => {
+          checkSubscription();
+        }, 1000);
+        
+        return () => {
+          clearTimeout(timer);
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
       }
 
       return () => {
