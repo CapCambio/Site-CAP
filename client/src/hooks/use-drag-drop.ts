@@ -110,38 +110,24 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     }
   };
   
-  // Carregar ordem da API primeiro, depois fallback para localStorage
+  // Renderizar imediatamente com localStorage (se disponível) ou initialItems
+  // Carregar ordem da API em background e atualizar se necessário
   useEffect(() => {
     if (initialItems.length === 0) return;
     if (isInitialized.current) return;
     
-    const initializeOrder = async () => {
-      // Tentar carregar da API primeiro
-      let order = await loadOrderFromAPI();
-      
-      // Se não conseguiu da API, tentar localStorage
-      if (!order) {
-        const storageKey = getStorageKey();
-        const savedOrder = localStorage.getItem(storageKey);
-        
-        if (savedOrder) {
-          try {
-            order = JSON.parse(savedOrder);
-            console.log('📋 Carregando ordem do localStorage:', order);
-          } catch (error) {
-            console.error('Erro ao carregar ordem do localStorage:', error);
-            order = null;
-          }
-        }
-      }
-      
-      if (order) {
+    // Tentar localStorage primeiro (síncrono, render imediato)
+    const storageKey = getStorageKey();
+    const savedOrder = localStorage.getItem(storageKey);
+    
+    if (savedOrder) {
+      try {
+        const order = JSON.parse(savedOrder);
         const reorderedItems = order
           .map((code: string) => initialItems.find(item => item.code === code))
           .filter(Boolean) as Currency[];
         
         if (reorderedItems.length > 0) {
-          // Adicionar novas moedas que não estão na ordem salva
           const newItems = initialItems.filter(item => 
             !reorderedItems.some(ordered => ordered.code === item.code)
           );
@@ -149,14 +135,33 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
         } else {
           setItems(initialItems);
         }
-      } else {
+      } catch (error) {
+        console.error('Erro ao carregar ordem do localStorage:', error);
         setItems(initialItems);
       }
-      
-      isInitialized.current = true;
-    };
+    } else {
+      setItems(initialItems);
+    }
     
-    initializeOrder();
+    isInitialized.current = true;
+    
+    // Carregar ordem da API em background (não bloqueia render)
+    if (userEmail) {
+      loadOrderFromAPI().then(order => {
+        if (order) {
+          const reorderedItems = order
+            .map((code: string) => initialItems.find(item => item.code === code))
+            .filter(Boolean) as Currency[];
+          
+          if (reorderedItems.length > 0) {
+            const newItems = initialItems.filter(item => 
+              !reorderedItems.some(ordered => ordered.code === item.code)
+            );
+            setItems([...reorderedItems, ...newItems]);
+          }
+        }
+      });
+    }
   }, [initialItems, userEmail]);
 
   // Re-sincronizar DADOS (preços) sem perder a ordem do usuário.
