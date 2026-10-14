@@ -27,8 +27,10 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, currentBuyPrice,
   const [isMobileLandscape, setIsMobileLandscape] = useState(false);
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
 
-  // Detectar mobile orientation
+  // Detectar mobile orientation (com debounce)
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     const checkOrientation = () => {
       const isMobile = window.innerWidth < 640; // Tailwind's sm breakpoint
       const isLandscape = window.innerWidth > window.innerHeight;
@@ -38,12 +40,18 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, currentBuyPrice,
       setIsMobilePortrait(isMobile && isPortrait);
     };
 
+    const debouncedCheckOrientation = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkOrientation, 150);
+    };
+
     checkOrientation();
-    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('resize', debouncedCheckOrientation);
     window.addEventListener('orientationchange', checkOrientation);
 
     return () => {
-      window.removeEventListener('resize', checkOrientation);
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', debouncedCheckOrientation);
       window.removeEventListener('orientationchange', checkOrientation);
     };
   }, []);
