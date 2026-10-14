@@ -1,7 +1,7 @@
 // Service Worker para Push Notifications e Cache
 
 // Versionamento dinâmico do cache para invalidação automática
-const CACHE_VERSION = '1.0.26'; // Atualizar este número em cada release
+const CACHE_VERSION = '1.0.27'; // Atualizar este número em cada release
 const CACHE_NAME = `cap-cotacoes-v${CACHE_VERSION}`;
 const OFFLINE_PAGE = '/offline.html';
 const ASSETS_TO_CACHE = [
@@ -97,6 +97,40 @@ self.addEventListener('fetch', (event) => {
             headers: { 'Content-Type': 'application/json' }
           });
         })
+    );
+    return;
+  }
+  
+  // Para /assets/, usar Stale While Revalidate (cache imediato, atualiza em background)
+  if (event.request.url.includes('/assets/')) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        // Retornar cache imediatamente se disponível
+        if (cachedResponse) {
+          // Atualizar cache em background (não bloqueia)
+          fetch(event.request).then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, networkResponse);
+              });
+            }
+          }).catch(() => {
+            // Ignorar erros de rede (já temos cache)
+          });
+          return cachedResponse;
+        }
+        
+        // Se não tem cache, buscar da rede e cache
+        return fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        });
+      })
     );
     return;
   }
