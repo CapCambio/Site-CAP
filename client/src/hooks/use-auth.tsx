@@ -96,8 +96,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(userData);
           localStorage.setItem("auth_user", JSON.stringify(userData));
 
-          // Carregar idioma salvo do usuário
-          await loadUserLanguage();
+          // Carregar idioma salvo do usuário (em paralelo, não bloqueia)
+          loadUserLanguage();
         } else {
           setUser(null);
           localStorage.removeItem("auth_user");
@@ -156,8 +156,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData);
       localStorage.setItem("auth_user", JSON.stringify(userData));
 
-      // Carregar idioma salvo do usuário
-      await loadUserLanguage();
+      // Carregar idioma salvo do usuário (em paralelo, não bloqueia)
+      loadUserLanguage();
 
     } catch (error) {
       console.error("Erro ao fazer login:", error);
