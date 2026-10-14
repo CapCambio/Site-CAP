@@ -181,6 +181,11 @@ app.use((req, res, next) => {
     .finally(() => {
       log("✅ Iniciando sistema de alertas...");
       alertSystem.startChecking(0.5);
+      
+      // Servidor só aceita conexões depois que as cotações estão carregadas
+      server.listen(port, "0.0.0.0", () => {
+        log(`serving on port ${port}`);
+      });
     });
 
   // Configura verificação periódica
@@ -189,10 +194,6 @@ app.use((req, res, next) => {
       console.error('Erro na verificação periódica de cotações:', error);
     });
   }, CHECK_INTERVAL_MINUTES * 60 * 1000);
-  
-  server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
-  });
 
   // Graceful shutdown: fecha conexões direitinho antes de morrer
   const gracefulShutdown = async (signal: string) => {
