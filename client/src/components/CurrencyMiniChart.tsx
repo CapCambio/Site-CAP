@@ -12,10 +12,11 @@ import { api } from '@/lib/http';
 interface CurrencyMiniChartProps {
   currencyCode: string;
   currentPrice?: number;
+  currentBuyPrice?: number;
   selectedDate?: Date;
 }
 
-export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: CurrencyMiniChartProps) {
+export function CurrencyMiniChart({ currencyCode, currentPrice, currentBuyPrice, selectedDate }: CurrencyMiniChartProps) {
   // MODO MOCKUP: Ative para gerar dados falsos para prints (apenas USD e EUR)
   const MOCK_MODE = false;
 
@@ -49,15 +50,11 @@ export function CurrencyMiniChart({ currencyCode, currentPrice, selectedDate }: 
 
 
 
-  // Buscar dados atuais da moeda primeiro
-  const { data: currentCurrencyData } = useQuery({
-    queryKey: ['/api/currencies/current-for-intraday', currencyCode],
-    queryFn: async () => {
-      const currencies = await api.currencies.getAll();
-      return currencies.find((c: any) => c.code === currencyCode);
-    },
-    refetchOnWindowFocus: false,
-  });
+  // Reaproveitar preços das props em vez de buscar de novo
+  const currentCurrencyData = currentPrice ? {
+    sellPrice: currentPrice,
+    buyPrice: currentBuyPrice
+  } : undefined;
 
   // Hook para dados intraday
   const {

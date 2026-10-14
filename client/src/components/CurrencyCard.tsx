@@ -262,6 +262,7 @@ export function CurrencyCard({
               <CurrencyMiniChart 
                 currencyCode={currency.code} 
                 currentPrice={displaySellPrice || undefined}
+                currentBuyPrice={displayBuyPrice || undefined}
                 selectedDate={selectedDate}
               />
             </Suspense>
