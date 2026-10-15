@@ -548,7 +548,7 @@
     "branchBento": "Bento Gonçalves - RS",
     "branchPasso": "Passo Fundo - RS",
     "defaultMessage": "Vim do site e gostaria de informações",
-    "platformAccessMessage": "Olá, sou cliente CAP e gostaria de solicitar acesso à plataforma de cotações.",
+    "platformAccessMessage": "Olá, sou cliente CAP e gostaria de solicitar acesso à plataforma de cotações."
   },
   "pwa": {
     "installApp": "Instalar App",

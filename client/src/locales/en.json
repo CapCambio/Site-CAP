@@ -551,7 +551,7 @@
     "branchBento": "Bento Gonçalves - RS",
     "branchPasso": "Passo Fundo - RS",
     "defaultMessage": "I came from the website and would like information",
-    "platformAccessMessage": "Hello, I'm a CAP client and would like to request access to the quotes platform.",
+    "platformAccessMessage": "Hello, I'm a CAP client and would like to request access to the quotes platform."
   },
   "pwa": {
     "installApp": "Install App",

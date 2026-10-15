@@ -551,7 +551,7 @@
     "branchBento": "Bento Gonçalves - RS",
     "branchPasso": "Passo Fundo - RS",
     "defaultMessage": "Vine del sitio web y me gustaría obtener información",
-    "platformAccessMessage": "Hola, soy cliente CAP y me gustaría solicitar acceso a la plataforma de cotizaciones.",
+    "platformAccessMessage": "Hola, soy cliente CAP y me gustaría solicitar acceso a la plataforma de cotizaciones."
   },
   "pwa": {
     "installApp": "Instalar App",
