@@ -181,6 +181,7 @@
     "passwordRequired": "Contraseña es obligatoria",
     "passwordIncorrect": "Contraseña incorrecta",
     "sessionAlreadyActive": "No fue posible iniciar sesión. Ya existe una sesión activa con este usuario. Cierre el acceso en el otro dispositivo o espere a que expire la sesión.",
+    "singleSessionNotice": "El sistema permite solo un inicio de sesión simultáneo por cuenta. Evite compartir sus credenciales.",
     "loginError": "No está autorizado a acceder a esta plataforma.",
     "contactAdmin": "Contacte al administrador",
     "emailInvalid": "Por favor ingrese una dirección de email válida.",

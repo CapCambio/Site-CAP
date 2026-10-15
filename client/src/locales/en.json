@@ -181,6 +181,7 @@
     "passwordRequired": "Password is required",
     "passwordIncorrect": "Incorrect password",
     "sessionAlreadyActive": "Sign-in failed. This account already has an active session. Sign out on the other device or wait for the session to expire.",
+    "singleSessionNotice": "System allows only one simultaneous login per account. Avoid sharing your credentials.",
     "loginError": "You are not authorized to access this platform.",
     "contactAdmin": "Contact the administrator",
     "emailInvalid": "Please enter a valid email address.",
