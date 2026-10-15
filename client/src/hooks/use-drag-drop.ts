@@ -342,22 +342,19 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     e.dataTransfer.dropEffect = 'move';
 
     if (draggedIndex !== null && draggedIndex !== index) {
-      console.log('🟡 handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout, sameColumn: draggedIndex % 2 === index % 2 });
+      console.log('🟡 handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout });
       setDragOverIndex(index);
 
-      // SWAP em todas as situações
       if (twoColumnLayout) {
-        // Desktop (2 colunas): apenas yellow ring, swap acontece no drop
-        console.log('🖥️ Desktop: yellow ring apenas (swap no drop)');
+        // Desktop (2 colunas): swap + yellow ring (swap no drop)
+        console.log('🖥️ Desktop: yellow ring (swap no drop)');
         return;
       } else {
-        // Mobile (1 coluna): live swap (move os cards em tempo real)
-        console.log('📱 Mobile: live swap');
+        // Mobile (1 coluna): insert + live swap
+        console.log('📱 Mobile: insert live');
         const newItems = [...items];
-        // Swap simples
-        const temp = newItems[draggedIndex];
-        newItems[draggedIndex] = newItems[index];
-        newItems[index] = temp;
+        const [dragged] = newItems.splice(draggedIndex, 1);
+        newItems.splice(index, 0, dragged);
 
         setItems(newItems);
         setDraggedIndex(index);
