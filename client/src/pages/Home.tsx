@@ -12,7 +12,7 @@ import { formatCurrencyValue, formatPercentage } from "../lib/currency";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { DndContext, closestCenter } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 
 // Componentes leves importados normalmente
 import { Header } from "../components/Header";
@@ -233,7 +233,7 @@ export default function Home() {
                     ))}
                   </div>
                 ) : (
-                  <SortableContext items={currencyList.map(c => ({ id: c.code, ...c }))} strategy={verticalListSortingStrategy}>
+                  <SortableContext items={currencyList.map(c => ({ id: c.code, ...c }))} strategy={rectSortingStrategy}>
                     {currencyList.map((currency) => renderCard(currency))}
                   </SortableContext>
                 )}

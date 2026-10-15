@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Currency } from '../lib/types';
+import { arrayMove } from '@dnd-kit/sortable';
 
 export function useSortable(initialItems: Currency[], userEmail?: string | null) {
   const [items, setItems] = useState<Currency[]>([]);
@@ -136,18 +137,13 @@ export function useSortable(initialItems: Currency[], userEmail?: string | null)
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
-    
+
     if (active && over && active.id !== over.id) {
       const oldIndex = items.findIndex((item) => item.code === active.id);
       const newIndex = items.findIndex((item) => item.code === over.id);
-      
+
       if (oldIndex !== -1 && newIndex !== -1) {
-        setItems((items) => {
-          const newItems = [...items];
-          const [moved] = newItems.splice(oldIndex, 1);
-          newItems.splice(newIndex, 0, moved);
-          return newItems;
-        });
+        setItems((items) => arrayMove(items, oldIndex, newIndex));
       }
     }
   };
