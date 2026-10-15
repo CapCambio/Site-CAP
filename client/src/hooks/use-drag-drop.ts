@@ -289,6 +289,7 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
+    console.log(' handleDragStart:', { index, item: items[index]?.code });
     const draggedItem: DragItem = {
       index,
       id: items[index].code,
