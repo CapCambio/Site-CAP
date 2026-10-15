@@ -143,13 +143,6 @@ export default function Home() {
       fadeTimerRef.current = null;
     }
   };
-  
-  // Fechar hint após primeiro arrasto
-  useEffect(() => {
-    if (showReorderHint && draggedItem) {
-      startTooltipFade();
-    }
-  }, [draggedItem, showReorderHint]);
 
   const {
     historicalData,
