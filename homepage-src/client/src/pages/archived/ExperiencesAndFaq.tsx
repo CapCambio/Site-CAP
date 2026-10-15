@@ -99,7 +99,7 @@ export function ArchivedFaq({ whatsappUrl }: ArchivedFaqProps) {
   ];
 
   return (
-    <section id="faq" className="scroll-mt-24 py-20 max-sm:py-10 sm:py-20 lg:py-5">
+    <section id="faq" className="scroll-mt-24 py-20 max-sm:py-6 sm:py-20 lg:py-5">
       <div className="container grid gap-10 lg:grid-cols-[.8fr_1.2fr]">
         <div>
           <p className="cap-kicker text-[#facb2e]">{t('home.faq.kicker')}</p>

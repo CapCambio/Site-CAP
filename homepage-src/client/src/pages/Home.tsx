@@ -329,7 +329,7 @@ export default function Home() {
         <ArchivedFaq whatsappUrl={waUrl(t('home.whatsappGeneral'))} />
       </main>
 
-      <footer className="border-t border-white/10 bg-[#070707] pb-8 pt-14 lg:pt-8">
+      <footer className="border-t border-white/10 bg-[#070707] pb-8 pt-8 lg:pt-8">
         <div className="container">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             <div className="flex flex-col items-center text-center">
