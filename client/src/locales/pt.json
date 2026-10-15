@@ -181,7 +181,7 @@
     "passwordRequired": "Senha é obrigatória",
     "passwordIncorrect": "Senha incorreta",
     "sessionAlreadyActive": "Já existe alguém logado no sistema utilizando esse email no momento. Finalize a outra sessão e tente novamente.",
-    "singleSessionNotice": "Sistema permite apenas um login simultâneo por conta. Evite compartilhar suas credenciais.",
+    "singleSessionNotice": "Cada login é pessoal e intransferível. O sistema permite apenas um acesso simultâneo por conta.",
     "loginError": "Você não está autorizado a acessar esta plataforma.",
     "contactAdmin": "Fale com o administrador",
     "emailInvalid": "Informe um endereço de email válido.",

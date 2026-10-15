@@ -181,7 +181,7 @@
     "passwordRequired": "Mot de passe est requis",
     "passwordIncorrect": "Mot de passe incorrect",
     "sessionAlreadyActive": "Connexion impossible. Une session est déjà active avec ce compte. Déconnectez-vous sur l'autre appareil ou attendez l'expiration de la session.",
-    "singleSessionNotice": "Le système n'autorise qu'une seule connexion simultanée par compte. Évitez de partager vos identifiants.",
+    "singleSessionNotice": "Chaque connexion est personnelle et non transférable. Le système n'autorise qu'un seul accès simultané par compte.",
     "loginError": "Vous n'êtes pas autorisé à accéder à cette plateforme.",
     "contactAdmin": "Contactez l'administrateur",
     "emailInvalid": "Veuillez entrer une adresse email valide.",
