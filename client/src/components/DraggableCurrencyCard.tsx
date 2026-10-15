@@ -22,7 +22,7 @@ interface DraggableCurrencyCardProps {
   onDragStart: (e: React.DragEvent, index: number) => void;
   onDragEnd: (e: React.DragEvent) => void;
   onDragOver: (e: React.DragEvent, index: number) => void;
-  onDragLeave: () => void;
+  onDragLeave: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, index: number) => void;
   handleMouseDown?: (index: number) => void;
   handleMouseUp?: () => void;
@@ -77,7 +77,7 @@ export function DraggableCurrencyCard({
       onDragStart={(e) => onDragStart(e, index)}
       onDragEnd={onDragEnd}
       onDragOver={(e) => onDragOver(e, index)}
-      onDragLeave={onDragLeave}
+      onDragLeave={(e) => onDragLeave(e)}
       onDrop={(e) => onDrop(e, index)}
       onMouseDown={() => handleMouseDown?.(index)}
       onMouseUp={handleMouseUp}
