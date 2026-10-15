@@ -60,6 +60,10 @@ export function DraggableCurrencyCard({
   const isThisCardBeingDragged = draggedIndex === index;
   const isThisCardSelected = selectedForDrag === index;
   
+  // Calcular se é drag entre colunas (índices par/ímpar diferentes)
+  const isCrossColumnDrag = draggedIndex !== null && index !== null && 
+    (draggedIndex % 2 !== index % 2);
+  
   // No mobile, só mostrar contorno se este card está selecionado E não está sendo arrastado
   const shouldShowMobileSelection = isMobile && isThisCardSelected && !isThisCardBeingDragged;
   
@@ -69,7 +73,10 @@ export function DraggableCurrencyCard({
         'relative transition-all duration-200 ease-in-out',
         isThisCardBeingDragged && 'opacity-30 scale-95',
         shouldShowMobileSelection && 'ring-4 ring-yellow-400 ring-opacity-70 scale-105 shadow-xl rounded-xl',
-        isDragOver && !isThisCardBeingDragged && 'transform translate-y-1 ring-2 ring-blue-400 ring-opacity-50',
+        // Feedback visual forte para drag entre colunas
+        isDragOver && !isThisCardBeingDragged && isCrossColumnDrag && 'transform translate-y-4 scale-105 ring-4 ring-blue-500 ring-opacity-60 shadow-lg',
+        // Feedback visual normal para mesma coluna
+        isDragOver && !isThisCardBeingDragged && !isCrossColumnDrag && 'transform translate-y-1 ring-2 ring-blue-400 ring-opacity-50',
         isThisCardSelected && 'cursor-move',
         isThisCardBeingDragged && 'cursor-grabbing'
       )}
