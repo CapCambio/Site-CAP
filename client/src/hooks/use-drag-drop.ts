@@ -345,31 +345,19 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
       console.log('🟡 handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout, sameColumn: draggedIndex % 2 === index % 2 });
       setDragOverIndex(index);
 
+      // SWAP em todas as situações
       if (twoColumnLayout) {
-        // Desktop (2 colunas): SWAP direto - troca de posição sem insert
-        // Se são colunas diferentes, adia para dragend
-        if (draggedIndex % 2 !== index % 2) {
-          console.log('⏸️ Coluna diferente - swap adiado para dragend');
-          return;
-        }
-
-        // Mesma coluna: swap direto (troca simples de posição)
-        console.log('🔄 Desktop: swap direto:', { from: draggedIndex, to: index });
+        // Desktop (2 colunas): apenas yellow ring, swap acontece no drop
+        console.log('🖥️ Desktop: yellow ring apenas (swap no drop)');
+        return;
+      } else {
+        // Mobile (1 coluna): live swap (move os cards em tempo real)
+        console.log('📱 Mobile: live swap');
         const newItems = [...items];
-        // Swap simples: troca as posições
+        // Swap simples
         const temp = newItems[draggedIndex];
         newItems[draggedIndex] = newItems[index];
         newItems[index] = temp;
-
-        setItems(newItems);
-        setDraggedIndex(index);
-        setSelectedForDrag(index);
-      } else {
-        // Mobile (1 coluna): INSERT (comportamento atual)
-        console.log('📱 Mobile: insert:', { from: draggedIndex, to: index });
-        const newItems = [...items];
-        const [dragged] = newItems.splice(draggedIndex, 1);
-        newItems.splice(index, 0, dragged);
 
         setItems(newItems);
         setDraggedIndex(index);
@@ -384,23 +372,25 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
 
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
-    console.log('🔵 handleDrop:', { draggedIndex, dropIndex, twoColumnLayout, sameColumn: draggedIndex !== null && draggedIndex % 2 === dropIndex % 2 });
+    console.log('🔵 handleDrop:', { draggedIndex, dropIndex, twoColumnLayout });
     setDragOverIndex(null);
 
     if (draggedIndex === null || draggedIndex === dropIndex) {
-      console.log('⚠️ handleDrop: early return - draggedIndex === dropIndex ou null');
+      console.log('⚠️ handleDrop: early return');
       return;
     }
 
-    // Drop em outra coluna não teve swap ao vivo; agenda para o dragend
-    if (twoColumnLayout && draggedIndex % 2 !== dropIndex % 2) {
-      console.log('📌 handleDrop: coluna diferente - agendando para dragend');
-      pendingMoveRef.current = dropIndex;
-      return;
+    if (twoColumnLayout) {
+      // Desktop: fazer o swap agora (não foi feito no dragover)
+      console.log('🖥️ Desktop: fazendo swap no drop');
+      const newItems = [...items];
+      const temp = newItems[draggedIndex];
+      newItems[draggedIndex] = newItems[dropIndex];
+      newItems[dropIndex] = temp;
+      setItems(newItems);
     }
+    // Mobile: swap já foi feito no dragover
 
-    console.log('✅ handleDrop: mesma coluna - ordem já foi atualizada no handleDragOver');
-    // A ordem já foi atualizada no handleDragOver
     setDraggedIndex(null);
     setIsLongPressActive(false);
     setSelectedForDrag(null);
