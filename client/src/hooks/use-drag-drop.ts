@@ -340,9 +340,9 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    
+
     if (draggedIndex !== null && draggedIndex !== index) {
-      console.log(' handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout, sameColumn: draggedIndex % 2 === index % 2 });
+      console.log('🟡 handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout, sameColumn: draggedIndex % 2 === index % 2 });
       setDragOverIndex(index);
 
       // Em layout de 2 colunas, não trocar com cards da outra coluna em tempo real
@@ -352,14 +352,14 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
         return;
       }
 
-      // Swap em tempo real (só para layout de 1 coluna)
+      // Swap em tempo real
+      console.log('🔄 Fazendo swap em tempo real:', { from: draggedIndex, to: index });
       const newItems = [...items];
       const [dragged] = newItems.splice(draggedIndex, 1);
       newItems.splice(index, 0, dragged);
-      
+
       setItems(newItems);
       setDraggedIndex(index);
-      //  ATUALIZAR selectedForDrag junto para manter sincronia
       setSelectedForDrag(index);
     }
   };
@@ -370,18 +370,22 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
 
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
+    console.log('🔵 handleDrop:', { draggedIndex, dropIndex, twoColumnLayout, sameColumn: draggedIndex !== null && draggedIndex % 2 === dropIndex % 2 });
     setDragOverIndex(null);
-    
+
     if (draggedIndex === null || draggedIndex === dropIndex) {
+      console.log('⚠️ handleDrop: early return - draggedIndex === dropIndex ou null');
       return;
     }
 
     // Drop em outra coluna não teve swap ao vivo; agenda para o dragend
     if (twoColumnLayout && draggedIndex % 2 !== dropIndex % 2) {
+      console.log('📌 handleDrop: coluna diferente - agendando para dragend');
       pendingMoveRef.current = dropIndex;
       return;
     }
 
+    console.log('✅ handleDrop: mesma coluna - ordem já foi atualizada no handleDragOver');
     // A ordem já foi atualizada no handleDragOver
     setDraggedIndex(null);
     setIsLongPressActive(false);
