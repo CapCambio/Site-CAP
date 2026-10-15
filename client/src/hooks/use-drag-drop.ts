@@ -345,22 +345,36 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
       console.log('🟡 handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout, sameColumn: draggedIndex % 2 === index % 2 });
       setDragOverIndex(index);
 
-      // Em layout de 2 colunas, não trocar com cards da outra coluna em tempo real
-      // (o swap real acontece no dragend via pendingMoveRef)
-      if (twoColumnLayout && draggedIndex % 2 !== index % 2) {
-        console.log('⏸️ Coluna diferente - swap adiado para dragend');
-        return;
+      if (twoColumnLayout) {
+        // Desktop (2 colunas): SWAP direto - troca de posição sem insert
+        // Se são colunas diferentes, adia para dragend
+        if (draggedIndex % 2 !== index % 2) {
+          console.log('⏸️ Coluna diferente - swap adiado para dragend');
+          return;
+        }
+
+        // Mesma coluna: swap direto (troca simples de posição)
+        console.log('🔄 Desktop: swap direto:', { from: draggedIndex, to: index });
+        const newItems = [...items];
+        // Swap simples: troca as posições
+        const temp = newItems[draggedIndex];
+        newItems[draggedIndex] = newItems[index];
+        newItems[index] = temp;
+
+        setItems(newItems);
+        setDraggedIndex(index);
+        setSelectedForDrag(index);
+      } else {
+        // Mobile (1 coluna): INSERT (comportamento atual)
+        console.log('📱 Mobile: insert:', { from: draggedIndex, to: index });
+        const newItems = [...items];
+        const [dragged] = newItems.splice(draggedIndex, 1);
+        newItems.splice(index, 0, dragged);
+
+        setItems(newItems);
+        setDraggedIndex(index);
+        setSelectedForDrag(index);
       }
-
-      // Swap em tempo real
-      console.log('🔄 Fazendo swap em tempo real:', { from: draggedIndex, to: index });
-      const newItems = [...items];
-      const [dragged] = newItems.splice(draggedIndex, 1);
-      newItems.splice(index, 0, dragged);
-
-      setItems(newItems);
-      setDraggedIndex(index);
-      setSelectedForDrag(index);
     }
   };
 
