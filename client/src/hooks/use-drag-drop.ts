@@ -19,20 +19,6 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
   const scrollInterval = useRef<NodeJS.Timeout | null>(null);
   const pendingMoveRef = useRef<number | null>(null);
   const lastSavedOrderRef = useRef<string | null>(null);
-  // Refs para leitura síncrona dentro de event handlers (evitam stale closure)
-  const draggedIndexRef = useRef<number | null>(null);
-  const itemsRef = useRef<Currency[]>([]);
-
-  // Helpers que mantêm estado e ref em sincronia — definidos aqui para uso nos effects também
-  const setDraggedIndexSynced = (index: number | null) => {
-    draggedIndexRef.current = index;
-    setDraggedIndex(index);
-  };
-
-  const setItemsSynced = (newItems: Currency[]) => {
-    itemsRef.current = newItems;
-    setItems(newItems);
-  };
   
   // Gerar chave única para cada usuário
   const getStorageKey = () => {
@@ -145,16 +131,16 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
           const newItems = initialItems.filter(item => 
             !reorderedItems.some(ordered => ordered.code === item.code)
           );
-          setItemsSynced([...reorderedItems, ...newItems]);
+          setItems([...reorderedItems, ...newItems]);
         } else {
-          setItemsSynced(initialItems);
+          setItems(initialItems);
         }
       } catch (error) {
         console.error('Erro ao carregar ordem do localStorage:', error);
-        setItemsSynced(initialItems);
+        setItems(initialItems);
       }
     } else {
-      setItemsSynced(initialItems);
+      setItems(initialItems);
     }
     
     isInitialized.current = true;
@@ -171,7 +157,7 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
             const newItems = initialItems.filter(item => 
               !reorderedItems.some(ordered => ordered.code === item.code)
             );
-            setItemsSynced([...reorderedItems, ...newItems]);
+            setItems([...reorderedItems, ...newItems]);
           }
         }
       });
@@ -188,29 +174,17 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     if (!isInitialized.current) return;
     if (initialItems.length === 0) return;
 
-    const prev = itemsRef.current;
-    if (prev.length === 0) {
-      setItemsSynced(initialItems);
-      return;
-    }
-    const byCode = new Map<string, Currency>(
-      initialItems.map(c => [c.code, c] as [string, Currency])
-    );
-    const kept = prev
-      .map(it => byCode.get(it.code))
-      .filter(Boolean) as Currency[];
-    const added = initialItems.filter(c => !prev.some(it => it.code === c.code));
-    const next = [...kept, ...added];
-    // Apenas atualiza se a lista de códigos mudou (evita re-render desnecessário)
-    const prevSig = prev.map(i => i.code).join('|');
-    const nextSig = next.map(i => i.code).join('|');
-    if (prevSig !== nextSig) {
-      setItemsSynced(next);
-    } else {
-      // Ordem igual mas dados (preços) podem ter mudado — atualiza sem mexer na ref de ordem
-      itemsRef.current = next;
-      setItems(next);
-    }
+    setItems(prev => {
+      if (prev.length === 0) return initialItems;
+      const byCode = new Map<string, Currency>(
+        initialItems.map(c => [c.code, c] as [string, Currency])
+      );
+      const kept = prev
+        .map(it => byCode.get(it.code))
+        .filter(Boolean) as Currency[];
+      const added = initialItems.filter(c => !prev.some(it => it.code === c.code));
+      return [...kept, ...added];
+    });
   }, [initialItems]);
 
   // Salvar ordem na API e localStorage quando a ORDEM mudar
@@ -279,12 +253,12 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
       // Iniciar drag visual
       const draggedItem: DragItem = {
         index,
-        id: itemsRef.current[index].code,
+        id: items[index].code,
         type: 'currency'
       };
 
       setDraggedItem(draggedItem);
-      setDraggedIndexSynced(index);
+      setDraggedIndex(index);
     }, 1000); // 1 segundo
 
     // Adicionar listener de touchmove para detectar scroll
@@ -315,15 +289,15 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
-    console.log(' handleDragStart:', { index, item: itemsRef.current[index]?.code });
+    console.log(' handleDragStart:', { index, item: items[index]?.code });
     const draggedItem: DragItem = {
       index,
-      id: itemsRef.current[index].code,
+      id: items[index].code,
       type: 'currency'
     };
     
     setDraggedItem(draggedItem);
-    setDraggedIndexSynced(index);
+    setDraggedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', e.currentTarget.outerHTML);
     
@@ -348,18 +322,16 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
 
     // Movimento entre colunas é aplicado só agora: mover o card de coluna durante
     // o arrasto remontaria o nó DOM e o navegador abortaria o drag nativo.
-    // Lê da ref para garantir o valor mais recente (sem stale closure).
-    const currentDraggedIndex = draggedIndexRef.current;
-    if (pendingMoveRef.current !== null && currentDraggedIndex !== null) {
-      const newItems = [...itemsRef.current];
-      const [dragged] = newItems.splice(currentDraggedIndex, 1);
+    if (pendingMoveRef.current !== null && draggedIndex !== null) {
+      const newItems = [...items];
+      const [dragged] = newItems.splice(draggedIndex, 1);
       newItems.splice(pendingMoveRef.current, 0, dragged);
-      setItemsSynced(newItems);
+      setItems(newItems);
       pendingMoveRef.current = null;
     }
 
     setDraggedItem(null);
-    setDraggedIndexSynced(null);
+    setDraggedIndex(null);
     setDragOverIndex(null);
     setIsLongPressActive(false);
     setSelectedForDrag(null);
@@ -368,61 +340,50 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-
-    // Lê da ref: garante valor atual mesmo sem re-render (cross-column não faz setDraggedIndex)
-    const currentDraggedIndex = draggedIndexRef.current;
     
-    if (currentDraggedIndex !== null && currentDraggedIndex !== index) {
-      console.log(' handleDragOver:', { currentDraggedIndex, targetIndex: index, twoColumnLayout, sameColumn: currentDraggedIndex % 2 === index % 2 });
+    if (draggedIndex !== null && draggedIndex !== index) {
+      console.log(' handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout, sameColumn: draggedIndex % 2 === index % 2 });
       setDragOverIndex(index);
 
       // Em layout de 2 colunas, não trocar com cards da outra coluna em tempo real
       // (o swap real acontece no dragend via pendingMoveRef)
-      if (twoColumnLayout && currentDraggedIndex % 2 !== index % 2) {
+      if (twoColumnLayout && draggedIndex % 2 !== index % 2) {
         console.log('⏸️ Coluna diferente - swap adiado para dragend');
         return;
       }
 
-      // Swap em tempo real (mesma coluna)
-      const newItems = [...itemsRef.current];
-      const [dragged] = newItems.splice(currentDraggedIndex, 1);
+      // Swap em tempo real
+      const newItems = [...items];
+      const [dragged] = newItems.splice(draggedIndex, 1);
       newItems.splice(index, 0, dragged);
       
-      setItemsSynced(newItems);
-      setDraggedIndexSynced(index);
-      // Manter sincronia do selectedForDrag
+      setItems(newItems);
+      setDraggedIndex(index);
+      //  ATUALIZAR selectedForDrag junto para manter sincronia
       setSelectedForDrag(index);
     }
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    // Limpa o feedback visual apenas quando o cursor realmente sai do card
-    // (e não quando entra em um elemento filho).
-    const related = e.relatedTarget as Node | null;
-    if (!related || !e.currentTarget.contains(related)) {
-      setDragOverIndex(null);
-    }
+  const handleDragLeave = () => {
+    // Não limpa o dragOverIndex para manter o feedback visual
   };
 
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
     setDragOverIndex(null);
-
-    // Lê da ref para garantir valor atual
-    const currentDraggedIndex = draggedIndexRef.current;
     
-    if (currentDraggedIndex === null || currentDraggedIndex === dropIndex) {
+    if (draggedIndex === null || draggedIndex === dropIndex) {
       return;
     }
 
     // Drop em outra coluna não teve swap ao vivo; agenda para o dragend
-    if (twoColumnLayout && currentDraggedIndex % 2 !== dropIndex % 2) {
+    if (twoColumnLayout && draggedIndex % 2 !== dropIndex % 2) {
       pendingMoveRef.current = dropIndex;
       return;
     }
 
     // A ordem já foi atualizada no handleDragOver
-    setDraggedIndexSynced(null);
+    setDraggedIndex(null);
     setIsLongPressActive(false);
     setSelectedForDrag(null);
   };
@@ -433,7 +394,7 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     setIsLongPressActive(false);
     setSelectedForDrag(null);
     setDraggedItem(null);
-    setDraggedIndexSynced(null);
+    setDraggedIndex(null);
     setDragOverIndex(null);
   };
 
