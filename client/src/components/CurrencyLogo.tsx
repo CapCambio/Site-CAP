@@ -38,7 +38,9 @@ export function CurrencyLogo({ code, className = "" }: CurrencyLogoProps) {
         <img 
           src={`https://flagcdn.com/w40/${countryCode}.png`} 
           alt={`Bandeira - ${code}`} 
-          className={`w-8 h-6 ${className}`} 
+          className={`w-8 h-6 ${className}`}
+          draggable={false}
+          onContextMenu={(e) => e.preventDefault()}
         />
       );
     }
@@ -49,7 +51,9 @@ export function CurrencyLogo({ code, className = "" }: CurrencyLogoProps) {
     <img 
       src={flagSrc} 
       alt={`Bandeira - ${code}`} 
-      className={`w-8 h-6 ${className}`} 
+      className={`w-8 h-6 ${className}`}
+      draggable={false}
+      onContextMenu={(e) => e.preventDefault()}
     />
   );
 }
