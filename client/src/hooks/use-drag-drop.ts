@@ -372,21 +372,23 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     console.log('🔵 handleDrop:', { draggedIndex, dropIndex, twoColumnLayout });
     setDragOverIndex(null);
 
-    if (draggedIndex === null || draggedIndex === dropIndex) {
-      console.log('⚠️ handleDrop: early return');
+    if (draggedIndex === null) {
+      console.log('⚠️ handleDrop: draggedIndex null');
       return;
     }
 
     if (twoColumnLayout) {
       // Desktop: fazer o swap agora (não foi feito no dragover)
-      console.log('🖥️ Desktop: fazendo swap no drop');
-      const newItems = [...items];
-      const temp = newItems[draggedIndex];
-      newItems[draggedIndex] = newItems[dropIndex];
-      newItems[dropIndex] = temp;
-      setItems(newItems);
+      if (draggedIndex !== dropIndex) {
+        console.log('🖥️ Desktop: fazendo swap no drop');
+        const newItems = [...items];
+        const temp = newItems[draggedIndex];
+        newItems[draggedIndex] = newItems[dropIndex];
+        newItems[dropIndex] = temp;
+        setItems(newItems);
+      }
     }
-    // Mobile: swap já foi feito no dragover
+    // Mobile: swap já foi feito no dragover, só limpar estados
 
     setDraggedIndex(null);
     setIsLongPressActive(false);
