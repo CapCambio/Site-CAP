@@ -36,15 +36,6 @@ const Loader = () => (
   </div>
 );
 
-// Estilos inline para o grid de 2 colunas
-const gridStyles = `
-  .currency-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
-`;
-
 
 export default function Home() {
   const { t } = useTranslation();
@@ -209,7 +200,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <style>{gridStyles}</style>
       <Header />
       <main className="container mx-auto px-4 pb-12 flex-grow">
         <Suspense fallback={<Loader />}>
@@ -221,7 +211,7 @@ export default function Home() {
 
           {activeTab === "current" && (
             <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <div className={`${isMobile ? '' : 'currency-grid'}`}>
+              <div className={`${isMobile ? '' : 'grid grid-cols-2 gap-4'}`}>
                 {/* Tooltip de primeira vez - aparece só uma vez por dispositivo */}
                 {showReorderHint && (
                   <div className={`mb-4 transition-all duration-300 ease-in-out ${
