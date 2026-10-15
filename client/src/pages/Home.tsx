@@ -36,6 +36,15 @@ const Loader = () => (
   </div>
 );
 
+// Estilos inline para o grid de 2 colunas
+const gridStyles = `
+  .currency-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+`;
+
 
 export default function Home() {
   const { t } = useTranslation();
@@ -200,6 +209,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <style>{gridStyles}</style>
       <Header />
       <main className="container mx-auto px-4 pb-12 flex-grow">
         <Suspense fallback={<Loader />}>
@@ -233,19 +243,14 @@ export default function Home() {
                     ))}
                   </div>
                 ) : (
-                  <SortableContext items={currencyList.map(c => c.code)} strategy={verticalListSortingStrategy}>
+                  <SortableContext items={currencyList.map(c => ({ id: c.code, ...c }))} strategy={verticalListSortingStrategy}>
                     {isMobile ? (
                       <div className="space-y-3">
                         {currencyList.map((currency) => renderCard(currency))}
                       </div>
                     ) : (
-                      <div className="currency-desktop-layout">
-                        <div className="currency-column">
-                          {currencyList.map((currency, index) => (index % 2 === 0 ? renderCard(currency) : null))}
-                        </div>
-                        <div className="currency-column">
-                          {currencyList.map((currency, index) => (index % 2 === 1 ? renderCard(currency) : null))}
-                        </div>
+                      <div className="space-y-3">
+                        {currencyList.map((currency) => renderCard(currency))}
                       </div>
                     )}
                   </SortableContext>
