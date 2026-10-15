@@ -1189,7 +1189,7 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
       icon: 'https://iili.io/fBQNNwX.jpg',
       // capcambio.up.railway.app/cotacoes é o app de cotações (capcambio.com.br ainda é WordPress)
       badge: 'https://capcambio.up.railway.app/optimized/android-chrome-192x192.webp',
-      image: 'https://capcambio.up.railway.app/optimized/android-chrome-512x512.webp',
+      image: 'https://iili.io/fBQNNwX.jpg',
       actions: [
         {
           action: 'view-quotes',
