@@ -67,7 +67,7 @@ export function DraggableCurrencyCard({
     <div
       className={cn(
         'relative transition-all duration-200 ease-in-out',
-        isThisCardBeingDragged && 'opacity-30 scale-95',
+        isThisCardBeingDragged && 'opacity-30 scale-95 pointer-events-none',
         shouldShowMobileSelection && 'ring-4 ring-yellow-400 ring-opacity-70 scale-105 shadow-xl rounded-xl',
         isDragOver && !isThisCardBeingDragged && 'transform translate-y-1',
         isThisCardSelected && 'cursor-move',
