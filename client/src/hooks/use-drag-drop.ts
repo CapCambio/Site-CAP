@@ -69,10 +69,11 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
 
   // Funções de auto-scroll
   const startAutoScroll = (direction: 'up' | 'down') => {
+    console.log('🔄 startAutoScroll:', direction);
     if (scrollInterval.current) {
       clearInterval(scrollInterval.current);
     }
-    
+
     scrollInterval.current = setInterval(() => {
       const scrollAmount = direction === 'up' ? -50 : 50;
       window.scrollBy({
@@ -83,6 +84,7 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
   };
 
   const stopAutoScroll = () => {
+    console.log('🛑 stopAutoScroll');
     if (scrollInterval.current) {
       clearInterval(scrollInterval.current);
       scrollInterval.current = null;
@@ -364,6 +366,7 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     e.preventDefault();
     console.log('🔵 handleDrop:', { draggedIndex, dropIndex });
     setDragOverIndex(null);
+    stopAutoScroll();
 
     // Insert já foi feito no dragover (live swap), só limpar estados
     setDraggedIndex(null);
