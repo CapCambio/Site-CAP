@@ -257,6 +257,18 @@ export default function LoginPage() {
                 )}
               </Button>
 
+              {submittedWithValidEmail && !isAuthorized && !isLoading && !isAdmin && !showSessionActiveError && !showNetworkError && (
+                <div className="mt-4 text-red-500 text-sm">
+                  {t('auth.loginError')} {" "}
+                  <button
+                    onClick={() => setShowBranchDialog(true)}
+                    className="text-white underline hover:text-white/80"
+                  >
+                    {t('auth.contactAdmin')}
+                  </button>.
+                </div>
+              )}
+
               <div className="mt-1 text-xs text-zinc-500 text-center bg-zinc-800/50 rounded-lg px-3 py-2 border border-zinc-700/50">
                 {t('auth.singleSessionNotice')}
               </div>
@@ -270,18 +282,6 @@ export default function LoginPage() {
               {showNetworkError && (
                 <div className="mt-4 text-red-500 text-sm">
                   {t('network.message')}
-                </div>
-              )}
-
-              {submittedWithValidEmail && !isAuthorized && !isLoading && !isAdmin && !showSessionActiveError && !showNetworkError && (
-                <div className="mt-4 text-red-500 text-sm">
-                  {t('auth.loginError')} {" "}
-                  <button
-                    onClick={() => setShowBranchDialog(true)}
-                    className="text-white underline hover:text-white/80"
-                  >
-                    {t('auth.contactAdmin')}
-                  </button>.
                 </div>
               )}
             </form>
