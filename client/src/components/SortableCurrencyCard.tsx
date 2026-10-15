@@ -46,7 +46,7 @@ export function SortableCurrencyCard({
       {...attributes}
       {...listeners}
       className={cn(
-        'relative transition-all duration-200 ease-in-out',
+        'relative',
         isDragging && 'opacity-30 scale-95 z-50',
         !isDragging && 'cursor-move'
       )}
