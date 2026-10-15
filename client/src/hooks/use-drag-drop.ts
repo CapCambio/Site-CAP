@@ -341,10 +341,13 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     e.dataTransfer.dropEffect = 'move';
     
     if (draggedIndex !== null && draggedIndex !== index) {
+      console.log(' handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout, sameColumn: draggedIndex % 2 === index % 2 });
       setDragOverIndex(index);
 
       // Em layout de 2 colunas, não trocar com cards da outra coluna em tempo real
+      // (o swap real acontece no dragend via pendingMoveRef)
       if (twoColumnLayout && draggedIndex % 2 !== index % 2) {
+        console.log('⏸️ Coluna diferente - swap adiado para dragend');
         return;
       }
 
@@ -355,7 +358,7 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
       
       setItems(newItems);
       setDraggedIndex(index);
-      // 🚨 ATUALIZAR selectedForDrag junto para manter sincronia
+      //  ATUALIZAR selectedForDrag junto para manter sincronia
       setSelectedForDrag(index);
     }
   };
