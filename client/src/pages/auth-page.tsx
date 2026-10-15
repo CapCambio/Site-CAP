@@ -161,9 +161,6 @@ export default function LoginPage() {
       <Card className="w-full max-w-md border-yellow-400/20 bg-zinc-900 text-white">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold tracking-tight">{t('auth.title')}</CardTitle>
-          <CardDescription className="text-zinc-400">
-            {t('auth.subtitle')}
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
