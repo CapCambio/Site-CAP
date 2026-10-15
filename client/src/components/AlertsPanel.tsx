@@ -177,9 +177,6 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
           {notifState === "unsupported" && (
             <p className="mt-2 text-zinc-400">{t('alertsPanel.notifUnsupported')}</p>
           )}
-          {alertsArray.length === 0 && (
-            <p className="mt-2 text-zinc-400">{t('alertsPanel.noAlertsActive')}</p>
-          )}
         </div>
       </div>
     </div>
