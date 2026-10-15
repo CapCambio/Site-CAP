@@ -5,18 +5,20 @@ import { useHistoricalData } from "../hooks/useHistoricalData";
 import { useDateSelection } from "../hooks/useDateSelection";
 import { useIsMobile } from "../hooks/use-mobile";
 import { useAuth } from "../hooks/use-auth";
-import { useDragDrop } from "../hooks/use-drag-drop";
+import { useSortable } from "../hooks/useSortable";
 import { useServiceWorker } from "@/hooks/useServiceWorker";
 import { ArrowDown, ArrowUp, Loader2 } from "lucide-react";
 import { formatCurrencyValue, formatPercentage } from "../lib/currency";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 // Componentes leves importados normalmente
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { CurrencyLogo } from "../components/CurrencyLogo";
-import { DraggableCurrencyCard } from "../components/DraggableCurrencyCard";
+import { SortableCurrencyCard } from "../components/SortableCurrencyCard";
 import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -59,22 +61,8 @@ export default function Home() {
   const {
     items: orderedCurrencies,
     setItems: setOrderedCurrencies,
-    draggedItem,
-    draggedIndex,
-    dragOverIndex,
-    isLongPressActive,
-    selectedForDrag,
-    handleDragStart,
-    handleDragEnd,
-    handleDragOver,
-    handleDragLeave,
-    handleDrop,
-    handleMouseDown,
-    handleMouseUp,
-    handleTouchStart,
-    handleTouchEnd,
-    cancelDragMode
-  } = useDragDrop(currencies, user?.email, !isMobile);
+    handleDragEnd
+  } = useSortable(currencies, user?.email);
 
   // Estado para controlar tooltip de primeira vez
   const [showReorderHint, setShowReorderHint] = useState(false);
@@ -205,8 +193,8 @@ export default function Home() {
   // Usar orderedCurrencies se tiver dados, senão usar currencies
   const currencyList = orderedCurrencies.length > 0 ? orderedCurrencies : currencies;
 
-  const renderCard = (currency: Currency, index: number) => (
-    <DraggableCurrencyCard
+  const renderCard = (currency: Currency) => (
+    <SortableCurrencyCard
       key={currency.code}
       currency={currency}
       isExpanded={expandedCards[currency.code] || false}
@@ -214,21 +202,6 @@ export default function Home() {
       isHistoricalView={isHistoricalView}
       historicalPrice={historicalPrices[currency.code]}
       selectedDate={selectedDate}
-      index={index}
-      isDragging={draggedItem?.index === index}
-      isDragOver={dragOverIndex === index}
-      draggedIndex={draggedIndex}
-      selectedForDrag={selectedForDrag}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      handleMouseDown={handleMouseDown}
-      handleMouseUp={handleMouseUp}
-      handleTouchStart={handleTouchStart}
-      handleTouchEnd={handleTouchEnd}
-      cancelDragMode={cancelDragMode}
     />
   );
 
@@ -244,42 +217,51 @@ export default function Home() {
           )}
 
           {activeTab === "current" && (
-            <div className={`${isMobile ? '' : 'currency-grid'}`}>
-              {/* Tooltip de primeira vez - aparece só uma vez por dispositivo */}
-              {showReorderHint && (
-                <div className={`mb-4 transition-all duration-300 ease-in-out ${
-                  isTooltipFading ? 'opacity-0 transform -translate-y-2 pointer-events-none' : 'opacity-100 transform translate-y-0'
-                } ${isTooltipFading ? 'h-0 overflow-hidden' : ''}`}>
-                  <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200 relative">
-                    {isMobile ? 
-                      t('home.reorderHint') : 
-                      t('home.dragToReorder')
-                    }
+            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <div className={`${isMobile ? '' : 'currency-grid'}`}>
+                {/* Tooltip de primeira vez - aparece só uma vez por dispositivo */}
+                {showReorderHint && (
+                  <div className={`mb-4 transition-all duration-300 ease-in-out ${
+                    isTooltipFading ? 'opacity-0 transform -translate-y-2 pointer-events-none' : 'opacity-100 transform translate-y-0'
+                  } ${isTooltipFading ? 'h-0 overflow-hidden' : ''}`}>
+                    <div className="text-center text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200 relative">
+                      {isMobile ? 
+                        t('home.reorderHint') : 
+                        t('home.dragToReorder')
+                      }
+                    </div>
                   </div>
-                </div>
-              )}
-              
-              {isLoadingCurrencies || (isHistoricalView && isLoadingDateSelection) ? (
-                <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
-                  {Array.from({ length: 17 }).map((_, index) => (
-                    <div key={index} className="h-36 bg-gray-100 rounded-lg animate-pulse" />
-                  ))}
-                </div>
-              ) : isMobile ? (
-                <div className="space-y-3">
-                  {currencyList.map((currency, index) => renderCard(currency, index))}
-                </div>
-              ) : (
-                <div className="currency-desktop-layout">
-                  <div className="currency-column">
-                    {currencyList.map((currency, index) => (index % 2 === 0 ? renderCard(currency, index) : null))}
+                )}
+                
+                {isLoadingCurrencies || (isHistoricalView && isLoadingDateSelection) ? (
+                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-4`}>
+                    {Array.from({ length: 17 }).map((_, index) => (
+                      <div key={index} className="h-36 bg-gray-100 rounded-lg animate-pulse" />
+                    ))}
                   </div>
-                  <div className="currency-column">
-                    {currencyList.map((currency, index) => (index % 2 === 1 ? renderCard(currency, index) : null))}
+                ) : isMobile ? (
+                  <SortableContext items={currencyList.map(c => c.code)} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-3">
+                      {currencyList.map((currency) => renderCard(currency))}
+                    </div>
+                  </SortableContext>
+                ) : (
+                  <div className="currency-desktop-layout">
+                    <SortableContext items={currencyList.filter((_, i) => i % 2 === 0).map(c => c.code)} strategy={verticalListSortingStrategy}>
+                      <div className="currency-column">
+                        {currencyList.map((currency, index) => (index % 2 === 0 ? renderCard(currency) : null))}
+                      </div>
+                    </SortableContext>
+                    
+                    <SortableContext items={currencyList.filter((_, i) => i % 2 === 1).map(c => c.code)} strategy={verticalListSortingStrategy}>
+                      <div className="currency-column">
+                        {currencyList.map((currency, index) => (index % 2 === 1 ? renderCard(currency) : null))}
+                      </div>
+                    </SortableContext>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </DndContext>
           )}
 
           {activeTab === "history" && (
