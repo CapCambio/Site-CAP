@@ -232,26 +232,23 @@ export default function Home() {
                       <div key={index} className="h-36 bg-gray-100 rounded-lg animate-pulse" />
                     ))}
                   </div>
-                ) : isMobile ? (
-                  <SortableContext items={currencyList.map(c => c.code)} strategy={verticalListSortingStrategy}>
-                    <div className="space-y-3">
-                      {currencyList.map((currency) => renderCard(currency))}
-                    </div>
-                  </SortableContext>
                 ) : (
-                  <div className="currency-desktop-layout">
-                    <SortableContext items={currencyList.filter((_, i) => i % 2 === 0).map(c => c.code)} strategy={verticalListSortingStrategy}>
-                      <div className="currency-column">
-                        {currencyList.map((currency, index) => (index % 2 === 0 ? renderCard(currency) : null))}
+                  <SortableContext items={currencyList.map(c => c.code)} strategy={verticalListSortingStrategy}>
+                    {isMobile ? (
+                      <div className="space-y-3">
+                        {currencyList.map((currency) => renderCard(currency))}
                       </div>
-                    </SortableContext>
-                    
-                    <SortableContext items={currencyList.filter((_, i) => i % 2 === 1).map(c => c.code)} strategy={verticalListSortingStrategy}>
-                      <div className="currency-column">
-                        {currencyList.map((currency, index) => (index % 2 === 1 ? renderCard(currency) : null))}
+                    ) : (
+                      <div className="currency-desktop-layout">
+                        <div className="currency-column">
+                          {currencyList.map((currency, index) => (index % 2 === 0 ? renderCard(currency) : null))}
+                        </div>
+                        <div className="currency-column">
+                          {currencyList.map((currency, index) => (index % 2 === 1 ? renderCard(currency) : null))}
+                        </div>
                       </div>
-                    </SortableContext>
-                  </div>
+                    )}
+                  </SortableContext>
                 )}
               </div>
             </DndContext>
