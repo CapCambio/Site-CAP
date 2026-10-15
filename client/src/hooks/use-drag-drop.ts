@@ -346,8 +346,8 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
       setDragOverIndex(index);
 
       if (twoColumnLayout) {
-        // Desktop (2 colunas): swap + yellow ring (swap no drop)
-        console.log('🖥️ Desktop: yellow ring (swap no drop)');
+        // Desktop (2 colunas): insert com yellow ring (sem live swap)
+        console.log('🖥️ Desktop: yellow ring (insert no drop)');
         return;
       } else {
         // Mobile (1 coluna): insert + live swap
@@ -378,17 +378,16 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     }
 
     if (twoColumnLayout) {
-      // Desktop: fazer o swap agora (não foi feito no dragover)
+      // Desktop: fazer o insert agora (não foi feito no dragover)
       if (draggedIndex !== dropIndex) {
-        console.log('🖥️ Desktop: fazendo swap no drop');
+        console.log('🖥️ Desktop: fazendo insert no drop');
         const newItems = [...items];
-        const temp = newItems[draggedIndex];
-        newItems[draggedIndex] = newItems[dropIndex];
-        newItems[dropIndex] = temp;
+        const [dragged] = newItems.splice(draggedIndex, 1);
+        newItems.splice(dropIndex, 0, dragged);
         setItems(newItems);
       }
     }
-    // Mobile: swap já foi feito no dragover, só limpar estados
+    // Mobile: insert já foi feito no dragover, só limpar estados
 
     setDraggedIndex(null);
     setIsLongPressActive(false);
