@@ -342,24 +342,17 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     e.dataTransfer.dropEffect = 'move';
 
     if (draggedIndex !== null && draggedIndex !== index) {
-      console.log('🟡 handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout });
+      console.log('🟡 handleDragOver:', { draggedIndex, targetIndex: index });
       setDragOverIndex(index);
 
-      if (twoColumnLayout) {
-        // Desktop (2 colunas): insert com yellow ring (sem live swap)
-        console.log('🖥️ Desktop: yellow ring (insert no drop)');
-        return;
-      } else {
-        // Mobile (1 coluna): insert + live swap
-        console.log('📱 Mobile: insert live');
-        const newItems = [...items];
-        const [dragged] = newItems.splice(draggedIndex, 1);
-        newItems.splice(index, 0, dragged);
+      // Live swap em ambos os layouts (mobile e desktop)
+      const newItems = [...items];
+      const [dragged] = newItems.splice(draggedIndex, 1);
+      newItems.splice(index, 0, dragged);
 
-        setItems(newItems);
-        setDraggedIndex(index);
-        setSelectedForDrag(index);
-      }
+      setItems(newItems);
+      setDraggedIndex(index);
+      setSelectedForDrag(index);
     }
   };
 
@@ -369,26 +362,10 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
 
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
-    console.log('🔵 handleDrop:', { draggedIndex, dropIndex, twoColumnLayout });
+    console.log('🔵 handleDrop:', { draggedIndex, dropIndex });
     setDragOverIndex(null);
 
-    if (draggedIndex === null) {
-      console.log('⚠️ handleDrop: draggedIndex null');
-      return;
-    }
-
-    if (twoColumnLayout) {
-      // Desktop: fazer o insert agora (não foi feito no dragover)
-      if (draggedIndex !== dropIndex) {
-        console.log('🖥️ Desktop: fazendo insert no drop');
-        const newItems = [...items];
-        const [dragged] = newItems.splice(draggedIndex, 1);
-        newItems.splice(dropIndex, 0, dragged);
-        setItems(newItems);
-      }
-    }
-    // Mobile: insert já foi feito no dragover, só limpar estados
-
+    // Insert já foi feito no dragover (live swap), só limpar estados
     setDraggedIndex(null);
     setIsLongPressActive(false);
     setSelectedForDrag(null);
