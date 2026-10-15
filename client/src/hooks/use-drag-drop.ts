@@ -343,16 +343,18 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     
     if (draggedIndex !== null && draggedIndex !== index) {
       console.log(' handleDragOver:', { draggedIndex, targetIndex: index, twoColumnLayout, sameColumn: draggedIndex % 2 === index % 2 });
+      
+      // SEMPRE setar dragOverIndex para feedback visual, mesmo entre colunas
       setDragOverIndex(index);
 
       // Em layout de 2 colunas, não trocar com cards da outra coluna em tempo real
       // (o swap real acontece no dragend via pendingMoveRef)
       if (twoColumnLayout && draggedIndex % 2 !== index % 2) {
-        console.log('⏸️ Coluna diferente - swap adiado para dragend');
+        console.log('⏸️ Coluna diferente - swap adiado para dragend, mas feedback visual aplicado');
         return;
       }
 
-      // Swap em tempo real
+      // Swap em tempo real (mesma coluna)
       const newItems = [...items];
       const [dragged] = newItems.splice(draggedIndex, 1);
       newItems.splice(index, 0, dragged);
