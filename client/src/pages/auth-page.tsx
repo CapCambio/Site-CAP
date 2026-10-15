@@ -260,6 +260,10 @@ export default function LoginPage() {
                 )}
               </Button>
 
+              <div className="mt-3 text-xs text-zinc-500 text-center bg-zinc-800/50 rounded-lg px-3 py-2 border border-zinc-700/50">
+                {t('auth.singleSessionNotice')}
+              </div>
+
               {showSessionActiveError && !isAdmin && (
                 <div className="mt-4 text-red-500 text-sm">
                   {t('auth.sessionAlreadyActive')}
@@ -317,9 +321,6 @@ export default function LoginPage() {
           </Dialog>
         </CardContent>
         <CardFooter className="flex flex-col space-y-3">
-          <div className="text-xs text-zinc-500 text-center bg-zinc-800/50 rounded-lg px-3 py-2 border border-zinc-700/50">
-            {t('auth.singleSessionNotice')}
-          </div>
           <div className="text-sm text-zinc-400 text-center">
             {t('auth.restrictedPage')} {" "}
             <button 
