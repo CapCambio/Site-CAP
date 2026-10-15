@@ -234,15 +234,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <SortableContext items={currencyList.map(c => ({ id: c.code, ...c }))} strategy={verticalListSortingStrategy}>
-                    {isMobile ? (
-                      <div className="space-y-3">
-                        {currencyList.map((currency) => renderCard(currency))}
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {currencyList.map((currency) => renderCard(currency))}
-                      </div>
-                    )}
+                    {currencyList.map((currency) => renderCard(currency))}
                   </SortableContext>
                 )}
               </div>
