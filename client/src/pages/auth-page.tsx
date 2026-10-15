@@ -298,7 +298,7 @@ export default function LoginPage() {
                   { name: t('whatsapp.branchBento'), phone: "5554999578486" },
                   { name: t('whatsapp.branchPasso'), phone: "5554996280422" }
                 ].map((branch) => {
-                  const message = encodeURIComponent(t('whatsapp.defaultMessage'));
+                  const message = encodeURIComponent(t('whatsapp.platformAccessMessage'));
                   const link = `https://api.whatsapp.com/send?phone=${branch.phone}&text=${message}`;
                   return (
                     <a
