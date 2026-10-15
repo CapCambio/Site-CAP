@@ -347,12 +347,11 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
 
       // Em layout de 2 colunas, não trocar com cards da outra coluna em tempo real
       // (o swap real acontece no dragend via pendingMoveRef)
-      if (twoColumnLayout && draggedIndex % 2 !== index % 2) {
-        console.log('⏸️ Coluna diferente - swap adiado para dragend');
+      if (twoColumnLayout) {
         return;
       }
 
-      // Swap em tempo real
+      // Swap em tempo real (só para layout de 1 coluna)
       const newItems = [...items];
       const [dragged] = newItems.splice(draggedIndex, 1);
       newItems.splice(index, 0, dragged);
