@@ -1,7 +1,6 @@
 import { Currency } from '../lib/types';
 import { CurrencyCard } from './CurrencyCard';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DraggableCurrencyCardProps {
   currency: Currency;
@@ -54,22 +53,15 @@ export function DraggableCurrencyCard({
   handleTouchEnd,
   cancelDragMode
 }: DraggableCurrencyCardProps) {
-  const isMobile = useIsMobile();
-  
   // Calcular se este card está sendo arrastado
   const isThisCardBeingDragged = draggedIndex === index;
   const isThisCardSelected = selectedForDrag === index;
-  
-  // No mobile, só mostrar contorno se este card está selecionado E não está sendo arrastado
-  const shouldShowMobileSelection = isMobile && isThisCardSelected && !isThisCardBeingDragged;
-  
+
   return (
     <div
       className={cn(
         'relative transition-all duration-200 ease-in-out',
         isThisCardBeingDragged && 'opacity-30 scale-95',
-        shouldShowMobileSelection && 'ring-4 ring-yellow-400 ring-opacity-70 scale-105 shadow-xl rounded-xl',
-        isDragOver && !isThisCardBeingDragged && 'transform translate-y-1 ring-4 ring-yellow-400 rounded-xl',
         isThisCardSelected && 'cursor-move',
         isThisCardBeingDragged && 'cursor-grabbing'
       )}
