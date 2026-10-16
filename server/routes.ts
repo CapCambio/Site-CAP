@@ -292,7 +292,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userName = emailLower.split('@')[0];
       }
 
-      console.log("User name resolved to:", userName);
+      devLog("User name resolved to:", userName);
 
       // Usuários comuns: verificar se já existe sessão ativa em outro dispositivo
       if (!isAdminEmail) {
