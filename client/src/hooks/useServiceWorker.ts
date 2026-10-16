@@ -21,7 +21,7 @@ export function useServiceWorker() {
       try {
         console.log('Tentando registrar o Service Worker...');
         const registration = await navigator.serviceWorker.register('/sw.js', {
-          scope: '/precos',
+          scope: '/',
         });
         
         // Verificar se há uma atualização disponível
