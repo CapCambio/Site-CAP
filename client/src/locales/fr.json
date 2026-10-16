@@ -372,6 +372,10 @@
     "message": "Impossible de se connecter au serveur. Vérifiez votre connexion internet et réessayez.",
     "retry": "Réessayer"
   },
+  "errorBoundary": {
+    "title": "Une erreur s'est produite",
+    "message": "Une erreur inattendue s'est produite lors du chargement de cette page. Veuillez réessayer."
+  },
   "notFound": {
     "title": "Page Non Trouvée",
     "message": "Avez-vous oublié d'ajouter la page au routeur?",

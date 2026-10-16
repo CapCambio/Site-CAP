@@ -1,5 +1,5 @@
 
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -10,6 +10,7 @@ import { useServiceWorker } from "@/hooks/useServiceWorker";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { NetworkError } from "@/components/NetworkError";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useState, useEffect } from 'react';
 import './lib/i18n';
 
@@ -49,6 +50,7 @@ function AppContent() {
   // Configurar notificações push
   const { isSupported, isSubscribed, isLoading } = usePushNotifications();
   const [networkError, setNetworkError] = useState(false);
+  const [location] = useLocation();
 
   // Detectar erros de rede globalmente
   const handleNetworkError = (error: Error) => {
@@ -81,15 +83,17 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-black">
       <LazyLoad>
-        <Switch>
-          <Route path="/" component={LandingPage} />
-          <ProtectedRoute path="/cotacoes" component={PrecosPage} />
-          <Route path="/tv">
-            <TvCaxiasPage />
-          </Route>
-          <Route path="/auth" component={LoginPage} />
-          <Route component={NotFound} />
-        </Switch>
+        <ErrorBoundary key={location}>
+          <Switch>
+            <Route path="/" component={LandingPage} />
+            <ProtectedRoute path="/cotacoes" component={PrecosPage} />
+            <Route path="/tv">
+              <TvCaxiasPage />
+            </Route>
+            <Route path="/auth" component={LoginPage} />
+            <Route component={NotFound} />
+          </Switch>
+        </ErrorBoundary>
       </LazyLoad>
       <Toaster />
       <Switch>

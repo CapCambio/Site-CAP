@@ -372,6 +372,10 @@
     "message": "Unable to connect to the server. Please check your internet connection and try again.",
     "retry": "Try Again"
   },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred while loading this page. Please try again."
+  },
   "notFound": {
     "title": "Page Not Found",
     "message": "Did you forget to add the page to the router?",

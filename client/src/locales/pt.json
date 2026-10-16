@@ -372,6 +372,10 @@
     "message": "Não foi possível conectar ao servidor. Verifique sua conexão com a internet e tente novamente.",
     "retry": "Tentar Novamente"
   },
+  "errorBoundary": {
+    "title": "Algo deu errado",
+    "message": "Ocorreu um erro inesperado ao carregar esta página. Tente novamente."
+  },
   "notFound": {
     "title": "Página Não Encontrada",
     "message": "Você esqueceu de adicionar a página ao roteador?",
