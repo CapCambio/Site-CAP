@@ -1358,10 +1358,10 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
 
         // Formata a mensagem com os alertas
         let mensagem = alertsToShow.map(alert => {
-          const variacaoFormatada = alert.variacao > 0
-            ? `${texts.rose} ${alert.variacao.toFixed(2)}%`
-            : `${texts.fell} ${Math.abs(alert.variacao).toFixed(2)}%`;
-          return `• ${alert.currencyCode}: R$ ${alert.sellPrice.toFixed(2)} (${variacaoFormatada})`;
+          const sinal = alert.variacao > 0 ? '+' : '';
+          const variacaoFormatada = `${sinal}${alert.variacao.toFixed(2).replace('.', ',')}%`;
+          const precoFormatado = alert.sellPrice.toFixed(2).replace('.', ',');
+          return `• ${alert.currencyCode} R$ ${precoFormatado} ${variacaoFormatada}`;
         }).join('\n');
 
         // Adiciona contador se houver mais itens
@@ -1450,10 +1450,10 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
 
       // Formata a mensagem com os alertas
       let mensagem = alertsToShow.map(alert => {
-        const variacaoFormatada = alert.variacao > 0
-          ? `${texts.rose} ${alert.variacao.toFixed(2)}%`
-          : `${texts.fell} ${Math.abs(alert.variacao).toFixed(2)}%`;
-        return `• ${alert.currencyCode}: R$ ${alert.sellPrice.toFixed(2)} (${variacaoFormatada})`;
+        const sinal = alert.variacao > 0 ? '+' : '';
+        const variacaoFormatada = `${sinal}${alert.variacao.toFixed(2).replace('.', ',')}%`;
+        const precoFormatado = alert.sellPrice.toFixed(2).replace('.', ',');
+        return `• ${alert.currencyCode} R$ ${precoFormatado} ${variacaoFormatada}`;
       }).join('\n');
 
       // Adiciona contador se houver mais itens
