@@ -69,7 +69,6 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
 
   // Funções de auto-scroll
   const startAutoScroll = (direction: 'up' | 'down') => {
-    console.log('🔄 startAutoScroll:', direction);
     if (scrollInterval.current) {
       clearInterval(scrollInterval.current);
     }
@@ -84,7 +83,6 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
   };
 
   const stopAutoScroll = () => {
-    console.log('🛑 stopAutoScroll');
     if (scrollInterval.current) {
       clearInterval(scrollInterval.current);
       scrollInterval.current = null;
@@ -291,7 +289,6 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
-    console.log(' handleDragStart:', { index, item: items[index]?.code });
     const draggedItem: DragItem = {
       index,
       id: items[index].code,
@@ -344,7 +341,6 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
     e.dataTransfer.dropEffect = 'move';
 
     if (draggedIndex !== null && draggedIndex !== index) {
-      console.log('🟡 handleDragOver:', { draggedIndex, targetIndex: index });
       setDragOverIndex(index);
 
       // Live swap em ambos os layouts (mobile e desktop)
@@ -364,7 +360,6 @@ export function useDragDrop(initialItems: Currency[], userEmail?: string | null,
 
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
-    console.log('🔵 handleDrop:', { draggedIndex, dropIndex });
     setDragOverIndex(null);
     stopAutoScroll();
 
