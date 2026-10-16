@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { authenticate, requireAdmin, optionalAuth } from './auth/JwtMiddleware';
 import { JwtService } from './auth/JwtService';
 import { PasswordService } from './auth/PasswordService';
+import { UserValidationCache } from './auth/UserValidationCache';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
 import { readPushLogEntries, devLog } from './logger';
 import * as db from './db';
@@ -1092,6 +1093,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           await db.deleteAlertsByUser(emailLower);
           alertSystem.removeAllUserAlerts(emailLower);
+          // deleteUser não alcança estas duas: sem elas o token da pessoa segue aceito por
+          // até 24h (cache de autorização em memória) e active_sessions — que não tem FK com
+          // users — guarda a linha órfã para sempre.
+          await db.releaseActiveSession(emailLower);
+          UserValidationCache.invalidateUser(emailLower);
           devLog(`✅ Todos os alertas do usuário ${email} foram removidos`);
         } catch (error) {
           console.error('Erro ao remover alertas do usuário:', error);
