@@ -25,10 +25,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/capcambio/cap-cambio-cotacoes"
+    "url": "https://github.com/CapCambio/Site-CAP"
   },
   "bugs": {
-    "url": "https://github.com/capcambio/cap-cambio-cotacoes/issues"
+    "url": "https://github.com/CapCambio/Site-CAP/issues"
   },
   "scripts": {
     "setup": "npm install",
