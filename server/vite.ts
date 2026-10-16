@@ -107,6 +107,11 @@ export function serveStatic(app: Express) {
   const reactAppRoutes = ['/cotacoes', '/tv'];
   for (const route of reactAppRoutes) {
     app.use(route, (_req, res) => {
+      // /tv é página interna: noindex no cabeçalho protege até de crawlers
+      // que não executam JS (complementa a meta robots injetada no client).
+      if (route === '/tv') {
+        res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+      }
       res.sendFile(path.resolve(distPath, "index.html"));
     });
   }
