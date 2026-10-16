@@ -34,10 +34,15 @@ PORT=8080
 APP_NAME=CAP Cotações
 APP_URL=https://seu-projeto.railway.app
 
-# Chaves VAPID (geradas anteriormente)
-VAPID_PUBLIC_KEY=BL9-cnBD0We5zZUfrgcP7--C6o6cIWS6RYMO8dI0XPmMgfiwf4vPYIa3Tc6OvvqKSIHsqYDmE6xHD8sG5Z-_Zmk
-VAPID_PRIVATE_KEY=tz-FMRJNIlH_JX1En9k4dan5oozLZsoHRB3h9TEADcw
-VAPID_EMAIL=capcambiocx@gmail.com
+# Obrigatórias — o app NÃO sobe sem estas (db.ts e JwtService.ts dão throw no boot)
+DATABASE_URL=postgresql://postgres:SU-SENHA@db.SEU-REF.supabase.co:5432/postgres
+JWT_SECRET=gere-um-segredo-longo-e-aleatorio (ex.: openssl rand -hex 32)
+
+# Chaves VAPID (push) — gere o par com "node scripts/generate-vapid-keys.js";
+# são opcionais no boot (só warn), mas o push não funciona sem elas.
+VAPID_PUBLIC_KEY=<chave pública gerada pelo script>
+VAPID_PRIVATE_KEY=<chave privada gerada pelo script — NUNCA commitar o valor real>
+VAPID_EMAIL=seu-email@dominio.com
 
 # Email (Brevo - configure após criar conta)
 EMAIL_ENABLED=true
@@ -48,8 +53,9 @@ EMAIL_PASS=sua-chave-brevo
 EMAIL_FROM="CAP Câmbio <no-reply@capcambio.com>"
 EMAIL_SECURE=false
 
-# Admin
-ADMIN_PASSWORDS_JSON={"capcambiocx@gmail.com":"sua-senha-admin"}
+# Admin — NÃO existe variável de senha admin. Administradores ficam na tabela
+# `users` do Postgres com senha em bcrypt. ADMIN_PASSWORDS_JSON é config morta
+# (nenhum código a lê) e não deve ser definida.
 ```
 
 ### 5. Configurar Brevo (Email)
