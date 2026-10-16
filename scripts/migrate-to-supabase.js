@@ -3,11 +3,17 @@ const { Client } = pg;
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const connectionString = 'postgresql://postgres:passofundo2012@db.wzrkasgtryxyiwtrmcqo.supabase.co:5432/postgres';
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('Defina DATABASE_URL no ambiente (ou em ../.env) antes de rodar este script.');
+  process.exit(1);
+}
 
 async function migrateUsers() {
   const client = new Client({ connectionString });

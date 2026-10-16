@@ -1,7 +1,17 @@
 import pg from 'pg';
-const { Client } = pg;
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const connectionString = 'postgresql://postgres:passofundo2012@db.wzrkasgtryxyiwtrmcqo.supabase.co:5432/postgres';
+const { Client } = pg;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('Defina DATABASE_URL no ambiente (ou em ../.env) antes de rodar este script.');
+  process.exit(1);
+}
 
 async function createTables() {
   const client = new Client({ connectionString });

@@ -1,9 +1,19 @@
 import pg from 'pg';
-const { Pool } = pg;
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const pool = new Pool({
-  connectionString: 'postgresql://postgres:passofundo2012@db.wzrkasgtryxyiwtrmcqo.supabase.co:5432/postgres'
-});
+const { Pool } = pg;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('Defina DATABASE_URL no ambiente (ou em ../.env) antes de rodar este script.');
+  process.exit(1);
+}
+
+const pool = new Pool({ connectionString });
 
 async function updatePasswords() {
   try {
