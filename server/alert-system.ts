@@ -1361,7 +1361,7 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
           const sinal = alert.variacao > 0 ? '+' : '';
           const variacaoFormatada = `${sinal}${alert.variacao.toFixed(2).replace('.', ',')}%`;
           const precoFormatado = alert.sellPrice.toFixed(2).replace('.', ',');
-          return `• ${alert.currencyCode} R$ ${precoFormatado} ${variacaoFormatada}`;
+          return `• ${alert.currencyCode} R$ ${precoFormatado} (${variacaoFormatada})`;
         }).join('\n');
 
         // Adiciona contador se houver mais itens
@@ -1453,7 +1453,7 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
         const sinal = alert.variacao > 0 ? '+' : '';
         const variacaoFormatada = `${sinal}${alert.variacao.toFixed(2).replace('.', ',')}%`;
         const precoFormatado = alert.sellPrice.toFixed(2).replace('.', ',');
-        return `• ${alert.currencyCode} R$ ${precoFormatado} ${variacaoFormatada}`;
+        return `• ${alert.currencyCode} R$ ${precoFormatado} (${variacaoFormatada})`;
       }).join('\n');
 
       // Adiciona contador se houver mais itens
