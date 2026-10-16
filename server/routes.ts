@@ -517,6 +517,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
       let endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
 
+      // Uma data malformada (ex.: ?startDate=abc) vira um objeto Invalid Date, que é
+      // truthy: passaria pelo guarda de !startDate e chegaria ao pool.query, estourando
+      // 500. Normalizar para undefined deixa a janela padrão de 31 dias se aplicar.
+      if (startDate && isNaN(startDate.getTime())) startDate = undefined;
+      if (endDate && isNaN(endDate.getTime())) endDate = undefined;
+
       // Limitar consultas a no máximo 1 ano atrás
       const oneYearAgo = new Date();
       oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
