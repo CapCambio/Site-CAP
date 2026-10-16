@@ -44,6 +44,7 @@
     "start:full": "NODE_ENV=production node dist/index.js",
     "start:https": "NODE_ENV=production HTTPS=true node dist/index.js",
     "check": "tsc",
+    "check:homepage": "node scripts/check-homepage-drift.js",
     "optimize:images": "node scripts/optimize-images.js",
     "update:favicon": "node scripts/update-favicon.js",
     "test:push": "node scripts/test-push-notification.js"

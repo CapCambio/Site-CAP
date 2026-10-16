@@ -1,0 +1,32 @@
+name: Homepage drift check
+
+# Não recompila a homepage no deploy (decisão tomada — ver memory
+# project-homepage-build-manual). Este check só GARANTE que o bundle commitado
+# em public/homepage não ficou para trás em relação ao fonte em homepage-src,
+# transformando "esqueci o build manual" num erro alto no PR em vez de uma home
+# veloz silenciosa no ar.
+
+on:
+  pull_request:
+    paths:
+      - 'homepage-src/**'
+      - 'public/homepage/**'
+      - '.github/workflows/homepage-drift.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'homepage-src/**'
+      - 'public/homepage/**'
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # o script navega git log <âncora>..HEAD; precisa do histórico todo.
+          fetch-depth: 0
+
+      - name: Check public/homepage is not stale vs homepage-src
+        run: node scripts/check-homepage-drift.js
