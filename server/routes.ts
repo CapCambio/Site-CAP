@@ -732,6 +732,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Canais de aviso do usuário (e-mail / push). Desligar um deles não apaga alerta nenhum.
+  app.get("/api/user/notification-channels", async (req: Request, res: Response) => {
+    try {
+      const userEmail = (req as any).user?.email;
+      if (!userEmail) {
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+      }
+
+      res.json(alertSystem.getNotificationChannels(userEmail));
+    } catch (error) {
+      console.error('Erro ao carregar canais de aviso:', error);
+      res.status(500).json({ error: 'Erro ao carregar canais de aviso' });
+    }
+  });
+
+  app.post("/api/user/notification-channels", async (req: Request, res: Response) => {
+    try {
+      const userEmail = (req as any).user?.email;
+      if (!userEmail) {
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+      }
+
+      const { notifyEmail, notifyPush } = req.body;
+      if (typeof notifyEmail !== 'boolean' || typeof notifyPush !== 'boolean') {
+        return res.status(400).json({ error: 'Canais inválidos' });
+      }
+      // Sem os dois o alerta existe, dispara e não avisa ninguém — a pessoa só descobre
+      // quando o preço fugiu e ela não foi chamada.
+      if (!notifyEmail && !notifyPush) {
+        return res.status(400).json({ error: 'Escolha pelo menos um canal de aviso' });
+      }
+
+      const saved = alertSystem.saveNotificationChannels(userEmail, { notifyEmail, notifyPush });
+
+      devLog(`🔕 Canais de aviso salvos para ${userEmail}:`, saved);
+
+      res.json({ success: true, ...saved });
+    } catch (error) {
+      console.error('Erro ao salvar canais de aviso:', error);
+      res.status(500).json({ error: 'Erro ao salvar canais de aviso' });
+    }
+  });
+
   // Configuração de atualização automática a cada minuto
   const server = createServer(app);
 

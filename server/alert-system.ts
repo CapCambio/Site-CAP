@@ -178,6 +178,8 @@ interface UserAlerts {
   lastNotificationSent?: string | null;
   cardOrder?: string[]; // NOVO: Ordem dos cards do usuário
   language?: string; // NOVO: Idioma preferido do usuário
+  notifyEmail?: boolean; // Opt-out do e-mail de alerta (push continua)
+  notifyPush?: boolean; // Opt-out do push de alerta (e-mail continua)
 }
 
 interface AlertsData {
@@ -740,6 +742,8 @@ class AlertSystem {
           }
           this.data[p.email].language = p.language;
           this.data[p.email].cardOrder = p.cardOrder;
+          this.data[p.email].notifyEmail = p.notifyEmail;
+          this.data[p.email].notifyPush = p.notifyPush;
         }
         console.log(`🔔 [loadAlerts] Preferências carregadas para ${prefs.length} usuários`);
       } catch (err) {
@@ -833,6 +837,38 @@ class AlertSystem {
       console.error('❌ Erro ao carregar idioma:', error);
       return null;
     }
+  }
+
+  /**
+   * Canais de aviso do usuário. Ausente vale ligado: quem nunca mexeu no switch continua
+   * recebendo os dois, e uma linha sem a coluna ainda não silencia ninguém.
+   */
+  public getNotificationChannels(email: string): { notifyEmail: boolean; notifyPush: boolean } {
+    const userData = this.data[email];
+    return {
+      notifyEmail: userData?.notifyEmail !== false,
+      notifyPush: userData?.notifyPush !== false
+    };
+  }
+
+  public saveNotificationChannels(
+    email: string,
+    channels: { notifyEmail: boolean; notifyPush: boolean }
+  ): { notifyEmail: boolean; notifyPush: boolean } {
+    if (!this.data[email]) {
+      this.data[email] = { email, alerts: {}, pushSubscriptions: [] };
+    }
+
+    this.data[email].notifyEmail = channels.notifyEmail;
+    this.data[email].notifyPush = channels.notifyPush;
+    this.saveAlerts();
+    import('./db')
+      .then((db) => db.updateUserPreferences(email, channels))
+      .catch((err) => console.error('❌ Erro ao salvar canais de aviso no banco:', err));
+
+    devLog(`🔕 Canais de aviso de ${email}: e-mail=${channels.notifyEmail}, push=${channels.notifyPush}`);
+    logger.info('CANAIS DE AVISO ALTERADOS', { email, ...channels });
+    return this.getNotificationChannels(email);
   }
 
 // ... (restante do código)
@@ -1436,7 +1472,9 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
     const userLanguage = userData.language || 'pt';
 
     // Enviar notificação push agrupada; quais assinaturas existem é decidido em sendPushNotification (banco)
-    if (alerts.length > 0) {
+    if (alerts.length > 0 && userData.notifyPush === false) {
+      logger.info('PUSH SUPRIMIDO (OPT-OUT DO USUARIO)', { email, notifyPush: false });
+    } else if (alerts.length > 0) {
       // Título baseado no idioma
       const titulo = this.getPushNotificationTitle(userLanguage);
 
@@ -1481,7 +1519,9 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
     });
     
     // Se houver alertas para notificar por e-mail, envia um único e-mail
-    if (emailAlerts.length > 0) {
+    if (emailAlerts.length > 0 && userData.notifyEmail === false) {
+      logger.info('E-MAIL SUPRIMIDO (OPT-OUT DO USUARIO)', { email, notifyEmail: false });
+    } else if (emailAlerts.length > 0) {
       // Prepara os dados para o template de e-mail
       const alertItems = emailAlerts.map(alert => ({
         currencyCode: alert.currencyCode,

@@ -4,11 +4,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Trash2, TrendingUp, TrendingDown, ArrowLeft } from "lucide-react";
+import { Bell, Trash2, TrendingUp, TrendingDown, ArrowLeft, Mail } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { api } from "@/lib/http";
+import { api, http } from "@/lib/http";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 
@@ -35,6 +36,11 @@ interface UserAlert {
 interface UserAlerts {
   email: string;
   alerts: { [currencyCode: string]: UserAlert };
+}
+
+interface NotificationChannels {
+  notifyEmail: boolean;
+  notifyPush: boolean;
 }
 
 interface AlertsPanelProps {
@@ -92,6 +98,45 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
 
   const handleRemoveAlert = (currencyCode: string) => {
     removeAlertMutation.mutate({ currencyCode });
+  };
+
+  const { data: channels } = useQuery<NotificationChannels>({
+    queryKey: ['/api/user/notification-channels', user?.email],
+    queryFn: () => http.get('/api/user/notification-channels'),
+    enabled: !!user?.email && isOpen
+  });
+
+  // Ausente vale ligado: enquanto a resposta não chega, o switch mostra o comportamento
+  // padrão de quem nunca optou nada, em vez de piscar desligado.
+  const notifyEmail = channels?.notifyEmail !== false;
+  const notifyPush = channels?.notifyPush !== false;
+
+  const channelsMutation = useMutation({
+    mutationFn: (next: NotificationChannels) =>
+      http.post('/api/user/notification-channels', next),
+    onSuccess: (saved: NotificationChannels) => {
+      queryClient.setQueryData(['/api/user/notification-channels', user?.email], saved);
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/notification-channels', user?.email] });
+      toast({
+        title: t('toasts.error'),
+        description: t('toasts.errorSaveChannels'),
+        variant: "destructive"
+      });
+    }
+  });
+
+  const toggleChannel = (channel: keyof NotificationChannels, value: boolean) => {
+    const next = { notifyEmail, notifyPush, [channel]: value };
+    if (!next.notifyEmail && !next.notifyPush) {
+      toast({
+        title: t('alertsPanel.needOneChannel'),
+        description: t('alertsPanel.needOneChannelDesc')
+      });
+      return;
+    }
+    channelsMutation.mutate(next);
   };
 
   const getTipoIcon = (tipo: string) => {
@@ -163,11 +208,52 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
     <div className="mt-6 p-4 bg-zinc-800/50 rounded-lg border border-zinc-700">
       <div className="flex items-start gap-3 text-sm">
         <Bell className="h-5 w-5 mt-0.5 flex-shrink-0 text-yellow-400" />
-        <div className="text-zinc-300">
-          <h4 className="font-medium text-white mb-2">{t('alertsPanel.aboutNotifications')}</h4>
-          <ul className="space-y-2 text-sm">
-            <li>• {t('alertsPanel.notificationEmail')}</li>
-            <li>• {t('alertsPanel.notificationPush')}</li>
+        <div className="flex-1 min-w-0 text-zinc-300">
+          <h4 className="font-medium text-white mb-1">{t('alertsPanel.howToReceive')}</h4>
+
+          <div className="flex items-center justify-between gap-4 py-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 flex-shrink-0 text-yellow-400" />
+                <span className="font-medium text-white">{t('alertsPanel.emailChannel')}</span>
+              </div>
+              <p className="mt-1 text-xs text-zinc-400">
+                {notifyEmail ? t('alertsPanel.emailChannelDesc') : t('alertsPanel.emailChannelOff')}
+              </p>
+            </div>
+            <Switch
+              checked={notifyEmail}
+              onCheckedChange={(checked) => toggleChannel('notifyEmail', checked)}
+              disabled={channelsMutation.isPending}
+              aria-label={t('alertsPanel.emailChannel')}
+              className="data-[state=unchecked]:bg-zinc-600"
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-4 py-2 border-t border-zinc-700/60">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <Bell className="h-4 w-4 flex-shrink-0 text-yellow-400" />
+                <span className="font-medium text-white">{t('alertsPanel.pushChannel')}</span>
+              </div>
+              <p className="mt-1 text-xs text-zinc-400">
+                {!notifyPush
+                  ? t('alertsPanel.pushChannelOff')
+                  : notifState === "on"
+                    ? t('alertsPanel.pushChannelDesc')
+                    : t('alertsPanel.pushChannelNoDevice')}
+              </p>
+            </div>
+            <Switch
+              checked={notifyPush}
+              onCheckedChange={(checked) => toggleChannel('notifyPush', checked)}
+              disabled={channelsMutation.isPending}
+              aria-label={t('alertsPanel.pushChannel')}
+              className="data-[state=unchecked]:bg-zinc-600"
+            />
+          </div>
+
+          <ul className="mt-2 space-y-2 text-sm">
             <li>• {t('alertsPanel.notificationInstall')}</li>
             <li>• {t('alertsPanel.notificationTroubleshoot')}</li>
           </ul>

@@ -167,7 +167,17 @@
     "notificationsOn": "Notifications activées",
     "notifOff": "Les notifications sont désactivées sur cet appareil. Touchez Activer les notifications puis autorisez la demande du navigateur.",
     "notifDenied": "Ce navigateur bloque les notifications du site. Autorisez-les dans les paramètres de notification du navigateur, puis rechargez la page.",
-    "notifUnsupported": "Ce navigateur ne prend pas en charge les notifications push. Utilisez un navigateur à jour ou recevez les alertes par e-mail."
+    "notifUnsupported": "Ce navigateur ne prend pas en charge les notifications push. Utilisez un navigateur à jour ou recevez les alertes par e-mail.",
+    "howToReceive": "Comment souhaitez-vous recevoir les alertes",
+    "emailChannel": "E-mail",
+    "emailChannelDesc": "Vous recevez un e-mail regroupant toutes les alertes déclenchées. Rien n'est arrivé ? Vérifiez le dossier spam ou indésirables.",
+    "emailChannelOff": "Les alertes arrivent uniquement par push. Aucune notification n'est envoyée si le navigateur est fermé ou les notifications sont bloquées.",
+    "pushChannel": "Notification push",
+    "pushChannelDesc": "Alertes instantanées dans votre navigateur ou sur votre appareil mobile.",
+    "pushChannelNoDevice": "Activé sur votre compte, mais ce navigateur n'autorise pas encore les notifications.",
+    "pushChannelOff": "Désactivé pour votre compte, sur tous les appareils.",
+    "needOneChannel": "Choisissez au moins un canal",
+    "needOneChannelDesc": "Si l'e-mail et le push sont désactivés, l'alerte se déclenche et vous ne serez pas prévenu."
   },
   "auth": {
     "title": "CAP Cotations",
@@ -535,6 +545,7 @@
     "dateAdjusted": "Date ajustée",
     "dateAdjustedDesc": "La date a été ajustée à la limite maximale de 1 an.",
     "errorRemoveAlertPanel": "Impossible de supprimer l'alerte.",
+    "errorSaveChannels": "Impossible d'enregistrer les canaux de notification.",
     "errorLoadHistory": "Erreur lors du chargement de l'historique",
     "errorLoadHistoryDesc": "Impossible de charger les données historiques. Veuillez réessayer.",
     "notSupported": "Non supporté",

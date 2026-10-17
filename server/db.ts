@@ -58,15 +58,17 @@ export async function initializeAlertsTable() {
   }
 }
 
-// Adicionar colunas de preferências de usuário (idioma + ordem dos cards)
+// Adicionar colunas de preferências de usuário (idioma + ordem dos cards + canais de aviso)
 export async function initializeUserPreferencesColumns() {
   try {
     await pool.query(`
       ALTER TABLE users
       ADD COLUMN IF NOT EXISTS language VARCHAR(5) DEFAULT 'pt',
-      ADD COLUMN IF NOT EXISTS card_order JSONB
+      ADD COLUMN IF NOT EXISTS card_order JSONB,
+      ADD COLUMN IF NOT EXISTS notify_email BOOLEAN DEFAULT TRUE,
+      ADD COLUMN IF NOT EXISTS notify_push BOOLEAN DEFAULT TRUE
     `);
-    console.log('✅ Colunas de preferências (language, card_order) verificadas');
+    console.log('✅ Colunas de preferências (language, card_order, notify_email, notify_push) verificadas');
   } catch (error) {
     console.error('❌ Erro ao verificar colunas de preferências:', error);
   }
@@ -74,7 +76,7 @@ export async function initializeUserPreferencesColumns() {
 
 export async function updateUserPreferences(
   email: string,
-  prefs: { language?: string; cardOrder?: string[] }
+  prefs: { language?: string; cardOrder?: string[]; notifyEmail?: boolean; notifyPush?: boolean }
 ): Promise<boolean> {
   const fields: string[] = [];
   const values: any[] = [];
@@ -87,6 +89,14 @@ export async function updateUserPreferences(
     fields.push(`card_order = $${idx++}`);
     values.push(JSON.stringify(prefs.cardOrder));
   }
+  if (prefs.notifyEmail !== undefined) {
+    fields.push(`notify_email = $${idx++}`);
+    values.push(prefs.notifyEmail);
+  }
+  if (prefs.notifyPush !== undefined) {
+    fields.push(`notify_push = $${idx++}`);
+    values.push(prefs.notifyPush);
+  }
   if (fields.length === 0) return false;
   values.push(email.toLowerCase());
   const result = await pool.query(
@@ -97,7 +107,7 @@ export async function updateUserPreferences(
 }
 
 export async function getAllUserPreferences(): Promise<
-  Array<{ email: string; language: string; cardOrder: string[] }>
+  Array<{ email: string; language: string; cardOrder: string[]; notifyEmail: boolean; notifyPush: boolean }>
 > {
   // SELECT * para tolerar a corrida no primeiro boot pós-deploy: se ALTER TABLE ainda não
   // commitou quando esta query roda, as colunas novas simplesmente não aparecem no row e os
@@ -106,7 +116,9 @@ export async function getAllUserPreferences(): Promise<
   return result.rows.map((r: any) => ({
     email: r.email,
     language: r.language || 'pt',
-    cardOrder: Array.isArray(r.card_order) ? r.card_order : []
+    cardOrder: Array.isArray(r.card_order) ? r.card_order : [],
+    notifyEmail: r.notify_email !== false,
+    notifyPush: r.notify_push !== false
   }));
 }
 

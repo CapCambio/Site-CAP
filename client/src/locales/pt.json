@@ -167,7 +167,17 @@
     "notificationsOn": "Notificações ativadas",
     "notifOff": "As notificações estão desativadas neste dispositivo. Toque em Ativar notificações e permita o aviso do navegador.",
     "notifDenied": "Este navegador está bloqueando as notificações do site. Libere o acesso nas configurações de notificação do navegador e recarregue a página.",
-    "notifUnsupported": "Este navegador não aceita notificações push. Use um navegador atualizado ou receba os alertas por e-mail."
+    "notifUnsupported": "Este navegador não aceita notificações push. Use um navegador atualizado ou receba os alertas por e-mail.",
+    "howToReceive": "Como você quer receber os alertas",
+    "emailChannel": "E-mail",
+    "emailChannelDesc": "Você recebe um e-mail com todos os alertas disparados no mesmo aviso. Não chegou? Verifique a caixa de spam/lixo eletrônico.",
+    "emailChannelOff": "Os alertas chegam só por push. Nenhum aviso é enviado se o navegador estiver fechado ou as notificações estiverem bloqueadas.",
+    "pushChannel": "Notificação push",
+    "pushChannelDesc": "Alertas instantâneos no seu navegador ou dispositivo móvel.",
+    "pushChannelNoDevice": "Ligado na sua conta, mas este navegador ainda não permite notificações.",
+    "pushChannelOff": "Desligado para a sua conta, em todos os dispositivos.",
+    "needOneChannel": "Escolha pelo menos um canal",
+    "needOneChannelDesc": "Com e-mail e push desligados, o alerta dispara e você não é avisado."
   },
   "auth": {
     "title": "CAP Cotações",
@@ -532,6 +542,7 @@
     "dateAdjusted": "Data ajustada",
     "dateAdjustedDesc": "A data foi ajustada para o limite máximo de 1 ano.",
     "errorRemoveAlertPanel": "Não foi possível remover o alerta.",
+    "errorSaveChannels": "Não foi possível salvar os canais de aviso.",
     "errorLoadHistory": "Erro ao carregar histórico",
     "errorLoadHistoryDesc": "Não foi possível carregar os dados históricos. Tente novamente.",
     "notSupported": "Não suportado",

@@ -167,7 +167,17 @@
     "notificationsOn": "Notifications are on",
     "notifOff": "Notifications are turned off on this device. Tap Turn notifications on and allow the browser prompt.",
     "notifDenied": "This browser is blocking notifications for this site. Allow them in the browser's notification settings and reload the page.",
-    "notifUnsupported": "This browser doesn't support push notifications. Use an up-to-date browser or receive alerts by email."
+    "notifUnsupported": "This browser doesn't support push notifications. Use an up-to-date browser or receive alerts by email.",
+    "howToReceive": "How you want to receive the alerts",
+    "emailChannel": "Email",
+    "emailChannelDesc": "You get one email with every alert triggered in the same notice. Nothing arrived? Check your spam or junk folder.",
+    "emailChannelOff": "Alerts arrive by push only. No notice is sent if the browser is closed or notifications are blocked.",
+    "pushChannel": "Push notification",
+    "pushChannelDesc": "Instant alerts in your browser or on your mobile device.",
+    "pushChannelNoDevice": "Enabled on your account, but this browser doesn't allow notifications yet.",
+    "pushChannelOff": "Disabled for your account, on every device.",
+    "needOneChannel": "Choose at least one channel",
+    "needOneChannelDesc": "With email and push both off, the alert fires and you aren't notified."
   },
   "auth": {
     "title": "CAP Quotes",
@@ -535,6 +545,7 @@
     "dateAdjusted": "Date adjusted",
     "dateAdjustedDesc": "The date was adjusted to the maximum limit of 1 year.",
     "errorRemoveAlertPanel": "Could not remove the alert.",
+    "errorSaveChannels": "Could not save the notification channels.",
     "errorLoadHistory": "Error loading history",
     "errorLoadHistoryDesc": "Could not load historical data. Please try again.",
     "notSupported": "Not supported",

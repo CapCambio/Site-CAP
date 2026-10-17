@@ -167,7 +167,17 @@
     "notificationsOn": "Notificaciones activadas",
     "notifOff": "Las notificaciones están desactivadas en este dispositivo. Toque Activar notificaciones y permita el aviso del navegador.",
     "notifDenied": "Este navegador está bloqueando las notificaciones del sitio. Permítalas en la configuración de notificaciones del navegador y vuelva a cargar la página.",
-    "notifUnsupported": "Este navegador no admite notificaciones push. Use un navegador actualizado o reciba las alertas por correo."
+    "notifUnsupported": "Este navegador no admite notificaciones push. Use un navegador actualizado o reciba las alertas por correo.",
+    "howToReceive": "Cómo quieres recibir las alertas",
+    "emailChannel": "Correo",
+    "emailChannelDesc": "Recibes un correo con todas las alertas disparadas en el mismo aviso. ¿No llegó? Revisa la carpeta de spam o correo no deseado.",
+    "emailChannelOff": "Las alertas llegan solo por push. No se envía ningún aviso si el navegador está cerrado o las notificaciones están bloqueadas.",
+    "pushChannel": "Notificación push",
+    "pushChannelDesc": "Alertas instantáneas en tu navegador o en tu dispositivo móvil.",
+    "pushChannelNoDevice": "Activado en tu cuenta, pero este navegador aún no permite notificaciones.",
+    "pushChannelOff": "Desactivado para tu cuenta, en todos los dispositivos.",
+    "needOneChannel": "Elige al menos un canal",
+    "needOneChannelDesc": "Con el correo y el push desactivados, la alerta se dispara y no recibes ningún aviso."
   },
   "auth": {
     "title": "CAP Cotizaciones",
@@ -535,6 +545,7 @@
     "dateAdjusted": "Fecha ajustada",
     "dateAdjustedDesc": "La fecha fue ajustada al límite máximo de 1 año.",
     "errorRemoveAlertPanel": "No fue posible eliminar el alerta.",
+    "errorSaveChannels": "No fue posible guardar los canales de aviso.",
     "errorLoadHistory": "Error al cargar historial",
     "errorLoadHistoryDesc": "No fue posible cargar los datos históricos. Intente nuevamente.",
     "notSupported": "No soportado",
