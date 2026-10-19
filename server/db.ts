@@ -58,6 +58,36 @@ export async function initializeAlertsTable() {
   }
 }
 
+// Garante 1 alerta por (usuário, moeda): remove duplicados históricos (mantém o
+// mais recente) e cria índice UNIQUE. Precisa rodar ANTES do addAlert fazer upsert,
+// pois o ON CONFLICT exige a constraint existente.
+export async function initializeAlertsUniqueness() {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(`
+      DELETE FROM alerts a
+      WHERE EXISTS (
+        SELECT 1 FROM alerts b
+        WHERE b.user_email = a.user_email
+          AND b.currency_code = a.currency_code
+          AND (b.created_at, b.id) > (a.created_at, a.id)
+      )
+    `);
+    await client.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS uniq_alerts_user_currency
+      ON alerts (user_email, currency_code)
+    `);
+    await client.query('COMMIT');
+    console.log('✅ Unicidade de alertas (1 por usuário+moeda) verificada');
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('❌ Erro ao impor unicidade de alertas:', error);
+  } finally {
+    client.release();
+  }
+}
+
 // Adicionar colunas de preferências de usuário (idioma + ordem dos cards + canais de aviso)
 export async function initializeUserPreferencesColumns() {
   try {
@@ -361,6 +391,14 @@ export async function addAlert(alert: Partial<Alert>): Promise<Alert> {
   const result = await pool.query(
     `INSERT INTO alerts (user_email, currency_code, tipo, ativo, valor, condicao_valor, validade)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
+     ON CONFLICT (user_email, currency_code)
+     DO UPDATE SET
+       tipo = EXCLUDED.tipo,
+       ativo = EXCLUDED.ativo,
+       valor = EXCLUDED.valor,
+       condicao_valor = EXCLUDED.condicao_valor,
+       validade = EXCLUDED.validade,
+       created_at = NOW()
      RETURNING *`,
     [alert.user_email?.toLowerCase(), alert.currency_code, alert.tipo || null, alert.ativo || true, alert.valor || null, alert.condicao_valor || null, alert.validade || null]
   );
