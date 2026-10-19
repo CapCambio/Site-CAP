@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import "./radio-styles.css";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { http } from "@/lib/http";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
@@ -40,6 +40,19 @@ interface CreateAlertData {
   condicaoValor?: 'acima' | 'abaixo';
 }
 
+interface ExistingAlert {
+  tipo: 'subida' | 'descida' | 'valor-especifico';
+  valor?: number;
+  validade?: string | null;
+  ativo: boolean;
+  condicaoValor?: 'acima' | 'abaixo';
+}
+
+interface UserAlertsResponse {
+  email: string;
+  alerts: { [currencyCode: string]: ExistingAlert };
+}
+
 export function AlertModal({ 
   isOpen, 
   onClose, 
@@ -70,6 +83,34 @@ export function AlertModal({
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Alerta já existente para esta moeda (mesma cache do "Meus Alertas").
+  // O servidor já impõe 1 por moeda (upsert), então recriar substitui; aqui só
+  // avisamos o usuário antes de sobrescrever.
+  const { data: alertsData } = useQuery<UserAlertsResponse>({
+    queryKey: ['/api/alerts', user?.email],
+    queryFn: () => http.get<UserAlertsResponse>(`/api/alerts/${user?.email}`),
+    enabled: !!user?.email && isOpen
+  });
+  const existingAlert = alertsData?.alerts?.[currencyCode];
+
+  const getTipoLabel = (tipo: ExistingAlert['tipo']) =>
+    tipo === 'valor-especifico'
+      ? t('alerts.specificValue')
+      : tipo === 'subida'
+      ? t('alerts.rise')
+      : t('alerts.fall');
+
+  // Payload aguardando confirmação de substituição (null = sem pendência).
+  const [pendingSubmit, setPendingSubmit] = useState<{
+    data: CreateAlertData;
+    existingTipo: ExistingAlert['tipo'];
+  } | null>(null);
+
+  // Ao (re)abrir o modal, descarta qualquer confirmação pendente de uma sessão anterior.
+  useEffect(() => {
+    if (isOpen) setPendingSubmit(null);
+  }, [isOpen]);
 
   const createAlertMutation = useMutation({
     mutationFn: async (data: CreateAlertData) => {
@@ -120,18 +161,17 @@ export function AlertModal({
     setTipo('valor-especifico');
     setValorEspecifico('');
     setValidade(getOneMonthAhead());
+    setPendingSubmit(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const buildAlertData = (): CreateAlertData | null => {
     if (!user?.email) {
       toast({
         title: t('toasts.error'),
         description: t('toasts.errorNotLoggedIn'),
         variant: "destructive",
       });
-      return;
+      return null;
     }
 
     const alertData: CreateAlertData = {
@@ -149,15 +189,36 @@ export function AlertModal({
           description: t('toasts.invalidValueDesc'),
           variant: "destructive",
         });
-        return;
+        return null;
       }
       alertData.valor = valor;
       // Condição fixa como 'acima' pois o valor sempre será maior que o atual
       alertData.condicaoValor = 'acima';
     }
 
+    return alertData;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const alertData = buildAlertData();
+    if (!alertData) return;
+
+    // Já existe alerta para esta moeda → confirmar antes de substituir.
+    if (existingAlert) {
+      setPendingSubmit({ data: alertData, existingTipo: existingAlert.tipo });
+      return;
+    }
+
     createAlertMutation.mutate(alertData);
   };
+
+  const confirmReplace = () => {
+    if (pendingSubmit) createAlertMutation.mutate(pendingSubmit.data);
+  };
+
+  const cancelReplace = () => setPendingSubmit(null);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -236,14 +297,7 @@ export function AlertModal({
           <div className="space-y-4">
             <div className="bg-zinc-800 p-3 rounded border border-zinc-700">
               <p className="text-sm text-zinc-300">
-                {(() => {
-                  const typeLabel = tipo === 'valor-especifico' 
-                    ? t('alerts.specificValue') 
-                    : tipo === 'subida' 
-                    ? t('alerts.rise') 
-                    : t('alerts.fall');
-                  return <strong>{t('alerts.howItWorks', { type: typeLabel })}:</strong>;
-                })()}<br/>
+                <strong>{t('alerts.howItWorks', { type: getTipoLabel(tipo) })}:</strong><br/>
                 {t('alerts.howItWorksText1')}<br/>
                 {t('alerts.howItWorksText2')}<br/>
                 {t('alerts.howItWorksText3')}
@@ -283,23 +337,54 @@ export function AlertModal({
               </p>
             </div>
 
-            <div className="flex gap-2 justify-end pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="border-zinc-600 text-white bg-transparent hover:bg-zinc-800 hover:text-white"
-              >
-                {t('alerts.cancel')}
-              </Button>
-              <Button
-                type="submit"
-                disabled={createAlertMutation.isPending}
-                className="bg-yellow-500 hover:bg-yellow-600 text-black"
-              >
-                {createAlertMutation.isPending ? t('common.loading') : t('alerts.create')}
-              </Button>
-            </div>
+            {pendingSubmit ? (
+              <div className="space-y-4 pt-4">
+                <div className="bg-yellow-500/10 border border-yellow-500/40 rounded p-3">
+                  <p className="text-sm text-yellow-200">
+                    {t('alerts.replaceExistingWarning', {
+                      currencyName,
+                      currentType: getTipoLabel(pendingSubmit.existingTipo),
+                    })}
+                  </p>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={cancelReplace}
+                    className="border-zinc-600 text-white bg-transparent hover:bg-zinc-800 hover:text-white"
+                  >
+                    {t('alerts.cancel')}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={confirmReplace}
+                    disabled={createAlertMutation.isPending}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black"
+                  >
+                    {createAlertMutation.isPending ? t('common.loading') : t('alerts.replaceConfirm')}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2 justify-end pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="border-zinc-600 text-white bg-transparent hover:bg-zinc-800 hover:text-white"
+                >
+                  {t('alerts.cancel')}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createAlertMutation.isPending}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black"
+                >
+                  {createAlertMutation.isPending ? t('common.loading') : t('alerts.create')}
+                </Button>
+              </div>
+            )}
           </div>
         </form>
       </DialogContent>

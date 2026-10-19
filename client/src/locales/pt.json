@@ -126,6 +126,8 @@
     "selectType": "Selecione o tipo de alerta",
     "targetValue": "Valor Alvo",
     "targetValuePlaceholder": "Digite o valor alvo (ex: 5,25)",
+    "replaceExistingWarning": "Você já tem um alerta de {{currentType}} para {{currencyName}}. Criar este novo vai substituí-lo.",
+    "replaceConfirm": "Substituir alerta",
     "duration": "Duração do Alerta",
     "howItWorks": "Como funciona o alerta {{type}}",
     "howItWorksText1": "• Os alertas monitoram o nosso preço de venda.",
