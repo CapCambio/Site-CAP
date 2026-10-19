@@ -127,7 +127,7 @@
     "targetValue": "Target Value",
     "targetValuePlaceholder": "Enter target value (ex: 5.25)",
     "duration": "Alert Duration",
-    "howItWorks": "How it works",
+    "howItWorks": "How the {{type}} alert works",
     "howItWorksText1": "• Alerts monitor our sell price.",
     "howItWorksText2": "• You will receive the alert via email and push notifications.",
     "howItWorksText3": "• You can create only one alert per currency.",

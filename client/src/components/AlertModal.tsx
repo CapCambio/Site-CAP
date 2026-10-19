@@ -236,7 +236,14 @@ export function AlertModal({
           <div className="space-y-4">
             <div className="bg-zinc-800 p-3 rounded border border-zinc-700">
               <p className="text-sm text-zinc-300">
-                <strong>{t('alerts.howItWorks')}:</strong><br/>
+                {(() => {
+                  const typeLabel = tipo === 'valor-especifico' 
+                    ? t('alerts.specificValue') 
+                    : tipo === 'subida' 
+                    ? t('alerts.rise') 
+                    : t('alerts.fall');
+                  return <strong>{t('alerts.howItWorks', { type: typeLabel })}:</strong>;
+                })()}<br/>
                 {t('alerts.howItWorksText1')}<br/>
                 {t('alerts.howItWorksText2')}<br/>
                 {t('alerts.howItWorksText3')}

@@ -127,7 +127,7 @@
     "targetValue": "Valor Alvo",
     "targetValuePlaceholder": "Digite o valor alvo (ex: 5,25)",
     "duration": "Duração do Alerta",
-    "howItWorks": "Como funciona",
+    "howItWorks": "Como funciona o alerta {{type}}",
     "howItWorksText1": "• Os alertas monitoram o nosso preço de venda.",
     "howItWorksText2": "• Você receberá o alerta via e-mail e por notificações push.",
     "howItWorksText3": "• É possível criar apenas um alerta por moeda.",

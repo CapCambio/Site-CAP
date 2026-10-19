@@ -127,7 +127,7 @@
     "targetValue": "Valeur Cible",
     "targetValuePlaceholder": "Entrez la valeur cible (ex: 5.25)",
     "duration": "Durée de l'Alerte",
-    "howItWorks": "Comment ça marche",
+    "howItWorks": "Comment fonctionne l'alerte {{type}}",
     "howItWorksText1": "• Les alertes surveillent notre prix de vente.",
     "howItWorksText2": "• Vous recevrez l'alerte par email et par notifications push.",
     "howItWorksText3": "• Vous pouvez créer une seule alerte par devise.",
