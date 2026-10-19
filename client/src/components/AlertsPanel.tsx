@@ -318,7 +318,7 @@ export function AlertsPanel({ isOpen, onClose }: AlertsPanelProps) {
                   <p className="text-zinc-400">{t('alertsPanel.loadingAlerts')}</p>
                 </div>
               ) : alertsArray.length === 0 ? (
-                <div className="text-center py-3 sm:py-12">
+                <div className="text-center py-2 sm:py-12">
                   <Bell className="h-16 w-16 text-zinc-600 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-white mb-2">{t('alertsPanel.noAlertsConfigured')}</h3>
                   <p className="text-zinc-400 mb-6">
