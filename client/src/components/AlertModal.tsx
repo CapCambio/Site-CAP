@@ -363,7 +363,7 @@ export function AlertModal({
 
     <AlertDialog open={!!pendingSubmit} onOpenChange={(open) => { if (!open) setPendingSubmit(null); }}>
       <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-xs">
-        <AlertDialogHeader>
+        <AlertDialogHeader className="text-center">
           <AlertDialogTitle className="text-white">{t('alerts.replaceExistingTitle')}</AlertDialogTitle>
           <AlertDialogDescription className="text-zinc-400">
             {t('alerts.replaceExistingWarning', {
@@ -371,7 +371,7 @@ export function AlertModal({
             })}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="sm:justify-center">
           <AlertDialogCancel className="border-zinc-600 text-white bg-transparent hover:bg-zinc-800">
             {t('alerts.cancel')}
           </AlertDialogCancel>
