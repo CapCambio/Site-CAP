@@ -362,7 +362,7 @@ export function AlertModal({
     </Dialog>
 
     <AlertDialog open={!!pendingSubmit} onOpenChange={(open) => { if (!open) setPendingSubmit(null); }}>
-      <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
+      <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-xs">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-white">{t('alerts.replaceExistingTitle')}</AlertDialogTitle>
           <AlertDialogDescription className="text-zinc-400">
