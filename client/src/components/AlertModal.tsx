@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
@@ -221,7 +222,8 @@ export function AlertModal({
   const cancelReplace = () => setPendingSubmit(null);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className="sm:max-w-[500px] bg-zinc-900 text-white border-zinc-800 max-h-[90vh] overflow-y-auto alert-modal-scrollbar landscape:pt-12 [@media(orientation:landscape)_and_(max-width:768px)]:[--dialog-close-top:1rem]"
         style={{ 
@@ -337,57 +339,53 @@ export function AlertModal({
               </p>
             </div>
 
-            {pendingSubmit ? (
-              <div className="space-y-4 pt-4">
-                <div className="bg-yellow-500/10 border border-yellow-500/40 rounded p-3">
-                  <p className="text-sm text-yellow-200">
-                    {t('alerts.replaceExistingWarning', {
-                      currencyName,
-                      currentType: getTipoLabel(pendingSubmit.existingTipo),
-                    })}
-                  </p>
-                </div>
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={cancelReplace}
-                    className="border-zinc-600 text-white bg-transparent hover:bg-zinc-800 hover:text-white"
-                  >
-                    {t('alerts.cancel')}
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={confirmReplace}
-                    disabled={createAlertMutation.isPending}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-black"
-                  >
-                    {createAlertMutation.isPending ? t('common.loading') : t('alerts.replaceConfirm')}
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex gap-2 justify-end pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                  className="border-zinc-600 text-white bg-transparent hover:bg-zinc-800 hover:text-white"
-                >
-                  {t('alerts.cancel')}
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createAlertMutation.isPending}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-black"
-                >
-                  {createAlertMutation.isPending ? t('common.loading') : t('alerts.create')}
-                </Button>
-              </div>
-            )}
+            <div className="flex gap-2 justify-end pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="border-zinc-600 text-white bg-transparent hover:bg-zinc-800 hover:text-white"
+              >
+                {t('alerts.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                disabled={createAlertMutation.isPending}
+                className="bg-yellow-500 hover:bg-yellow-600 text-black"
+              >
+                {createAlertMutation.isPending ? t('common.loading') : t('alerts.create')}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
     </Dialog>
+
+    <AlertDialog open={!!pendingSubmit} onOpenChange={(open) => { if (!open) setPendingSubmit(null); }}>
+      <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-white">{t('alerts.replaceExistingTitle')}</AlertDialogTitle>
+          <AlertDialogDescription className="text-zinc-400">
+            {t('alerts.replaceExistingWarning', {
+              currencyName,
+              currentType: pendingSubmit ? getTipoLabel(pendingSubmit.existingTipo) : '',
+            })}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="border-zinc-600 text-white bg-transparent hover:bg-zinc-800">
+            {t('alerts.cancel')}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={confirmReplace}
+            disabled={createAlertMutation.isPending}
+            className="bg-yellow-500 hover:bg-yellow-600 text-black"
+          >
+            {createAlertMutation.isPending ? t('common.loading') : t('alerts.replaceConfirm')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

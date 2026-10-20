@@ -126,6 +126,7 @@
     "selectType": "Select alert type",
     "targetValue": "Target Value",
     "targetValuePlaceholder": "Enter target value (ex: 5.25)",
+    "replaceExistingTitle": "Replace existing alert?",
     "replaceExistingWarning": "You already have a {{currentType}} alert for {{currencyName}}. Creating this new one will replace it.",
     "replaceConfirm": "Replace alert",
     "duration": "Alert Duration",
