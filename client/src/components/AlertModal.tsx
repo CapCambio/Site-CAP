@@ -368,7 +368,6 @@ export function AlertModal({
           <AlertDialogDescription className="text-zinc-400">
             {t('alerts.replaceExistingWarning', {
               currencyName,
-              currentType: pendingSubmit ? getTipoLabel(pendingSubmit.existingTipo) : '',
             })}
           </AlertDialogDescription>
         </AlertDialogHeader>

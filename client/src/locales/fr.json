@@ -127,7 +127,7 @@
     "targetValue": "Valeur Cible",
     "targetValuePlaceholder": "Entrez la valeur cible (ex: 5.25)",
     "replaceExistingTitle": "Remplacer l'alerte existante ?",
-    "replaceExistingWarning": "Vous avez déjà une alerte de type {{currentType}} pour {{currencyName}}. Créer cette nouvelle alerte la remplacera.",
+    "replaceExistingWarning": "Vous avez déjà une alerte pour {{currencyName}}. Créer cette nouvelle alerte la remplacera.",
     "replaceConfirm": "Remplacer l'alerte",
     "duration": "Durée de l'Alerte",
     "howItWorks": "Comment fonctionne l'alerte {{type}}",
