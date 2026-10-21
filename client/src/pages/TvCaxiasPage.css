@@ -517,8 +517,8 @@ button:focus-visible, input:focus-visible {
 .cap-witch-p {
   position: absolute;
   z-index: 5;
-  top: -0.18818em;
-  left: -0.09403em;
+  top: calc(-0.18818em - 0.01518em);
+  left: calc(-0.09403em - 0.0207em);
   width: 0.8em;
   /* o preflight (img { max-width: 100% }) a limitaria à largura da letra P */
   max-width: none;
