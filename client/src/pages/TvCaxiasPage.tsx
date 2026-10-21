@@ -355,7 +355,7 @@ export default function TvCaxiasPage() {
           <span className="cap-mark__letter cap-mark__letter--p">
             P
             {halloweenPreviewActive && <img className="halloween-cap-web" src={HALLOWEEN_ASSETS.cornerWeb} alt="" aria-hidden="true" />}
-            {halloweenPreviewActive && <video className="cap-witch-p" src="/assets/bruxinha%20animada.webm" autoPlay loop muted playsInline aria-hidden="true" />}
+            {halloweenPreviewActive && <img className="cap-witch-p" src="/assets/bruxinha%20p2.png" alt="" aria-hidden="true" />}
 
           </span>
         </span>
