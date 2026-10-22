@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import "./TvCaxiasPage.css";
 
 const ASSET_BASE = import.meta.env.BASE_URL || '/';
@@ -233,14 +233,41 @@ function ratesFromSheet(responseText: string): Rate[] {
   });
 }
 
+function useDecorativeLoopPause(ref: RefObject<HTMLVideoElement>, active: boolean, pauseMs: number) {
+  useEffect(() => {
+    if (!active) return;
+    const video = ref.current;
+    if (!video) return;
+
+    let pauseTimer: number | undefined;
+    const restartAfterPause = () => {
+      pauseTimer = window.setTimeout(() => {
+        video.currentTime = 0;
+        void video.play();
+      }, pauseMs);
+    };
+
+    video.addEventListener('ended', restartAfterPause);
+    return () => {
+      video.removeEventListener('ended', restartAfterPause);
+      if (pauseTimer) window.clearTimeout(pauseTimer);
+    };
+  }, [ref, active, pauseMs]);
+}
+
 export default function TvCaxiasPage() {
   const [rates, setRates] = useState(RATES);
   const [seasonalDate, setSeasonalDate] = useState(() => new Date());
   const dollar = rates.find((rate) => rate.id === "usd") ?? rates[0];
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
-  const halloweenPreviewActive = seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
-  const christmasActive = isChristmasSeason(seasonalDate);
+  const santaVideoRef = useRef<HTMLVideoElement>(null);
+  const catVideoRef = useRef<HTMLVideoElement>(null);
+  const witchVideoRef = useRef<HTMLVideoElement>(null);
+  const spiderVideoRef = useRef<HTMLVideoElement>(null);
+  const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const halloweenPreviewActive = isLocalhost || seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
+  const christmasActive = !isLocalhost && isChristmasSeason(seasonalDate);
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
   const halloweenTopDecorationActive = halloweenPreviewActive;
@@ -282,6 +309,32 @@ export default function TvCaxiasPage() {
       if (nextDayTimer) window.clearTimeout(nextDayTimer);
     };
   }, []);
+
+  useDecorativeLoopPause(santaVideoRef, christmasActive, 10000);
+  useDecorativeLoopPause(catVideoRef, halloweenPreviewActive, 3000);
+  useDecorativeLoopPause(witchVideoRef, halloweenPreviewActive, 2000);
+
+  useEffect(() => {
+    if (!halloweenPreviewActive) return;
+    const video = spiderVideoRef.current;
+    if (!video) return;
+
+    const ANIMATION_DURATION = 32000;
+    const PAUSE_START = 14500;
+    const PAUSE_END = 19500;
+
+    const startTime = Date.now();
+    const interval = window.setInterval(() => {
+      const elapsed = (Date.now() - startTime) % ANIMATION_DURATION;
+      if (elapsed >= PAUSE_START && elapsed < PAUSE_END) {
+        if (!video.paused) video.pause();
+      } else {
+        if (video.paused) void video.play();
+      }
+    }, 100);
+
+    return () => window.clearInterval(interval);
+  }, [halloweenPreviewActive]);
 
   useEffect(() => {
     let isActive = true;
@@ -344,18 +397,18 @@ export default function TvCaxiasPage() {
         <span className="cap-mark" aria-hidden="true">
           <span className="cap-mark__letter cap-mark__letter--c">
             C
-            {halloweenPreviewActive && <img className="halloween-cap-cat" src={HALLOWEEN_ASSETS.peekingCat} alt="" aria-hidden="true" />}
+            {halloweenPreviewActive && <video ref={catVideoRef} className="halloween-cap-cat" src="/assets/gatinho%20animado.webm" autoPlay muted playsInline aria-hidden="true" />}
           </span>
           <span className="cap-mark__letter cap-mark__letter--a">
             A
             {witchHatActive && <img className="halloween-witch-hat" src={HALLOWEEN_ASSETS.witchHat} alt="" aria-hidden="true" />}
             {christmasActive && <img className="christmas-santa-hat" src={CHRISTMAS_ASSETS.santaHat} alt="" aria-hidden="true" />}
-            {christmasActive && <img className="christmas-cap-reindeer christmas-cap-reindeer--full-body" src={CHRISTMAS_ASSETS.capReindeerFullBody} alt="" aria-hidden="true" />}
           </span>
           <span className="cap-mark__letter cap-mark__letter--p">
             P
             {halloweenPreviewActive && <img className="halloween-cap-web" src={HALLOWEEN_ASSETS.cornerWeb} alt="" aria-hidden="true" />}
-            {halloweenPreviewActive && <img className="cap-witch-p" src="/assets/bruxinha%20p2.png" alt="" aria-hidden="true" />}
+            {halloweenPreviewActive && <video ref={witchVideoRef} className="cap-witch-p" src="/assets/bruxinha%20animada.webm" autoPlay muted playsInline aria-hidden="true" />}
+            {christmasActive && <video ref={santaVideoRef} className="cap-santa-p" src="/assets/papai%20noel.webm" autoPlay muted playsInline aria-hidden="true" />}
 
           </span>
         </span>
@@ -401,7 +454,7 @@ export default function TvCaxiasPage() {
             </span>
           )}
           {halloweenPreviewActive && <span className="halloween-table-spider-thread" aria-hidden="true" />}
-          {halloweenPreviewActive && <img className="halloween-table-spider" src={HALLOWEEN_ASSETS.tableSpider} alt="" aria-hidden="true" />}
+          {halloweenPreviewActive && <video ref={spiderVideoRef} className="halloween-table-spider" src="/assets/aranha%20animada.webm" autoPlay muted playsInline aria-hidden="true" />}
         </div>
       </section>
       </main>

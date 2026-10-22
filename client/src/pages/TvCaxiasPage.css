@@ -320,7 +320,7 @@ button:focus-visible, input:focus-visible {
    luzes de pisca-pisca e sinos laterais enquadram o título; chapéu no A e rena diagonal no C preservam a
    composição oficial, Halloween e o ticker-base. */
 .broadcast-shell--christmas-preview .brand-rail {
-  padding-top: clamp(3.75rem, 9vh, 5rem);
+  padding-top: 5.5cqh;
 }
 
 .christmas-title-garland,
@@ -333,9 +333,9 @@ button:focus-visible, input:focus-visible {
 
 .christmas-title-garland {
   z-index: 3;
-  top: -0.5rem;
-  left: -2rem;
-  width: calc(100% + 4rem);
+  top: -0.8cqh;
+  left: -2.5cqw;
+  width: 105cqw;
   height: auto;
   transform: scaleX(1.14);
   transform-origin: top left;
@@ -344,10 +344,10 @@ button:focus-visible, input:focus-visible {
 .christmas-title-twinkle {
   position: absolute;
   z-index: 4;
-  top: -0.1rem;
+  top: -0.2cqh;
   left: 0;
-  width: 100%;
-  height: clamp(54px, 10vh, 76px);
+  width: 100cqw;
+  height: 8cqh;
   pointer-events: none;
   mix-blend-mode: normal;
   transform: none;
@@ -356,16 +356,16 @@ button:focus-visible, input:focus-visible {
 .christmas-title-bell {
   position: absolute;
   z-index: 5;
-  top: clamp(2.85rem, 7vh, 3.5rem);
+  top: 4.5cqh;
   display: block;
-  width: clamp(50px, 5vw, 64px);
+  width: 5cqw;
   height: auto;
   pointer-events: none;
-  filter: drop-shadow(0 2px 2px rgb(92 55 5 / 25%));
+  filter: drop-shadow(0 0.2cqh 0.2cqh rgb(92 55 5 / 25%));
 }
 
-.christmas-title-bell--left { top: clamp(2.35rem, 6vh, 3rem); left: 0.6rem; }
-.christmas-title-bell--right { top: clamp(2.66rem, 6.6vh, 3.31rem); right: 0.7rem; transform: scaleX(-1); }
+.christmas-title-bell--left { top: 3.8cqh; left: 0.8cqw; }
+.christmas-title-bell--right { top: 4.2cqh; right: 0.9cqw; transform: scaleX(-1); }
 
 .christmas-title-twinkle--one {
   background:
@@ -482,26 +482,28 @@ button:focus-visible, input:focus-visible {
 }
 
 .christmas-santa-hat {
+  position: absolute;
   z-index: 3;
-  bottom: calc(var(--ticker-height) + 4rem); /* raised hat a bit more */
-  left: calc(47% - 1.2rem);
-  width: clamp(105px, 9.4vw, 128px);
+  top: calc(-0.17em + 0.0828em);
+  left: calc(50% + 0.069em);
+  transform: translateX(-38%) rotate(-6deg) scale(1.3);
+  width: calc(0.51em - 0.021em);
   height: auto;
-  transform: rotate(-5deg);
+  pointer-events: none;
 }
 
 .christmas-cap-reindeer {
   z-index: 2;
-  bottom: calc(var(--ticker-height) - 0.41rem);
-  left: -0.65rem;
-  width: clamp(80px, 7vw, 100px); /* slightly larger */
+  bottom: calc(var(--ticker-height) - 0.5cqh);
+  left: -0.8cqw;
+  width: 9cqw;
   height: auto;
 }
 
 .christmas-cap-reindeer--bust {
-  bottom: calc(var(--ticker-height) + 2.1rem);
-  left: 2.55rem;
-  width: clamp(54px, 4.9vw, 64px);
+  bottom: calc(var(--ticker-height) + 2.8cqh);
+  left: 3.2cqw;
+  width: 6cqw;
 }
 
 .halloween-witch {
@@ -517,10 +519,21 @@ button:focus-visible, input:focus-visible {
 .cap-witch-p {
   position: absolute;
   z-index: 5;
-  top: -0.18818em;
-  left: -0.09403em;
+  top: calc(-0.18818em - 0.01518em);
+  left: calc(-0.09403em - 0.0207em);
   width: 0.8em;
   /* o preflight (img { max-width: 100% }) a limitaria à largura da letra P */
+  max-width: none;
+  height: auto;
+  pointer-events: none;
+}
+
+.cap-santa-p {
+  position: absolute;
+  z-index: 5;
+  top: calc(-0.18818em - 0.0207em);
+  left: calc(-0.09403em - 0.069em);
+  width: calc(0.938em);
   max-width: none;
   height: auto;
   pointer-events: none;
@@ -673,9 +686,9 @@ button:focus-visible, input:focus-visible {
   position: absolute;
   z-index: 3;
   top: var(--quote-table-header-height);
-  bottom: 0.15rem;
+  bottom: 0.2cqh;
   left: calc(var(--currency-flag-inset) / 2);
-  width: clamp(18px, 1.7vw, 24px);
+  width: 2cqw;
   overflow: visible;
   pointer-events: none;
   transform: translateX(-50%);
@@ -798,8 +811,8 @@ button:focus-visible, input:focus-visible {
 .broadcast-shell--halloween-preview .brand-rail { padding-top: 7cqh; }
 .broadcast-shell--christmas-preview .brand-rail { padding-top: 9cqh; }
 .broadcast-shell .brand-logo { top: 1.8cqh; width: 10.3cqw; }
-.broadcast-shell .brand-status { font-size: clamp(2rem, 3.4cqw, 4rem); margin-top: 3.78858cqh; }
-.broadcast-shell .travel-carousel { top: 43.5%; height: 35%; }
+.broadcast-shell .brand-status { font-size: clamp(2rem, 3.4cqw, 4rem); margin-top: calc(3.78858cqh - 1.395cqh); }
+.broadcast-shell .travel-carousel { top: calc(43.5% - 1.023cqh); height: 35%; }
 .broadcast-shell--original .travel-carousel { top: 48.5%; }
 .broadcast-shell .cap-mark { right: 0.8cqw; font-size: 14.5cqw; }
 .broadcast-shell .side-ticker__track { font-size: clamp(1.08rem, 1.4cqw, 1.35rem); }
