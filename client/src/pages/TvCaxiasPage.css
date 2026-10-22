@@ -811,9 +811,15 @@ button:focus-visible, input:focus-visible {
 .broadcast-shell--halloween-preview .brand-rail { padding-top: 7cqh; }
 .broadcast-shell--christmas-preview .brand-rail { padding-top: 9cqh; }
 .broadcast-shell .brand-logo { top: 1.8cqh; width: 10.3cqw; }
-.broadcast-shell .brand-status { font-size: clamp(2rem, 3.4cqw, 4rem); margin-top: calc(3.78858cqh - 1.395cqh); }
-.broadcast-shell .travel-carousel { top: calc(43.5% - 1.023cqh); height: 35%; }
+.broadcast-shell .brand-status { font-size: clamp(2rem, 3.4cqw, 4rem); }
+.broadcast-shell .travel-carousel { height: 35%; }
+/* Vertical do letreiro e da janela de viagens é declarada por tema: ajustar um não desloca os outros. */
+.broadcast-shell--original .brand-status { margin-top: calc(3.78858cqh - 1.395cqh); }
+.broadcast-shell--halloween-preview .brand-status { margin-top: calc(3.78858cqh - 1.395cqh + 0.093cqh + 0.186cqh + 0.279cqh); }
+.broadcast-shell--christmas-preview .brand-status { margin-top: calc(3.78858cqh - 1.395cqh); }
 .broadcast-shell--original .travel-carousel { top: 48.5%; }
+.broadcast-shell--halloween-preview .travel-carousel { top: calc(43.5% - 1.023cqh); }
+.broadcast-shell--christmas-preview .travel-carousel { top: calc(43.5% - 1.023cqh); }
 .broadcast-shell .cap-mark { right: 0.8cqw; font-size: 14.5cqw; }
 .broadcast-shell .side-ticker__track { font-size: clamp(1.08rem, 1.4cqw, 1.35rem); }
 
