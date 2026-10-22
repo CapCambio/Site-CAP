@@ -158,9 +158,9 @@ function HalloweenTopDecor() {
       <img className="halloween-corner-web halloween-corner-web--left" src={HALLOWEEN_ASSETS.cornerWeb} alt="" />
       <img className="halloween-corner-web halloween-corner-web--right" src={HALLOWEEN_ASSETS.cornerWeb} alt="" />
       <img className="halloween-web-connector" src={HALLOWEEN_ASSETS.connectorWeb} alt="" />
-      <img className="halloween-bat halloween-bat--one" src={HALLOWEEN_ASSETS.batLeft} alt="" />
-      <img className="halloween-bat halloween-bat--two" src={HALLOWEEN_ASSETS.batCenter} alt="" />
-      <img className="halloween-bat halloween-bat--three" src={HALLOWEEN_ASSETS.batRight} alt="" />
+      <video className="halloween-bat halloween-bat--one" src="/assets/morcego%20esquerda.webm" autoPlay loop muted playsInline aria-hidden="true" />
+      <video className="halloween-bat halloween-bat--two" src="/assets/morcego%20meio.webm" autoPlay loop muted playsInline aria-hidden="true" />
+      <video className="halloween-bat halloween-bat--three" src="/assets/morcego%20direito.webm" autoPlay loop muted playsInline aria-hidden="true" />
     </div>
   );
 }

@@ -278,9 +278,9 @@ button:focus-visible, input:focus-visible {
   z-index: 1;
 }
 
-.halloween-bat--one { top: 10.485cqh; left: 0.866cqw; transform: rotate(-8deg); }
+.halloween-bat--one { top: 10.020cqh; left: 0.866cqw; transform: rotate(-8deg); }
 .halloween-bat--two { top: 1.438cqh; left: 11.064cqw; width: 6.095cqw; transform: rotate(5deg); }
-.halloween-bat--three { top: 9.049cqh; right: 1.130cqw; transform: rotate(8deg); }
+.halloween-bat--three { top: 7.933cqh; right: 1.130cqw; transform: rotate(8deg); }
 
 .halloween-witch-hat {
   position: absolute;
