@@ -310,7 +310,7 @@ export default function TvCaxiasPage() {
     };
   }, []);
 
-  useDecorativeLoopPause(santaVideoRef, christmasActive, 10000);
+  useDecorativeLoopPause(santaVideoRef, christmasActive, 3000);
   useDecorativeLoopPause(catVideoRef, halloweenPreviewActive, 3000);
   useDecorativeLoopPause(witchVideoRef, halloweenPreviewActive, 2000);
 

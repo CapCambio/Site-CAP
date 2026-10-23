@@ -542,9 +542,9 @@ button:focus-visible, input:focus-visible {
 .cap-santa-p {
   position: absolute;
   z-index: 5;
-  top: calc(-0.18818em - 0.0207em);
+  top: calc(-0.18818em - 0.0207em - 0.069em + 0.0345em - 0.0138em - 0.0069em + 0.00345em + 0.00207em + 0.00138em + 0.00069em + 0.00069em + 0.00138em);
   left: calc(-0.09403em - 0.069em);
-  width: calc(0.938em);
+  width: calc(0.938em + 0.069em + 0.207em - 0.1035em - 0.069em);
   max-width: none;
   height: auto;
   pointer-events: none;
