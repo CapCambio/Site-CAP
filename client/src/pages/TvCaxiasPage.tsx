@@ -266,8 +266,8 @@ export default function TvCaxiasPage() {
   const witchVideoRef = useRef<HTMLVideoElement>(null);
   const spiderVideoRef = useRef<HTMLVideoElement>(null);
   const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-  const halloweenPreviewActive = isLocalhost || seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
-  const christmasActive = !isLocalhost && isChristmasSeason(seasonalDate);
+  const halloweenPreviewActive = !isLocalhost && seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
+  const christmasActive = isLocalhost || isChristmasSeason(seasonalDate);
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
   const halloweenTopDecorationActive = halloweenPreviewActive;
@@ -398,6 +398,7 @@ export default function TvCaxiasPage() {
           <span className="cap-mark__letter cap-mark__letter--c">
             C
             {halloweenPreviewActive && <video ref={catVideoRef} className="halloween-cap-cat" src="/assets/gatinho%20animado.webm" autoPlay muted playsInline aria-hidden="true" />}
+            {christmasActive && <video className="christmas-cap-rena" src="/assets/rena%20animada.webm" autoPlay loop muted playsInline aria-hidden="true" />}
           </span>
           <span className="cap-mark__letter cap-mark__letter--a">
             A
@@ -408,7 +409,7 @@ export default function TvCaxiasPage() {
             P
             {halloweenPreviewActive && <img className="halloween-cap-web" src={HALLOWEEN_ASSETS.cornerWeb} alt="" aria-hidden="true" />}
             {halloweenPreviewActive && <video ref={witchVideoRef} className="cap-witch-p" src="/assets/bruxinha%20animada.webm" autoPlay muted playsInline aria-hidden="true" />}
-            {christmasActive && <video ref={santaVideoRef} className="cap-santa-p" src="/assets/papai%20noel.webm" autoPlay muted playsInline aria-hidden="true" />}
+            {christmasActive && <video ref={santaVideoRef} className="cap-santa-p" src="/assets/papai%20noel%20animado.webm" autoPlay muted playsInline aria-hidden="true" />}
 
           </span>
         </span>
