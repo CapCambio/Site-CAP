@@ -6,7 +6,7 @@ import webpush from 'web-push';
 import Handlebars from 'handlebars';
 import { jsonStorage } from './json-storage';
 import { logger, devLog } from './logger';
-import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint, getCurrencyHistory, deleteAlertByUserAndCurrency } from './db';
+import { getPushSubscriptionsByUser, deletePushSubscriptionByEndpoint, getCurrencyHistory, deleteAlertByUserAndCurrency, getUserByEmail } from './db';
 import type { PushSubscription as DbPushSubscription } from './db';
 
 // Registrar helpers Handlebars
@@ -661,25 +661,12 @@ class AlertSystem {
    */
   private async getUserName(email: string): Promise<string> {
     try {
-      // Tenta encontrar o nome no arquivo de configuração
-      const configPath = join(__dirname, 'config', 'authorized-emails.json');
-      if (existsSync(configPath)) {
-        const configData = readFileSync(configPath, 'utf8');
-        const config = JSON.parse(configData);
-        
-        // Buscar em authorizedEmails
-        const authorizedUser = config.authorizedEmails?.find((u: any) => u.email === email);
-        if (authorizedUser?.name) {
-          return authorizedUser.name;
-        }
-        
-        // Buscar em adminEmails
-        const adminUser = config.adminEmails?.find((u: any) => u.email === email);
-        if (adminUser?.name) {
-          return adminUser.name;
-        }
+      const user = await getUserByEmail(email);
+      const name = user?.name?.trim();
+      if (name && !name.includes('@')) {
+        return name;
       }
-      
+
       // Fallback: usar parte do email antes do @
       return email.split('@')[0];
     } catch (error) {
