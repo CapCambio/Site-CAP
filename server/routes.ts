@@ -1598,18 +1598,16 @@ export async function refreshCurrencies() {
     const todayStr = new Date().toISOString().split('T')[0];
     yesterdayCacheDate = todayStr;
 
-    // Buscar histórico do dia anterior para todas as moedas
+    // Buscar histórico dos últimos 7 dias para pegar o último dia útil antes de hoje
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const dayBeforeYesterday = new Date(yesterday);
-    dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
+    const lookbackStart = new Date(today);
+    lookbackStart.setDate(lookbackStart.getDate() - 7);
 
     // Buscar histórico para todas as moedas de uma vez
-    const allHistory = await db.getCurrencyHistory(undefined, dayBeforeYesterday, today);
+    const allHistory = await db.getCurrencyHistory(undefined, lookbackStart, today);
 
-    // Processar e cachear o último preço de cada moeda do dia anterior
+    // Processar e cachear o último preço antes de hoje para cada moeda
     const historyByCode = new Map<string, any[]>();
     allHistory.forEach((record: any) => {
       if (!historyByCode.has(record.code)) {
@@ -1618,12 +1616,12 @@ export async function refreshCurrencies() {
       historyByCode.get(record.code)!.push(record);
     });
 
-    // Para cada moeda, pegar o último preço do dia anterior
+    // Para cada moeda, pegar o último preço disponível antes de hoje
     for (const [code, records] of Array.from(historyByCode.entries())) {
       const sortedRecords = records
         .filter((record: { timestamp: string | Date }) => {
           const recordDate = new Date(record.timestamp);
-          return recordDate >= dayBeforeYesterday && recordDate < today;
+          return recordDate >= lookbackStart && recordDate < today;
         })
         .sort((a: { timestamp: string | Date }, b: { timestamp: string | Date }) =>
           new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
