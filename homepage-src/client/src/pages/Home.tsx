@@ -160,7 +160,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="servicos" className="scroll-mt-24 bg-[#0d0d0b] py-20 max-sm:py-10 sm:py-20 lg:pb-5 lg:pt-0">
+        <section id="servicos" className="scroll-mt-24 bg-[#0d0d0b] py-20 max-sm:py-10 sm:py-20 lg:pb-16 lg:pt-0">
           <div className="container">
             <div className="max-w-2xl"><p className="cap-kicker text-[#facb2e]">{t('home.services.kicker')}</p><h2 className="cap-display mt-3 text-4xl font-extrabold sm:text-5xl">{t('home.services.title')}</h2></div>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
@@ -194,7 +194,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="cotacoes" className="scroll-mt-24 border-y border-white/10 bg-[#070707] py-20 max-sm:py-10 sm:py-20 lg:py-5" aria-labelledby="cotacoes-title">
+        <section id="cotacoes" className="scroll-mt-24 border-y border-white/10 bg-[#070707] py-20 max-sm:py-10 sm:py-20 lg:py-16" aria-labelledby="cotacoes-title">
           <div className="container grid items-center gap-10 lg:grid-cols-[.94fr_1.06fr] lg:gap-16">
             <div className="relative flex min-h-[280px] items-center justify-center py-3 max-sm:hidden sm:min-h-[360px]">
               <svg aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 480 360" preserveAspectRatio="none">
@@ -244,7 +244,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="diferenciais" className="scroll-mt-24 border-y border-white/10 bg-black py-20 max-sm:py-10 sm:py-20 lg:py-5">
+        <section id="diferenciais" className="scroll-mt-24 border-y border-white/10 bg-black py-20 max-sm:py-10 sm:py-20 lg:py-16">
           <div className="container grid items-start gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-stretch lg:gap-16">
             <div>
               <div className="max-w-2xl">
@@ -268,14 +268,14 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="sobre" className="scroll-mt-24 py-20 max-sm:py-10 sm:py-20 lg:py-5">
+        <section id="sobre" className="scroll-mt-24 py-20 max-sm:py-10 sm:py-20 lg:py-16">
           <div className="container grid items-center gap-12 lg:grid-cols-[.9fr_1.1fr]">
             <div className="order-2 relative lg:order-2"><div className="cap-grid absolute inset-0 rounded-[2rem] opacity-35" /><article className="cap-surface relative flex min-h-[360px] flex-col items-center overflow-hidden rounded-[2rem] border-2 border-[#facb2e]/75 p-7 text-center shadow-2xl sm:p-9"><div aria-hidden="true" className="pointer-events-none absolute inset-3 rounded-[1.35rem] border border-[#facb2e]/20" /><div className="relative inline-flex items-center gap-2 rounded-full border border-[#facb2e]/30 bg-[#facb2e]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.18em] text-[#facb2e]"><ShieldCheck className="size-4" />{t('home.about.partnerLabel')}</div><div className="relative my-6 flex h-28 w-full items-center justify-center sm:h-32 lg:h-40"><img src={asset("invest-corretora.png")} alt="Invest Corretora" className="h-auto w-full max-w-[280px] object-contain lg:max-w-[360px] lg:scale-[1.3]" /></div><h3 className="cap-display relative text-lg font-extrabold uppercase tracking-normal sm:text-xl" style={{ wordSpacing: '0.15em' }}>INVEST SOCIEDADE CORRETORA DE CAMBIO LTDA</h3><p className="relative mt-3 max-w-xs text-xs leading-5 text-white/70">{t('home.about.partnerDesc')}</p></article></div>
             <div className="order-1 lg:order-1"><p className="cap-kicker text-[#facb2e]">{t('home.about.kicker')}</p><div className="mt-3"><h2 className="cap-display text-4xl font-extrabold leading-[1.02] sm:text-5xl"><span className="block">{t('home.about.title1')}</span>{" "}<span className="block">{t('home.about.title2')}</span><span className="block lg:hidden">{t('home.about.title3').split(' ').slice(0, -1).join(' ')}</span><span className="block lg:hidden">{t('home.about.title3').split(' ').slice(-1)}</span></h2></div><h2 className="cap-display mt-3 hidden text-4xl font-extrabold leading-[1.02] sm:text-5xl lg:block">{t('home.about.title3')}</h2><p className="mt-7 max-w-xl text-base leading-7 text-white/75">{t('home.about.desc')}</p></div>
           </div>
         </section>
 
-        <section id="lojas" className="scroll-mt-24 bg-black py-20 max-sm:py-10 sm:py-20 lg:py-5">
+        <section id="lojas" className="scroll-mt-24 bg-black py-20 max-sm:py-10 sm:py-20 lg:py-16">
 	          <div className="container">
 	            <div className="grid gap-10 xl:grid-cols-[.72fr_1.28fr] xl:items-start xl:gap-8">
 	              <div>
