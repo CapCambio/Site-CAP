@@ -141,7 +141,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-[linear-gradient(90deg,#000_0%,transparent_17%,transparent_78%,#000_100%)]" />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,#000_0%,transparent_14%,transparent_76%,#000_100%)]" />
           </div>
-          <div className="container relative z-10 grid min-h-[600px] items-start gap-10 py-12 sm:py-16 lg:min-h-[520px] lg:grid-cols-[1.1fr_.9fr] lg:pb-20 lg:pt-10">
+          <div className="container relative z-10 grid min-h-[600px] items-start gap-10 py-12 sm:py-16 lg:min-h-[520px] lg:grid-cols-[1.1fr_.9fr] lg:pb-6 lg:pt-10">
             <div className="max-w-[760px]">
               <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#facb2e]/25 bg-[#facb2e]/10 px-3 py-1.5 text-xs font-bold text-[#facb2e]"><span className="cap-pulse h-1.5 w-1.5 rounded-full bg-[#facb2e]" />{t('home.hero.since')}</div>
               <h1 className="cap-display max-w-[680px] text-5xl font-extrabold leading-[.95] text-white sm:text-6xl lg:text-7xl">{t('home.hero.title1')} <span className="text-[#facb2e]">{t('home.hero.title2')}</span></h1>
@@ -160,7 +160,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="servicos" className="scroll-mt-24 bg-[#0d0d0b] py-20 max-sm:py-10 sm:py-20 lg:pb-20 lg:pt-20">
+        <section id="servicos" className="scroll-mt-24 bg-black py-20 max-sm:py-10 sm:py-20 lg:pb-20 lg:pt-20">
           <div className="container">
             <div className="max-w-2xl"><p className="cap-kicker text-[#facb2e]">{t('home.services.kicker')}</p><h2 className="cap-display mt-3 text-4xl font-extrabold sm:text-5xl">{t('home.services.title')}</h2></div>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
@@ -194,7 +194,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="cotacoes" className="scroll-mt-24 border-y border-white/10 bg-[#070707] py-20 max-sm:py-10 sm:py-20 lg:py-20" aria-labelledby="cotacoes-title">
+        <section id="cotacoes" className="scroll-mt-24 border-y border-white/10 bg-black py-20 max-sm:py-10 sm:py-20 lg:py-20" aria-labelledby="cotacoes-title">
           <div className="container grid items-center gap-10 lg:grid-cols-[.94fr_1.06fr] lg:gap-16">
             <div className="relative flex min-h-[280px] items-center justify-center py-3 max-sm:hidden sm:min-h-[360px]">
               <svg aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 480 360" preserveAspectRatio="none">
@@ -297,7 +297,7 @@ export default function Home() {
 	              </div>
 
 		              <article className="group overflow-hidden rounded-[1.75rem] border border-white/[.06] bg-white/[.025] shadow-[0_24px_65px_rgba(0,0,0,.22)]">
-	                <div className="relative aspect-[16/9] overflow-hidden bg-[#0d0d0b] xl:aspect-[15/8]">
+	                <div className="relative aspect-[16/9] overflow-hidden bg-black xl:aspect-[15/8]">
 	                  <img key={`${activeOffice.city}-backdrop`} src={activeOffice.photo} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover object-center opacity-35 blur-2xl" />
 	                  <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
 	                  <img key={activeOffice.city} src={activeOffice.photo} alt={`${t('home.stores.facade')} ${activeOffice.city}`} className="relative z-10 h-full w-full object-contain object-center transition-transform duration-700 group-hover:scale-[1.03]" />
@@ -329,7 +329,7 @@ export default function Home() {
         <ArchivedFaq whatsappUrl={waUrl(t('home.whatsappGeneral'))} />
       </main>
 
-      <footer className="border-t border-white/10 bg-[#070707] pb-8 pt-8 lg:pt-8">
+      <footer className="border-t border-white/10 bg-black pb-8 pt-8 lg:pt-8">
         <div className="container">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             <div className="flex flex-col items-center text-center">

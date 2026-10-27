@@ -19,7 +19,7 @@ export function ArchivedExperiences({ onContactClick }: ArchivedExperiencesProps
   const { t } = useTranslation();
 
   return (
-    <section id="depoimentos" className="border-y border-white/10 bg-[#0a0a09] py-20 sm:py-28">
+    <section id="depoimentos" className="border-y border-white/10 bg-black py-20 sm:py-28">
       <div className="container grid gap-8 lg:grid-cols-[.9fr_1.1fr]">
         <div>
           <p className="cap-kicker text-[#facb2e]">{t('home.experiences.kicker')}</p>

@@ -58,7 +58,7 @@
   * { @apply border-border outline-ring/50; }
   html { scroll-behavior: smooth; }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-black text-foreground;
     font-family: "Plus Jakarta Sans", sans-serif;
     min-width: 320px;
     overflow-x: hidden;
