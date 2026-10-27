@@ -160,7 +160,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="servicos" className="scroll-mt-24 bg-black py-20 max-sm:py-10 sm:py-20 lg:pb-20 lg:pt-20">
+        <section id="servicos" className="scroll-mt-24 bg-black py-20 max-sm:py-10 sm:py-20 lg:pb-20 lg:pt-6">
           <div className="container">
             <div className="max-w-2xl"><p className="cap-kicker text-[#facb2e]">{t('home.services.kicker')}</p><h2 className="cap-display mt-3 text-4xl font-extrabold sm:text-5xl">{t('home.services.title')}</h2></div>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
