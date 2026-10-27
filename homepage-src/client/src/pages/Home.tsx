@@ -141,7 +141,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-[linear-gradient(90deg,#000_0%,transparent_17%,transparent_78%,#000_100%)]" />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,#000_0%,transparent_14%,transparent_76%,#000_100%)]" />
           </div>
-          <div className="container relative z-10 grid min-h-[600px] items-start gap-10 py-12 sm:py-16 lg:min-h-[520px] lg:grid-cols-[1.1fr_.9fr] lg:pb-2 lg:pt-10">
+          <div className="container relative z-10 grid min-h-[600px] items-start gap-10 py-12 sm:py-16 lg:min-h-[520px] lg:grid-cols-[1.1fr_.9fr] lg:pb-24 lg:pt-10">
             <div className="max-w-[760px]">
               <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#facb2e]/25 bg-[#facb2e]/10 px-3 py-1.5 text-xs font-bold text-[#facb2e]"><span className="cap-pulse h-1.5 w-1.5 rounded-full bg-[#facb2e]" />{t('home.hero.since')}</div>
               <h1 className="cap-display max-w-[680px] text-5xl font-extrabold leading-[.95] text-white sm:text-6xl lg:text-7xl">{t('home.hero.title1')} <span className="text-[#facb2e]">{t('home.hero.title2')}</span></h1>
@@ -160,7 +160,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="servicos" className="scroll-mt-24 bg-[#0d0d0b] py-20 max-sm:py-10 sm:py-20 lg:pb-24 lg:pt-0">
+        <section id="servicos" className="scroll-mt-24 bg-[#0d0d0b] py-20 max-sm:py-10 sm:py-20 lg:pb-24 lg:pt-24">
           <div className="container">
             <div className="max-w-2xl"><p className="cap-kicker text-[#facb2e]">{t('home.services.kicker')}</p><h2 className="cap-display mt-3 text-4xl font-extrabold sm:text-5xl">{t('home.services.title')}</h2></div>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
