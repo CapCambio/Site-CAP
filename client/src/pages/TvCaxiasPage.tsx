@@ -265,6 +265,7 @@ export default function TvCaxiasPage() {
   const catVideoRef = useRef<HTMLVideoElement>(null);
   const witchVideoRef = useRef<HTMLVideoElement>(null);
   const spiderVideoRef = useRef<HTMLVideoElement>(null);
+  const garlandVideoRef = useRef<HTMLVideoElement>(null);
   const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
   const halloweenPreviewActive = !isLocalhost && seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
   const christmasActive = isLocalhost || isChristmasSeason(seasonalDate);
@@ -310,7 +311,7 @@ export default function TvCaxiasPage() {
     };
   }, []);
 
-  useDecorativeLoopPause(santaVideoRef, christmasActive, 3000);
+  useDecorativeLoopPause(santaVideoRef, christmasActive, 4000);
   useDecorativeLoopPause(catVideoRef, halloweenPreviewActive, 3000);
   useDecorativeLoopPause(witchVideoRef, halloweenPreviewActive, 2000);
 
@@ -374,6 +375,7 @@ export default function TvCaxiasPage() {
       <aside className="brand-rail" aria-label="Status das cotações">
         {halloweenTopDecorationActive && <HalloweenTopDecor />}
         {christmasActive && <img className="christmas-title-garland" src={CHRISTMAS_ASSETS.titleGarlandStraight} alt="" aria-hidden="true" />}
+        {christmasActive && <video ref={garlandVideoRef} className="christmas-title-garland-video" src="/assets/guirlanda%20animada.webm" autoPlay muted playsInline loop aria-hidden="true" />}
         {christmasActive && <span className="christmas-title-twinkle christmas-title-twinkle--one" aria-hidden="true" />}
         {christmasActive && <span className="christmas-title-twinkle christmas-title-twinkle--two" aria-hidden="true" />}
         {christmasActive && <span className="christmas-title-twinkle christmas-title-twinkle--three" aria-hidden="true" />}
@@ -425,6 +427,8 @@ export default function TvCaxiasPage() {
       <section className="quote-stage quote-stage--table-only" aria-label="Tabela de cotações">
         <div className="quote-table-wrap relative">
   {halloweenPreviewActive && <img className="absolute bottom-0 right-0 w-[48.41%] z-20 pointer-events-none translate-x-[49.60504%] translate-y-[10.09766%]" src="/assets/árvore.png" alt="Árvore de abóboras" aria-hidden="true" />}
+  {christmasActive && <img className="absolute bottom-0 right-0 w-[48.41%] z-20 pointer-events-none translate-x-[49.60504%] translate-y-[11.08192%]" src="/assets/árvore%20de%20natal.png" alt="Árvore de Natal" aria-hidden="true" />}
+  {christmasActive && <video className="absolute bottom-0 right-0 w-[48.41%] z-[21] pointer-events-none translate-x-[49.60504%] translate-y-[7.27816%]" src="/assets/árvore%20natal%20animada.webm" autoPlay muted playsInline loop preload="auto" aria-hidden="true" />}
   
           <table className="quote-table">
             <thead>

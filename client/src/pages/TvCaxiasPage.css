@@ -344,12 +344,24 @@ button:focus-visible, input:focus-visible {
 
 .christmas-title-garland {
   z-index: 3;
+  top: calc(-0.8cqh - 0.7px);
+  left: -2.5cqw;
+  width: 105cqw;
+  height: auto;
+  transform: scaleX(1.14);
+  transform-origin: top left;
+}
+
+.christmas-title-garland-video {
+  position: absolute;
+  z-index: 4;
   top: -0.8cqh;
   left: -2.5cqw;
   width: 105cqw;
   height: auto;
   transform: scaleX(1.14);
   transform-origin: top left;
+  pointer-events: none;
 }
 
 .christmas-title-twinkle {
@@ -542,8 +554,8 @@ button:focus-visible, input:focus-visible {
 .cap-santa-p {
   position: absolute;
   z-index: 5;
-  top: calc(-0.18818em - 0.0207em - 0.069em + 0.0345em - 0.0138em - 0.0069em + 0.00345em + 0.00207em + 0.00138em + 0.00069em + 0.00069em + 0.00138em);
-  left: calc(-0.09403em - 0.069em);
+  top: calc(-0.18818em - 0.0207em - 0.069em + 0.0345em - 0.0138em - 0.0069em + 0.00345em + 0.00207em + 0.00138em + 0.00069em + 0.00069em + 0.00138em + 0.4px);
+  left: calc(-0.09403em - 0.069em - 0.069em + 0.0345em);
   width: calc(0.938em + 0.069em + 0.207em - 0.1035em - 0.069em);
   max-width: none;
   height: auto;
@@ -714,7 +726,7 @@ button:focus-visible, input:focus-visible {
   max-width: none;
   object-fit: contain;
   mix-blend-mode: normal;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-1px);
 }
 
 /* STYLE NOTE — Halloween na tabela: a aranha e sua teia percorrem a margem anterior
@@ -827,10 +839,10 @@ button:focus-visible, input:focus-visible {
 /* Vertical do letreiro e da janela de viagens é declarada por tema: ajustar um não desloca os outros. */
 .broadcast-shell--original .brand-status { margin-top: calc(3.78858cqh - 1.395cqh); }
 .broadcast-shell--halloween-preview .brand-status { margin-top: calc(3.78858cqh - 1.395cqh + 0.093cqh + 0.186cqh + 0.279cqh); }
-.broadcast-shell--christmas-preview .brand-status { margin-top: calc(3.78858cqh - 1.395cqh); }
+.broadcast-shell--christmas-preview .brand-status { margin-top: calc(3.78858cqh - 1.395cqh - 7px); }
 .broadcast-shell--original .travel-carousel { top: 48.5%; }
 .broadcast-shell--halloween-preview .travel-carousel { top: calc(43.5% - 1.023cqh); }
-.broadcast-shell--christmas-preview .travel-carousel { top: calc(43.5% - 1.023cqh); }
+.broadcast-shell--christmas-preview .travel-carousel { top: calc(43.5% - 1.023cqh - 2px); }
 .broadcast-shell .cap-mark { right: 0.8cqw; font-size: 14.5cqw; }
 .broadcast-shell .side-ticker__track { font-size: clamp(1.08rem, 1.4cqw, 1.35rem); }
 
