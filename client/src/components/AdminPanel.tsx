@@ -691,7 +691,7 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
                 size="sm"
                 onClick={() => handlePageChange(pagination.page - 1)}
                 disabled={pagination.page === 1}
-                className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                className="border-zinc-600 text-black hover:bg-zinc-700"
               >
                 {t('admin.previous')}
               </Button>
@@ -717,7 +717,7 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
                       onClick={() => handlePageChange(pageNum)}
                       className={pageNum === pagination.page 
                         ? "bg-yellow-500 text-black hover:bg-yellow-600" 
-                        : "border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                        : "border-zinc-600 text-black hover:bg-zinc-700"
                       }
                     >
                       {pageNum}
@@ -731,7 +731,7 @@ function AlertsManagement({ authorizedEmails }: AlertsManagementProps) {
                 size="sm"
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page === pagination.totalPages}
-                className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                className="border-zinc-600 text-black hover:bg-zinc-700"
               >
                 {t('admin.next')}
               </Button>
@@ -1317,7 +1317,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                       size="sm"
                       onClick={() => handlePageChange(pagination.page - 1)}
                       disabled={pagination.page === 1}
-                      className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                      className="border-zinc-600 text-black hover:bg-zinc-700"
                     >
                       {t('admin.previous')}
                     </Button>
@@ -1343,7 +1343,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                             onClick={() => handlePageChange(pageNum)}
                             className={pageNum === pagination.page 
                               ? "bg-yellow-500 text-black hover:bg-yellow-600" 
-                              : "border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                              : "border-zinc-600 text-black hover:bg-zinc-700"
                             }
                           >
                             {pageNum}
@@ -1357,7 +1357,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                       size="sm"
                       onClick={() => handlePageChange(pagination.page + 1)}
                       disabled={pagination.page === pagination.totalPages}
-                      className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                      className="border-zinc-600 text-black hover:bg-zinc-700"
                     >
                       {t('admin.next')}
                     </Button>
