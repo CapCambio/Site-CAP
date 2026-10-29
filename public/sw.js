@@ -191,7 +191,7 @@ self.addEventListener('push', (event) => {
     requireInteraction: false,
     data: {
       url: data.data?.url || '/',
-      actionUrl: data.data?.actionUrl || 'https://capcambio.up.railway.app/cotacoes'
+      actionUrl: data.data?.actionUrl || 'https://capcambio.com.br/cotacoes'
     },
     actions: data.actions || [
       {
@@ -218,7 +218,7 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
   // Sempre redireciona para a página de cotações, independentemente de onde clicou
-  const targetUrl = event.notification.data.actionUrl || 'https://capcambio.up.railway.app/cotacoes';
+  const targetUrl = event.notification.data.actionUrl || 'https://capcambio.com.br/cotacoes';
   
   event.waitUntil(
     clients.matchAll({ type: 'window' })

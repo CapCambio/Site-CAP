@@ -1210,9 +1210,8 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
       title: titulo,
       body: mensagem,
       icon: 'https://iili.io/fBQNNwX.jpg',
-      // capcambio.up.railway.app/cotacoes é o app de cotações (capcambio.com.br ainda é WordPress)
-      badge: 'https://capcambio.up.railway.app/push-badge.png',
-      image: 'https://capcambio.up.railway.app/nota-push.jpg',
+      badge: 'https://capcambio.com.br/push-badge.png',
+      image: 'https://capcambio.com.br/nota-push.jpg',
       actions: [
         {
           action: 'view-quotes',
@@ -1221,7 +1220,7 @@ devLog(`📝 Alerta criado: ${email} - ${currencyCode} (${tipo})${valorInfo}${va
       ],
       data: {
         url: `${process.env.APP_URL || ''}/dashboard`,
-        actionUrl: 'https://capcambio.up.railway.app/cotacoes',
+        actionUrl: 'https://capcambio.com.br/cotacoes',
         currencyCode,
         variacao: currencyCode === 'MULTIPLE' ? null : variacao,
         language
