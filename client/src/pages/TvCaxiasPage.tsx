@@ -55,16 +55,30 @@ const RATES: Rate[] = [
 const SHEET_ENDPOINT = "https://docs.google.com/spreadsheets/d/1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk/gviz/tq?tqx=out:json&gid=0";
 
 const HALLOWEEN_MONTH_INDEX = 9;
-// Período natalino: 26 de novembro até 06 de janeiro.
+// Período natalino: primeiro domingo do Advento até Dia de Reis (6 de janeiro).
+// Tradição católica: árvore montada no Advento, desmontada no Dia de Reis.
+function getFirstSundayOfAdvent(year: number): Date {
+  const nov30 = new Date(year, 10, 30);
+  const dayOfWeek = nov30.getDay();
+  const firstSunday = new Date(nov30);
+  
+  if (dayOfWeek === 0) {
+    firstSunday.setDate(nov30.getDate());
+  } else if (dayOfWeek <= 3) {
+    firstSunday.setDate(nov30.getDate() - dayOfWeek);
+  } else {
+    firstSunday.setDate(nov30.getDate() + (7 - dayOfWeek));
+  }
+  
+  return firstSunday;
+}
+
 function isChristmasSeason(date: Date) {
-  const month = date.getMonth();
-  const day = date.getDate();
-
-  const isLateNovember = month === 10 && day >= 26;
-  const isDecember = month === 11;
-  const isEarlyJanuary = month === 0 && day <= 6;
-
-  return isLateNovember || isDecember || isEarlyJanuary;
+  const year = date.getFullYear();
+  const firstSundayOfAdvent = getFirstSundayOfAdvent(year);
+  const epiphany = new Date(year + 1, 0, 6);
+  
+  return date >= firstSundayOfAdvent && date <= epiphany;
 }
 
 const HALLOWEEN_ASSETS = {

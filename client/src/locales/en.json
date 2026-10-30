@@ -15,6 +15,8 @@
     "actions": "Actions",
     "edit": "Edit",
     "delete": "Delete",
+    "confirmDeleteTitle": "Confirm deletion",
+    "confirmDeleteMessage": "Are you sure you want to delete user {{email}}? This action cannot be undone.",
     "save": "Save",
     "cancel": "Cancel",
     "noUsers": "No users found",

@@ -15,6 +15,8 @@
     "actions": "Actions",
     "edit": "Modifier",
     "delete": "Supprimer",
+    "confirmDeleteTitle": "Confirmer la suppression",
+    "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer l'utilisateur {{email}} ? Cette action ne peut pas être annulée.",
     "save": "Enregistrer",
     "cancel": "Annuler",
     "noUsers": "Aucun utilisateur trouvé",

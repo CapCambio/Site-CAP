@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ArrowLeft, Settings, Search, Trash2, LogOut, Edit, Bell, TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -767,6 +768,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   const [showOnlyUsersWithAlerts, setShowOnlyUsersWithAlerts] = useState(false);
   const [showOnlyAdmins, setShowOnlyAdmins] = useState(false);
   const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
+  const [pendingDeleteEmail, setPendingDeleteEmail] = useState<string | null>(null);
 
   // Impedir scroll do body quando o painel está aberto
   useEffect(() => {
@@ -905,10 +907,19 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
         const newTotalPages = Math.ceil(newTotal / itemsPerPage);
         const pageToLoad = currentPage > newTotalPages ? Math.max(1, newTotalPages) : currentPage;
         loadAuthorizedEmails(pageToLoad);
+        setPendingDeleteEmail(null);
       }
     } catch (error) {
       console.error('Erro ao remover email:', error);
     }
+  };
+
+  const confirmDeleteEmail = (email: string) => {
+    setPendingDeleteEmail(email);
+  };
+
+  const cancelDeleteEmail = () => {
+    setPendingDeleteEmail(null);
   };
 
   const startEdit = (email: string, name: string) => {
@@ -1272,7 +1283,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                                     <Edit className="h-4 w-4" />
                                   </button>
                                   <button 
-                                    onClick={() => handleRemoveEmail(item.email)}
+                                    onClick={() => confirmDeleteEmail(item.email)}
                                     className="text-zinc-400 hover:text-red-400 transition-colors p-1"
                                     title={t('admin.removeEmail')}
                                   >
@@ -1368,6 +1379,30 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
           </Card>
         </main>
       </div>
+
+      <AlertDialog open={!!pendingDeleteEmail} onOpenChange={(open) => { if (!open) setPendingDeleteEmail(null); }}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-xs">
+          <AlertDialogHeader className="text-center">
+            <AlertDialogTitle className="text-white">{t('admin.confirmDeleteTitle')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              {t('admin.confirmDeleteMessage', { 
+                email: pendingDeleteEmail ? authorizedEmails.find(e => e.email === pendingDeleteEmail)?.name || pendingDeleteEmail : '' 
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-center">
+            <AlertDialogCancel className="border-zinc-600 text-white bg-transparent hover:bg-zinc-800">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => pendingDeleteEmail && handleRemoveEmail(pendingDeleteEmail)}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {t('admin.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
