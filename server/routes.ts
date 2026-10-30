@@ -426,6 +426,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json({ success: false });
     }
 
+    // Atualiza last_access na tabela users (para o painel admin mostrar acesso recente)
+    try {
+      await db.updateUser(email.toLowerCase(), { last_access: new Date().toISOString() });
+    } catch (error) {
+      console.error('Erro ao atualizar last_access no heartbeat:', error);
+    }
+
     const clearAuthCookie = () => res.clearCookie('jwt', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
