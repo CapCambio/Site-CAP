@@ -479,7 +479,7 @@
       "title": "2. Validité",
       "intro": "CAP Câmbio fournit deux environnements numériques principaux avec des objectifs distincts:",
       "item1": "Site Institutionnel: Destiné à la présentation de l'entreprise, localisation des magasins physiques (Caxias do Sul, Bento Gonçalves et Passo Fundo), description des services (Monnaie Papier, Transferts Internationaux et DHL) et facilitation du contact via WhatsApp.",
-      "item2": "Plateforme CAP Cotações: Environnement réservé aux clients autorisés, offrant consultation de devises en temps réel, alertes personnalisables, historique de cotations avec graphiques et convertisseur de devises basé sur les prix pratiqués par l'entreprise.",
+      "item2": "Plateforme CAP Câmbio: Environnement réservé aux clients autorisés, offrant consultation de devises en temps réel, alertes personnalisables, historique de cotations avec graphiques et convertisseur de devises basé sur les prix pratiqués par l'entreprise.",
       "item3": "Autorisation: L'accès est accordé après inscription préalable et autorisation discrétionnaire de l'équipe CAP.",
       "item4": "Responsabilité: L'utilisateur est seul responsable de la garde et du secret de ses identifiants d'accès, le partage avec des tiers étant interdit.",
       "item5": "Fonctionnalités: La plateforme permet la configuration de notifications par e-mail et push, ainsi que l'accès hors ligne partiel via la technologie PWA."
@@ -573,7 +573,7 @@
   },
   "pwa": {
     "installApp": "Installer l'app",
-    "installCapCotacoes": "Installer CAP Cotações",
+    "installCapCotacoes": "Installer CAP Câmbio",
     "iosInstructions": "Appuyez sur Partager puis sur \"Ajouter à l'écran d'accueil\"",
     "installDescription": "Installez l'app pour recevoir des notifications",
     "close": "Fermer",

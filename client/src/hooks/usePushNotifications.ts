@@ -91,7 +91,7 @@ export function usePushNotifications() {
     const supported = "serviceWorker" in navigator && "Notification" in window && 'PushManager' in window;
     setIsSupported(supported);
     
-    if (supported && user?.email) {
+    if (supported && user?.email && !user?.isAdmin) {
       // Verificar permissões quando o usuário voltar para a página
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible') {

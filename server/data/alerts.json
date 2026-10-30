@@ -171,34 +171,6 @@
     "notifyPush": true,
     "lastNotificationSent": null
   },
-  "prrenata@hotmail.com": {
-    "email": "prrenata@hotmail.com",
-    "alerts": {},
-    "pushSubscriptions": [],
-    "language": "pt",
-    "cardOrder": [
-      "USD",
-      "EUR",
-      "GBP",
-      "AUD",
-      "ARS",
-      "NZD",
-      "CAD",
-      "CHF",
-      "UYU",
-      "CLP",
-      "MXN",
-      "COP",
-      "CNY",
-      "JPY",
-      "PEN",
-      "ZAR",
-      "AED"
-    ],
-    "notifyEmail": true,
-    "notifyPush": true,
-    "lastNotificationSent": null
-  },
   "althausleida@gmail.com": {
     "email": "althausleida@gmail.com",
     "alerts": {},
@@ -227,8 +199,8 @@
     "notifyPush": true,
     "lastNotificationSent": null
   },
-  "marciomedeirosjr92@gmail.com": {
-    "email": "marciomedeirosjr92@gmail.com",
+  "capcambiocx@gmail.com": {
+    "email": "capcambiocx@gmail.com",
     "alerts": {},
     "pushSubscriptions": [],
     "language": "pt",
@@ -255,8 +227,36 @@
     "notifyPush": true,
     "lastNotificationSent": null
   },
-  "capcambiocx@gmail.com": {
-    "email": "capcambiocx@gmail.com",
+  "prrenata@hotmail.com": {
+    "email": "prrenata@hotmail.com",
+    "alerts": {},
+    "pushSubscriptions": [],
+    "language": "pt",
+    "cardOrder": [
+      "USD",
+      "EUR",
+      "GBP",
+      "AUD",
+      "ARS",
+      "NZD",
+      "CAD",
+      "CHF",
+      "UYU",
+      "CLP",
+      "MXN",
+      "COP",
+      "CNY",
+      "JPY",
+      "PEN",
+      "ZAR",
+      "AED"
+    ],
+    "notifyEmail": true,
+    "notifyPush": true,
+    "lastNotificationSent": null
+  },
+  "marciomedeirosjr92@gmail.com": {
+    "email": "marciomedeirosjr92@gmail.com",
     "alerts": {},
     "pushSubscriptions": [],
     "language": "pt",

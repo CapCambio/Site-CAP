@@ -183,7 +183,7 @@
     "needOneChannelDesc": "Com e-mail e push desligados, o alerta dispara e você não é avisado."
   },
   "auth": {
-    "title": "CAP Cotações",
+    "title": "CAP Câmbio",
     "subtitle": "Acompanhe as cotações de moedas em tempo real",
     "email": "Email",
     "emailPlaceholder": "Digite seu email",
@@ -305,7 +305,7 @@
     "privacyPolicy": "Política de Privacidade"
   },
   "header": {
-    "title": "CAP Cotações",
+    "title": "CAP Câmbio",
     "settings": "Configurações",
     "alerts": "Meus Alertas",
     "adminPanel": "Gerenciamento",
@@ -411,14 +411,14 @@
     "disclaimer": "Esta é uma tradução informativa. A versão em português é a única legalmente válida.",
     "section1": {
       "title": "1. Informações Coletadas",
-      "content": "A CAP Câmbio valoriza a privacidade e a proteção dos dados pessoais de seus clientes e visitantes. Esta Política de Privacidade explica como coletamos, utilizamos, protegemos e armazenamos suas informações em nosso site institucional e na plataforma CAP Cotações, em total conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018). Coletamos informações em diferentes níveis de interação com nossos serviços digitais:"
+      "content": "A CAP Câmbio valoriza a privacidade e a proteção dos dados pessoais de seus clientes e visitantes. Esta Política de Privacidade explica como coletamos, utilizamos, protegemos e armazenamos suas informações em nosso site institucional e na plataforma CAP Câmbio, em total conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018). Coletamos informações em diferentes níveis de interação com nossos serviços digitais:"
     },
     "section2": {
       "title": "2. Níveis de Coleta",
       "intro": "Coletamos informações em diferentes níveis de interação com nossos serviços digitais:",
       "item1": "Navegação e Análise Estatística: Utilizamos ferramentas de terceiros, como Google Analytics e Microsoft Clarity, para coletar dados técnicos e comportamentais. Isso inclui endereço IP (anonimizado), tipo de dispositivo, navegador, páginas visitadas, tempo de permanência e interações visuais (mapas de calor e gravações de sessão). Esses dados são processados de forma agregada e desidentificada.",
       "item2": "Contato e Reservas: Informações fornecidas voluntariamente por você ao entrar em contato via WhatsApp ou e-mail (nome, telefone e detalhes da operação desejada).",
-      "item3": "Plataforma CAP Cotações: Dados necessários para o funcionamento do sistema restrito, incluindo endereço de e-mail cadastrado, nome e preferências de alertas personalizados."
+      "item3": "Plataforma CAP Câmbio: Dados necessários para o funcionamento do sistema restrito, incluindo endereço de e-mail cadastrado, nome e preferências de alertas personalizados."
     },
     "section3": {
       "title": "3. Finalidade do Tratamento de Dados",
@@ -438,7 +438,7 @@
     },
     "section5": {
       "title": "5. Cookies e Tecnologias de Rastreio",
-      "content": "Utilizamos cookies para: 1. Manter sua sessão ativa na plataforma CAP Cotações. 2. Armazenar suas preferências de visualização. 3. Coletar dados de análise via Google e Microsoft. Você pode gerenciar ou desativar os cookies nas configurações do seu navegador ou através do nosso banner de consentimento. Note que a desativação pode afetar algumas funcionalidades do site."
+      "content": "Utilizamos cookies para: 1. Manter sua sessão ativa na plataforma CAP Câmbio. 2. Armazenar suas preferências de visualização. 3. Coletar dados de análise via Google e Microsoft. Você pode gerenciar ou desativar os cookies nas configurações do seu navegador ou através do nosso banner de consentimento. Note que a desativação pode afetar algumas funcionalidades do site."
     },
     "section6": {
       "title": "6. Seus Direitos (LGPD)",
@@ -471,13 +471,13 @@
     "disclaimer": "Esta é uma tradução informativa. A versão em português é a única legalmente válida.",
     "section1": {
       "title": "1. Descrição dos Serviços Digitais",
-      "content": "Estes Termos de Uso regem o acesso e a utilização dos serviços digitais da CAP Câmbio, incluindo seu site institucional e a plataforma exclusiva CAP Cotações. Ao navegar em nossas páginas ou utilizar nossos sistemas, você declara ter lido, compreendido e concordado integralmente com as disposições aqui estabelecidas."
+      "content": "Estes Termos de Uso regem o acesso e a utilização dos serviços digitais da CAP Câmbio, incluindo seu site institucional e a plataforma exclusiva CAP Câmbio. Ao navegar em nossas páginas ou utilizar nossos sistemas, você declara ter lido, compreendido e concordado integralmente com as disposições aqui estabelecidas."
     },
     "section2": {
-      "title": "2. Acesso e Uso da Plataforma CAP Cotações",
+      "title": "2. Acesso e Uso da Plataforma CAP Câmbio",
       "intro": "A CAP Câmbio disponibiliza dois ambientes digitais principais com finalidades distintas:",
       "item1": "Site Institucional: Destinado à apresentação da empresa, localização das lojas físicas (Caxias do Sul, Bento Gonçalves e Passo Fundo), descrição de serviços (Papel Moeda, Transferências Internacionais e DHL) e facilitação de contato via WhatsApp.",
-      "item2": "Plataforma CAP Cotações: Ambiente restrito a clientes autorizados, oferecendo consulta de moedas em tempo real, alertas personalizáveis, histórico de cotações com gráficos e conversor de moedas baseado nos preços praticados pela empresa.",
+      "item2": "Plataforma CAP Câmbio: Ambiente restrito a clientes autorizados, oferecendo consulta de moedas em tempo real, alertas personalizáveis, histórico de cotações com gráficos e conversor de moedas baseado nos preços praticados pela empresa.",
       "item3": "Autorização: O acesso é concedido mediante cadastro prévio e autorização discricionária da equipe da CAP.",
       "item4": "Responsabilidade: O usuário é o único responsável pela guarda e sigilo de suas credenciais de acesso, sendo vedado o compartilhamento com terceiros.",
       "item5": "Funcionalidades: A plataforma permite a configuração de notificações via e-mail e push, bem como o acesso offline parcial via tecnologia PWA."
@@ -570,7 +570,7 @@
   },
   "pwa": {
     "installApp": "Instalar App",
-    "installCapCotacoes": "Instalar CAP Cotações",
+    "installCapCotacoes": "Instalar CAP Câmbio",
     "iosInstructions": "Toque em Compartilhar e depois em \"Adicionar à Tela Inicial\"",
     "installDescription": "Instale o app para receber notificações",
     "close": "Fechar",

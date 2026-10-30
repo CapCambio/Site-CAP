@@ -479,7 +479,7 @@
       "title": "2. Validity",
       "intro": "CAP Câmbio provides two main digital environments with distinct purposes:",
       "item1": "Institutional Website: Intended for company presentation, physical store locations (Caxias do Sul, Bento Gonçalves and Passo Fundo), service description (Paper Currency, International Transfers and DHL) and facilitating contact via WhatsApp.",
-      "item2": "CAP Cotações Platform: Environment restricted to authorized clients, offering real-time currency consultation, customizable alerts, quote history with charts and currency converter based on company prices.",
+      "item2": "CAP Câmbio Platform: Environment restricted to authorized clients, offering real-time currency consultation, customizable alerts, quote history with charts and currency converter based on company prices.",
       "item3": "Authorization: Access is granted upon prior registration and discretionary authorization from the CAP team.",
       "item4": "Responsibility: The user is solely responsible for safeguarding and maintaining the confidentiality of their access credentials, and sharing with third parties is prohibited.",
       "item5": "Features: The platform allows configuration of email and push notifications, as well as partial offline access via PWA technology."
@@ -573,7 +573,7 @@
   },
   "pwa": {
     "installApp": "Install App",
-    "installCapCotacoes": "Install CAP Cotações",
+    "installCapCotacoes": "Install CAP Câmbio",
     "iosInstructions": "Tap Share and then \"Add to Home Screen\"",
     "installDescription": "Install the app to receive notifications",
     "close": "Close",
