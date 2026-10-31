@@ -282,7 +282,7 @@ export default function TvCaxiasPage() {
   const garlandVideoRef = useRef<HTMLVideoElement>(null);
   const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
   const halloweenPreviewActive = !isLocalhost && seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
-  const christmasActive = isChristmasSeason(seasonalDate);
+  const christmasActive = true; // TESTE: forçado para true, voltar para isChristmasSeason(seasonalDate) depois
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
   const halloweenTopDecorationActive = halloweenPreviewActive;
