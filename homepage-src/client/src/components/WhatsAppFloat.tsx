@@ -30,7 +30,7 @@ export default function WhatsAppFloat() {
     const onOpenEvent = (event: Event) => {
       const detail = (event as CustomEvent<{ hideCaxias?: boolean; message?: string }>).detail;
       setHideCaxias(Boolean(detail?.hideCaxias));
-      setCustomMessage(detail?.message ? encodeURIComponent(detail.message) : null);
+      setCustomMessage(detail?.message || null);
       setOpen(true);
     };
 
@@ -43,7 +43,7 @@ export default function WhatsAppFloat() {
         event.stopPropagation();
         setHideCaxias(false);
         const linkMessage = link.getAttribute("data-cap-whatsapp-message");
-        setCustomMessage(linkMessage ? encodeURIComponent(linkMessage) : null);
+        setCustomMessage(linkMessage || null);
         setOpen(true);
       }
     };
