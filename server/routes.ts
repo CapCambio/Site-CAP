@@ -384,6 +384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax' as const,
+          path: '/',
         });
         return res.status(401).json({ error: 'Sessão encerrada: outro dispositivo fez login', superseded: true });
       }
@@ -411,6 +412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const, // Usar 'lax' mesmo em produção pois frontend/backend estão no mesmo domínio
+      path: '/',
     });
 
     res.json({ message: 'Logout realizado com sucesso' });
@@ -437,6 +439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
+      path: '/',
     });
 
     if (sid) {
