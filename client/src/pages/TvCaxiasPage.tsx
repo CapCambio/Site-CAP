@@ -132,7 +132,7 @@ const TRAVEL_SLIDES = [
   },
   {
     src: `${ASSET_BASE}assets/Cotacoes1.png`,
-    alt: "Calcule com cotações em tempo real e receba alertas de variações",
+    alt: "Calcule com cotações atualizadas, receba alertas de variações e muito mais",
   },
   {
     src: `${ASSET_BASE}assets/Cambio2.jpg`,
