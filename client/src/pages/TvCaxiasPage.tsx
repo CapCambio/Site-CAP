@@ -131,6 +131,10 @@ const TRAVEL_SLIDES = [
     alt: "Envios internacionais via DHL",
   },
   {
+    src: `${ASSET_BASE}assets/Cotacoes1.png`,
+    alt: "Calcule com cotações em tempo real e receba alertas de variações",
+  },
+  {
     src: `${ASSET_BASE}assets/Cambio2.jpg`,
     alt: "CAP Câmbio — compra e venda de moedas estrangeiras",
   },
@@ -143,11 +147,7 @@ const TRAVEL_SLIDES = [
     alt: "Envie documentos e encomendas via DHL",
   },
   {
-    src: `${ASSET_BASE}assets/Cotacoes1.jpg`,
-    alt: "Calcule com cotações em tempo real e receba alertas de variações",
-  },
-  {
-    src: `${ASSET_BASE}assets/Cotacoes2.jpg`,
+    src: `${ASSET_BASE}assets/Cotacoes2.png`,
     alt: "Gráfico de variações mensais e diárias das cotações",
   },
 ];
@@ -283,6 +283,8 @@ export default function TvCaxiasPage() {
   const dollar = rates.find((rate) => rate.id === "usd") ?? rates[0];
   const euro = rates.find((rate) => rate.id === "eur") ?? rates[1];
   const [activeTravelSlide, setActiveTravelSlide] = useState(0);
+  // O carrossel só avança (passo +1), então o slide que estava visível é sempre o anterior.
+  const exitingTravelSlide = (activeTravelSlide - 1 + TRAVEL_SLIDES.length) % TRAVEL_SLIDES.length;
   const santaVideoRef = useRef<HTMLVideoElement>(null);
   const catVideoRef = useRef<HTMLVideoElement>(null);
   const witchVideoRef = useRef<HTMLVideoElement>(null);
@@ -290,7 +292,7 @@ export default function TvCaxiasPage() {
   const garlandVideoRef = useRef<HTMLVideoElement>(null);
   const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
   const halloweenPreviewActive = !isLocalhost && seasonalDate.getMonth() === HALLOWEEN_MONTH_INDEX;
-  const christmasActive = isChristmasSeason(seasonalDate);
+  const christmasActive = !isLocalhost && isChristmasSeason(seasonalDate);
   const originalLayoutActive = !halloweenPreviewActive && !christmasActive;
   const witchHatActive = halloweenPreviewActive;
   const halloweenTopDecorationActive = halloweenPreviewActive;
@@ -410,11 +412,11 @@ export default function TvCaxiasPage() {
           {TRAVEL_SLIDES.map((slide, index) => (
             <img
               key={slide.src}
-              className={`travel-carousel__slide ${index === activeTravelSlide ? "is-active" : ""}`}
+              className={`travel-carousel__slide ${index === activeTravelSlide ? "is-active" : ""} ${index === exitingTravelSlide ? "is-exiting" : ""}`}
               src={slide.src}
               alt={slide.alt}
               aria-hidden={index !== activeTravelSlide}
-              loading={index === 0 ? "eager" : "lazy"}
+              loading="eager"
             />
           ))}
         </div>
