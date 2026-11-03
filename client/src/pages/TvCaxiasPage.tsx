@@ -142,6 +142,14 @@ const TRAVEL_SLIDES = [
     src: `${ASSET_BASE}assets/DHL2.jpg`,
     alt: "Envie documentos e encomendas via DHL",
   },
+  {
+    src: `${ASSET_BASE}assets/Cotacoes1.jpg`,
+    alt: "Calcule com cotações em tempo real e receba alertas de variações",
+  },
+  {
+    src: `${ASSET_BASE}assets/Cotacoes2.jpg`,
+    alt: "Gráfico de variações mensais e diárias das cotações",
+  },
 ];
 
 function tickerRate(value: string) {
