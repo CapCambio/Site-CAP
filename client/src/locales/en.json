@@ -198,12 +198,12 @@
     "sessionAlreadyActive": "Sign-in failed. This account already has an active session. Sign out on the other device or wait for the session to expire.",
     "singleSessionNotice": "Each login is personal and non-transferable. The system allows only one simultaneous access per account.",
     "loginError": "You are not authorized to access this platform.",
-    "contactAdmin": "Request access here",
+    "contactAdmin": "Request access here.",
     "emailInvalid": "Please enter a valid email address.",
     "whatsappContact": "Contact via WhatsApp",
     "selectBranch": "Which CAP would you like to contact?",
     "restrictedPage": "This is a restricted page. Only registered customers with authorized email by CAP Câmbio can access the content.",
-    "requestAccess": "Request access here"
+    "requestAccess": "Request access here."
   },
   "chart": {
     "loading": "Loading data...",

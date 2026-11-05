@@ -265,7 +265,7 @@ export default function LoginPage() {
                     className="text-white underline hover:text-white/80"
                   >
                     {t('auth.contactAdmin')}
-                  </button>.
+                  </button>
                 </div>
               )}
 
@@ -325,7 +325,7 @@ export default function LoginPage() {
               className="text-zinc-400 underline hover:text-zinc-300 transition-colors"
             >
               {t('auth.requestAccess')}
-            </button>.
+            </button>
           </div>
         </CardFooter>
       </Card>
