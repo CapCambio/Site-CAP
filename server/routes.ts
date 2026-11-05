@@ -1005,11 +1005,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
+      const filter = (req.query.filter as string) || 'all';
       const offset = (page - 1) * limit;
 
       // Usar banco de dados
       const authorizedEmails = await db.getAuthorizedEmails();
       const adminEmails = await db.getAdminEmails();
+
+      // Buscar todos os usuários com alertas (uma única query)
+      const alertsResult = await pool.query('SELECT DISTINCT user_email FROM alerts');
+      const withAlertsSet = new Set(alertsResult.rows.map((r: any) => r.user_email.toLowerCase()));
 
       // Converter para formato uniforme e adicionar informações de último acesso
       const allEmails = [
@@ -1018,7 +1023,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             email: user.email,
             name: user.name || 'Cliente',
             lastAccess: user.last_access,
-            isAdmin: false
+            isAdmin: false,
+            hasAlerts: withAlertsSet.has(user.email.toLowerCase())
           };
         }),
         ...adminEmails.map((admin: db.User) => {
@@ -1026,7 +1032,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             email: admin.email,
             name: admin.name || 'CAP Câmbio',
             lastAccess: admin.last_access,
-            isAdmin: true
+            isAdmin: true,
+            hasAlerts: false
           };
         })
       ];
@@ -1041,9 +1048,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return new Date(b.lastAccess).getTime() - new Date(a.lastAccess).getTime();
       });
 
+      // Aplicar filtro antes da paginação
+      let filtered = allEmails;
+      if (filter === 'admin') {
+        filtered = allEmails.filter(u => u.isAdmin);
+      } else if (filter === 'withAlerts') {
+        filtered = allEmails.filter(u => !u.isAdmin && u.hasAlerts);
+      }
+
       // Aplicar paginação
-      const totalEmails = allEmails.length;
-      const paginatedEmails = allEmails.slice(offset, offset + limit);
+      const totalEmails = filtered.length;
+      const paginatedEmails = filtered.slice(offset, offset + limit);
 
       res.json({
         emails: paginatedEmails,

@@ -28,6 +28,7 @@ interface AuthorizedEmail {
   name: string;
   isAdmin: boolean;
   lastAccess?: string;
+  hasAlerts?: boolean;
 }
 
 interface AlertsManagementProps {
@@ -783,9 +784,15 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
     loadAuthorizedEmails(1);
   }, []);
 
+  // Re-carregar quando os filtros mudam
+  useEffect(() => {
+    loadAuthorizedEmails(1);
+  }, [showOnlyAdmins, showOnlyUsersWithAlerts]);
+
   const loadAuthorizedEmails = async (page: number = currentPage) => {
     try {
-      const response = await fetch(`/api/admin/emails?page=${page}&limit=${itemsPerPage}`);
+      const filter = showOnlyAdmins ? 'admin' : showOnlyUsersWithAlerts ? 'withAlerts' : 'all';
+      const response = await fetch(`/api/admin/emails?page=${page}&limit=${itemsPerPage}&filter=${filter}`);
       if (response.ok) {
         const data = await response.json();
         console.log('Dados recebidos da API:', data);
@@ -794,7 +801,8 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
           email: item.email,
           name: item.name || t('admin.noName'),
           isAdmin: item.isAdmin || false,
-          lastAccess: item.lastAccess || undefined
+          lastAccess: item.lastAccess || undefined,
+          hasAlerts: item.hasAlerts || false
         }));
 
         console.log('Emails processados:', allEmails);
@@ -949,58 +957,18 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
     });
   };
 
-  const checkUserHasAlerts = async (email: string) => {
-    try {
-      const response = await fetch(`/api/alerts/${email}`);
-      if (response.ok) {
-        const data = await response.json();
-        const alerts = data.alerts || {};
-        return Object.keys(alerts).length > 0;
-      }
-    } catch (error) {
-      console.error('Erro ao verificar alertas do usuário:', error);
-    }
-    return false;
-  };
-
-  const [usersWithAlerts, setUsersWithAlerts] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    const checkAllUsersAlerts = async () => {
-      const usersWithAlertsSet = new Set<string>();
-      
-      for (const user of authorizedEmails) {
-        if (!user.isAdmin) {
-          const hasAlerts = await checkUserHasAlerts(user.email);
-          if (hasAlerts) {
-            usersWithAlertsSet.add(user.email);
-          }
-        }
-      }
-      
-      setUsersWithAlerts(usersWithAlertsSet);
-    };
-
-    if (authorizedEmails.length > 0) {
-      checkAllUsersAlerts();
-    }
-  }, [authorizedEmails]);
-
-  const filteredEmails = authorizedEmails.filter(item => {
-    const matchesSearch = item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const hasAlertsFilter = showOnlyUsersWithAlerts ? usersWithAlerts.has(item.email) : true;
-    const isAdminFilter = showOnlyAdmins ? item.isAdmin : true;
-    
-    return matchesSearch && hasAlertsFilter && isAdminFilter;
-  });
-
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
       loadAuthorizedEmails(newPage);
     }
   };
+
+  // Filtro de busca (texto) ainda é client-side
+  const filteredEmails = authorizedEmails.filter(item => {
+    const matchesSearch = item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesSearch;
+  });
 
   return (
     <div className="fixed inset-0 z-50 bg-black text-white overflow-y-auto">
@@ -1240,7 +1208,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                             <div className="min-w-0 flex-1">
                               <h4 className="font-medium text-white truncate">{item.name || t('admin.noName')}</h4>
                               <p className="text-sm text-zinc-300">{item.email}</p>
-                              {usersWithAlerts.has(item.email) && (
+                              {item.hasAlerts && (
                                 <button 
                                   onClick={() => toggleUserExpanded(item.email)}
                                   className="flex items-center gap-1 text-xs text-yellow-400 hover:text-yellow-300 transition-colors mt-1"
