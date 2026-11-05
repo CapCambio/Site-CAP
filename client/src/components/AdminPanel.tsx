@@ -1092,7 +1092,10 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                         type="checkbox"
                         id="showOnlyAdmins"
                         checked={showOnlyAdmins}
-                        onChange={(e) => setShowOnlyAdmins(e.target.checked)}
+                        onChange={(e) => {
+                          setShowOnlyAdmins(e.target.checked);
+                          if (e.target.checked) setShowOnlyUsersWithAlerts(false);
+                        }}
                         className="h-4 w-4 bg-zinc-800 border-zinc-600 rounded focus:ring-yellow-500 focus:border-yellow-500 focus:ring-offset-0 focus:ring-offset-zinc-800"
                         style={{
                           accentColor: '#eab308',
@@ -1112,7 +1115,10 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                         type="checkbox"
                         id="showOnlyUsersWithAlerts"
                         checked={showOnlyUsersWithAlerts}
-                        onChange={(e) => setShowOnlyUsersWithAlerts(e.target.checked)}
+                        onChange={(e) => {
+                          setShowOnlyUsersWithAlerts(e.target.checked);
+                          if (e.target.checked) setShowOnlyAdmins(false);
+                        }}
                         className="h-4 w-4 bg-zinc-800 border-zinc-600 rounded focus:ring-yellow-500 focus:border-yellow-500 focus:ring-offset-0 focus:ring-offset-zinc-800"
                         style={{
                           accentColor: '#eab308',
