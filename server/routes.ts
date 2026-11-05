@@ -14,6 +14,7 @@ import { UserValidationCache } from './auth/UserValidationCache';
 import monitoringRoutes from './monitoring/MonitoringRoutes';
 import { readPushLogEntries, devLog } from './logger';
 import * as db from './db';
+import { pool } from './db';
 import { getCurrencyHistory as getCurrencyHistoryFromDB } from './db';
 
 // Limiar de sessão viva (heartbeat mais recente que isso = logado em outro lugar)
