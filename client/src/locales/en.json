@@ -289,7 +289,7 @@
     "up": "Up",
     "down": "Down",
     "chart": "Chart",
-    "details": "Details",
+    "details": "History",
     "variationTooltip": "Variation in relation to the rate at which the currency closed the previous day."
   },
   "errors": {

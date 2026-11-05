@@ -289,7 +289,7 @@
     "up": "Hausse",
     "down": "Baisse",
     "chart": "Graphique",
-    "details": "Détails",
+    "details": "Historique",
     "variationTooltip": "Variation par rapport au taux auquel la devise a clôturé la veille."
   },
   "errors": {

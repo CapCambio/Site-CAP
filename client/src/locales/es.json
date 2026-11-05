@@ -289,7 +289,7 @@
     "up": "Subida",
     "down": "Bajada",
     "chart": "Gráfico",
-    "details": "Detalles",
+    "details": "Histórico",
     "variationTooltip": "Variación en relación a la cotización con la que la moneda cerró el día anterior."
   },
   "errors": {
