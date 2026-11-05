@@ -198,7 +198,7 @@
     "sessionAlreadyActive": "Já existe alguém logado no sistema utilizando esse email no momento. Finalize a outra sessão e tente novamente.",
     "singleSessionNotice": "Cada login é pessoal e intransferível. O sistema permite apenas um acesso simultâneo por conta.",
     "loginError": "Você não está autorizado a acessar esta plataforma.",
-    "contactAdmin": "Fale com o administrador",
+    "contactAdmin": "Solicite seu acesso aqui",
     "emailInvalid": "Informe um endereço de email válido.",
     "whatsappContact": "Contato via WhatsApp",
     "selectBranch": "Com qual CAP deseja falar?",

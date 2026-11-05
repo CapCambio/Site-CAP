@@ -198,7 +198,7 @@
     "sessionAlreadyActive": "Sign-in failed. This account already has an active session. Sign out on the other device or wait for the session to expire.",
     "singleSessionNotice": "Each login is personal and non-transferable. The system allows only one simultaneous access per account.",
     "loginError": "You are not authorized to access this platform.",
-    "contactAdmin": "Contact the administrator",
+    "contactAdmin": "Request access here",
     "emailInvalid": "Please enter a valid email address.",
     "whatsappContact": "Contact via WhatsApp",
     "selectBranch": "Which CAP would you like to contact?",

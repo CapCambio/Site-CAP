@@ -198,7 +198,7 @@
     "sessionAlreadyActive": "No fue posible iniciar sesión. Ya existe una sesión activa con este usuario. Cierre el acceso en el otro dispositivo o espere a que expire la sesión.",
     "singleSessionNotice": "Cada inicio de sesión es personal e intransferible. El sistema permite solo un acceso simultáneo por cuenta.",
     "loginError": "No está autorizado a acceder a esta plataforma.",
-    "contactAdmin": "Contacte al administrador",
+    "contactAdmin": "Solicite su acceso aquí",
     "emailInvalid": "Por favor ingrese una dirección de email válida.",
     "whatsappContact": "Contacto vía WhatsApp",
     "selectBranch": "¿Con qué CAP desea contactar?",

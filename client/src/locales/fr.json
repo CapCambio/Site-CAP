@@ -198,7 +198,7 @@
     "sessionAlreadyActive": "Connexion impossible. Une session est déjà active avec ce compte. Déconnectez-vous sur l'autre appareil ou attendez l'expiration de la session.",
     "singleSessionNotice": "Chaque connexion est personnelle et non transférable. Le système n'autorise qu'un seul accès simultané par compte.",
     "loginError": "Vous n'êtes pas autorisé à accéder à cette plateforme.",
-    "contactAdmin": "Contactez l'administrateur",
+    "contactAdmin": "Demandez votre accès ici",
     "emailInvalid": "Veuillez entrer une adresse email valide.",
     "whatsappContact": "Contact via WhatsApp",
     "selectBranch": "Avec quel CAP souhaitez-vous contacter?",
