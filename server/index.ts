@@ -170,8 +170,8 @@ app.use((req, res, next) => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 
   // Timer para verificar cotações periodicamente (independente de acesso à página)
-  const CHECK_INTERVAL_MINUTES = 0.5; // Verificar a cada 30 segundos
-  log(`⏰ Iniciando verificação automática de cotações a cada ${CHECK_INTERVAL_MINUTES * 60} segundos`);
+  const CHECK_INTERVAL_SECONDS = 15; // Verificar a cada 15 segundos
+  log(`⏰ Iniciando verificação automática de cotações a cada ${CHECK_INTERVAL_SECONDS} segundos`);
 
   // Verificação inicial: popula as cotações ANTES de ligar o sistema de alertas.
   // Isso faz a primeira verificação de alertas usar o preço VIVO da planilha como
@@ -198,7 +198,7 @@ app.use((req, res, next) => {
     refreshCurrencies().catch(error => {
       console.error('Erro na verificação periódica de cotações:', error);
     });
-  }, CHECK_INTERVAL_MINUTES * 60 * 1000);
+  }, CHECK_INTERVAL_SECONDS * 1000);
 
   // Graceful shutdown: fecha conexões direitinho antes de morrer
   const gracefulShutdown = async (signal: string) => {

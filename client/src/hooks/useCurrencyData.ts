@@ -28,7 +28,7 @@ export function useCurrencyData() {
   } = useQuery({
     queryKey: ['/api/currencies'],
     refetchOnWindowFocus: false,
-    staleTime: 30 * 1000, // 30 segundos - permite atualização mais rápida
+    staleTime: 15 * 1000, // 15 segundos - acompanha o poll das telas
     queryFn: async () => {
       const currenciesResponse = await fetch('/api/currencies');
 
@@ -90,7 +90,7 @@ export function useCurrencyData() {
     }
   }, [currencies]);
 
-  // Configura a atualização automática a cada 30 segundos
+  // Configura a atualização automática a cada 15 segundos
   useEffect(() => {
     // Lê apenas o cache do servidor (/api/currencies). A leitura da planilha é
     // responsabilidade do timer do servidor, não de cada visitante.
@@ -98,7 +98,7 @@ export function useCurrencyData() {
       refetch().catch(err => {
         console.error('Erro na atualização automática:', err);
       });
-    }, 30 * 1000); // 30 segundos
+    }, 15 * 1000); // 15 segundos
 
     // Limpa o timer quando o componente é desmontado
     return () => clearInterval(timer);

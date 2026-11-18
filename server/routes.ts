@@ -486,8 +486,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/currencies", authRateLimiter(300, 60 * 1000, "currencies"), async (req, res) => {
-    // Cache de 30s no navegador (alinhado com staleTime do React Query)
-    res.setHeader('Cache-Control', 'public, max-age=30');
+    // Cache curto no navegador: o poll das telas já é de 15s e o servidor
+    // reconsulta a planilha a cada 15s.
+    res.setHeader('Cache-Control', 'public, max-age=5');
     // Última consulta bem-sucedida à planilha: as telas usam este sinal (não o
     // lastUpdate por moeda) para decidir entre exibir preço ou traço.
     res.setHeader('X-Sheet-Last-Check', getLastSuccessfulSheetCheck() ?? '');

@@ -382,7 +382,7 @@ export default function TvCaxiasPage() {
     };
 
     void loadRates();
-    const refreshId = window.setInterval(loadRates, 30_000);
+    const refreshId = window.setInterval(loadRates, 15_000);
 
     return () => {
       isActive = false;
