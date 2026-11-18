@@ -8,7 +8,8 @@ import {
   storeCurrencyData,
   getCachedCurrencyData,
   shouldRefreshData,
-  formatDateTime
+  formatDateTime,
+  isPriceFresh
 } from '../lib/currency';
 
 export function useCurrencyData() {
@@ -19,7 +20,7 @@ export function useCurrencyData() {
 
   // Get currency data from API
   const {
-    data: currencies,
+    data,
     isLoading,
     isError,
     error,
@@ -36,13 +37,17 @@ export function useCurrencyData() {
       }
 
       const currencies = await currenciesResponse.json();
+      // Header do servidor: momento da última consulta bem-sucedida à planilha.
+      // É o sinal de frescor (independe de o preço ter mudado ou não).
+      const lastSuccessfulCheck = currenciesResponse.headers.get('X-Sheet-Last-Check') || null;
 
-      // Não sobrescrevemos a variação que vem do backend, pois ela já é calculada lá
-      // As variações são calculadas corretamente para todas as moedas no servidor
-
-      return currencies;
+      return { currencies: currencies as Currency[], lastSuccessfulCheck };
     },
   });
+
+  const currencies = data?.currencies ?? [];
+  // Sem consulta bem-sucedida recente à planilha, mostra traço em vez de preço.
+  const pricesFresh = isPriceFresh(data?.lastSuccessfulCheck);
 
   // Get the formatted last update time
   const getFormattedLastUpdate = () => {
@@ -100,7 +105,8 @@ export function useCurrencyData() {
   }, [refetch]);
 
   return {
-    currencies: currencies as Currency[] || [],
+    currencies: currencies as Currency[],
+    pricesFresh,
     isLoading,
     isRefreshing,
     isError,

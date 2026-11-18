@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 
 interface DraggableCurrencyCardProps {
   currency: Currency;
+  pricesFresh: boolean;
   isExpanded: boolean;
   onToggleExpand: () => void;
   isHistoricalView?: boolean;
@@ -32,6 +33,7 @@ interface DraggableCurrencyCardProps {
 
 export function DraggableCurrencyCard({
   currency,
+  pricesFresh,
   isExpanded,
   onToggleExpand,
   isHistoricalView,
@@ -79,6 +81,7 @@ export function DraggableCurrencyCard({
       {/* Card principal (sempre renderiza, mas com opacidade diferente) */}
       <CurrencyCard
         currency={currency}
+        pricesFresh={pricesFresh}
         isExpanded={isExpanded}
         onToggleExpand={onToggleExpand}
         isHistoricalView={isHistoricalView}

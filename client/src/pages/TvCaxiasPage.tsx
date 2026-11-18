@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { isPriceFresh } from "../lib/currency";
 import "./TvCaxiasPage.css";
 
 const ASSET_BASE = import.meta.env.BASE_URL || '/';
@@ -20,39 +21,40 @@ type Rate = {
   sell: string;
 };
 
-type GoogleSheetsResponse = {
-  table?: {
-    rows?: Array<{
-      c?: Array<{ v?: string | null } | null>;
-    }>;
-  };
-};
-
 /**
- * Valores locais de contingência. A planilha pública atualiza as 16 moedas
- * disponíveis; itens ausentes, como o Dirham, permanecem com este valor.
+ * Template de apresentação da TV: ordem, nomes exibidos e bandeiras.
+ * Os preços NUNCA vêm daqui — são lidos de /api/currencies, a mesma fonte
+ * do /cotacoes, raspada e persistida pelo servidor.
  */
 const RATES: Rate[] = [
-  { id: "usd", flagUrl: `${ASSET_BASE}assets/us_b1b2a6e3.png`, currency: "Dólar Americano", buy: "5,0500", sell: "5,5700" },
-  { id: "eur", flagUrl: `${ASSET_BASE}assets/eu_9ea20765.png`, currency: "Euro", buy: "5,9000", sell: "6,4800" },
-  { id: "gbp", flagUrl: `${ASSET_BASE}assets/gb_290d0f48.png`, currency: "Libra Esterlina", buy: "6,9000", sell: "7,7400" },
-  { id: "aud", flagUrl: `${ASSET_BASE}assets/au_058d7b28.png`, currency: "Dólar Australiano", buy: "3,6000", sell: "4,0900" },
-  { id: "ars", flagUrl: `${ASSET_BASE}assets/ar_b1abffe2.png`, currency: "Peso Argentino", buy: "0,0035", sell: "0,0056" },
-  { id: "nzd", flagUrl: `${ASSET_BASE}assets/nz_6e8f9064.png`, currency: "Dólar Neozelandês", buy: "2,8000", sell: "3,3400" },
-  { id: "cad", flagUrl: `${ASSET_BASE}assets/ca_d70af462.png`, currency: "Dólar Canadense", buy: "3,6500", sell: "4,1400" },
-  { id: "chf", flagUrl: `${ASSET_BASE}assets/ch_13a5032b.png`, currency: "Franco Suíço", buy: "6,2200", sell: "7,0300" },
-  { id: "uyu", flagUrl: `${ASSET_BASE}assets/uy_adcd611e.png`, currency: "Peso Uruguaio", buy: "0,1200", sell: "0,1660" },
-  { id: "clp", flagUrl: `${ASSET_BASE}assets/cl_05769a83.png`, currency: "Peso Chileno", buy: "0,0045", sell: "0,0069" },
-  { id: "mxn", flagUrl: `${ASSET_BASE}assets/mx_3ab0dcc8.png`, currency: "Peso Mexicano", buy: "0,2800", sell: "0,3900" },
-  { id: "cop", flagUrl: `${ASSET_BASE}assets/co_b59ac1cf.png`, currency: "Peso Colombiano", buy: "0,00135", sell: "0,0022" },
-  { id: "cny", flagUrl: `${ASSET_BASE}assets/cn_7e22b1c1.png`, currency: "Iuan Chinês", buy: "0,7000", sell: "0,9100" },
-  { id: "jpy", flagUrl: `${ASSET_BASE}assets/jp_931e9425.png`, currency: "Iene Japonês", buy: "0,0300", sell: "0,0375" },
-  { id: "pen", flagUrl: `${ASSET_BASE}assets/pe_a2792b99.png`, currency: "Novo Sol Peruano", buy: "1,4500", sell: "1,8000" },
-  { id: "zar", flagUrl: `${ASSET_BASE}assets/za_0f5e408d.png`, currency: "Rand Africano", buy: "0,2800", sell: "0,3920" },
-  { id: "aed", flagUrl: `${ASSET_BASE}assets/ae_c9f358b9.png`, currency: "Dirham dos Emirados Árabes", buy: "1,2500", sell: "1,6700" },
+  { id: "usd", flagUrl: `${ASSET_BASE}assets/us_b1b2a6e3.png`, currency: "Dólar Americano", buy: "", sell: "" },
+  { id: "eur", flagUrl: `${ASSET_BASE}assets/eu_9ea20765.png`, currency: "Euro", buy: "", sell: "" },
+  { id: "gbp", flagUrl: `${ASSET_BASE}assets/gb_290d0f48.png`, currency: "Libra Esterlina", buy: "", sell: "" },
+  { id: "aud", flagUrl: `${ASSET_BASE}assets/au_058d7b28.png`, currency: "Dólar Australiano", buy: "", sell: "" },
+  { id: "ars", flagUrl: `${ASSET_BASE}assets/ar_b1abffe2.png`, currency: "Peso Argentino", buy: "", sell: "" },
+  { id: "nzd", flagUrl: `${ASSET_BASE}assets/nz_6e8f9064.png`, currency: "Dólar Neozelandês", buy: "", sell: "" },
+  { id: "cad", flagUrl: `${ASSET_BASE}assets/ca_d70af462.png`, currency: "Dólar Canadense", buy: "", sell: "" },
+  { id: "chf", flagUrl: `${ASSET_BASE}assets/ch_13a5032b.png`, currency: "Franco Suíço", buy: "", sell: "" },
+  { id: "uyu", flagUrl: `${ASSET_BASE}assets/uy_adcd611e.png`, currency: "Peso Uruguaio", buy: "", sell: "" },
+  { id: "clp", flagUrl: `${ASSET_BASE}assets/cl_05769a83.png`, currency: "Peso Chileno", buy: "", sell: "" },
+  { id: "mxn", flagUrl: `${ASSET_BASE}assets/mx_3ab0dcc8.png`, currency: "Peso Mexicano", buy: "", sell: "" },
+  { id: "cop", flagUrl: `${ASSET_BASE}assets/co_b59ac1cf.png`, currency: "Peso Colombiano", buy: "", sell: "" },
+  { id: "cny", flagUrl: `${ASSET_BASE}assets/cn_7e22b1c1.png`, currency: "Iuan Chinês", buy: "", sell: "" },
+  { id: "jpy", flagUrl: `${ASSET_BASE}assets/jp_931e9425.png`, currency: "Iene Japonês", buy: "", sell: "" },
+  { id: "pen", flagUrl: `${ASSET_BASE}assets/pe_a2792b99.png`, currency: "Novo Sol Peruano", buy: "", sell: "" },
+  { id: "zar", flagUrl: `${ASSET_BASE}assets/za_0f5e408d.png`, currency: "Rand Africano", buy: "", sell: "" },
+  { id: "aed", flagUrl: `${ASSET_BASE}assets/ae_c9f358b9.png`, currency: "Dirham dos Emirados Árabes", buy: "", sell: "" },
 ];
 
-const SHEET_ENDPOINT = "https://docs.google.com/spreadsheets/d/1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk/gviz/tq?tqx=out:json&gid=0";
+// Sem leitura confirmada e dentro da janela de frescor, nenhum preço é exibido:
+// mostra-se um traço em vez dos valores antigos, que poderiam passar por cotação
+// atual na TV.
+const NO_RATE_LABEL = "—";
+
+// Mesma fonte do /cotacoes: endpoint do servidor (raspa a planilha num timer e
+// persiste), não o Google direto — evita CORS/rede na caixinha da TV e herda o
+// fallback em camadas do servidor.
+const CURRENCIES_ENDPOINT = "/api/currencies";
 
 const HALLOWEEN_MONTH_INDEX = 9;
 // Período natalino: primeiro domingo do Advento até Dia de Reis (6 de janeiro).
@@ -162,13 +164,13 @@ function tickerRate(value: string) {
 function TickerContent({ dollar, euro, halloweenActive, christmasActive }: { dollar: Rate; euro: Rate; halloweenActive: boolean; christmasActive: boolean }) {
   return (
     <>
-      <span className="side-ticker__copy">DÓLAR AMERICANO: COMPRA R$ {tickerRate(dollar.buy)}</span>
+      <span className="side-ticker__copy">DÓLAR AMERICANO: COMPRA {formatRate(dollar.buy, tickerRate)}</span>
       {halloweenActive ? <img className="side-ticker__pumpkin" src={HALLOWEEN_ASSETS.pumpkin} alt="" /> : christmasActive ? <img className="side-ticker__christmas-tree" src={CHRISTMAS_ASSETS.tickerTree} alt="" /> : <span className="side-ticker__separator side-ticker__separator--rate" aria-hidden="true">•</span>}
-      <span className="side-ticker__copy">VENDA R$ {tickerRate(dollar.sell)}</span>
+      <span className="side-ticker__copy">VENDA {formatRate(dollar.sell, tickerRate)}</span>
       {halloweenActive ? <img className="side-ticker__ghost" src={HALLOWEEN_ASSETS.ghost} alt="" /> : christmasActive ? <img className="side-ticker__christmas-gifts" src={CHRISTMAS_ASSETS.tickerGifts} alt="" /> : <span className="side-ticker__separator side-ticker__separator--currency" aria-hidden="true">•</span>}
-      <span className="side-ticker__copy">EURO: COMPRA R$ {tickerRate(euro.buy)}</span>
+      <span className="side-ticker__copy">EURO: COMPRA {formatRate(euro.buy, tickerRate)}</span>
       {halloweenActive ? <img className="side-ticker__pumpkin" src={HALLOWEEN_ASSETS.pumpkin} alt="" /> : christmasActive ? <img className="side-ticker__christmas-tree" src={CHRISTMAS_ASSETS.tickerTree} alt="" /> : <span className="side-ticker__separator side-ticker__separator--rate" aria-hidden="true">•</span>}
-      <span className="side-ticker__copy">VENDA R$ {tickerRate(euro.sell)}</span>
+      <span className="side-ticker__copy">VENDA {formatRate(euro.sell, tickerRate)}</span>
       {halloweenActive ? <img className="side-ticker__ghost" src={HALLOWEEN_ASSETS.ghost} alt="" /> : christmasActive ? <img className="side-ticker__christmas-gifts" src={CHRISTMAS_ASSETS.tickerGifts} alt="" /> : <span className="side-ticker__separator side-ticker__separator--currency" aria-hidden="true">•</span>}
     </>
   );
@@ -185,14 +187,6 @@ function HalloweenTopDecor() {
       <video className="halloween-bat halloween-bat--three" src="/assets/morcego%20direito.webm" autoPlay loop muted playsInline aria-hidden="true" />
     </div>
   );
-}
-
-function normalizeCurrencyName(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLocaleLowerCase("pt-BR");
 }
 
 function normalizeRateValue(value: string) {
@@ -227,31 +221,37 @@ function tableRate(value: string) {
   return `${integerPart},${decimalPart.slice(0, fractionDigits).padEnd(fractionDigits, "0")}`;
 }
 
-function ratesFromSheet(responseText: string): Rate[] {
-  const start = responseText.indexOf("{");
-  const end = responseText.lastIndexOf("}");
+function formatRate(value: string, formatter: (value: string) => string) {
+  if (!value) return NO_RATE_LABEL;
+  return `R$ ${formatter(value)}`;
+}
 
-  if (start === -1 || end === -1) {
-    throw new Error("Resposta da planilha em formato inesperado.");
-  }
+type ServerCurrency = {
+  code: string;
+  buyPrice: number;
+  sellPrice: number;
+  lastUpdate: string;
+};
 
-  const payload = JSON.parse(responseText.slice(start, end + 1)) as GoogleSheetsResponse;
-  const sheetRows = payload.table?.rows?.slice(1) ?? [];
-  const valuesByCurrency = new Map(
-    sheetRows.flatMap((row) => {
-      const [currency, buy, sell] = row.c ?? [];
-      if (!currency?.v || !buy?.v || !sell?.v) return [];
+/**
+ * Combina o template de apresentação (ordem, nomes, bandeiras) com os preços do
+ * servidor. Só mostra preço se o servidor confirmou consulta recente à planilha
+ * (pricesFresh) e a moeda trouxe valores; caso contrário, permanece o traço.
+ */
+function ratesFromServer(currencies: ServerCurrency[], pricesFresh: boolean): Rate[] {
+  if (!pricesFresh) return RATES;
 
-      return [[normalizeCurrencyName(currency.v), {
-        buy: normalizeRateValue(buy.v),
-        sell: normalizeRateValue(sell.v),
-      }] as const];
-    }),
+  const byCode = new Map(
+    currencies.map((currency) => [currency.code.toLowerCase(), currency] as const),
   );
 
   return RATES.map((rate) => {
-    const sourceRate = valuesByCurrency.get(normalizeCurrencyName(rate.currency));
-    return sourceRate ? { ...rate, ...sourceRate } : rate;
+    const currency = byCode.get(rate.id);
+    if (!currency) return rate;
+
+    if (!currency.buyPrice || !currency.sellPrice) return rate;
+
+    return { ...rate, buy: String(currency.buyPrice), sell: String(currency.sellPrice) };
   });
 }
 
@@ -363,17 +363,22 @@ export default function TvCaxiasPage() {
 
   useEffect(() => {
     let isActive = true;
+    let serverCurrencies: ServerCurrency[] = [];
+    let serverLastCheck: string | null = null;
 
     const loadRates = async () => {
       try {
-        const response = await fetch(`${SHEET_ENDPOINT}&cacheBust=${Date.now()}`, { cache: "no-store" });
-        if (!response.ok) throw new Error("Não foi possível ler a planilha.");
+        const response = await fetch(`${CURRENCIES_ENDPOINT}?cacheBust=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) throw new Error("Não foi possível ler as cotações.");
 
-        const updatedRates = ratesFromSheet(await response.text());
-        if (isActive) setRates(updatedRates);
+        serverCurrencies = await response.json();
+        serverLastCheck = response.headers.get("X-Sheet-Last-Check");
       } catch {
-        // A TV mantém os valores locais caso a rede ou a planilha não estejam disponíveis.
+        // Falha transitória de leitura: mantém a última resposta do servidor em
+        // vez de zerar na hora. A guarda de frescor ainda envelhece os preços e
+        // os troca por traço assim que saem da janela.
       }
+      if (isActive) setRates(ratesFromServer(serverCurrencies, isPriceFresh(serverLastCheck)));
     };
 
     void loadRates();
@@ -471,8 +476,8 @@ export default function TvCaxiasPage() {
                     <img className="flag-image" src={rate.flagUrl} alt="" aria-hidden="true" />
                     <span>{rate.currency}</span>
                   </th>
-                  <td><span className="rate-value">R$ {tableRate(rate.buy)}</span></td>
-                  <td><span className="rate-value">R$ {tableRate(rate.sell)}</span></td>
+                  <td><span className="rate-value">{formatRate(rate.buy, tableRate)}</span></td>
+                  <td><span className="rate-value">{formatRate(rate.sell, tableRate)}</span></td>
                 </tr>
               ))}
             </tbody>

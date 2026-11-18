@@ -88,6 +88,21 @@ export function formatPercentage(value: number | null): string {
   return `${intPart},${decPart}%`;
 }
 
+// Janela de frescor única: um preço só é considerado atual se o servidor o
+// raspou da planilha dentro deste intervalo. Passou disso, a UI mostra traço em
+// vez do valor — vale para /cotacoes e /tv (mesma regra, sem divergir).
+export const PRICE_FRESHNESS_WINDOW_MS = 5 * 60 * 1000;
+
+export function isPriceFresh(
+  lastUpdate: Date | string | null | undefined,
+  now: number = Date.now()
+): boolean {
+  if (!lastUpdate) return false;
+  const updatedAt = lastUpdate instanceof Date ? lastUpdate.getTime() : Date.parse(lastUpdate);
+  if (!Number.isFinite(updatedAt)) return false;
+  return now - updatedAt <= PRICE_FRESHNESS_WINDOW_MS;
+}
+
 // Format dates to locale format
 export function formatDate(date: Date | string): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;

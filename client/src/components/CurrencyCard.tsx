@@ -22,6 +22,7 @@ const CurrencyMiniChart = lazy(() => import("./CurrencyMiniChart").then(module =
 
 interface CurrencyCardProps {
   currency: Currency;
+  pricesFresh: boolean;
   isExpanded: boolean;
   onToggleExpand: () => void;
   isHistoricalView?: boolean;
@@ -35,6 +36,7 @@ interface CurrencyCardProps {
 
 export function CurrencyCard({ 
   currency, 
+  pricesFresh,
   isExpanded, 
   onToggleExpand, 
   isHistoricalView = false, 
@@ -65,8 +67,14 @@ export function CurrencyCard({
   // Verifica se a data selecionada é a data atual
   const isCurrentDate = selectedDate ? isSameDay(selectedDate, new Date()) : false;
 
-  // Só esconde a variação se estiver em modo histórico E não for data atual
-  const shouldShowVariation = !isHistoricalView || isCurrentDate;
+  // Na visão atual, só exibe preço se o servidor confirmou consulta recente à
+  // planilha (pricesFresh); caso contrário mostra traço, nunca um valor antigo.
+  const showBuyPrice = isHistoricalView ? hasHistoricalData : pricesFresh;
+  const showSellPrice = isHistoricalView ? hasHistoricalData : pricesFresh;
+
+  // Só esconde a variação se estiver em modo histórico E não for data atual;
+  // na visão atual, esconde também quando não há consulta recente confirmada.
+  const shouldShowVariation = isHistoricalView ? isCurrentDate : pricesFresh;
 
   const handleTooltipOpen = () => {
     setShowTooltip(true);
@@ -147,13 +155,13 @@ export function CurrencyCard({
           <div>
             <p className="text-sm text-gray-500">{t('currency.buy')}</p>
             <p className={`text-xl font-bold text-[#1a1a1a] ${!hasHistoricalData && isHistoricalView ? 'opacity-50' : ''}`}>
-              {hasHistoricalData || !isHistoricalView ? `R$ ${formatCurrencyValue(code, displayBuyPrice || 0)}` : '—'}
+              {showBuyPrice ? `R$ ${formatCurrencyValue(code, displayBuyPrice || 0)}` : '—'}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">{t('currency.sell')}</p>
             <p className={`text-xl font-bold text-[#1a1a1a] ${!hasHistoricalData && isHistoricalView ? 'opacity-50' : ''}`}>
-              {hasHistoricalData || !isHistoricalView ? `R$ ${formatCurrencyValue(code, displaySellPrice || 0)}` : '—'}
+              {showSellPrice ? `R$ ${formatCurrencyValue(code, displaySellPrice || 0)}` : '—'}
             </p>
           </div>
         </div>
@@ -261,8 +269,8 @@ export function CurrencyCard({
             <Suspense fallback={<div className="h-32 flex items-center justify-center"><div className="animate-pulse text-sm text-gray-400">Carregando gráfico...</div></div>}>
               <CurrencyMiniChart 
                 currencyCode={currency.code} 
-                currentPrice={displaySellPrice || undefined}
-                currentBuyPrice={displayBuyPrice || undefined}
+                currentPrice={showSellPrice ? (displaySellPrice || undefined) : undefined}
+                currentBuyPrice={showBuyPrice ? (displayBuyPrice || undefined) : undefined}
                 selectedDate={selectedDate}
               />
             </Suspense>

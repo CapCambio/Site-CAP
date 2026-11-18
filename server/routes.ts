@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { scrapeCurrencyData, updateCurrenciesWithScrapedData, hasContentChanged } from "./scraper";
+import { scrapeCurrencyData, updateCurrenciesWithScrapedData, hasContentChanged, getLastSuccessfulSheetCheck } from "./scraper";
 import { jsonStorage } from "./json-storage";
 import { alertSystem } from "./init-alert-system";
 import fs from "fs";
@@ -485,6 +485,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/currencies", authRateLimiter(300, 60 * 1000, "currencies"), async (req, res) => {
     // Cache de 30s no navegador (alinhado com staleTime do React Query)
     res.setHeader('Cache-Control', 'public, max-age=30');
+    // Última consulta bem-sucedida à planilha: as telas usam este sinal (não o
+    // lastUpdate por moeda) para decidir entre exibir preço ou traço.
+    res.setHeader('X-Sheet-Last-Check', getLastSuccessfulSheetCheck() ?? '');
+    res.setHeader('Access-Control-Expose-Headers', 'X-Sheet-Last-Check');
     
     try {
     const now = Date.now();

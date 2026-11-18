@@ -16,7 +16,7 @@ export interface ScrapedCurrency {
 const SPREADSHEET_ID = '1FUFonvyBaF5kIpbKuAB53n_FEMZ1QDo1piI9JpsVsUk';
 
 export const SOURCE_URL =
-  `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+  `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=0&headers=1`;
 
 // Arquivos locais
 const HASH_FILE_PATH = path.join(
@@ -50,6 +50,18 @@ let memoryCache: {
 } | null = null;
 
 const CACHE_TTL = 5 * 60 * 1000;
+
+// Momento da última vez que o servidor CONSULTOU a planilha com sucesso,
+// independente de o conteúdo ter mudado. É o sinal usado pelas telas para
+// decidir entre exibir preço ou traço (distinto do lastUpdate por moeda, que
+// só avança quando o preço muda).
+let lastSuccessfulSheetCheck: number | null = null;
+
+export function getLastSuccessfulSheetCheck(): string | null {
+  return lastSuccessfulSheetCheck !== null
+    ? new Date(lastSuccessfulSheetCheck).toISOString()
+    : null;
+}
 
 /**
  * Gera hash do conteúdo recebido
@@ -536,6 +548,10 @@ export async function hasContentChanged(): Promise<{
 
   try {
     const rawContent = await fetchGoogleSheet();
+
+    // A planilha respondeu: registra a consulta bem-sucedida (mesmo que o
+    // conteúdo não tenha mudado) para as telas saberem que os dados são atuais.
+    lastSuccessfulSheetCheck = Date.now();
 
     const currentHash =
       generateContentHash(rawContent);

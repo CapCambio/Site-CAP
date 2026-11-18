@@ -30,9 +30,13 @@ export function useDateSelection() {
       const startDateStr = startOfDay(selectedDate).toISOString();
       const endDateStr = endOfDay(selectedDate).toISOString();
       
-      // Reaproveitar cache do React Query se disponível (evita segunda busca de /api/currencies)
-      let currencies: Currency[] = queryClient.getQueryData(['/api/currencies']) as Currency[];
-      
+      // Reaproveitar cache do React Query se disponível (evita segunda busca de /api/currencies).
+      // O cache da query ['/api/currencies'] guarda { currencies, lastSuccessfulCheck }.
+      const cached = queryClient.getQueryData(['/api/currencies']) as
+        | { currencies?: Currency[] }
+        | undefined;
+      let currencies: Currency[] | undefined = cached?.currencies;
+
       if (!currencies) {
         // Se não está no cache, buscar da API
         const currenciesResponse = await fetch('/api/currencies');
@@ -46,7 +50,7 @@ export function useDateSelection() {
       const result: HistoricalPriceByDate = {};
       
       // Para cada moeda, buscar o histórico do dia
-      for (const currency of currencies) {
+      for (const currency of currencies ?? []) {
         try {
           const historyResponse = await fetch(
             `/api/history/${currency.code}?startDate=${startDateStr}&endDate=${endDateStr}`

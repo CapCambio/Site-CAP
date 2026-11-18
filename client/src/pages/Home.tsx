@@ -49,6 +49,7 @@ export default function Home() {
 
   const { 
     currencies, 
+    pricesFresh,
     isLoading: isLoadingCurrencies, 
     isRefreshing,
     refreshData, 
@@ -209,6 +210,7 @@ export default function Home() {
     <DraggableCurrencyCard
       key={currency.code}
       currency={currency}
+      pricesFresh={pricesFresh}
       isExpanded={expandedCards[currency.code] || false}
       onToggleExpand={() => handleToggleCardExpand(currency.code)}
       isHistoricalView={isHistoricalView}
