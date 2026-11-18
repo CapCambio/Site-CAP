@@ -90,7 +90,7 @@ export function useCurrencyData() {
     }
   }, [currencies]);
 
-  // Configura a atualização automática a cada 1 minuto
+  // Configura a atualização automática a cada 30 segundos
   useEffect(() => {
     // Lê apenas o cache do servidor (/api/currencies). A leitura da planilha é
     // responsabilidade do timer do servidor, não de cada visitante.
@@ -98,7 +98,7 @@ export function useCurrencyData() {
       refetch().catch(err => {
         console.error('Erro na atualização automática:', err);
       });
-    }, 1 * 60 * 1000); // 1 minuto
+    }, 30 * 1000); // 30 segundos
 
     // Limpa o timer quando o componente é desmontado
     return () => clearInterval(timer);

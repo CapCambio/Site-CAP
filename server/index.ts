@@ -170,8 +170,8 @@ app.use((req, res, next) => {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 
   // Timer para verificar cotações periodicamente (independente de acesso à página)
-  const CHECK_INTERVAL_MINUTES = 1; // Verificar a cada 1 minuto
-  log(`⏰ Iniciando verificação automática de cotações a cada ${CHECK_INTERVAL_MINUTES} minutos`);
+  const CHECK_INTERVAL_MINUTES = 0.5; // Verificar a cada 30 segundos
+  log(`⏰ Iniciando verificação automática de cotações a cada ${CHECK_INTERVAL_MINUTES * 60} segundos`);
 
   // Verificação inicial: popula as cotações ANTES de ligar o sistema de alertas.
   // Isso faz a primeira verificação de alertas usar o preço VIVO da planilha como
