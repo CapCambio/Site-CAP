@@ -91,6 +91,9 @@ interface Alert {
 // Cache em memória para moedas
 let currenciesCache: any[] = [];
 let currenciesCacheTime = 0;
+// Enquanto a atualização grava moeda a moeda, o jsonStorage contém um retrato
+// pela metade. A API não pode cachear esse retrato (ficaria 5 min no ar).
+let currenciesUpdating = false;
 const CURRENCIES_CACHE_TTL = 5 * 60 * 1000; // 5 minutos
 
 // Cache em memória para histórico do dia anterior (reduz queries ao banco)
@@ -493,17 +496,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
     const now = Date.now();
     
-    // Usar cache se ainda válido
-    if (currenciesCache.length > 0 && (now - currenciesCacheTime) < CURRENCIES_CACHE_TTL) {
+    // Usar cache se ainda válido. Durante uma atualização, serve o instantâneo
+    // anterior (completo) mesmo que o TTL tenha expirado.
+    if (currenciesCache.length > 0 && (currenciesUpdating || (now - currenciesCacheTime) < CURRENCIES_CACHE_TTL)) {
       return res.json(currenciesCache);
     }
     
     // Tentar obter do jsonStorage (fallback)
     const currencies = await jsonStorage.getAllCurrencies();
     
-    // Atualizar cache
-    currenciesCache = currencies;
-    currenciesCacheTime = now;
+    // Atualizar cache — nunca com um instantâneo parcial de atualização em curso
+    if (!currenciesUpdating) {
+      currenciesCache = currencies;
+      currenciesCacheTime = now;
+    }
     
     res.json(currencies);
   } catch (error) {
@@ -1603,6 +1609,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 // Função para atualizar as moedas (usada tanto no endpoint quanto no timer)
 export async function refreshCurrencies() {
   console.log(`⏰ [${new Date().toISOString()}] refreshCurrencies() iniciado`);
+  // O timer de 30s não deve sobrepor uma atualização ainda em curso.
+  if (currenciesUpdating) {
+    console.log('⏭️ Atualização anterior ainda em andamento, pulando este ciclo');
+    return [];
+  }
   try {
     // OTIMIZAÇÃO 3: Verificar hash do conteúdo antes de fazer scraping
     const { changed } = await hasContentChanged();
@@ -1633,9 +1644,10 @@ export async function refreshCurrencies() {
     const now = new Date();
     const savedCurrencies: any[] = [];
     
-    // Invalidar cache de moedas
-    currenciesCache = [];
-    currenciesCacheTime = 0;
+    // A gravação moeda a moeda começou: a API passa a servir o instantâneo
+    // anterior (completo). O cache só é invalidado no finally, quando o
+    // jsonStorage já tem todos os preços novos.
+    currenciesUpdating = true;
     
     // OTIMIZAÇÃO 2: Cachear histórico do dia anterior em memória
     // Sempre atualiza o cache para garantir dados atualizados
@@ -1765,5 +1777,13 @@ export async function refreshCurrencies() {
   } catch (error) {
     console.error("Erro ao atualizar moedas:", error);
     throw error;
+  } finally {
+    if (currenciesUpdating) {
+      currenciesUpdating = false;
+      // Só agora o jsonStorage tem o retrato completo: invalida para a próxima
+      // leitura repovoar o cache com os preços novos.
+      currenciesCache = [];
+      currenciesCacheTime = 0;
+    }
   }
 }
