@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
+import { normalizePersonName } from "@shared/normalize-name";
 
 function getLocale(): string {
   const lang = i18n.language || 'pt';
@@ -828,13 +829,14 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
 
     setShowValidationErrors(false);
     setIsLoading(true);
+    const normalizedName = normalizePersonName(newName);
     try {
       const response = await fetch('/api/admin/emails', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email: newEmail,
-          name: newName,
+          name: normalizedName,
           type: 'authorized' // Por padrão adiciona como usuário comum
         })
       });
@@ -845,7 +847,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
         loadAuthorizedEmails(currentPage);
         toast({
           title: t('toasts.userAdded'),
-          description: t('toasts.userAddedDesc', { name: newName, email: newEmail })
+          description: t('toasts.userAddedDesc', { name: normalizedName, email: newEmail })
         });
       } else {
         toast({
@@ -879,7 +881,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
         body: JSON.stringify({ 
           oldEmail,
           newEmail: editEmail,
-          name: editName,
+          name: normalizePersonName(editName),
           type: emailToEdit.isAdmin ? 'admin' : 'authorized'
         })
       });

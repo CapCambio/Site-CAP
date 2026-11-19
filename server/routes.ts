@@ -16,6 +16,7 @@ import { readPushLogEntries, devLog } from './logger';
 import * as db from './db';
 import { pool } from './db';
 import { getCurrencyHistory as getCurrencyHistoryFromDB } from './db';
+import { normalizePersonName } from '../shared/normalize-name';
 
 // Limiar de sessão viva (heartbeat mais recente que isso = logado em outro lugar)
 const HEARTBEAT_TIMEOUT = 30 * 1000; // 30 segundos
@@ -1095,6 +1096,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const emailLower = email.toLowerCase();
+      const normalizedName = normalizePersonName(name);
 
       if (type === "authorized") {
         // Verificar se email já existe
@@ -1102,7 +1104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!existingUser) {
           await db.addUser({
             email: emailLower,
-            name,
+            name: normalizedName,
             is_admin: false,
             created_at: new Date().toISOString()
           });
@@ -1113,7 +1115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!existingUser) {
           await db.addUser({
             email: emailLower,
-            name,
+            name: normalizedName,
             is_admin: true,
             created_at: new Date().toISOString()
           });
@@ -1142,7 +1144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newEmailLower = newEmail.toLowerCase();
 
       // Atualizar email no banco de dados
-      await db.updateUser(oldEmailLower, { email: newEmailLower, name });
+      await db.updateUser(oldEmailLower, { email: newEmailLower, name: normalizePersonName(name) });
 
       res.json({ message: "Email editado com sucesso" });
     } catch (error) {
