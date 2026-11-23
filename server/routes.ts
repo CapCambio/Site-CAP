@@ -1147,8 +1147,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const oldEmailLower = oldEmail.toLowerCase();
       const newEmailLower = newEmail.toLowerCase();
 
-      // Atualizar email no banco de dados
+      // Atualizar usuário no banco de dados (nome e email)
       await db.updateUser(oldEmailLower, { email: newEmailLower, name: normalizePersonName(name) });
+
+      // Se o email mudou, migrar alertas e push subscriptions para o novo email
+      if (oldEmailLower !== newEmailLower) {
+        try {
+          await db.migrateUserEmail(oldEmailLower, newEmailLower);
+        } catch (err) {
+          console.error('Erro ao migrar alertas/subscriptions para novo email:', err);
+          // Não aborta — o usuário já foi atualizado
+        }
+      }
 
       // Invalida cache dos dois emails: o antigo (pode estar cacheado como válido)
       // e o novo (pode ter sido tentado antes e cacheado como inválido por 24h).

@@ -318,6 +318,10 @@ export async function updateUser(email: string, updates: Partial<User>): Promise
   const values = [];
   let paramIndex = 1;
 
+  if (updates.email !== undefined) {
+    fields.push(`email = $${paramIndex++}`);
+    values.push(updates.email.toLowerCase());
+  }
   if (updates.name !== undefined) {
     fields.push(`name = $${paramIndex++}`);
     values.push(updates.name);
@@ -348,6 +352,16 @@ export async function updateUser(email: string, updates: Partial<User>): Promise
 export async function deleteUser(email: string): Promise<boolean> {
   const result = await pool.query('DELETE FROM users WHERE email = $1', [email.toLowerCase()]);
   return (result.rowCount || 0) > 0;
+}
+
+// Migra alertas, push subscriptions e sessão ativa para um novo email
+// (usado quando o admin edita o email de um cliente)
+export async function migrateUserEmail(oldEmail: string, newEmail: string): Promise<void> {
+  const old = oldEmail.toLowerCase();
+  const neo = newEmail.toLowerCase();
+  await pool.query('UPDATE alerts SET user_email = $1 WHERE user_email = $2', [neo, old]);
+  await pool.query('UPDATE push_subscriptions SET email = $1 WHERE email = $2', [neo, old]);
+  await pool.query('UPDATE active_sessions SET email = $1 WHERE email = $2', [neo, old]);
 }
 
 // Migração: converte senhas admin em plaintext para bcrypt hash (roda no startup)
