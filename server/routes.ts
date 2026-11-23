@@ -1125,6 +1125,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Invalida o cache de autorização para que o novo usuário possa entrar imediatamente,
+      // sem precisar aguardar a expiração do cache de 24h.
+      UserValidationCache.invalidateUser(emailLower);
+
       res.json({ message: "Email adicionado com sucesso" });
     } catch (error) {
       console.error("Erro ao adicionar email:", error);
@@ -1145,6 +1149,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Atualizar email no banco de dados
       await db.updateUser(oldEmailLower, { email: newEmailLower, name: normalizePersonName(name) });
+
+      // Invalida cache dos dois emails: o antigo (pode estar cacheado como válido)
+      // e o novo (pode ter sido tentado antes e cacheado como inválido por 24h).
+      UserValidationCache.invalidateUser(oldEmailLower);
+      UserValidationCache.invalidateUser(newEmailLower);
 
       res.json({ message: "Email editado com sucesso" });
     } catch (error) {
@@ -1303,6 +1312,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         is_admin: false,
         created_at: new Date().toISOString()
       });
+
+      // Invalida o cache de autorização para que o novo usuário possa entrar imediatamente,
+      // sem precisar aguardar a expiração do cache de 24h.
+      UserValidationCache.invalidateUser(emailLower);
 
       res.json({ success: true, message: 'Email adicionado com sucesso' });
     } catch (error) {
